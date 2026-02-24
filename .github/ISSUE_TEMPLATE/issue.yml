@@ -1,5 +1,5 @@
-name: "✨ Issue Template ✨
-description: "이슈 템플릿"
+name: ✨ Issue Template ✨
+description: 이슈 템플릿
 body:
   - type: textarea
     attributes:
@@ -7,6 +7,11 @@ body:
       description: 할 일을 체크박스 형태로 작성해주세요.
     validations:
       required: true
+    value: """
+        - [ ] 할 일 1
+        - [ ] 할 일 2
+        - [ ] 할 일 3
+      """
   - type: textarea
     attributes:
       label: 🙋🏻 참고 자료
