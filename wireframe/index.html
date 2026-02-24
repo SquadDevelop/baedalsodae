@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>배달소대 — 와이어프레임</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ── 상단 헤더 ── -->
+  <header class="wf-header">
+    <div class="wf-logo">🛵 배달소대</div>
+    <nav class="screen-tabs">
+      <button class="tab active" data-screen="home">홈</button>
+      <button class="tab" data-screen="restaurant">음식점</button>
+      <button class="tab" data-screen="menu">메뉴</button>
+      <button class="tab" data-screen="cart">장바구니</button>
+      <button class="tab" data-screen="checkout">결제</button>
+      <button class="tab" data-screen="tracking">배달추적</button>
+      <button class="tab" data-screen="mypage">마이페이지</button>
+    </nav>
+    <div class="wf-badge">와이어프레임 v1.0</div>
+  </header>
+
+  <!-- ── 캔버스 ── -->
+  <main class="canvas">
+
+    <!-- ────────────── 1. 홈 ────────────── -->
+    <section class="screen active" id="screen-home">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <!-- 검색 -->
+        <div class="search-bar">
+          <span class="icon">📍</span>
+          <span class="addr-text">서울 강남구 역삼동</span>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="음식, 음식점 검색..." class="search-input" readonly />
+        </div>
+
+        <!-- 배너 -->
+        <div class="banner-slider">
+          <div class="banner active-banner">
+            <div class="banner-tag">오늘만 특가</div>
+            <div class="banner-title">치킨 무제한<br/><strong>최대 30% 할인</strong></div>
+            <div class="banner-dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+          </div>
+        </div>
+
+        <!-- 카테고리 -->
+        <div class="section-label">카테고리</div>
+        <div class="category-grid">
+          <div class="cat-item"><div class="cat-icon">🍗</div><div class="cat-name">치킨</div></div>
+          <div class="cat-item"><div class="cat-icon">🍕</div><div class="cat-name">피자</div></div>
+          <div class="cat-item"><div class="cat-icon">🍜</div><div class="cat-name">중식</div></div>
+          <div class="cat-item"><div class="cat-icon">🍣</div><div class="cat-name">일식</div></div>
+          <div class="cat-item"><div class="cat-icon">🍔</div><div class="cat-name">버거</div></div>
+          <div class="cat-item"><div class="cat-icon">🥗</div><div class="cat-name">샐러드</div></div>
+          <div class="cat-item"><div class="cat-icon">🥩</div><div class="cat-name">고기</div></div>
+          <div class="cat-item"><div class="cat-icon">🍰</div><div class="cat-name">디저트</div></div>
+        </div>
+
+        <!-- 인기 음식점 -->
+        <div class="section-header"><span class="section-label">🔥 인기 음식점</span><span class="see-all">전체보기</span></div>
+        <div class="restaurant-list">
+          <div class="rest-card" data-nav="restaurant">
+            <div class="rest-thumb thumb-1"></div>
+            <div class="rest-info">
+              <div class="rest-name">BBQ 치킨 역삼점</div>
+              <div class="rest-meta"><span class="star">★ 4.8</span> · 리뷰 1,234 · 30~40분</div>
+              <div class="rest-tags"><span class="tag">최소주문 12,000원</span><span class="tag green">할인중</span></div>
+            </div>
+          </div>
+          <div class="rest-card" data-nav="restaurant">
+            <div class="rest-thumb thumb-2"></div>
+            <div class="rest-info">
+              <div class="rest-name">도미노피자 강남점</div>
+              <div class="rest-meta"><span class="star">★ 4.6</span> · 리뷰 892 · 25~35분</div>
+              <div class="rest-tags"><span class="tag">최소주문 15,000원</span></div>
+            </div>
+          </div>
+          <div class="rest-card" data-nav="restaurant">
+            <div class="rest-thumb thumb-3"></div>
+            <div class="rest-info">
+              <div class="rest-name">홍콩반점 역삼점</div>
+              <div class="rest-meta"><span class="star">★ 4.5</span> · 리뷰 567 · 20~30분</div>
+              <div class="rest-tags"><span class="tag">최소주문 10,000원</span><span class="tag blue">무료배달</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 탭 -->
+        <nav class="bottom-nav">
+          <div class="bn-item active"><div class="bn-icon">🏠</div><div class="bn-label">홈</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div><div class="bn-label">검색</div></div>
+          <div class="bn-item"><div class="bn-icon">🛒</div><div class="bn-label">장바구니</div></div>
+          <div class="bn-item"><div class="bn-icon">📋</div><div class="bn-label">주문내역</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-label">마이</div></div>
+        </nav>
+      </div>
+
+      <!-- 어노테이션 -->
+      <aside class="annotations">
+        <h3>📌 홈 화면</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>위치 선택</strong> — 현재 위치 or 수기 입력. 배달 가능 반경 자동 계산</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>통합 검색</strong> — 음식명 & 가게명 동시 검색, 자동완성 지원</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>프로모션 배너</strong> — 슬라이드형. 클릭 시 이벤트 페이지 이동</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>카테고리</strong> — 8개 주요 카테고리. 탭 시 필터링된 목록 표시</div></div>
+        <div class="anno-item"><span class="anno-num">5</span><div><strong>음식점 카드</strong> — 썸네일 · 별점 · 예상 도착시간 · 최소주문금액 표시</div></div>
+        <div class="anno-item"><span class="anno-num">6</span><div><strong>하단 탭바</strong> — 홈 / 검색 / 장바구니 / 주문내역 / 마이페이지</div></div>
+      </aside>
+    </section>
+
+    <!-- ────────────── 2. 음식점 상세 ────────────── -->
+    <section class="screen" id="screen-restaurant">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <div class="page-header">
+          <button class="back-btn">← 뒤로</button>
+          <div class="header-icons"><span>🔍</span> <span>♡</span> <span>⋯</span></div>
+        </div>
+
+        <!-- 커버 이미지 -->
+        <div class="rest-cover cover-1">
+          <div class="cover-badge">🔥 인기</div>
+        </div>
+
+        <!-- 가게 기본 정보 -->
+        <div class="rest-detail-info">
+          <h2 class="rest-detail-name">BBQ 치킨 역삼점</h2>
+          <div class="rest-detail-meta">
+            <span class="star lg">★ 4.8</span>
+            <span class="dot-sep">·</span>
+            <span>리뷰 1,234</span>
+            <span class="dot-sep">·</span>
+            <span>30~40분</span>
+          </div>
+          <div class="info-chips">
+            <div class="chip"><span class="chip-icon">🚗</span><div><div class="chip-label">배달비</div><div class="chip-val">2,000원~</div></div></div>
+            <div class="chip"><span class="chip-icon">💰</span><div><div class="chip-label">최소주문</div><div class="chip-val">12,000원</div></div></div>
+            <div class="chip"><span class="chip-icon">⏱</span><div><div class="chip-label">예상시간</div><div class="chip-val">30~40분</div></div></div>
+          </div>
+        </div>
+
+        <!-- 메뉴 탭 -->
+        <div class="menu-tabs">
+          <button class="menu-tab active">메뉴</button>
+          <button class="menu-tab">리뷰</button>
+          <button class="menu-tab">정보</button>
+        </div>
+
+        <!-- 메뉴 그룹 -->
+        <div class="menu-group">
+          <div class="menu-group-title">🏆 인기 메뉴</div>
+          <div class="menu-item" data-nav="menu">
+            <div class="menu-thumb m-thumb-1"></div>
+            <div class="menu-item-info">
+              <div class="menu-name">황금올리브 치킨</div>
+              <div class="menu-desc">바삭한 황금빛 올리브 치킨, 단품·세트 선택 가능</div>
+              <div class="menu-price">18,000원</div>
+            </div>
+          </div>
+          <div class="menu-item" data-nav="menu">
+            <div class="menu-thumb m-thumb-2"></div>
+            <div class="menu-item-info">
+              <div class="menu-name">자메이카 통다리구이</div>
+              <div class="menu-desc">특제 양념 통다리, 매콤달콤한 자메이카 소스</div>
+              <div class="menu-price">19,000원</div>
+            </div>
+          </div>
+          <div class="menu-group-title">🍗 후라이드 & 양념</div>
+          <div class="menu-item" data-nav="menu">
+            <div class="menu-thumb m-thumb-3"></div>
+            <div class="menu-item-info">
+              <div class="menu-name">후라이드 치킨 (중)</div>
+              <div class="menu-desc">담백하고 바삭한 기본 후라이드</div>
+              <div class="menu-price">16,000원</div>
+            </div>
+          </div>
+        </div>
+
+        <nav class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div><div class="bn-label">홈</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div><div class="bn-label">검색</div></div>
+          <div class="bn-item"><div class="bn-icon">🛒</div><div class="bn-label">장바구니</div></div>
+          <div class="bn-item"><div class="bn-icon">📋</div><div class="bn-label">주문내역</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-label">마이</div></div>
+        </nav>
+      </div>
+
+      <aside class="annotations">
+        <h3>📌 음식점 상세</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>커버 이미지</strong> — 가게 대표 이미지, 슬라이드 지원</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>핵심 정보 칩</strong> — 배달비 / 최소주문 / 예상시간 3단 표시</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>탭 전환</strong> — 메뉴 / 리뷰 / 가게정보</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>메뉴 카드</strong> — thumb · 이름 · 설명 · 가격. 클릭 시 옵션 선택 시트</div></div>
+        <div class="anno-item"><span class="anno-num">5</span><div><strong>찜 버튼</strong> — 하트 아이콘. 찜 목록에 저장</div></div>
+      </aside>
+    </section>
+
+    <!-- ────────────── 3. 메뉴 옵션 선택 ────────────── -->
+    <section class="screen" id="screen-menu">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <!-- 바텀시트 형태 -->
+        <div class="bottom-sheet-bg">
+          <div class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-product">
+              <div class="sheet-thumb st-thumb-1"></div>
+              <div class="sheet-prod-info">
+                <div class="sheet-prod-name">황금올리브 치킨</div>
+                <div class="sheet-prod-desc">바삭한 황금빛 올리브 치킨</div>
+                <div class="sheet-prod-price">18,000원</div>
+              </div>
+            </div>
+
+            <div class="option-group">
+              <div class="option-group-title">사이즈 선택 <span class="required">(필수)</span></div>
+              <label class="option-row selected-option">
+                <span>🔵</span>
+                <span class="opt-name">중 (기본)</span>
+                <span class="opt-price">+0원</span>
+              </label>
+              <label class="option-row">
+                <span>⚪</span>
+                <span class="opt-name">대</span>
+                <span class="opt-price">+3,000원</span>
+              </label>
+            </div>
+
+            <div class="option-group">
+              <div class="option-group-title">소스 선택 <span class="required">(필수)</span></div>
+              <label class="option-row selected-option">
+                <span>🔵</span>
+                <span class="opt-name">기본 소스</span>
+                <span class="opt-price">+0원</span>
+              </label>
+              <label class="option-row">
+                <span>⚪</span>
+                <span class="opt-name">허니 소스</span>
+                <span class="opt-price">+500원</span>
+              </label>
+            </div>
+
+            <div class="option-group">
+              <div class="option-group-title">추가 옵션 <span class="optional">(선택)</span></div>
+              <label class="option-row checkbox-row">
+                <input type="checkbox" checked readonly /> <span class="opt-name">치즈볼 4개 추가</span>
+                <span class="opt-price">+3,000원</span>
+              </label>
+              <label class="option-row checkbox-row">
+                <input type="checkbox" readonly /> <span class="opt-name">콜라 1.5L 추가</span>
+                <span class="opt-price">+2,500원</span>
+              </label>
+            </div>
+
+            <!-- 수량 & 담기 -->
+            <div class="qty-row">
+              <div class="qty-ctrl">
+                <button class="qty-btn">−</button>
+                <span class="qty-num">1</span>
+                <button class="qty-btn">+</button>
+              </div>
+              <button class="add-cart-btn" data-nav="cart">장바구니 담기 · 21,000원</button>
+            </div>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" style="z-index:1">
+          <div class="bn-item"><div class="bn-icon">🏠</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div></div>
+          <div class="bn-item"><div class="bn-icon">🛒</div></div>
+          <div class="bn-item"><div class="bn-icon">📋</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div></div>
+        </nav>
+      </div>
+
+      <aside class="annotations">
+        <h3>📌 메뉴 옵션 선택 (바텀시트)</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>바텀시트</strong> — 메뉴 카드 클릭 시 슬라이드 업 애니메이션</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>필수 옵션</strong> — 라디오 버튼 형태, 하나만 선택 가능</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>선택 옵션</strong> — 체크박스 형태, 다중 선택 가능</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>수량 조절</strong> — ─ / + 버튼. 최소 1개</div></div>
+        <div class="anno-item"><span class="anno-num">5</span><div><strong>장바구니 담기</strong> — 실시간 금액 갱신. 클릭 시 장바구니 이동</div></div>
+      </aside>
+    </section>
+
+    <!-- ────────────── 4. 장바구니 ────────────── -->
+    <section class="screen" id="screen-cart">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <div class="page-header">
+          <button class="back-btn">← 뒤로</button>
+          <h3 class="page-title">장바구니</h3>
+          <button class="clear-btn">전체삭제</button>
+        </div>
+
+        <!-- 배달 유형 -->
+        <div class="delivery-toggle">
+          <button class="dtog active">🛵 일반배달</button>
+          <button class="dtog">🤝 묶음배달</button>
+        </div>
+
+        <!-- 가게 -->
+        <div class="cart-store">
+          <span class="cart-store-icon">🍗</span>
+          <span class="cart-store-name">BBQ 치킨 역삼점</span>
+        </div>
+
+        <!-- 장바구니 아이템 -->
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <div class="cart-item-name">황금올리브 치킨 (중)</div>
+            <div class="cart-item-opts">기본 소스, 치즈볼 4개 추가</div>
+            <div class="cart-item-price">21,000원</div>
+          </div>
+          <div class="cart-qty-ctrl">
+            <button class="qty-btn sm">−</button>
+            <span class="qty-num">1</span>
+            <button class="qty-btn sm">+</button>
+          </div>
+        </div>
+        <div class="cart-item">
+          <div class="cart-item-info">
+            <div class="cart-item-name">후라이드 치킨 (중)</div>
+            <div class="cart-item-opts">기본 소스</div>
+            <div class="cart-item-price">16,000원</div>
+          </div>
+          <div class="cart-qty-ctrl">
+            <button class="qty-btn sm">−</button>
+            <span class="qty-num">1</span>
+            <button class="qty-btn sm">+</button>
+          </div>
+        </div>
+
+        <!-- 쿠폰 -->
+        <div class="coupon-row">
+          <span class="coupon-icon">🎟</span>
+          <span class="coupon-text">쿠폰 / 포인트 적용</span>
+          <span class="coupon-arrow">→</span>
+        </div>
+
+        <!-- 금액 요약 -->
+        <div class="price-summary">
+          <div class="price-row"><span>메뉴 금액</span><span>37,000원</span></div>
+          <div class="price-row"><span>배달비</span><span>2,000원</span></div>
+          <div class="price-row discount"><span>쿠폰 할인</span><span>−3,000원</span></div>
+          <div class="price-row total"><span>총 결제금액</span><span>36,000원</span></div>
+        </div>
+
+        <button class="checkout-btn" data-nav="checkout">36,000원 결제하기</button>
+
+        <nav class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div><div class="bn-label">홈</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div><div class="bn-label">검색</div></div>
+          <div class="bn-item active"><div class="bn-icon">🛒</div><div class="bn-label">장바구니</div></div>
+          <div class="bn-item"><div class="bn-icon">📋</div><div class="bn-label">주문내역</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div><div class="bn-label">마이</div></div>
+        </nav>
+      </div>
+
+      <aside class="annotations">
+        <h3>📌 장바구니</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>배달 유형</strong> — 일반 / 묶음배달 선택 (묶음시 배달비 절감)</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>수량 조절</strong> — 0으로 줄이면 자동 삭제 확인 다이얼로그</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>쿠폰/포인트</strong> — 보유 쿠폰 목록 바텀시트, 포인트 직접 입력</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>금액 요약</strong> — 메뉴 + 배달비 − 할인 = 최종 금액 실시간 갱신</div></div>
+        <div class="anno-item"><span class="anno-num">5</span><div><strong>결제 버튼</strong> — CTA. 최소 주문 금액 미달 시 비활성화</div></div>
+      </aside>
+    </section>
+
+    <!-- ────────────── 5. 결제 ────────────── -->
+    <section class="screen" id="screen-checkout">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <div class="page-header">
+          <button class="back-btn">← 뒤로</button>
+          <h3 class="page-title">결제</h3>
+        </div>
+
+        <!-- 배달 주소 -->
+        <div class="checkout-section">
+          <div class="co-section-title">📍 배달 주소</div>
+          <div class="address-card">
+            <div class="addr-main">서울 강남구 역삼동 123-45</div>
+            <div class="addr-detail">강남오피스텔 1205호</div>
+            <button class="addr-change">변경</button>
+          </div>
+          <input type="text" class="rider-note" placeholder="🛵 라이더에게 전달사항 (예: 문 앞 배달)" />
+        </div>
+
+        <!-- 주문 요약 -->
+        <div class="checkout-section">
+          <div class="co-section-title">🍗 주문 요약</div>
+          <div class="order-item-row"><span>황금올리브 치킨 (중) x1</span><span>21,000원</span></div>
+          <div class="order-item-row"><span>후라이드 치킨 (중) x1</span><span>16,000원</span></div>
+        </div>
+
+        <!-- 결제 수단 -->
+        <div class="checkout-section">
+          <div class="co-section-title">💳 결제 수단</div>
+          <div class="payment-options">
+            <div class="pay-opt selected-pay">
+              <span>💳</span><span>신용/체크카드</span>
+            </div>
+            <div class="pay-opt">
+              <span>📱</span><span>카카오페이</span>
+            </div>
+            <div class="pay-opt">
+              <span>🍎</span><span>애플페이</span>
+            </div>
+            <div class="pay-opt">
+              <span>💵</span><span>현금영수증</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 최종 금액 -->
+        <div class="final-price-box">
+          <div class="fp-row"><span>메뉴 금액</span><span>37,000원</span></div>
+          <div class="fp-row"><span>배달비</span><span>2,000원</span></div>
+          <div class="fp-row discount"><span>쿠폰 할인</span><span>−3,000원</span></div>
+          <div class="fp-row total"><span>최종 결제금액</span><span>36,000원</span></div>
+        </div>
+
+        <button class="checkout-btn" data-nav="tracking">36,000원 결제 완료</button>
+
+        <nav class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div></div>
+          <div class="bn-item"><div class="bn-icon">🛒</div></div>
+          <div class="bn-item"><div class="bn-icon">📋</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div></div>
+        </nav>
+      </div>
+
+      <aside class="annotations">
+        <h3>📌 결제 화면</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>배달 주소</strong> — 기본 주소 자동 표시, 변경 버튼으로 다른 주소 선택</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>라이더 전달사항</strong> — 150자 이내, 공동현관 비번 등</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>결제 수단</strong> — 카드 / 간편결제(카카오·네이버·애플페이)</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>최종 결제금액</strong> — 모든 할인 적용 후 금액 표시</div></div>
+        <div class="anno-item"><span class="anno-num">5</span><div><strong>결제 완료</strong> — PG연동 후 주문 생성 → 추적 화면으로 이동</div></div>
+      </aside>
+    </section>
+
+    <!-- ────────────── 6. 배달 추적 ────────────── -->
+    <section class="screen" id="screen-tracking">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <div class="page-header">
+          <button class="back-btn">← 뒤로</button>
+          <h3 class="page-title">배달 추적</h3>
+        </div>
+
+        <!-- 지도 영역 -->
+        <div class="map-area">
+          <div class="map-placeholder">
+            <div class="map-label">📍 지도 영역</div>
+            <div class="map-marker store">🍗</div>
+            <div class="map-path"></div>
+            <div class="map-marker rider">🛵</div>
+            <div class="map-marker dest">🏠</div>
+          </div>
+        </div>
+
+        <!-- 상태 스텝 -->
+        <div class="tracking-status">
+          <div class="status-step done">
+            <div class="step-circle done-c">✓</div>
+            <div class="step-text">주문 접수</div>
+          </div>
+          <div class="step-line done-line"></div>
+          <div class="status-step done">
+            <div class="step-circle done-c">✓</div>
+            <div class="step-text">조리 중</div>
+          </div>
+          <div class="step-line done-line"></div>
+          <div class="status-step active-step">
+            <div class="step-circle active-c pulse-anim">🛵</div>
+            <div class="step-text">배달 중</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="status-step">
+            <div class="step-circle">📦</div>
+            <div class="step-text">배달 완료</div>
+          </div>
+        </div>
+
+        <!-- ETA -->
+        <div class="eta-box">
+          <div class="eta-time">약 12분 후 도착</div>
+          <div class="eta-sub">라이더 김철수 · ☎ 010-****-5678</div>
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="tracking-actions">
+          <button class="track-btn outline">라이더에게 연락</button>
+          <button class="track-btn outline">주문 상세 보기</button>
+        </div>
+
+        <nav class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div></div>
+          <div class="bn-item"><div class="bn-icon">🛒</div></div>
+          <div class="bn-item active"><div class="bn-icon">📋</div><div class="bn-label">주문내역</div></div>
+          <div class="bn-item"><div class="bn-icon">👤</div></div>
+        </nav>
+      </div>
+
+      <aside class="annotations">
+        <h3>📌 배달 추적</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>실시간 지도</strong> — 라이더 위치 WebSocket 실시간 업데이트 (Google Maps / 카카오맵 SDK)</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>단계 표시</strong> — 접수 → 조리 중 → 배달 중 → 완료. 현재 단계 강조 & 펄스 애니</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>ETA</strong> — 예상 도착 시간(분) 실시간 갱신</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>라이더 연락</strong> — 앱 내 마스킹 번호로 통화 연결</div></div>
+      </aside>
+    </section>
+
+    <!-- ────────────── 7. 마이페이지 ────────────── -->
+    <section class="screen" id="screen-mypage">
+      <div class="phone-frame">
+        <div class="phone-status">9:41 AM ● ● ●</div>
+
+        <div class="page-header no-border">
+          <h3 class="page-title">마이페이지</h3>
+          <button class="setting-btn">⚙️</button>
+        </div>
+
+        <!-- 프로필 -->
+        <div class="profile-card">
+          <div class="profile-avatar">👤</div>
+          <div class="profile-info">
+            <div class="profile-name">홍길동 님</div>
+            <div class="profile-email">hong@email.com</div>
+          </div>
+          <button class="profile-edit">수정</button>
+        </div>
+
+        <!-- 포인트 / 쿠폰 -->
+        <div class="point-coupon-row">
+          <div class="pc-card">
+            <div class="pc-value">12,500P</div>
+            <div class="pc-label">보유 포인트</div>
+          </div>
+          <div class="pc-divider"></div>
+          <div class="pc-card">
+            <div class="pc-value">3장</div>
+            <div class="pc-label">쿠폰</div>
+          </div>
+        </div>
+
+        <!-- 메뉴 리스트 -->
+        <div class="mypage-menu-list">
+          <div class="mp-item"><span>📋</span><span>주문 내역</span><span>→</span></div>
+          <div class="mp-item"><span>♡</span><span>찜 목록</span><span>→</span></div>
+          <div class="mp-item"><span>⭐</span><span>리뷰 관리</span><span>→</span></div>
+          <div class="mp-item"><span>📍</span><span>배달 주소 관리</span><span>→</span></div>
+          <div class="mp-item"><span>💳</span><span>결제 수단 관리</span><span>→</span></div>
+          <div class="mp-item"><span>🔔</span><span>알림 설정</span><span>→</span></div>
+          <div class="mp-item"><span>🛡</span><span>개인정보 처리방침</span><span>→</span></div>
+        </div>
+
+        <button class="logout-btn">로그아웃</button>
+
+        <nav class="bottom-nav">
+          <div class="bn-item"><div class="bn-icon">🏠</div><div class="bn-label">홈</div></div>
+          <div class="bn-item"><div class="bn-icon">🔍</div><div class="bn-label">검색</div></div>
+          <div class="bn-item"><div class="bn-icon">🛒</div><div class="bn-label">장바구니</div></div>
+          <div class="bn-item"><div class="bn-icon">📋</div><div class="bn-label">주문내역</div></div>
+          <div class="bn-item active"><div class="bn-icon">👤</div><div class="bn-label">마이</div></div>
+        </nav>
+      </div>
+
+      <aside class="annotations">
+        <h3>📌 마이페이지</h3>
+        <div class="anno-item"><span class="anno-num">1</span><div><strong>프로필</strong> — 닉네임 / 이메일. 수정 시 인증 재확인</div></div>
+        <div class="anno-item"><span class="anno-num">2</span><div><strong>포인트 / 쿠폰</strong> — 보유 현황 한눈에 표시</div></div>
+        <div class="anno-item"><span class="anno-num">3</span><div><strong>주문내역</strong> — 날짜 / 가게명 / 금액 / 상태. 리오더 버튼 포함</div></div>
+        <div class="anno-item"><span class="anno-num">4</span><div><strong>찜 목록</strong> — 즐겨찾기 가게 빠른 접근</div></div>
+        <div class="anno-item"><span class="anno-num">5</span><div><strong>주소 관리</strong> — 복수 주소 저장, 기본 주소 지정</div></div>
+      </aside>
+    </section>
+
+  </main>
+
+  <!-- ── 플로우 다이어그램 ── -->
+  <section class="flow-section">
+    <h2 class="flow-title">📊 사용자 플로우 다이어그램</h2>
+    <div class="flow-diagram">
+      <div class="flow-node start">앱 실행</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">홈 화면<br/><small>위치 설정 / 카테고리 / 가게 목록</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">음식점 상세<br/><small>메뉴 / 리뷰 / 정보</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">메뉴 옵션 선택<br/><small>필수 옵션 · 추가 옵션</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">장바구니<br/><small>수량 조절 · 쿠폰 · 포인트</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">결제<br/><small>주소 확인 · 결제 수단 선택</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node">배달 추적<br/><small>실시간 라이더 위치 · 예상시간</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-node end">배달 완료 &amp; 리뷰 작성</div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
