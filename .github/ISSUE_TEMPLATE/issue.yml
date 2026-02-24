@@ -1,6 +1,5 @@
 name: "✨ Issue Template ✨"
 description: "이슈 템플릿"
-
 body:
   - type: textarea
     id: content
