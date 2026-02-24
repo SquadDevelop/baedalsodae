@@ -1,19 +1,36 @@
-name: "✨ Feature"
-description: "새로운 기능 추가"
-labels: ["feature"]
+name: "✨ Issue Template ✨
+description: "이슈 템플릿"
 body:
-  - type: textarea
-    attributes:
-      label: 📄 설명
-      description: 새로운 기능에 대한 설명을 작성해 주세요.
-      placeholder: 자세히 적을수록 좋습니다!
-    validations:
-      required: true
   - type: textarea
     attributes:
       label: ✅ 작업할 내용
       description: 할 일을 체크박스 형태로 작성해주세요.
-      placeholder: 최대한 세분화 해서 적어주세요!
+      value: """
+      ### 이슈 번호 <!-- 이슈 번호를 작성해주세요 ex) #11 -->
+- close #이슈번호
+
+### 💡 작업 내용
+- 
+-
+
+### 🔍 변경 이유
+- 
+-
+
+
+### ✅ 변경 유형
+- [ ] feat (새로운 기능)
+- [ ] fix (버그 수정)
+- [ ] refactor (코드 구조 개선)
+- [ ] chore (설정, 빌드 관련 등)
+- [ ] docs (문서 수정)
+- [ ] test (테스트 코드 추가/수정)
+
+
+### 🧠 기타 참고 사항
+(관련 이슈 번호, 참고 문서, 스크린샷 등)
+]()
+"""
     validations:
       required: true
   - type: textarea
