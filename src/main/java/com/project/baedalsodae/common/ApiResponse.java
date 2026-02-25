@@ -1,0 +1,57 @@
+package com.project.baedalsodae.common;
+
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDateTime;
+
+@Getter
+public class ApiResponse<T> {
+
+    private final String code;
+    private final HttpStatus status;
+    private final String message;
+    private final T data;
+    private final LocalDateTime timestamp;
+
+    private ApiResponse(String code, HttpStatus status, String message, T data) {
+        this.code = code;
+        this.status = status;
+        this.message = message;
+        this.data = data;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    private ApiResponse(ErrorCode errorCode, T data) {
+        this.code = errorCode.getCode();
+        this.status = errorCode.getStatus();
+        this.message = errorCode.getMessage();
+        this.data = data;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    private ApiResponse(ErrorCode errorCode, String customMessage, T data) {
+        this.code = errorCode.getCode();
+        this.status = errorCode.getStatus();
+        this.message = customMessage;
+        this.data = data;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>("SUCCESS", HttpStatus.OK, message, data);
+    }
+
+    public static <T> ApiResponse<T> success(String message) {
+        return new ApiResponse<>("SUCCESS", HttpStatus.OK, message, null);
+    }
+
+    public static <T> ApiResponse<T> error(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode, null);
+    }
+
+    public static <T> ApiResponse<T> error(ErrorCode errorCode, String customMessage) {
+        return new ApiResponse<>(errorCode, customMessage,null);
+    }
+
+}
