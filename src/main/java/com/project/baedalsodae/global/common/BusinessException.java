@@ -1,4 +1,4 @@
-package com.project.baedalsodae.common;
+package com.project.baedalsodae.global.common;
 
 import lombok.Getter;
 
