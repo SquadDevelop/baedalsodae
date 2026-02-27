@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedBy;
@@ -17,23 +19,23 @@ public class BaseAuditEntity extends BaseTimeEntity {
 
   @CreatedBy
   @Column(name = "created_by", updatable = false)
-  private Long createdBy;
+  private UUID createdBy;
 
   @LastModifiedBy
   @Column(name = "updated_by")
-  private Long updatedBy;
+  private UUID updatedBy;
 
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
 
   @Column(name = "deleted_by")
-  private Long deletedBy;
+  private UUID deletedBy;
 
   @Column(name = "is_deleted")
   @ColumnDefault("false")
-  private boolean isDeleted;
+  private boolean isDeleted = false;
 
-  public void softDelete(Long userId) {
+  public void softDelete(UUID userId) {
     this.isDeleted = true;
     this.deletedAt = LocalDateTime.now();
     this.deletedBy = userId;
