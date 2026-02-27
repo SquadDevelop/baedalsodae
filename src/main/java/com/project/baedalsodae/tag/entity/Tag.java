@@ -1,0 +1,30 @@
+package com.project.baedalsodae.tag.entity;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "p_tag")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Tag {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
+
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+}
