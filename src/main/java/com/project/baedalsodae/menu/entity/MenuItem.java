@@ -39,7 +39,7 @@ public class MenuItem extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private MenuCategory menuCategory;
 
-    @Column(name = "menu_status", columnDefinition = "TEXT")
+    @Column(name = "menu_status")
     @Enumerated(EnumType.STRING)
     private MenuStatus menuStatus;
 
