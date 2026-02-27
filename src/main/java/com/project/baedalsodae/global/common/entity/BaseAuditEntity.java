@@ -31,7 +31,7 @@ public class BaseAuditEntity extends BaseTimeEntity {
 
   @Column(name = "is_deleted")
   @ColumnDefault("false")
-  private boolean isDeleted;
+  private boolean isDeleted = false;
 
   public void softDelete(Long userId) {
     this.isDeleted = true;
