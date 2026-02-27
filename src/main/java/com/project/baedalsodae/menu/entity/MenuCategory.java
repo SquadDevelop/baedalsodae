@@ -2,6 +2,8 @@ package com.project.baedalsodae.menu.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,5 +25,8 @@ public class MenuCategory extends BaseAuditEntity {
 
     @Column(name = "order_no", nullable = false)
     private int orderNo;
+
+    @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MenuItem> menuItems = new ArrayList<>();
 
 }
