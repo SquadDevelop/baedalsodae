@@ -22,6 +22,7 @@ public class User extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
     private UUID id;
 
     @Column(name = "username", nullable = false, length = 20, unique = true)
