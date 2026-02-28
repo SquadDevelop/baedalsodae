@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MenuCategoryRepository extends JpaRepository<MenuCategory, Long> {
+  Optional<MenuCategory> findByIdAndDeletedIsFalse(UUID menuCategoryId);
 }

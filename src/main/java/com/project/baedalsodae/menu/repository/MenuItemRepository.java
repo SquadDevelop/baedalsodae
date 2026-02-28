@@ -9,4 +9,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
+
+  @Query(
+      "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted ="
+          + " false")
+  Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
 }
