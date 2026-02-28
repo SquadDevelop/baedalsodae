@@ -15,4 +15,7 @@ public interface MenuItemService {
   @Transactional
   MenuResponseDto.MenuItemResponse patchMenuItem(
       UUID menuItemId, MenuRequestDto.PatchMenuRequest request);
+
+  @Transactional
+  void deleteMenuItem(UUID menuItemId);
 }

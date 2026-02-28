@@ -38,4 +38,10 @@ public class MenuItemController {
     MenuResponseDto.MenuItemResponse response = menuItemService.patchMenuItem(menuItemId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }
+
+  @DeleteMapping("/{menuItemId}")
+  public ResponseEntity<ApiResponse<Void>> deleteMenuItem(@PathVariable UUID menuItemId) {
+    menuItemService.deleteMenuItem(menuItemId);
+    return ResponseEntity.ok(ApiResponse.success(""));
+  }
 }

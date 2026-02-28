@@ -66,4 +66,13 @@ public class MenuItemServiceImpl implements MenuItemService {
     if (request.menuStatus() != null) item.changeMenuStatus(request.menuStatus());
     return MenuResponseDto.MenuItemResponse.fromEntity(item);
   }
+
+  @Override
+  public void deleteMenuItem(UUID menuItemId) {
+    MenuItem item =
+        menuItemRepository
+            .findByIdAndDeletedIsFalse(menuItemId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+    item.softDelete(null); // 토큰 기능 추가 시 수정 필요
+  }
 }
