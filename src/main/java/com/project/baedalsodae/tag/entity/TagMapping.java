@@ -36,4 +36,12 @@ public class TagMapping {
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
+
+  public static TagMapping create(Tag tag, MenuItem menuItem, int orderNo) {
+    TagMapping tagMapping = new TagMapping();
+    tagMapping.tag = tag;
+    tagMapping.menuItem = menuItem;
+    tagMapping.orderNo = orderNo;
+    return tagMapping;
+  }
 }
