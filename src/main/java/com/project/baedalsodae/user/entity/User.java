@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -48,5 +49,5 @@ public class User extends BaseAuditEntity {
     private UserRole role;
 
     @Column(name = "user_main_address_id")
-    private Long userMainAddressId;
+    private UUID userMainAddressId;
 }
