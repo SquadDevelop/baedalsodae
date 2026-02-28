@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "p_end_areas")
+@Table(name = "p_end_area")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EndArea extends BaseTimeEntity {
 
@@ -32,6 +33,6 @@ public class EndArea extends BaseTimeEntity {
     @Column(name = "location")
     private String location;
 
-    @Column(name = "version", length = 20)
-    private String version;
+    @Version
+    private Long version;
 }
