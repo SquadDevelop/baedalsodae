@@ -7,14 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface MenuItemService {
 
-  @Transactional
   MenuResponseDto.MenuItemResponse updateMenuItem(
       UUID menuItemId, MenuRequestDto.MenuRequest request);
 
-  @Transactional
   MenuResponseDto.MenuItemResponse patchMenuItem(
       UUID menuItemId, MenuRequestDto.PatchMenuRequest request);
 
-  @Transactional
   void deleteMenuItem(UUID menuItemId);
 }

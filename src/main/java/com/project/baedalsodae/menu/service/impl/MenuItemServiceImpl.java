@@ -12,6 +12,7 @@ import com.project.baedalsodae.menu.service.MenuItemService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class MenuItemServiceImpl implements MenuItemService {
   private final MenuItemRepository menuItemRepository;
   private final MenuCategoryRepository menuCategoryRepository;
 
+  @Transactional
   @Override
   public MenuResponseDto.MenuItemResponse updateMenuItem(
       UUID menuItemId, MenuRequestDto.MenuRequest request) {
@@ -43,6 +45,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     return MenuResponseDto.MenuItemResponse.fromEntity(item);
   }
 
+  @Transactional
   @Override
   public MenuResponseDto.MenuItemResponse patchMenuItem(
       UUID menuItemId, MenuRequestDto.PatchMenuRequest request) {
@@ -66,6 +69,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     return MenuResponseDto.MenuItemResponse.fromEntity(item);
   }
 
+  @Transactional
   @Override
   public void deleteMenuItem(UUID menuItemId) {
     MenuItem item =
