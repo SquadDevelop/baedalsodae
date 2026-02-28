@@ -6,10 +6,7 @@ import com.project.baedalsodae.tag.entity.TagMapping;
 import com.project.baedalsodae.tag.repository.TagMappingRepository;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.tag.service.TagService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -57,5 +54,11 @@ public class TagMappingServiceImpl implements TagMappingService {
     }
 
     tagMappingRepository.saveAll(tagMappings);
+  }
+
+  @Transactional
+  @Override
+  public void deleteAllTagMappingByMenuItemId(UUID menuItemId) {
+    tagMappingRepository.deleteByMenuItemId(menuItemId);
   }
 }
