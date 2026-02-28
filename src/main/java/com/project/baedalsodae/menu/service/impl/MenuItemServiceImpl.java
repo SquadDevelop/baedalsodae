@@ -43,4 +43,27 @@ public class MenuItemServiceImpl implements MenuItemService {
     item.changeMenuStatus(request.menuStatus());
     return MenuResponseDto.MenuItemResponse.fromEntity(item);
   }
+
+  @Override
+  public MenuResponseDto.MenuItemResponse patchMenuItem(
+      UUID menuItemId, MenuRequestDto.PatchMenuRequest request) {
+    MenuItem item =
+        menuItemRepository
+            .findByIdAndDeletedIsFalse(menuItemId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+    if (request.categoryId() != null) {
+      MenuCategory category =
+          menuCategoryRepository
+              .findByIdAndDeletedIsFalse(request.categoryId())
+              .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+      item.changeMenuCategory(category);
+    }
+    if (request.name() != null) item.changeName(request.name());
+    if (request.description() != null) item.changeDescription(request.description());
+    if (request.price() != null) item.changePrice(request.price());
+    if (request.orderNo() != null) item.changeOrderNo(request.orderNo());
+    if (request.isPopular() != null) item.changeIsPopular(request.isPopular());
+    if (request.menuStatus() != null) item.changeMenuStatus(request.menuStatus());
+    return MenuResponseDto.MenuItemResponse.fromEntity(item);
+  }
 }

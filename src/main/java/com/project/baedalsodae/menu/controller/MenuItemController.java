@@ -31,4 +31,11 @@ public class MenuItemController {
     MenuResponseDto.MenuItemResponse response = menuItemService.updateMenuItem(menuItemId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }
+
+  @PatchMapping("/{menuItemId}")
+  public ResponseEntity<ApiResponse<MenuResponseDto.MenuItemResponse>> patchMenuItem(
+      @PathVariable UUID menuItemId, @RequestBody MenuRequestDto.PatchMenuRequest request) {
+    MenuResponseDto.MenuItemResponse response = menuItemService.patchMenuItem(menuItemId, request);
+    return ResponseEntity.ok(ApiResponse.success("", response));
+  }
 }

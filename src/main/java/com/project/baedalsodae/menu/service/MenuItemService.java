@@ -12,4 +12,7 @@ public interface MenuItemService {
   MenuResponseDto.MenuItemResponse updateMenuItem(
       UUID menuItemId, MenuRequestDto.MenuRequest request);
 
+  @Transactional
+  MenuResponseDto.MenuItemResponse patchMenuItem(
+      UUID menuItemId, MenuRequestDto.PatchMenuRequest request);
 }
