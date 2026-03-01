@@ -21,8 +21,11 @@ public enum ErrorCode {
     // user/signup
     USER_NOT_FOUND("U001", HttpStatus.NOT_FOUND, "유저가 없습니다"),
     USER_DUPLICATED_EMAIL("U002", HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
-    USER_DUPLICATED_PHONE_NUMBER("U003", HttpStatus.CONFLICT, "이미 가입된 전화번호입니다");
+    USER_DUPLICATED_PHONE_NUMBER("U003", HttpStatus.CONFLICT, "이미 가입된 전화번호입니다"),
 
+    //cart
+    CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND,"장바구니가 없습니다.")
+    ;
     private final String code;
     private final HttpStatus status;
     private final String message;

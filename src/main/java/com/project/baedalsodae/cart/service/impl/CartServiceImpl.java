@@ -1,11 +1,30 @@
 package com.project.baedalsodae.cart.service.impl;
 
+import com.project.baedalsodae.cart.dto.response.CartResponse;
+import com.project.baedalsodae.cart.entity.Cart;
+import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.cart.service.CartService;
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
+	private final CartRepository cartRepository;
+
+	@Override
+	@Transactional
+	public CartResponse getCart(UUID userId) {
+
+		Cart cart = cartRepository.findByUserId(userId)
+				.orElseThrow(()-> new BusinessException(ErrorCode.CART_NOT_FOUND));
+
+		return CartResponse.from(cart);
+	}
 }

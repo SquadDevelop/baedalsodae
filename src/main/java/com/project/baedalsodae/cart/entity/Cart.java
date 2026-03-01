@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,10 @@ import java.util.UUID;
 
 @Entity
 @Table(
-	name = "p_cart",
-	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_cart_user_store", columnNames = {"user_id"})
-	}
+		name = "p_cart",
+		uniqueConstraints = {
+				@UniqueConstraint(name = "uq_cart_user_store", columnNames = {"user_id"})
+		}
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,5 +36,14 @@ public class Cart extends BaseAuditEntity {
 	@Column(name = "status", nullable = false)
 	private CartStatus status;
 
+	@OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CartItem> items = new ArrayList<>();
 
+	public int getTotalQuantity() {
+		return items.stream().mapToInt(CartItem::getQuantity).sum();
+	}
+
+	public int getTotalAmount() {
+		return items.stream().mapToInt(CartItem::getLineAmount).sum();
+	}
 }
