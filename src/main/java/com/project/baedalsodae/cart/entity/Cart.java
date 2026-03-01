@@ -42,4 +42,14 @@ public class Cart extends BaseAuditEntity {
 	public int getTotalAmount() {
 		return items.stream().mapToInt(CartItem::getLineAmount).sum();
 	}
+
+	public Cart(UUID userId, UUID storeId){
+		this.userId = userId;
+		this.storeId = storeId;
+	}
+
+	public static Cart create(UUID userId, UUID storeId){
+		return new Cart(userId, storeId);
+	}
+
 }

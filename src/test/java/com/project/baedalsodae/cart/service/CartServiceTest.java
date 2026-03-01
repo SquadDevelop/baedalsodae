@@ -1,5 +1,7 @@
 package com.project.baedalsodae.cart.service;
 
+import com.project.baedalsodae.cart.dto.response.CartResponse;
+import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.cart.service.impl.CartServiceImpl;
 import com.project.baedalsodae.global.common.BusinessException;
@@ -30,14 +32,14 @@ public class CartServiceTest {
 
 	@Test
 	@DisplayName("실패 - 장바구니가 존재하지 않음")
-	void getCart_fail_cartNotFound(){
+	void getCart_fail_cartNotFound() {
 		//given
 		UUID userId = UUID.randomUUID();
 		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
 				.willReturn(Optional.empty());
 
 		//when
-		Throwable throwable = catchThrowable(()-> cartService.getCart(userId));
+		Throwable throwable = catchThrowable(() -> cartService.getCart(userId));
 		log.info("throwable = " + throwable);
 
 		//then
@@ -46,6 +48,26 @@ public class CartServiceTest {
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_NOT_FOUND);
 	}
 
+	@Test
+	@DisplayName("성공 - 빈 장바구니 조회")
+	void getCart_success_EmptyCart() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId = UUID.randomUUID();
+		Cart emptyCart = Cart.create(userId, storeId);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(emptyCart));
+
+		//when
+		CartResponse response = cartService.getCart(userId);
+
+		log.info("response = {}", response);
+
+		//then
+		assertThat(response.items()).isEmpty();
+		assertThat(response.totalAmount()).isZero();
+	}
 
 
 }
