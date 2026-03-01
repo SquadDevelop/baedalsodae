@@ -42,4 +42,14 @@ public class CartItem extends BaseTimeEntity {
 		return menuItem.getPrice() * quantity;
 	}
 
+	public CartItem(Cart cart, MenuItem menuItem) {
+		this.cart = cart;
+		this.menuItem = menuItem;
+		this.quantity = 1;
+	}
+
+	public static CartItem create(Cart cart, MenuItem menuItem) {
+		return new CartItem(cart, menuItem);
+	}
+
 }

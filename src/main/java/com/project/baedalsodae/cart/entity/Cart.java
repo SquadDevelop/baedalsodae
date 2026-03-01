@@ -2,9 +2,7 @@ package com.project.baedalsodae.cart.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +41,16 @@ public class Cart extends BaseAuditEntity {
 		return items.stream().mapToInt(CartItem::getLineAmount).sum();
 	}
 
-	public Cart(UUID userId, UUID storeId){
+	public void addItem(CartItem item) {
+		this.items.add(item);
+	}
+
+	public Cart(UUID userId, UUID storeId) {
 		this.userId = userId;
 		this.storeId = storeId;
 	}
 
-	public static Cart create(UUID userId, UUID storeId){
+	public static Cart create(UUID userId, UUID storeId) {
 		return new Cart(userId, storeId);
 	}
 

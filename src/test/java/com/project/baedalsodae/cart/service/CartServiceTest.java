@@ -2,10 +2,12 @@ package com.project.baedalsodae.cart.service;
 
 import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.entity.Cart;
+import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.cart.service.impl.CartServiceImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.menu.entity.MenuItem;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,12 @@ public class CartServiceTest {
 
 	@InjectMocks
 	private CartServiceImpl cartService;
+
+	@Mock
+	private MenuItem menuItem1;
+
+	@Mock
+	private MenuItem menuItem2;
 
 	@Test
 	@DisplayName("실패 - 장바구니가 존재하지 않음")
@@ -69,5 +77,38 @@ public class CartServiceTest {
 		assertThat(response.totalAmount()).isZero();
 	}
 
+	@Test
+	@DisplayName("성공 - 장바구니 정상 조회")
+	void getCart_success(){
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId = UUID.randomUUID();
 
+		Cart cart = Cart.create(userId, storeId);
+
+		given(menuItem1.getId()).willReturn(UUID.randomUUID());
+		given(menuItem1.getName()).willReturn("후라이드 치킨");
+		given(menuItem1.getPrice()).willReturn(18000);
+		CartItem cartItem1 = CartItem.create(cart, menuItem1);
+
+		given(menuItem2.getId()).willReturn(UUID.randomUUID());
+		given(menuItem2.getName()).willReturn("짜장면");
+		given(menuItem2.getPrice()).willReturn(8000);
+		CartItem cartItem2 = CartItem.create(cart, menuItem2);
+
+		cart.addItem(cartItem1);
+		cart.addItem(cartItem2);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		//when
+		CartResponse response = cartService.getCart(userId);
+
+		log.info("response = {}", response);
+
+		//then
+		assertThat(response.items()).hasSize(2);
+		assertThat(response.totalAmount()).isEqualTo(26000);
+	}
 }
