@@ -15,7 +15,7 @@ import java.util.UUID;
 @Table(
 	name = "p_cart",
 	uniqueConstraints = {
-		@UniqueConstraint(name = "uq_cart_user_store", columnNames = {"user_id", "store_id"})
+		@UniqueConstraint(name = "uq_cart_user_store", columnNames = {"user_id"})
 	}
 )
 @Getter
