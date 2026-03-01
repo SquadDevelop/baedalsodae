@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "p_user")
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseAuditEntity {
 
     @Id
@@ -58,7 +59,7 @@ public class User extends BaseAuditEntity {
     private UUID userMainAddressId;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<UserAddress> userAddresses;
+    private List<UserAddress> userAddresses = new ArrayList<>();
 
     public void update(String phone, String email, String password, String nickname) {
         if (phone != null && !phone.isBlank()) {
