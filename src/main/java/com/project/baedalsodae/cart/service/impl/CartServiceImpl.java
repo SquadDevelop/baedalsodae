@@ -22,7 +22,7 @@ public class CartServiceImpl implements CartService {
 	@Transactional
 	public CartResponse getCart(UUID userId) {
 
-		Cart cart = cartRepository.findByUserId(userId)
+		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
 				.orElseThrow(()-> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 		return CartResponse.from(cart);

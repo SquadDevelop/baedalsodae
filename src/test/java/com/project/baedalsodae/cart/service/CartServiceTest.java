@@ -33,7 +33,7 @@ public class CartServiceTest {
 	void getCart_fail_cartNotFound(){
 		//given
 		UUID userId = UUID.randomUUID();
-		given(cartRepository.findByUserId(userId))
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
 				.willReturn(Optional.empty());
 
 		//when
