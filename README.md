@@ -248,8 +248,9 @@ docker compose down -v
 #### 백엔드
 
 ```bash
-# 환경 변수 설정 후 실행
-export POSTGRES_URL=jdbc:postgresql://localhost:5432/baedalsodae
+# 환경 변수 설정 후 실행(인텔레제이 환경 변수 사용도 가능)
+export POSTGRES_DB=baedalsodae
+export POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/baedalsodae
 export POSTGRES_USER=baedal_user
 export POSTGRES_PASSWORD=your_password
 export REDIS_HOST=localhost
@@ -265,6 +266,25 @@ cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+## 로컬 환경 세팅
+
+> 백엔드 단독 로컬 실행 시 사용하는 간단한 세팅 가이드입니다.
+
+1. `.env.example`을 복사해서 `.env` 파일 생성 후 값 입력
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Docker로 PostgreSQL 실행
+   ```bash
+   docker-compose up -d
+   ```
+
+3. 애플리케이션 실행
+  - 인텔레제이 환경 변수 설정 후 실행
 
 ---
 
