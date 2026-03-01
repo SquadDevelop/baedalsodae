@@ -2,6 +2,7 @@ package com.project.baedalsodae.global.common;
 
 import jakarta.transaction.SystemException;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -61,6 +62,20 @@ public class GlobalExceptionHandler {
 
         String message = String.format("'%s' 파라미터의 값이 올바르지 않습니다: %s",
                 exception.getName(), exception.getValue());
+
+        return ResponseEntity
+                .status(ErrorCode.INVALID_REQUEST.getStatus())
+                .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<String>> handleConstraintViolation(
+            ConstraintViolationException exception) {
+        log.warn("Constraint Violation: ", exception);
+
+        String message = exception.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
 
         return ResponseEntity
                 .status(ErrorCode.INVALID_REQUEST.getStatus())
