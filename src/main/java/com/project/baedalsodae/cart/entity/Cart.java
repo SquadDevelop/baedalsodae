@@ -32,10 +32,6 @@ public class Cart extends BaseAuditEntity {
 	@Column(name = "store_id", nullable = false)
 	private UUID storeId;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "status", nullable = false)
-	private CartStatus status;
-
 	@OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CartItem> items = new ArrayList<>();
 
