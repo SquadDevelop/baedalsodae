@@ -5,15 +5,18 @@ import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 public class UserRequestDto {
 
     @Getter
-    @Setter
     @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Create {
 
         @NotBlank
@@ -57,13 +60,20 @@ public class UserRequestDto {
     }
 
     @Getter
-    @Setter
     @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Update {
 
+        @Pattern(regexp = "^01(?:0|1|[6-9])[-]?(\\d{3}|\\d{4})[-]?(\\d{4})$")
         private String phone;
+
+        @Email
         private String email;
+
+        @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]{8,15}$")
         private String password;
+
         private String nickname;
         private String roadAddress;
         private String detailAddress;

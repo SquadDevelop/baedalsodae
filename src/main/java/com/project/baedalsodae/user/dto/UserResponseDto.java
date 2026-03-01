@@ -4,13 +4,18 @@ import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class UserResponseDto {
 
     @Getter
     @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Detail {
 
         private UUID id;
@@ -46,6 +51,8 @@ public class UserResponseDto {
 
     @Getter
     @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Delete {
 
         private UUID id;
