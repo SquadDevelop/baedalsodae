@@ -1,7 +1,6 @@
 package com.project.baedalsodae.user.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
-import com.project.baedalsodae.user.dto.UserRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,10 +60,18 @@ public class User extends BaseAuditEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserAddress> userAddresses;
 
-    public void update(UserRequestDto.Update updateRequest) {
-        this.phone = updateRequest.getPhone();
-        this.email = updateRequest.getEmail();
-        this.password = updateRequest.getPassword();
-        this.nickname = updateRequest.getNickname();
+    public void update(String phone, String email, String password, String nickname) {
+        if (phone != null && !phone.isBlank()) {
+            this.phone = phone;
+        }
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        if (password != null && !password.isBlank()) {
+            this.password = password;
+        }
+        if (nickname != null && !nickname.isBlank()) {
+            this.nickname = nickname;
+        }
     }
 }
