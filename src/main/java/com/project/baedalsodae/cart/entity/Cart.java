@@ -42,6 +42,12 @@ public class Cart extends BaseAuditEntity {
 	}
 
 	public void addItem(CartItem item) {
+		for(CartItem existingCartItem : this.items){
+			if(existingCartItem.isSameMenuItem(item.getMenuItem().getId())){
+				existingCartItem.increaseQuantity(item.getQuantity());
+				return;
+			}
+		}
 		this.items.add(item);
 	}
 

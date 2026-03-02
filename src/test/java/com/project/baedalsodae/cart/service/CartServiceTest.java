@@ -339,4 +339,48 @@ public class CartServiceTest {
 		assertThat(response.totalAmount()).isEqualTo(26000);
 	}
 
+	@Test
+	@DisplayName("성공 - 이미 담긴 메뉴면 수량만 증가")
+	void addCartItem_success_existingCart_increaseQuantity_whenSameMenuItem() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId1 = UUID.randomUUID();
+		UUID menuItemId1 = UUID.randomUUID();
+		AddCartItemRequest addCartItemRequest = new AddCartItemRequest(
+				storeId1,
+				menuItemId1,
+				1
+		);
+
+		given(storeRepository.findById(storeId1))
+				.willReturn(Optional.of(store1));
+
+		given(menuItemRepository.findById(menuItemId1))
+				.willReturn(Optional.of(menuItem1));
+
+		given(menuItem1.getId()).willReturn(menuItemId1);
+		given(menuItem1.getName()).willReturn("치킨");
+		given(menuItem1.getPrice()).willReturn(18000);
+		Cart cart = Cart.create(userId, storeId1);
+		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
+		cart.addItem(cartItem1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		given(cartRepository.save(any(Cart.class)))
+				.willAnswer(inv -> inv.getArgument(0));
+
+		//when
+		CartResponse response = cartService.addCartItem(userId, addCartItemRequest);
+		log.info("response = {}", response);
+
+		//then
+		assertThat(response).isNotNull();
+		assertThat(response.items()).hasSize(1);
+		assertThat(response.items().get(0).menuItemId()).isEqualTo(menuItemId1);
+		assertThat(response.items().get(0).quantity()).isEqualTo(2);
+		assertThat(response.totalQuantity()).isEqualTo(2);
+		assertThat(response.totalAmount()).isEqualTo(36000);
+	}
 }

@@ -52,4 +52,11 @@ public class CartItem extends BaseTimeEntity {
 		return new CartItem(cart, menuItem, quantity);
 	}
 
+	public boolean isSameMenuItem(UUID menuItemId){
+		return this.menuItem.getId().equals(menuItemId);
+	}
+
+	public void increaseQuantity(int quantity) {
+		this.quantity += quantity;
+	}
 }
