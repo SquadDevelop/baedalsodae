@@ -24,7 +24,8 @@ public enum ErrorCode {
     USER_DUPLICATED_PHONE_NUMBER("U003", HttpStatus.CONFLICT, "이미 가입된 전화번호입니다"),
 
     //cart
-    CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND,"장바구니가 없습니다.")
+    CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND,"장바구니가 없습니다."),
+    CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST,"수량은 1 이상이어야 합니다.")
     ;
     private final String code;
     private final HttpStatus status;

@@ -1,5 +1,6 @@
 package com.project.baedalsodae.cart.service.impl;
 
+import com.project.baedalsodae.cart.dto.request.AddCartItemRequest;
 import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
@@ -19,12 +20,19 @@ public class CartServiceImpl implements CartService {
 	private final CartRepository cartRepository;
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public CartResponse getCart(UUID userId) {
-
 		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
-				.orElseThrow(()-> new BusinessException(ErrorCode.CART_NOT_FOUND));
+				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 		return CartResponse.from(cart);
+	}
+
+
+	@Override
+	@Transactional
+	public void addCartItem(UUID userId, AddCartItemRequest request) {
+		if (!request.isValidQuantity())
+			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 	}
 }
