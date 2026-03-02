@@ -2,7 +2,7 @@ package com.project.baedalsodae.tag.entity;
 
 import com.project.baedalsodae.menu.entity.MenuItem;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class TagMapping {
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+  private Instant createdAt;
 
   public static TagMapping create(Tag tag, MenuItem menuItem, int orderNo) {
     TagMapping tagMapping = new TagMapping();
