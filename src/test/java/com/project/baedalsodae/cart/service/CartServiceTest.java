@@ -66,7 +66,7 @@ public class CartServiceTest {
 	void getCart_fail_cartNotFound() {
 		//given
 		UUID userId = UUID.randomUUID();
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.empty());
 
 		//when
@@ -89,7 +89,7 @@ public class CartServiceTest {
 		given(store1.getId()).willReturn(storeId);
 		Cart emptyCart = Cart.create(userId, store1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(emptyCart));
 
 		//when
@@ -126,7 +126,7 @@ public class CartServiceTest {
 		cart.addItem(cartItem1);
 		cart.addItem(cartItem2);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when
@@ -248,7 +248,7 @@ public class CartServiceTest {
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when
@@ -282,7 +282,7 @@ public class CartServiceTest {
 		given(menuItemRepository.findById(menuItemId1))
 				.willReturn(Optional.of(menuItem1));
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.empty());
 
 		given(cartRepository.save(any(Cart.class)))
@@ -329,7 +329,7 @@ public class CartServiceTest {
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		given(cartRepository.save(any(Cart.class)))
@@ -378,7 +378,7 @@ public class CartServiceTest {
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		given(cartRepository.save(any(Cart.class)))
@@ -425,7 +425,7 @@ public class CartServiceTest {
 		UUID cartItemId = UUID.randomUUID();
 		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.empty());
 
 		//when
@@ -451,7 +451,7 @@ public class CartServiceTest {
 
 		Cart cart = Cart.create(userId, store1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when
@@ -480,7 +480,7 @@ public class CartServiceTest {
 		given(cartItem1.getId()).willReturn(cartItemId1);
 		cart.addItem(cartItem1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when
@@ -497,7 +497,7 @@ public class CartServiceTest {
 		UUID userId = UUID.randomUUID();
 		UUID cartItemId1 = UUID.randomUUID();
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.empty());
 
 		//when
@@ -522,7 +522,7 @@ public class CartServiceTest {
 
 		Cart cart = Cart.create(userId, store1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when
@@ -551,7 +551,7 @@ public class CartServiceTest {
 		given(cartItem1.getId()).willReturn(cartItemId1);
 		cart.addItem(cartItem1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when
@@ -568,7 +568,7 @@ public class CartServiceTest {
 		UUID userId = UUID.randomUUID();
 		UUID cartItemId1 = UUID.randomUUID();
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.empty());
 
 		//when
@@ -592,7 +592,7 @@ public class CartServiceTest {
 
 		Cart cart = Cart.create(userId, store1);
 
-		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+		given(cartRepository.findCartWithItemsByUserId(userId))
 				.willReturn(Optional.of(cart));
 
 		//when

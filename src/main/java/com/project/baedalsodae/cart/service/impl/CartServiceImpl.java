@@ -31,7 +31,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional(readOnly = true)
 	public CartResponse getCart(UUID userId) {
-		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 		return CartResponse.from(cart);
@@ -52,7 +52,7 @@ public class CartServiceImpl implements CartService {
 		MenuItem menuItem = menuItemRepository.findById(menuItemId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
-		Optional<Cart> optionalCart = cartRepository.findByUserIdAndIsDeletedFalse(userId);
+		Optional<Cart> optionalCart = cartRepository.findCartWithItemsByUserId(userId);
 
 		optionalCart.ifPresent(existingCart -> {
 			if (!existingCart.isSameStore(storeId))
@@ -73,7 +73,7 @@ public class CartServiceImpl implements CartService {
 		if (!request.isValidQuantity())
 			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 
-		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 		CartItem cartItem = cart.findCartItemById(cartItemId)
@@ -85,7 +85,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional
 	public void removeCartItem(UUID userId, UUID cartItemId) {
-		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 		final boolean isRemoved = cart.removeItem(cartItemId);
@@ -95,7 +95,7 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional
 	public void clearCart(UUID userId) {
-		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 		cartRepository.delete(cart);
