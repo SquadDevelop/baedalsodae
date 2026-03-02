@@ -42,8 +42,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public Detail getUser(UUID userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = findByUserId(userId);
 
         return Detail.from(user);
     }
@@ -51,8 +50,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public Detail updateUser(UUID userId, UserRequestDto.Update updateRequest) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = findByUserId(userId);
 
         String encodedPassword = user.getPassword();
         if (updateRequest.getPassword() != null && !updateRequest.getPassword().isBlank()) {
@@ -72,11 +70,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public Delete deleteUser(UUID userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = findByUserId(userId);
 
         user.softDelete(userId);
 
         return Delete.from(user);
+    }
+
+    private User findByUserId(UUID userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 }
