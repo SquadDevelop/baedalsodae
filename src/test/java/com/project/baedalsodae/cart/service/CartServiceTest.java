@@ -103,16 +103,18 @@ public class CartServiceTest {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID storeId = UUID.randomUUID();
+		UUID menuItemId1 = UUID.randomUUID();
+		UUID menuItemId2 = UUID.randomUUID();
 
 		given(store1.getId()).willReturn(storeId);
 		Cart cart = Cart.create(userId, store1);
 
-		given(menuItem1.getId()).willReturn(UUID.randomUUID());
+		given(menuItem1.getId()).willReturn(menuItemId1);
 		given(menuItem1.getName()).willReturn("후라이드 치킨");
 		given(menuItem1.getPrice()).willReturn(18000);
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 
-		given(menuItem2.getId()).willReturn(UUID.randomUUID());
+		given(menuItem2.getId()).willReturn(menuItemId2);
 		given(menuItem2.getName()).willReturn("짜장면");
 		given(menuItem2.getPrice()).willReturn(8000);
 		CartItem cartItem2 = CartItem.create(cart, menuItem2, 1);
@@ -432,6 +434,32 @@ public class CartServiceTest {
 		assertThat(throwable)
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_NOT_FOUND);
+
+	}
+
+	@Test
+	@DisplayName("실패 - 장바구니 아이템 수량 변경 시 해당 아이템이 장바구니에 없음")
+	void updateCartItemQuantity_fail_cartItemNotFound(){
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId1 = UUID.randomUUID();
+		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
+
+		Cart cart = Cart.create(userId, store1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.updateCartItemQuantity(userId, cartItemId1, request);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_ITEM_NOT_FOUND);
 
 	}
 }

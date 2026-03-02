@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -57,6 +58,15 @@ public class Cart extends BaseAuditEntity {
 
 	public boolean isSameStore(UUID storeId) {
 		return this.store.getId().equals(storeId);
+	}
+
+	public Optional<CartItem> findCartItemById(UUID cartItemId){
+		for(CartItem existingCartItem : this.items){
+			if(existingCartItem.getId().equals(cartItemId)){
+				return Optional.of(existingCartItem);
+			}
+		}
+		return Optional.empty();
 	}
 
 	public Cart(UUID userId, Store store) {

@@ -76,6 +76,9 @@ public class CartServiceImpl implements CartService {
 		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
+		cart.findCartItemById(cartItemId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+
 
 	}
 }
