@@ -7,13 +7,14 @@ import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.menu.entity.MenuItem;
+import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -22,6 +23,7 @@ public class CartServiceImpl implements CartService {
 
 	private final CartRepository cartRepository;
 	private final StoreRepository storeRepository;
+	private final MenuItemRepository menuItemRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -40,7 +42,10 @@ public class CartServiceImpl implements CartService {
 			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 
 		Store store = storeRepository.findById(request.storeId())
-				.orElseThrow(()-> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+				.orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+		MenuItem menuItem = menuItemRepository.findById(request.menuItemId())
+				.orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
 		return null;
 	}

@@ -9,6 +9,7 @@ import com.project.baedalsodae.cart.service.impl.CartServiceImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuItem;
+import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,9 @@ public class CartServiceTest {
 	@Mock
 	private StoreRepository storeRepository;
 
+	@Mock
+	private MenuItemRepository menuItemRepository;
+
 	@InjectMocks
 	private CartServiceImpl cartService;
 
@@ -44,6 +48,9 @@ public class CartServiceTest {
 
 	@Mock
 	private MenuItem menuItem2;
+
+	@Mock
+	private Store store1;
 
 	@Test
 	@DisplayName("실패 - 장바구니가 존재하지 않음")
@@ -168,6 +175,36 @@ public class CartServiceTest {
 		assertThat(throwable)
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_NOT_FOUND);
+	}
 
+	@Test
+	@DisplayName("실패 - 장바구니 아이템 추가 시 메뉴가 존재하지 않음")
+	void addCartItem_fail_menuNotFound() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId = UUID.randomUUID();
+		UUID menuItemId = UUID.randomUUID();
+		AddCartItemRequest addCartItemRequest = new AddCartItemRequest(
+				storeId,
+				menuItemId,
+				1
+		);
+
+		given(storeRepository.findById(storeId))
+				.willReturn(Optional.of(store1));
+
+		given(menuItemRepository.findById(menuItemId))
+				.willReturn(Optional.empty());
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.addCartItem(userId, addCartItemRequest);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_ITEM_NOT_FOUND);
 	}
 }

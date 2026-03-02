@@ -28,7 +28,10 @@ public enum ErrorCode {
     CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST,"수량은 1 이상이어야 합니다."),
 
     //store
-    STORE_NOT_FOUND("ST001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다.")
+    STORE_NOT_FOUND("ST001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
+
+    //menu_item
+    MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 존재하지 않습니다.")
     ;
     private final String code;
     private final HttpStatus status;
