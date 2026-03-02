@@ -1,0 +1,70 @@
+package com.project.baedalsodae.user.dto.response;
+
+import com.project.baedalsodae.user.entity.User;
+import com.project.baedalsodae.user.entity.UserRole;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+public class UserResponseDto {
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Detail {
+
+        private UUID id;
+        private String username;
+        private String phone;
+        private String email;
+        private String name;
+        private String nickname;
+        private UserRole role;
+
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+
+        private UUID createdBy;
+        private UUID updatedBy;
+
+        public static Detail from(User user) {
+            return Detail.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .phone(user.getPhone())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .nickname(user.getNickname())
+                    .role(user.getRole())
+                    .createdAt(user.getCreatedAt())
+                    .updatedAt(user.getUpdatedAt())
+                    .createdBy(user.getCreatedBy())
+                    .updatedBy(user.getUpdatedBy())
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Delete {
+
+        private UUID id;
+        private LocalDateTime deletedAt;
+        private UUID deletedBy;
+
+        public static Delete from(User user) {
+            return Delete.builder()
+                    .id(user.getId())
+                    .deletedAt(user.getDeletedAt())
+                    .deletedBy(user.getDeletedBy())
+                    .build();
+        }
+    }
+}

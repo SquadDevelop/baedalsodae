@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: baedalsodae-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: baedalsodae
+    env_file:
+      - .env
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    restart: unless-stopped

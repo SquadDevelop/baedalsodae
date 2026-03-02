@@ -47,4 +47,49 @@ public class MenuItem extends BaseAuditEntity {
   @Column(name = "menu_status")
   @Enumerated(EnumType.STRING)
   private MenuStatus menuStatus;
+
+  public void changeMenuInfo(
+      String name,
+      String description,
+      int price,
+      MenuStatus menuStatus,
+      int orderNo,
+      MenuCategory menuCategory,
+      boolean popular) {
+    this.name = name;
+    this.description = description;
+    this.price = price;
+    this.menuStatus = menuStatus;
+    this.orderNo = orderNo;
+    this.menuCategory = menuCategory;
+    this.isPopular = popular;
+  }
+
+  public void changeName(String name) {
+    this.name = name;
+  }
+
+  public void changeDescription(String description) {
+    this.description = description;
+  }
+
+  public void changePrice(Integer price) {
+    this.price = price;
+  }
+
+  public void changeMenuStatus(MenuStatus menuStatus) {
+    this.menuStatus = menuStatus;
+  }
+
+  public void changeOrderNo(Integer integer) {
+    this.orderNo = integer;
+  }
+
+  public void changeIsPopular(Boolean popular) {
+    this.isPopular = popular;
+  }
+
+  public void changeMenuCategory(MenuCategory category) {
+    this.menuCategory = category;
+  }
 }
