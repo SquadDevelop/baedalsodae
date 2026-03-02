@@ -3,9 +3,8 @@ package com.project.baedalsodae.menu.dto.requestDto;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
 import java.util.UUID;
 
-public class MenuRequestDto {
 
-  public record MenuRequest(
+  public record MenuPutRequestDto(
       String name,
       String description,
       int price,
@@ -14,12 +13,3 @@ public class MenuRequestDto {
       UUID categoryId,
       MenuStatus menuStatus) {}
 
-  public record PatchMenuRequest(
-      String name,
-      String description,
-      Integer price,
-      Integer orderNo,
-      Boolean isPopular,
-      UUID categoryId,
-      MenuStatus menuStatus) {}
-}

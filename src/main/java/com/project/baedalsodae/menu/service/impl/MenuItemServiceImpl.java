@@ -2,8 +2,9 @@ package com.project.baedalsodae.menu.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.menu.dto.requestDto.MenuRequestDto;
-import com.project.baedalsodae.menu.dto.responseDto.MenuResponseDto;
+import com.project.baedalsodae.menu.dto.requestDto.MenuPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.MenuPutRequestDto;
+import com.project.baedalsodae.menu.dto.responseDto.MenuItemResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
@@ -23,8 +24,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
   @Transactional
   @Override
-  public MenuResponseDto.MenuItemResponse updateMenuItem(
-      UUID menuItemId, MenuRequestDto.MenuRequest request) {
+  public MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuPutRequestDto request) {
     MenuItem item =
         menuItemRepository
             .findByIdAndDeletedIsFalse(menuItemId)
@@ -42,13 +42,12 @@ public class MenuItemServiceImpl implements MenuItemService {
         category,
         request.isPopular());
     item.changeMenuStatus(request.menuStatus());
-    return MenuResponseDto.MenuItemResponse.fromEntity(item);
+    return MenuItemResponseDto.fromEntity(item);
   }
 
   @Transactional
   @Override
-  public MenuResponseDto.MenuItemResponse patchMenuItem(
-      UUID menuItemId, MenuRequestDto.PatchMenuRequest request) {
+  public MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuPatchRequestDto request) {
     MenuItem item =
         menuItemRepository
             .findByIdAndDeletedIsFalse(menuItemId)
@@ -66,7 +65,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     if (request.orderNo() != null) item.changeOrderNo(request.orderNo());
     if (request.isPopular() != null) item.changeIsPopular(request.isPopular());
     if (request.menuStatus() != null) item.changeMenuStatus(request.menuStatus());
-    return MenuResponseDto.MenuItemResponse.fromEntity(item);
+    return MenuItemResponseDto.fromEntity(item);
   }
 
   @Transactional

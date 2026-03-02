@@ -1,17 +1,15 @@
 package com.project.baedalsodae.menu.service;
 
-import com.project.baedalsodae.menu.dto.requestDto.MenuRequestDto;
-import com.project.baedalsodae.menu.dto.responseDto.MenuResponseDto;
+import com.project.baedalsodae.menu.dto.requestDto.MenuPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.MenuPutRequestDto;
+import com.project.baedalsodae.menu.dto.responseDto.MenuItemResponseDto;
 import java.util.UUID;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface MenuItemService {
 
-  MenuResponseDto.MenuItemResponse updateMenuItem(
-      UUID menuItemId, MenuRequestDto.MenuRequest request);
+  MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuPutRequestDto request);
 
-  MenuResponseDto.MenuItemResponse patchMenuItem(
-      UUID menuItemId, MenuRequestDto.PatchMenuRequest request);
+  MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuPatchRequestDto request);
 
   void deleteMenuItem(UUID menuItemId);
 }
