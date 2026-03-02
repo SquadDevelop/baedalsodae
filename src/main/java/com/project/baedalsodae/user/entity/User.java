@@ -61,6 +61,18 @@ public class User extends BaseAuditEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserAddress> userAddresses = new ArrayList<>();
 
+    public static User create(String username, String phone, String email, String encodedPassword, String name, String nickname, UserRole role) {
+        return User.builder()
+                .username(username)
+                .phone(phone)
+                .email(email)
+                .password(encodedPassword)
+                .name(name)
+                .nickname(nickname)
+                .role(role)
+                .build();
+    }
+
     public void update(String phone, String email, String password, String nickname) {
         if (phone != null && !phone.isBlank()) {
             this.phone = phone;

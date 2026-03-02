@@ -1,6 +1,5 @@
 package com.project.baedalsodae.user.dto.request;
 
-import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -45,18 +44,6 @@ public class UserRequestDto {
 
         private String roadAddress;
         private String detailAddress;
-
-        public User toEntity(String encodedPassword) {
-            return User.builder()
-                    .username(this.username)
-                    .phone(this.phone)
-                    .email(this.email)
-                    .password(encodedPassword)
-                    .name(this.name)
-                    .nickname(this.nickname)
-                    .role(this.role)
-                    .build();
-        }
     }
 
     @Getter
