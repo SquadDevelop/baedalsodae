@@ -415,10 +415,20 @@ public class CartServiceTest {
 	@DisplayName("실패 - 장바구니 아이템 수량 변경 시 장바구니가 존재하지 않음")
 	void updateCartItemQuantity_fail_cartNotFound(){
 		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId = UUID.randomUUID();
+		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
 
 		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.updateCartItemQuantity(userId, cartItemId, request);
+		});
+		log.info("throwable = " + throwable);
 
 		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_NOT_FOUND);
 
 	}
 }
