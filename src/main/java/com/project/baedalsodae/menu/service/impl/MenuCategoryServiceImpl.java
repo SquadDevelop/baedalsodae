@@ -32,4 +32,14 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     menuCategory.changeMenuCategoryName(request.name());
     return MenuCategoryResponseDto.fromEntity(menuCategory);
   }
+
+  @Override
+  @Transactional
+  public void deleteMenuCategory(UUID menuCategoryId) {
+    MenuCategory menuCategory =
+        menuCategoryRepository
+            .findByIdAndDeletedIsFalse(menuCategoryId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    menuCategory.softDelete(null); // / 토큰 기능 추가 시 수정 필요
+  }
 }

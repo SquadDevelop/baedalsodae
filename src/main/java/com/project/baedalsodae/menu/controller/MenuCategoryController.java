@@ -25,4 +25,9 @@ public class MenuCategoryController {
         menuCategoryService.updateMenuCategory(menuCategoryId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }
+  @DeleteMapping("/{menuCategoryId}")
+  public ResponseEntity<ApiResponse<Void>> deleteMenuCategory(@PathVariable UUID menuCategoryId) {
+    menuCategoryService.deleteMenuCategory(menuCategoryId);
+    return ResponseEntity.ok(ApiResponse.success(""));
+  }
 }
