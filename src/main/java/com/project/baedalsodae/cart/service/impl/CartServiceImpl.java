@@ -3,6 +3,7 @@ package com.project.baedalsodae.cart.service.impl;
 import com.project.baedalsodae.cart.dto.request.AddCartItemRequest;
 import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.entity.Cart;
+import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.BusinessException;
@@ -35,7 +36,6 @@ public class CartServiceImpl implements CartService {
 		return CartResponse.from(cart);
 	}
 
-
 	@Override
 	@Transactional
 	public CartResponse addCartItem(UUID userId, AddCartItemRequest request) {
@@ -58,6 +58,11 @@ public class CartServiceImpl implements CartService {
 				throw new BusinessException(ErrorCode.CART_DIFFERENT_STORE);
 		});
 
-		return null;
+		Cart cart = optionalCart.orElseGet(() -> Cart.create(userId, storeId));
+		cart.addItem(CartItem.create(cart, menuItem));
+
+		final Cart savedCart = cartRepository.save(cart);
+
+		return CartResponse.from(savedCart);
 	}
 }

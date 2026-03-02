@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @Slf4j
@@ -249,5 +250,43 @@ public class CartServiceTest {
 		assertThat(throwable)
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_DIFFERENT_STORE);
+	}
+
+	@Test
+	@DisplayName("성공 - 최초 추가, 장바구니 신규 생성 후 아이템 추가")
+	void addCartItem_success_newCart() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId1 = UUID.randomUUID();
+		UUID menuItemId1 = UUID.randomUUID();
+		AddCartItemRequest addCartItemRequest = new AddCartItemRequest(
+				storeId1,
+				menuItemId1,
+				1
+		);
+
+		given(storeRepository.findById(storeId1))
+				.willReturn(Optional.of(store1));
+
+		given(menuItemRepository.findById(menuItemId1))
+				.willReturn(Optional.of(menuItem1));
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.empty());
+
+		given(cartRepository.save(any(Cart.class)))
+				.willAnswer(inv -> inv.getArgument(0));
+
+		given(menuItem1.getId()).willReturn(menuItemId1);
+
+		//when
+		CartResponse response = cartService.addCartItem(userId, addCartItemRequest);
+		log.info("response = {}", response);
+
+		//then
+		assertThat(response).isNotNull();
+		assertThat(response.items()).hasSize(1);
+		assertThat(response.items().get(0).menuItemId()).isEqualTo(menuItemId1);
+		assertThat(response.items().get(0).quantity()).isEqualTo(addCartItemRequest.quantity());
 	}
 }
