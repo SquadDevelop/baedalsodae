@@ -2,7 +2,7 @@ package com.project.baedalsodae.menu.common;
 
 public interface Orderable {
 
-  int getOrderNo();
+  Integer getOrderNo();
 
   void changeOrderNo(int order);
 }

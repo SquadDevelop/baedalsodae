@@ -52,7 +52,10 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         menuCategoryRepository
             .findByIdAndDeletedIsFalse(menuCategoryId)
             .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-    int from = menuCategory.getOrderNo();
+    Integer from = menuCategory.getOrderNo();
+    if(from == null) {
+      throw new BusinessException(ErrorCode.INVALID_MENU_CATEGORY_ORDER);
+    }
     int to = request.orderNo();
 
     if (from == to) {

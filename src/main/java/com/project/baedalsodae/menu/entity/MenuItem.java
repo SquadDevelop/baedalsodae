@@ -35,8 +35,8 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "order_no", nullable = false)
-  private int orderNo;
+  @Column(name = "order_no")
+  private Integer orderNo;
 
   @Column(name = "price", nullable = false)
   private int price;
@@ -97,5 +97,11 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
   @Override
   public void changeOrderNo(int orderNo) {
     this.orderNo = orderNo;
+  }
+
+  @Override
+  public void softDelete(UUID userId) {
+    super.softDelete(userId);
+    this.orderNo = null;
   }
 }
