@@ -1,7 +1,7 @@
 package com.project.baedalsodae.user.service;
 
-import com.project.baedalsodae.user.dto.UserRequestDto;
-import com.project.baedalsodae.user.dto.UserResponseDto;
+import com.project.baedalsodae.user.dto.request.UserRequestDto;
+import com.project.baedalsodae.user.dto.response.UserResponseDto;
 import java.util.UUID;
 
 public interface UserService {

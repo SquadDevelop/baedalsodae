@@ -1,4 +1,4 @@
-package com.project.baedalsodae.user.dto;
+package com.project.baedalsodae.user.dto.request;
 
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;

@@ -2,9 +2,9 @@ package com.project.baedalsodae.user.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.user.dto.UserRequestDto;
-import com.project.baedalsodae.user.dto.UserResponseDto.Delete;
-import com.project.baedalsodae.user.dto.UserResponseDto.Detail;
+import com.project.baedalsodae.user.dto.request.UserRequestDto;
+import com.project.baedalsodae.user.dto.response.UserResponseDto.Delete;
+import com.project.baedalsodae.user.dto.response.UserResponseDto.Detail;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserService;
