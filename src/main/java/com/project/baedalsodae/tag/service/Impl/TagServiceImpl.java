@@ -1,14 +1,12 @@
 package com.project.baedalsodae.tag.service.Impl;
 
 import com.project.baedalsodae.tag.entity.Tag;
+import com.project.baedalsodae.tag.repository.TagBulkRepository;
 import com.project.baedalsodae.tag.repository.TagRepository;
 import com.project.baedalsodae.tag.service.TagService;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TagServiceImpl implements TagService {
 
   private final TagRepository tagRepository;
+  private final TagBulkRepository tagBulkRepository;
 
   @Override
   @Transactional(readOnly = true)
@@ -24,19 +23,8 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public Map<String, Tag> createNewTags(List<String> names) {
-    List<Tag> tags = names.stream().map(Tag::create).toList();
-    tagRepository.saveAllAndFlush(tags);
-    return tags.stream().collect(Collectors.toMap(Tag::getName, t -> t));
+  public void createNewTagsIfNotExists(List<String> tagNames) {
+    List<String> distinctNames = tagNames.stream().distinct().toList();
+    tagBulkRepository.bulkInsertIgnore(distinctNames);
   }
-
-  @Override
-  public Tag findOrCreateTag(String name) {
-    return tagRepository.findByName(name).orElseGet(() -> {
-      Tag newTag = Tag.create(name);
-      return tagRepository.saveAndFlush(newTag);
-    });
-  }
-
 }

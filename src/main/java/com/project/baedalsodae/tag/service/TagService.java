@@ -8,7 +8,5 @@ public interface TagService {
 
   List<Tag> findAllByNames(List<String> names);
 
-  Map<String, Tag> createNewTags(List<String> names);
-
-  Tag findOrCreateTag(String name);
+  void createNewTagsIfNotExists(List<String> distinctNames);
 }

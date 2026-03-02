@@ -7,8 +7,8 @@ import com.project.baedalsodae.tag.repository.TagMappingRepository;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.tag.service.TagService;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,32 +23,19 @@ public class TagMappingServiceImpl implements TagMappingService {
   @Transactional
   public void createTagMappings(MenuItem menuItem, List<String> tagNames) {
 
-    Map<String, Tag> resolvedTagMap = new HashMap<>();
+    List<String> distinctNames = tagNames.stream().distinct().toList();
 
-    List<Tag> tagList = tagService.findAllByNames(tagNames);
-    for (Tag tag : tagList) {
-      resolvedTagMap.put(tag.getName(), tag);
-    }
+    tagService.createNewTagsIfNotExists(distinctNames);
 
-    List<String> tagNotFoundNames =
-        tagNames.stream().filter(name -> !resolvedTagMap.containsKey(name)).toList();
-
-    if (!tagNotFoundNames.isEmpty()) {
-      try {
-        Map<String, Tag> newTagMap = tagService.createNewTags(tagNotFoundNames);
-        resolvedTagMap.putAll(newTagMap);
-      } catch (DataIntegrityViolationException e) {
-        for (String name : tagNotFoundNames) {
-          resolvedTagMap.put(name, tagService.findOrCreateTag(name));
-        }
-      }
-    }
+    Map<String, Tag> tagMap =
+        tagService.findAllByNames(distinctNames).stream()
+            .collect(Collectors.toMap(Tag::getName, t -> t));
 
     List<TagMapping> tagMappings = new ArrayList<>();
 
     for (int i = 0; i < tagNames.size(); i++) {
       String tagName = tagNames.get(i);
-      Tag tag = resolvedTagMap.get(tagName);
+      Tag tag = tagMap.get(tagName);
       TagMapping mapping = TagMapping.create(tag, menuItem, i);
       tagMappings.add(mapping);
     }
