@@ -91,4 +91,13 @@ public class CartServiceImpl implements CartService {
 		final boolean isRemoved = cart.removeItem(cartItemId);
 		if(!isRemoved) throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
 	}
+
+	@Override
+	@Transactional
+	public void clearCart(UUID userId) {
+		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+
+
+	}
 }

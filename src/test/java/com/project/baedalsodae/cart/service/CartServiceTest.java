@@ -560,4 +560,27 @@ public class CartServiceTest {
 		//then
 		assertThat(cart.getItems()).hasSize(0);
 	}
+
+	@Test
+	@DisplayName("실패 - 장바구니 비우기 시 장바구니가 존재하지 않음")
+	void clearCart_fail_cartNotFound() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId1 = UUID.randomUUID();
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.empty());
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.clearCart(userId);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_NOT_FOUND);
+
+	}
 }
