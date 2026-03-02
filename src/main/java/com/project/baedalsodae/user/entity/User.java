@@ -5,19 +5,27 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
 @Table(name = "p_user")
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseAuditEntity {
 
     @Id
@@ -48,5 +56,35 @@ public class User extends BaseAuditEntity {
     private UserRole role;
 
     @Column(name = "user_main_address_id")
-    private Long userMainAddressId;
+    private UUID userMainAddressId;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserAddress> userAddresses = new ArrayList<>();
+
+    public static User create(String username, String phone, String email, String encodedPassword, String name, String nickname, UserRole role) {
+        return User.builder()
+                .username(username)
+                .phone(phone)
+                .email(email)
+                .password(encodedPassword)
+                .name(name)
+                .nickname(nickname)
+                .role(role)
+                .build();
+    }
+
+    public void update(String phone, String email, String password, String nickname) {
+        if (phone != null && !phone.isBlank()) {
+            this.phone = phone;
+        }
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+        if (password != null && !password.isBlank()) {
+            this.password = password;
+        }
+        if (nickname != null && !nickname.isBlank()) {
+            this.nickname = nickname;
+        }
+    }
 }

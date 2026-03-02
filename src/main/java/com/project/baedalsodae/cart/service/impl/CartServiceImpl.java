@@ -73,5 +73,9 @@ public class CartServiceImpl implements CartService {
 		if (!request.isValidQuantity())
 			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 
+		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+
+
 	}
 }
