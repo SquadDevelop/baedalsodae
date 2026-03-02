@@ -25,15 +25,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public Detail createUser(UserRequestDto.Create createRequest) {
         String encodedPassword = passwordEncoder.encode(createRequest.getPassword());
-        User newUser = userRepository.save(createRequest.toEntity(encodedPassword));
 
-        return Detail.from(newUser);
+        User newUser = User.create(
+                createRequest.getUsername(),
+                createRequest.getPhone(),
+                createRequest.getEmail(),
+                encodedPassword,
+                createRequest.getName(),
+                createRequest.getNickname(),
+                createRequest.getRole()
+        );
+
+        return Detail.from(userRepository.save(newUser));
     }
 
     @Transactional(readOnly = true)
     @Override
     public Detail getUser(UUID userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return Detail.from(user);
@@ -42,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public Detail updateUser(UUID userId, UserRequestDto.Update updateRequest) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         String encodedPassword = user.getPassword();
@@ -63,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public Delete deleteUser(UUID userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.softDelete(userId);
