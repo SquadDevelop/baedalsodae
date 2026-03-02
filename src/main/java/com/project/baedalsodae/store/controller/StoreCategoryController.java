@@ -21,14 +21,14 @@ public class StoreCategoryController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<StoreCategoryListResponse>> getStoreCategoryListForCustomer() {
-        StoreCategoryListResponse response = storeCategoryService.storeCategoryList();
+        StoreCategoryListResponse response = storeCategoryService.getActiveStoreCategories();
         return ResponseEntity.ok(ApiResponse.success("Store categories retrieved.", response));
     }
 
     @GetMapping("{/storeCategoryId}")
     public ResponseEntity<ApiResponse<StoreCategoryDetailResponse>> getStoreCategoryDetail(
             @PathVariable UUID storeCategoryId) {
-        StoreCategoryDetailResponse response = storeCategoryService.storeCategoryDetail(storeCategoryId);
+        StoreCategoryDetailResponse response = storeCategoryService.getStoreCategoryDetail(storeCategoryId);
         return ResponseEntity.ok(ApiResponse.success("Store category detail retrieved.", response));
     }
 

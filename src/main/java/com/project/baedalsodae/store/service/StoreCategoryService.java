@@ -8,9 +8,8 @@ import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import java.util.UUID;
 
 public interface StoreCategoryService {
-    StoreCategoryListResponse storeCategoryList();
-//    StoreCategoryListResponse storeCategoryList();
-    StoreCategoryDetailResponse storeCategoryDetail(UUID storeCategoryId);
+    StoreCategoryListResponse getActiveStoreCategories();
+    StoreCategoryDetailResponse getStoreCategoryDetail(UUID storeCategoryId);
     void createStoreCategory(CreateStoreCategoryRequest request);
     void patchStoreCategory(PatchStoreCategoryRequest request, UUID storeCategoryId);
     void deleteStoreCategory(UUID storeCategoryId);

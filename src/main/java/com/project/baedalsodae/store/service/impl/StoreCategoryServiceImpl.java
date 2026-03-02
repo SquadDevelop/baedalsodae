@@ -23,7 +23,7 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
     private final StoreCategoryRepository storeCategoryRepository;
 
     @Override
-    public StoreCategoryListResponse storeCategoryList() {
+    public StoreCategoryListResponse getActiveStoreCategories() {
         List<StoreCategoryResponse> storeCategoryResponseList = storeCategoryRepository.findAllByIsDeletedFalse()
                 .stream()
                 .map(StoreCategoryResponse::from)
@@ -33,8 +33,9 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
     }
 
     @Override
-    public StoreCategoryDetailResponse storeCategoryDetail(UUID storeCategoryId) {
-        return null;
+    public StoreCategoryDetailResponse getStoreCategoryDetail(UUID storeCategoryId) {
+        StoreCategory storeCategory = getStoreCategory(storeCategoryId);
+        return StoreCategoryDetailResponse.fromStoreCategory(storeCategory);
     }
 
     @Override
