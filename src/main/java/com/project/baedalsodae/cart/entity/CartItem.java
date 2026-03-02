@@ -30,7 +30,7 @@ public class CartItem extends BaseTimeEntity {
 			foreignKey = @ForeignKey(name = "fk_cart_item_cart_id"))
 	private Cart cart;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "menu_item_id", nullable = false,
 			foreignKey = @ForeignKey(name = "fk_cart_item_menu_item_id"))
 	private MenuItem menuItem;
