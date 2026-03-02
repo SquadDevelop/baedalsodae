@@ -106,12 +106,12 @@ public class CartServiceTest {
 		given(menuItem1.getId()).willReturn(UUID.randomUUID());
 		given(menuItem1.getName()).willReturn("후라이드 치킨");
 		given(menuItem1.getPrice()).willReturn(18000);
-		CartItem cartItem1 = CartItem.create(cart, menuItem1);
+		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 
 		given(menuItem2.getId()).willReturn(UUID.randomUUID());
 		given(menuItem2.getName()).willReturn("짜장면");
 		given(menuItem2.getPrice()).willReturn(8000);
-		CartItem cartItem2 = CartItem.create(cart, menuItem2);
+		CartItem cartItem2 = CartItem.create(cart, menuItem2, 1);
 
 		cart.addItem(cartItem1);
 		cart.addItem(cartItem2);
@@ -234,7 +234,7 @@ public class CartServiceTest {
 				.willReturn(Optional.of(menuItem2));
 
 		Cart cart = Cart.create(userId, storeId1);
-		CartItem cartItem1 = CartItem.create(cart, menuItem1);
+		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 
 		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
@@ -289,4 +289,54 @@ public class CartServiceTest {
 		assertThat(response.items().get(0).menuItemId()).isEqualTo(menuItemId1);
 		assertThat(response.items().get(0).quantity()).isEqualTo(addCartItemRequest.quantity());
 	}
+
+	@Test
+	@DisplayName("성공 - 기존 장바구니에 아이템 추가")
+	void addCartItem_success_existingCart_addNewMenuItem() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId1 = UUID.randomUUID();
+		UUID menuItemId1 = UUID.randomUUID();
+		UUID menuItemId2 = UUID.randomUUID();
+		AddCartItemRequest addCartItemRequest = new AddCartItemRequest(
+				storeId1,
+				menuItemId2,
+				1
+		);
+
+		given(storeRepository.findById(storeId1))
+				.willReturn(Optional.of(store1));
+
+		given(menuItemRepository.findById(menuItemId2))
+				.willReturn(Optional.of(menuItem2));
+
+		given(menuItem1.getId()).willReturn(menuItemId1);
+		given(menuItem1.getName()).willReturn("치킨");
+		given(menuItem1.getPrice()).willReturn(18000);
+		Cart cart = Cart.create(userId, storeId1);
+		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
+		cart.addItem(cartItem1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		given(cartRepository.save(any(Cart.class)))
+				.willAnswer(inv -> inv.getArgument(0));
+
+		given(menuItem2.getId()).willReturn(menuItemId2);
+		given(menuItem2.getName()).willReturn("짜장면");
+		given(menuItem2.getPrice()).willReturn(8000);
+
+		//when
+		CartResponse response = cartService.addCartItem(userId, addCartItemRequest);
+		log.info("response = {}", response);
+
+		//then
+		assertThat(response).isNotNull();
+		assertThat(response.items()).hasSize(2);
+		assertThat(response.items().get(0).menuItemId()).isEqualTo(menuItemId1);
+		assertThat(response.items().get(1).menuItemId()).isEqualTo(menuItemId2);
+		assertThat(response.totalAmount()).isEqualTo(26000);
+	}
+
 }

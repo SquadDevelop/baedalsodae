@@ -59,7 +59,7 @@ public class CartServiceImpl implements CartService {
 		});
 
 		Cart cart = optionalCart.orElseGet(() -> Cart.create(userId, storeId));
-		cart.addItem(CartItem.create(cart, menuItem));
+		cart.addItem(CartItem.create(cart, menuItem, request.quantity()));
 
 		final Cart savedCart = cartRepository.save(cart);
 
