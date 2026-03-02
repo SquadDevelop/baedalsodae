@@ -1,6 +1,7 @@
 package com.project.baedalsodae.cart.service.impl;
 
 import com.project.baedalsodae.cart.dto.request.AddCartItemRequest;
+import com.project.baedalsodae.cart.dto.request.UpdateCartItemQuantityRequest;
 import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
@@ -64,5 +65,13 @@ public class CartServiceImpl implements CartService {
 		final Cart savedCart = cartRepository.save(cart);
 
 		return CartResponse.from(savedCart);
+	}
+
+	@Override
+	@Transactional
+	public void updateCartItemQuantity(UUID userId, UUID cartItemId, UpdateCartItemQuantityRequest request) {
+		if (!request.isValidQuantity())
+			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
+
 	}
 }

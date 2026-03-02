@@ -1,6 +1,7 @@
 package com.project.baedalsodae.cart.service;
 
 import com.project.baedalsodae.cart.dto.request.AddCartItemRequest;
+import com.project.baedalsodae.cart.dto.request.UpdateCartItemQuantityRequest;
 import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
@@ -388,5 +389,25 @@ public class CartServiceTest {
 		assertThat(response.items().get(0).quantity()).isEqualTo(2);
 		assertThat(response.totalQuantity()).isEqualTo(2);
 		assertThat(response.totalAmount()).isEqualTo(36000);
+	}
+
+	@Test
+	@DisplayName("실패 - 장바구니 아이템 수량 변경 시 수량이 0 이하")
+	void updateCartItemQuantity_fail_invalidQuantity(){
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId = UUID.randomUUID();
+		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(0);
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.updateCartItemQuantity(userId, cartItemId, request);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_INVALID_QUANTITY);
 	}
 }
