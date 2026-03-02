@@ -2,7 +2,9 @@ package com.project.baedalsodae.cart.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +44,8 @@ public class Cart extends BaseAuditEntity {
 	}
 
 	public void addItem(CartItem item) {
-		for(CartItem existingCartItem : this.items){
-			if(existingCartItem.isSameMenuItem(item.getMenuItem().getId())){
+		for (CartItem existingCartItem : this.items) {
+			if (existingCartItem.isSameMenuItem(item.getMenuItem().getId())) {
 				existingCartItem.increaseQuantity(item.getQuantity());
 				return;
 			}
