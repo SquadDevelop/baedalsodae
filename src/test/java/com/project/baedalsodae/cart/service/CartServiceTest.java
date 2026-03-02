@@ -419,6 +419,9 @@ public class CartServiceTest {
 		UUID cartItemId = UUID.randomUUID();
 		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
 
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+        .willReturn(Optional.empty());
+
 		//when
 		Throwable throwable = catchThrowable(() -> {
 			cartService.updateCartItemQuantity(userId, cartItemId, request);
