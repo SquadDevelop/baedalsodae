@@ -9,6 +9,8 @@ import com.project.baedalsodae.cart.service.impl.CartServiceImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuItem;
+import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.BDDMockito.given;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +32,9 @@ public class CartServiceTest {
 
 	@Mock
 	private CartRepository cartRepository;
+
+	@Mock
+	private StoreRepository storeRepository;
 
 	@InjectMocks
 	private CartServiceImpl cartService;
@@ -79,7 +85,7 @@ public class CartServiceTest {
 
 	@Test
 	@DisplayName("성공 - 장바구니 정상 조회")
-	void getCart_success(){
+	void getCart_success() {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID storeId = UUID.randomUUID();
@@ -113,7 +119,7 @@ public class CartServiceTest {
 
 	@Test
 	@DisplayName("실패 - 장바구니 아이템 추가 시 수량이 0이하")
-	void addCartItem_fail_invalidQuantity(){
+	void addCartItem_fail_invalidQuantity() {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID storeId = UUID.randomUUID();
@@ -125,7 +131,7 @@ public class CartServiceTest {
 		);
 
 		//when
-		Throwable throwable = catchThrowable(()->{
+		Throwable throwable = catchThrowable(() -> {
 			cartService.addCartItem(userId, addCartItemRequest);
 		});
 		log.info("throwable = " + throwable);
@@ -136,4 +142,32 @@ public class CartServiceTest {
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_INVALID_QUANTITY);
 	}
 
+	@Test
+	@DisplayName("실패 - 장바구니 아이템 추가 시 가게가 존재하지 않음")
+	void addCartItem_fail_storeNotFound() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId = UUID.randomUUID();
+		UUID menuItemId = UUID.randomUUID();
+		AddCartItemRequest addCartItemRequest = new AddCartItemRequest(
+				storeId,
+				menuItemId,
+				1
+		);
+
+		given(storeRepository.findById(storeId))
+				.willReturn(Optional.empty());
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.addCartItem(userId, addCartItemRequest);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_NOT_FOUND);
+
+	}
 }

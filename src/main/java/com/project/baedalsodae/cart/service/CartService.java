@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface CartService {
 	CartResponse getCart(UUID userId);
 
-	void addCartItem(UUID userId, AddCartItemRequest addCartItemRequest);
+	CartResponse addCartItem(UUID userId, AddCartItemRequest addCartItemRequest);
 }

@@ -7,10 +7,13 @@ import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,6 +21,7 @@ import java.util.UUID;
 public class CartServiceImpl implements CartService {
 
 	private final CartRepository cartRepository;
+	private final StoreRepository storeRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -31,8 +35,13 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	@Transactional
-	public void addCartItem(UUID userId, AddCartItemRequest request) {
+	public CartResponse addCartItem(UUID userId, AddCartItemRequest request) {
 		if (!request.isValidQuantity())
 			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
+
+		Store store = storeRepository.findById(request.storeId())
+				.orElseThrow(()-> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+		return null;
 	}
 }
