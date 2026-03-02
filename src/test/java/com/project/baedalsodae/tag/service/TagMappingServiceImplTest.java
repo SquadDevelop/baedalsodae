@@ -1,10 +1,7 @@
 package com.project.baedalsodae.tag.service;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.never;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
@@ -13,7 +10,6 @@ import com.project.baedalsodae.tag.entity.Tag;
 import com.project.baedalsodae.tag.repository.TagMappingRepository;
 import com.project.baedalsodae.tag.service.Impl.TagMappingServiceImpl;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
 class TagMappingServiceImplTest {
@@ -36,61 +31,40 @@ class TagMappingServiceImplTest {
   private TagMappingServiceImpl tagMappingService;
 
   @Test
-  @DisplayName("모든 태그가 이미 존재하면 배치 생성 없이 TagMapping을 저장한다")
-  void createTagMappings_whenAllTagsExist_savesWithoutBatchCreation() {
+  @DisplayName("태그를 upsert 후 전체 조회하여 TagMapping을 저장한다")
+  void createTagMappings_upsertAndSaveMappings() {
     // given
     MenuItem menuItem = mock(MenuItem.class);
     Tag tag1 = mock(Tag.class);
     Tag tag2 = mock(Tag.class);
     given(tag1.getName()).willReturn("치킨");
     given(tag2.getName()).willReturn("피자");
-    given(tagService.findAllByNames(anyList())).willReturn(List.of(tag1, tag2));
+    given(tagService.findAllByNames(List.of("치킨", "피자"))).willReturn(List.of(tag1, tag2));
 
     // when
     tagMappingService.createTagMappings(menuItem, List.of("치킨", "피자"));
 
     // then
-    then(tagService).should(never()).createNewTags(anyList());
+    then(tagService).should().createNewTagsIfNotExists(List.of("치킨", "피자"));
+    then(tagService).should().findAllByNames(List.of("치킨", "피자"));
     then(tagMappingRepository).should().saveAll(anyList());
   }
 
   @Test
-  @DisplayName("신규 태그가 있으면 배치 생성 후 TagMapping을 저장한다")
-  void createTagMappings_addsNewTagsAndSavesMappings() {
+  @DisplayName("중복 태그명이 포함된 경우 distinct 처리 후 upsert하고 TagMapping은 원본 순서대로 저장한다")
+  void createTagMappings_withDuplicateTagNames_distinctBeforeUpsert() {
     // given
     MenuItem menuItem = mock(MenuItem.class);
-    Tag existingTag = mock(Tag.class);
-    Tag newTag = mock(Tag.class);
-    given(existingTag.getName()).willReturn("치킨");
-    given(tagService.findAllByNames(anyList())).willReturn(List.of(existingTag));
-    given(tagService.createNewTags(List.of("피자"))).willReturn(Map.of("피자", newTag));
+    Tag tag = mock(Tag.class);
+    given(tag.getName()).willReturn("치킨");
+    given(tagService.findAllByNames(List.of("치킨"))).willReturn(List.of(tag));
 
     // when
-    tagMappingService.createTagMappings(menuItem, List.of("치킨", "피자"));
+    tagMappingService.createTagMappings(menuItem, List.of("치킨", "치킨"));
 
     // then
-    then(tagService).should().createNewTags(List.of("피자"));
-    then(tagMappingRepository).should().saveAll(anyList());
-  }
-
-  @Test
-  @DisplayName("배치 생성 중 동시 충돌 발생 시 개별 findOrCreateTag로 fallback 처리한다")
-  void createTagMappings_batchCreationConflict_fallbackToFindOrCreate() {
-    // given
-    MenuItem menuItem = mock(MenuItem.class);
-    Tag tag1 = mock(Tag.class);
-    Tag tag2 = mock(Tag.class);
-    given(tagService.findAllByNames(anyList())).willReturn(List.of());
-    given(tagService.createNewTags(anyList())).willThrow(DataIntegrityViolationException.class);
-    given(tagService.findOrCreateTag("신규1")).willReturn(tag1);
-    given(tagService.findOrCreateTag("신규2")).willReturn(tag2);
-
-    // when
-    tagMappingService.createTagMappings(menuItem, List.of("신규1", "신규2"));
-
-    // then
-    then(tagService).should().findOrCreateTag("신규1");
-    then(tagService).should().findOrCreateTag("신규2");
+    then(tagService).should().createNewTagsIfNotExists(List.of("치킨"));
+    then(tagService).should().findAllByNames(List.of("치킨"));
     then(tagMappingRepository).should().saveAll(anyList());
   }
 
