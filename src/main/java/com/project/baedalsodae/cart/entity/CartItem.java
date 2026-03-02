@@ -42,6 +42,18 @@ public class CartItem extends BaseTimeEntity {
 		return menuItem.getPrice() * quantity;
 	}
 
+	public boolean isSameMenuItem(UUID menuItemId) {
+		return this.menuItem.getId().equals(menuItemId);
+	}
+
+	public void increaseQuantity(int quantity) {
+		this.quantity += quantity;
+	}
+
+	public void changeQuantity(int quantity){
+		this.quantity = quantity;
+	}
+
 	public CartItem(Cart cart, MenuItem menuItem, int quantity) {
 		this.cart = cart;
 		this.menuItem = menuItem;
@@ -50,13 +62,5 @@ public class CartItem extends BaseTimeEntity {
 
 	public static CartItem create(Cart cart, MenuItem menuItem, int quantity) {
 		return new CartItem(cart, menuItem, quantity);
-	}
-
-	public boolean isSameMenuItem(UUID menuItemId) {
-		return this.menuItem.getId().equals(menuItemId);
-	}
-
-	public void increaseQuantity(int quantity) {
-		this.quantity += quantity;
 	}
 }

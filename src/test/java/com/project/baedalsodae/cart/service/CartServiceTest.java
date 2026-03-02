@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +51,9 @@ public class CartServiceTest {
 
 	@Mock
 	private MenuItem menuItem2;
+
+	@Mock
+	private CartItem cartItem1;
 
 	@Mock
 	private Store store1;
@@ -395,7 +399,7 @@ public class CartServiceTest {
 
 	@Test
 	@DisplayName("실패 - 장바구니 아이템 수량 변경 시 수량이 0 이하")
-	void updateCartItemQuantity_fail_invalidQuantity(){
+	void updateCartItemQuantity_fail_invalidQuantity() {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID cartItemId = UUID.randomUUID();
@@ -415,14 +419,14 @@ public class CartServiceTest {
 
 	@Test
 	@DisplayName("실패 - 장바구니 아이템 수량 변경 시 장바구니가 존재하지 않음")
-	void updateCartItemQuantity_fail_cartNotFound(){
+	void updateCartItemQuantity_fail_cartNotFound() {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID cartItemId = UUID.randomUUID();
 		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
 
 		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
-        .willReturn(Optional.empty());
+				.willReturn(Optional.empty());
 
 		//when
 		Throwable throwable = catchThrowable(() -> {
@@ -439,7 +443,7 @@ public class CartServiceTest {
 
 	@Test
 	@DisplayName("실패 - 장바구니 아이템 수량 변경 시 해당 아이템이 장바구니에 없음")
-	void updateCartItemQuantity_fail_cartItemNotFound(){
+	void updateCartItemQuantity_fail_cartItemNotFound() {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID cartItemId1 = UUID.randomUUID();
@@ -461,5 +465,28 @@ public class CartServiceTest {
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_ITEM_NOT_FOUND);
 
+	}
+
+	@Test
+	@DisplayName("성공 - 장바구니 아이템 수량 정상 변경")
+	void updateCartItemQuantity_success() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId1 = UUID.randomUUID();
+		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
+
+		Cart cart = Cart.create(userId, store1);
+
+		given(cartItem1.getId()).willReturn(cartItemId1);
+		cart.addItem(cartItem1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		//when
+		cartService.updateCartItemQuantity(userId, cartItemId1, request);
+
+		//then
+		verify(cartItem1).changeQuantity(request.quantity());
 	}
 }
