@@ -24,7 +24,7 @@ public record CartResponse(
 
 		return new CartResponse(
 				cart.getId(),
-				cart.getStoreId(),
+				cart.getStore().getId(),
 				items.size(),
 				cart.getTotalQuantity(),
 				cart.getTotalAmount(),

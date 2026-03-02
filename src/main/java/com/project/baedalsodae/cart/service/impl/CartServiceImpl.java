@@ -58,7 +58,7 @@ public class CartServiceImpl implements CartService {
 				throw new BusinessException(ErrorCode.CART_DIFFERENT_STORE);
 		});
 
-		Cart cart = optionalCart.orElseGet(() -> Cart.create(userId, storeId));
+		Cart cart = optionalCart.orElseGet(() -> Cart.create(userId, store));
 		cart.addItem(CartItem.create(cart, menuItem, request.quantity()));
 
 		final Cart savedCart = cartRepository.save(cart);

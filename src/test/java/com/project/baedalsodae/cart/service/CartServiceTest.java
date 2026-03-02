@@ -80,7 +80,9 @@ public class CartServiceTest {
 		//given
 		UUID userId = UUID.randomUUID();
 		UUID storeId = UUID.randomUUID();
-		Cart emptyCart = Cart.create(userId, storeId);
+
+		given(store1.getId()).willReturn(storeId);
+		Cart emptyCart = Cart.create(userId, store1);
 
 		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
 				.willReturn(Optional.of(emptyCart));
@@ -101,7 +103,8 @@ public class CartServiceTest {
 		UUID userId = UUID.randomUUID();
 		UUID storeId = UUID.randomUUID();
 
-		Cart cart = Cart.create(userId, storeId);
+		given(store1.getId()).willReturn(storeId);
+		Cart cart = Cart.create(userId, store1);
 
 		given(menuItem1.getId()).willReturn(UUID.randomUUID());
 		given(menuItem1.getName()).willReturn("후라이드 치킨");
@@ -233,7 +236,8 @@ public class CartServiceTest {
 		given(menuItemRepository.findById(menuItemId2))
 				.willReturn(Optional.of(menuItem2));
 
-		Cart cart = Cart.create(userId, storeId1);
+		given(store1.getId()).willReturn(storeId1);
+		Cart cart = Cart.create(userId, store1);
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 
@@ -313,7 +317,8 @@ public class CartServiceTest {
 		given(menuItem1.getId()).willReturn(menuItemId1);
 		given(menuItem1.getName()).willReturn("치킨");
 		given(menuItem1.getPrice()).willReturn(18000);
-		Cart cart = Cart.create(userId, storeId1);
+		given(store1.getId()).willReturn(storeId1);
+		Cart cart = Cart.create(userId, store1);
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 
@@ -361,7 +366,8 @@ public class CartServiceTest {
 		given(menuItem1.getId()).willReturn(menuItemId1);
 		given(menuItem1.getName()).willReturn("치킨");
 		given(menuItem1.getPrice()).willReturn(18000);
-		Cart cart = Cart.create(userId, storeId1);
+		given(store1.getId()).willReturn(storeId1);
+		Cart cart = Cart.create(userId, store1);
 		CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 		cart.addItem(cartItem1);
 

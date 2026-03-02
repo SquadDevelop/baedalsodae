@@ -1,6 +1,7 @@
 package com.project.baedalsodae.cart.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
+import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,8 +30,9 @@ public class Cart extends BaseAuditEntity {
 	@Column(name = "user_id", nullable = false)
 	private UUID userId;
 
-	@Column(name = "store_id", nullable = false)
-	private UUID storeId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "store_id", nullable = false)
+	private Store store;
 
 	@OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<CartItem> items = new ArrayList<>();
@@ -54,16 +56,16 @@ public class Cart extends BaseAuditEntity {
 	}
 
 	public boolean isSameStore(UUID storeId) {
-		return this.storeId.equals(storeId);
+		return this.store.getId().equals(storeId);
 	}
 
-	public Cart(UUID userId, UUID storeId) {
+	public Cart(UUID userId, Store store) {
 		this.userId = userId;
-		this.storeId = storeId;
+		this.store = store;
 	}
 
-	public static Cart create(UUID userId, UUID storeId) {
-		return new Cart(userId, storeId);
+	public static Cart create(UUID userId, Store store) {
+		return new Cart(userId, store);
 	}
 
 }
