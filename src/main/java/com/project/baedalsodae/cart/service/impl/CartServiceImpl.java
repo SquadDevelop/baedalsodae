@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,11 +42,21 @@ public class CartServiceImpl implements CartService {
 		if (!request.isValidQuantity())
 			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 
-		Store store = storeRepository.findById(request.storeId())
+		final UUID storeId = request.storeId();
+		final UUID menuItemId = request.menuItemId();
+
+		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-		MenuItem menuItem = menuItemRepository.findById(request.menuItemId())
+		MenuItem menuItem = menuItemRepository.findById(menuItemId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+
+		Optional<Cart> optionalCart = cartRepository.findByUserIdAndIsDeletedFalse(userId);
+
+		optionalCart.ifPresent(existingCart -> {
+			if (!existingCart.isSameStore(request.storeId()))
+				throw new BusinessException(ErrorCode.CART_DIFFERENT_STORE);
+		});
 
 		return null;
 	}

@@ -52,6 +52,9 @@ public class CartServiceTest {
 	@Mock
 	private Store store1;
 
+	@Mock
+	private Store store2;
+
 	@Test
 	@DisplayName("실패 - 장바구니가 존재하지 않음")
 	void getCart_fail_cartNotFound() {
@@ -206,5 +209,45 @@ public class CartServiceTest {
 		assertThat(throwable)
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.MENU_ITEM_NOT_FOUND);
+	}
+
+	@Test
+	@DisplayName("실패 - 장바구니 아이템 추가시 다른 가게 메뉴를 이미 담은 장바구니에 추가 시도")
+	void addCartItem_fail_differentStore() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID storeId1 = UUID.randomUUID();
+		UUID storeId2 = UUID.randomUUID();
+		UUID menuItemId1 = UUID.randomUUID();
+		UUID menuItemId2 = UUID.randomUUID();
+		AddCartItemRequest addCartItemRequest = new AddCartItemRequest(
+				storeId2,
+				menuItemId2,
+				1
+		);
+
+		given(storeRepository.findById(storeId2))
+				.willReturn(Optional.of(store2));
+
+		given(menuItemRepository.findById(menuItemId2))
+				.willReturn(Optional.of(menuItem2));
+
+		Cart cart = Cart.create(userId, storeId1);
+		CartItem cartItem1 = CartItem.create(cart, menuItem1);
+		cart.addItem(cartItem1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.addCartItem(userId, addCartItemRequest);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_DIFFERENT_STORE);
 	}
 }

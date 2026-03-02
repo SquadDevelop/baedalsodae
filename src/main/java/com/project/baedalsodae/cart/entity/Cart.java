@@ -45,6 +45,10 @@ public class Cart extends BaseAuditEntity {
 		this.items.add(item);
 	}
 
+	public boolean isSameStore(UUID storeId) {
+		return this.storeId.equals(storeId);
+	}
+
 	public Cart(UUID userId, UUID storeId) {
 		this.userId = userId;
 		this.storeId = storeId;

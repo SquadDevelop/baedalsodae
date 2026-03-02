@@ -26,6 +26,7 @@ public enum ErrorCode {
     //cart
     CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND,"장바구니가 없습니다."),
     CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST,"수량은 1 이상이어야 합니다."),
+    CART_DIFFERENT_STORE("CT003", HttpStatus.BAD_REQUEST, "다른 가게의 메뉴는 담을 수 없습니다."),
 
     //store
     STORE_NOT_FOUND("ST001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
