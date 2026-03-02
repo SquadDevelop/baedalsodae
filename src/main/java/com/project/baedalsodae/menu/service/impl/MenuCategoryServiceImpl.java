@@ -62,7 +62,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     UUID storeId = menuCategory.getStore().getId();
 
     List<MenuCategory> menuCategories =
-        menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId);
+        menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseForUpdate(storeId);
 
     OrderUtil.reorder(menuCategories, from, to);
     menuCategory.changeOrderNo(to);
