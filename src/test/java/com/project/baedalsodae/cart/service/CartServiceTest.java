@@ -481,7 +481,7 @@ public class CartServiceTest {
 		cart.addItem(cartItem1);
 
 		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
-				.willReturn(Optional.empty());
+				.willReturn(Optional.of(cart));
 
 		//when
 		cartService.updateCartItemQuantity(userId, cartItemId1, request);
@@ -536,5 +536,28 @@ public class CartServiceTest {
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_ITEM_NOT_FOUND);
 
+	}
+
+	@Test
+	@DisplayName("성공 - 아이템 정상 삭제")
+	void removeCartItem_success() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId1 = UUID.randomUUID();
+		UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(2);
+
+		Cart cart = Cart.create(userId, store1);
+
+		given(cartItem1.getId()).willReturn(cartItemId1);
+		cart.addItem(cartItem1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		//when
+		cartService.removeCartItem(userId, cartItemId1);
+
+		//then
+		assertThat(cart.getItems()).hasSize(0);
 	}
 }

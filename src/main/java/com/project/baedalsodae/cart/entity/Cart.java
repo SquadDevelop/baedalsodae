@@ -69,6 +69,10 @@ public class Cart extends BaseAuditEntity {
 		return Optional.empty();
 	}
 
+	public boolean removeItem(UUID cartItemId) {
+		return this.items.removeIf(i -> i.getId().equals(cartItemId));
+	}
+
 	public Cart(UUID userId, Store store) {
 		this.userId = userId;
 		this.store = store;
@@ -77,5 +81,4 @@ public class Cart extends BaseAuditEntity {
 	public static Cart create(UUID userId, Store store) {
 		return new Cart(userId, store);
 	}
-
 }
