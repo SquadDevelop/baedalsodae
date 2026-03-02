@@ -53,14 +53,12 @@ public class MenuItem extends BaseAuditEntity {
       String description,
       int price,
       MenuStatus menuStatus,
-      int orderNo,
       MenuCategory menuCategory,
       boolean popular) {
     this.name = name;
     this.description = description;
     this.price = price;
     this.menuStatus = menuStatus;
-    this.orderNo = orderNo;
     this.menuCategory = menuCategory;
     this.isPopular = popular;
   }
