@@ -481,12 +481,35 @@ public class CartServiceTest {
 		cart.addItem(cartItem1);
 
 		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
-				.willReturn(Optional.of(cart));
+				.willReturn(Optional.empty());
 
 		//when
 		cartService.updateCartItemQuantity(userId, cartItemId1, request);
 
 		//then
 		verify(cartItem1).changeQuantity(request.quantity());
+	}
+
+	@Test
+	@DisplayName("실패 - 장바구니 아이템 삭제 시 장바구니가 존재하지 않음")
+	void removeCartItem_fail_cartNotFound() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartItemId1 = UUID.randomUUID();
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.empty());
+
+		//when
+		Throwable throwable = catchThrowable(() -> {
+			cartService.removeCartItem(userId, cartItemId1);
+		});
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_NOT_FOUND);
+
 	}
 }

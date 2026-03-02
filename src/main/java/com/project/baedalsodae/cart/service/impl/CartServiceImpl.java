@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
 		Optional<Cart> optionalCart = cartRepository.findByUserIdAndIsDeletedFalse(userId);
 
 		optionalCart.ifPresent(existingCart -> {
-			if (!existingCart.isSameStore(request.storeId()))
+			if (!existingCart.isSameStore(storeId))
 				throw new BusinessException(ErrorCode.CART_DIFFERENT_STORE);
 		});
 
@@ -80,5 +80,13 @@ public class CartServiceImpl implements CartService {
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 
 		cartItem.changeQuantity(request.quantity());
+	}
+
+	@Override
+	@Transactional
+	public void removeCartItem(UUID userId, UUID cartItemId) {
+		Cart cart = cartRepository.findByUserIdAndIsDeletedFalse(userId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+
 	}
 }
