@@ -1,6 +1,7 @@
 package com.project.baedalsodae.cart.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
+import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -21,7 +22,7 @@ import java.util.UUID;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cart extends BaseAuditEntity {
+public class Cart extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
