@@ -583,4 +583,22 @@ public class CartServiceTest {
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_NOT_FOUND);
 
 	}
+
+	@Test
+	@DisplayName("성공 - 장바구니 비우기 전체 아이템 삭제")
+	void clearCart_success() {
+		//given
+		UUID userId = UUID.randomUUID();
+
+		Cart cart = Cart.create(userId, store1);
+
+		given(cartRepository.findByUserIdAndIsDeletedFalse(userId))
+				.willReturn(Optional.of(cart));
+
+		//when
+		cartService.clearCart(userId);
+
+		//then
+		verify(cartRepository).delete(cart);
+	}
 }
