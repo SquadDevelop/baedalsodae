@@ -11,4 +11,7 @@ public interface MenuCategoryService {
       UUID menuCategoryId, MenuCategoryPutRequestDto request);
 
   void deleteMenuCategory(UUID menuCategoryId);
+
+  MenuCategoryResponseDto updateMenuCategoryOrder(
+      UUID menuCategoryId, MenuCategoryPatchRequestDto request);
 }

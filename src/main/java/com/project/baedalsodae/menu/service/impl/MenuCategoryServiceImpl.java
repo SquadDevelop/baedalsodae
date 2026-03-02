@@ -42,4 +42,30 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
             .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
     menuCategory.softDelete(null); // / 토큰 기능 추가 시 수정 필요
   }
+
+  @Override
+  @Transactional
+  public MenuCategoryResponseDto updateMenuCategoryOrder(
+      UUID menuCategoryId, MenuCategoryPatchRequestDto request) {
+
+    MenuCategory menuCategory =
+        menuCategoryRepository
+            .findByIdAndDeletedIsFalse(menuCategoryId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    int from = menuCategory.getOrderNo();
+    int to = request.orderNo();
+
+    if (from == to) {
+      return MenuCategoryResponseDto.fromEntity(menuCategory);
+    }
+
+    UUID storeId = menuCategory.getStore().getId();
+
+    List<MenuCategory> menuCategories =
+        menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId);
+
+    OrderUtil.reorder(menuCategories, from, to);
+    menuCategory.changeOrderNo(to);
+    return MenuCategoryResponseDto.fromEntity(menuCategory);
+  }
 }

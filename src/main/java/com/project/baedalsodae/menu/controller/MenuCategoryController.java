@@ -25,6 +25,15 @@ public class MenuCategoryController {
         menuCategoryService.updateMenuCategory(menuCategoryId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }
+
+  @PatchMapping("/{menuCategoryId}/orders")
+  public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> updateMenuCategoryOrder(
+      @PathVariable UUID menuCategoryId, @Valid @RequestBody MenuCategoryPatchRequestDto request) {
+    MenuCategoryResponseDto response =
+        menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request);
+    return ResponseEntity.ok(ApiResponse.success("", response));
+  }
+
   @DeleteMapping("/{menuCategoryId}")
   public ResponseEntity<ApiResponse<Void>> deleteMenuCategory(@PathVariable UUID menuCategoryId) {
     menuCategoryService.deleteMenuCategory(menuCategoryId);
