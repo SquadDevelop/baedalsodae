@@ -4,6 +4,7 @@ import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,6 +45,7 @@ public class UserRequestDto {
 
         private String roadAddress;
         private String detailAddress;
+        private String description;
     }
 
     @Getter
@@ -62,7 +64,7 @@ public class UserRequestDto {
         private String password;
 
         private String nickname;
-        private String roadAddress;
-        private String detailAddress;
+
+        private List<UpdateUserAddressRequest> addresses;
     }
 }
