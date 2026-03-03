@@ -1,0 +1,31 @@
+### 장바구니 조회
+GET http://localhost:18082/api/v1/carts
+X-User-Id: {{userId}}
+
+### 장바구니 아이템 추가
+POST http://localhost:18082/api/v1/carts/items
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "storeId": "{{storeId}}",
+  "menuItemId": "{{menuItemId}}",
+  "quantity": 2
+}
+
+### 장바구니 아이템 수량 변경
+PATCH http://localhost:18082/api/v1/carts/items/{{cartItemId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### 장바구니 아이템 삭제
+DELETE http://localhost:18082/api/v1/carts/items/{{cartItemId}}
+X-User-Id: {{userId}}
+
+### 장바구니 비우기
+DELETE http://localhost:18082/api/v1/carts
+X-User-Id: {{userId}}
