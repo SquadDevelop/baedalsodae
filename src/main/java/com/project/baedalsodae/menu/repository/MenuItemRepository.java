@@ -14,4 +14,8 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
       "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted ="
           + " false")
   Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
+
+  Optional<Integer> findMaxOrderNoByMenuCategoryId(UUID menuCategoryId);
+
+  boolean existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(UUID menuCategoryId, String name);
 }

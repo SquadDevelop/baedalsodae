@@ -3,6 +3,7 @@ package com.project.baedalsodae.menu.service.impl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
@@ -10,6 +11,7 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
+import com.project.baedalsodae.tag.service.TagMappingService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,31 @@ public class MenuItemServiceImpl implements MenuItemService {
 
   private final MenuItemRepository menuItemRepository;
   private final MenuCategoryRepository menuCategoryRepository;
+  private final TagMappingService tagMappingService;
+
+  @Transactional
+  @Override
+  public MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request) {
+    if (existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, request.name())) {
+      throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+    }
+    MenuCategory category =
+        menuCategoryRepository
+            .findByIdAndDeletedIsFalse(menuCategoryId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    int maxOrderNo = menuItemRepository.findMaxOrderNoByMenuCategoryId((menuCategoryId)).orElse(0);
+    MenuItem item =
+        MenuItem.createMenuItem(
+            request.name(),
+            request.description(),
+            request.price(),
+            request.isPopular(),
+            maxOrderNo + 1,
+            request.menuStatus(),
+            category);
+    tagMappingService.createTagMappings(menuItemRepository.save(item), request.tagNames());
+    return MenuItemResponseDto.fromEntity(item);
+  }
 
   @Transactional
   @Override
@@ -73,5 +100,9 @@ public class MenuItemServiceImpl implements MenuItemService {
             .findByIdAndDeletedIsFalse(menuItemId)
             .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
     item.softDelete(null); // 토큰 기능 추가 시 수정 필요
+  }
+  private boolean existsByNameAndMenuCategoryIdAndDeletedIsFalse(UUID menuCategoryId, String name) {
+    return menuItemRepository.existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(
+        menuCategoryId, name);
   }
 }
