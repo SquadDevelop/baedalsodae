@@ -7,6 +7,8 @@ import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService {
 
 	private final CartRepository cartRepository;
+	private final StoreRepository storeRepository;
 
 	@Override
 	@Transactional
@@ -30,6 +33,10 @@ public class OrderServiceImpl implements OrderService {
 		if(cart.hasNoItems()){
 			throw new BusinessException(ErrorCode.CART_ITEM_EMPTY);
 		}
+
+		final UUID storeId = cart.getStore().getId();
+		Store store = storeRepository.findById(storeId)
+				.orElseThrow(()-> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
 		return null;
 	}

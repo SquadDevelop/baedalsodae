@@ -1,12 +1,14 @@
 package com.project.baedalsodae.order.service;
 
 import com.project.baedalsodae.cart.entity.Cart;
+import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,10 +37,19 @@ public class OrderServiceTest {
 	private CartRepository cartRepository;
 
 	@Mock
+	private StoreRepository storeRepository;
+
+	@Mock
 	private Cart cart;
 
 	@Mock
 	private Store store;
+
+	@Mock
+	private CartItem cartItem1;
+
+	@Mock
+	private CartItem cartItem2;
 
 	@Test
 	@DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -96,5 +109,43 @@ public class OrderServiceTest {
 		assertThat(throwable)
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.CART_ITEM_EMPTY);
+	}
+
+	@Test
+	@DisplayName("실패 - 주문 생성 시 존재하지 않는 가게")
+	void createOrder_fail_storeNotFound() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartId = UUID.randomUUID();
+		UUID storeId = UUID.randomUUID();
+		UUID addressId = UUID.randomUUID();
+
+		String storeRequestMessage = "리뷰이벤트 잽닝이 막국수 주시면 감사하겠습니다.";
+
+		CreateOrderRequest request = CreateOrderRequest.builder()
+				.cartId(cartId)
+				.addressId(addressId)
+				.storeRequestMessage(storeRequestMessage)
+				.build();
+
+		given(cartRepository.findCartWithItemsByIdAndUserId(cartId, userId))
+				.willReturn(Optional.of(cart));
+
+		given(cart.getStore()).willReturn(store);
+		given(store.getId()).willReturn(storeId);
+
+		given(cart.hasNoItems()).willReturn(false);
+
+		given(storeRepository.findById(storeId))
+				.willReturn(Optional.empty());
+
+		//when
+		Throwable throwable = catchThrowable(() -> orderService.createOrder(userId, request));
+		log.info("throwable = " + throwable);
+
+		//then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_NOT_FOUND);
 	}
 }
