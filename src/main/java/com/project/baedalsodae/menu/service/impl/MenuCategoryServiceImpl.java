@@ -53,7 +53,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
             .findByIdAndDeletedIsFalse(menuCategoryId)
             .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
     Integer from = menuCategory.getOrderNo();
-    if(from == null) {
+    if (from == null) {
       throw new BusinessException(ErrorCode.INVALID_MENU_CATEGORY_ORDER);
     }
     int to = request.orderNo();
@@ -67,8 +67,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     List<MenuCategory> menuCategories =
         menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseForUpdate(storeId);
 
-    OrderUtil.reorder(menuCategories, from, to);
-    menuCategory.changeOrderNo(to);
+    OrderUtil.reorder(menuCategories, menuCategory, from, to);
     return MenuCategoryResponseDto.fromEntity(menuCategory);
   }
 }

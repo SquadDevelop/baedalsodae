@@ -3,7 +3,7 @@ package com.project.baedalsodae.menu.common;
 import java.util.List;
 
 public class OrderUtil {
-  public static <T extends Orderable> void reorder(
+  public static <T extends Orderable> void shiftBetween(
       List<T> items, int sourceOrderNo, int targetOrderNo) {
     boolean isMovingDown = sourceOrderNo < targetOrderNo;
 
@@ -16,5 +16,10 @@ public class OrderUtil {
           .filter(item -> item.getOrderNo() >= targetOrderNo && item.getOrderNo() < sourceOrderNo)
           .forEach(item -> item.changeOrderNo(item.getOrderNo() + 1));
     }
+  }
+
+  public static <T extends Orderable> void reorder(List<T> items, T target, int from, int to) {
+    shiftBetween(items, from, to);
+    target.changeOrderNo(to);
   }
 }

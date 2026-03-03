@@ -29,8 +29,11 @@ public enum ErrorCode {
   // store
   STORE_NOT_FOUND("S001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
 
-  // MenuItem
+  // menu-category
   MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),
+  INVALID_MENU_CATEGORY_ORDER("MC002", HttpStatus.BAD_REQUEST, "메뉴 카테고리 순서가 잘못됐습니다."),
+
+  // menuItem
   MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 없습니다"),
 
   // cart
