@@ -31,4 +31,5 @@ public class BaseTimeEntity {
   public LocalDateTime getLocalDateUpdatedAt() {
     return updatedAt != null ? LocalDateTime.ofInstant(updatedAt, ZoneId.systemDefault()) : null;
   }
+
 }
