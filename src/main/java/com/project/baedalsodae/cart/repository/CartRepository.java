@@ -20,7 +20,7 @@ public interface CartRepository extends JpaRepository<Cart, UUID> {
 	@Query("select c from Cart c " +
 			"left join fetch c.items i " +
 			"left join fetch i.menuItem " +
-			"where c.userId = :userId and c.id = :cartId")
-	Optional<Cart> findCartWithItemsByUserIdAndCartId(@Param("userId") UUID userId, @Param("cartId") UUID cartId);
+			"where c.id = :cartId and c.userId = :userId")
+	Optional<Cart> findCartWithItemsByIdAndUserId(@Param("cartId") UUID cartId, @Param("userId") UUID userId);
 
 }

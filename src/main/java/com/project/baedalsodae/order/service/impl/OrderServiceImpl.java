@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
 	public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
 		final UUID cartId = request.cartId();
 
-		Cart cart = cartRepository.findCartWithItemsByUserIdAndCartId(userId, cartId)
+		Cart cart = cartRepository.findCartWithItemsByIdAndUserId(cartId, userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
 
