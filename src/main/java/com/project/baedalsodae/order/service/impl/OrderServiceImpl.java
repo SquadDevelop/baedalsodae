@@ -27,6 +27,9 @@ public class OrderServiceImpl implements OrderService {
 		Cart cart = cartRepository.findCartWithItemsByIdAndUserId(cartId, userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
+		if(cart.hasNoItems()){
+			throw new BusinessException(ErrorCode.CART_ITEM_EMPTY);
+		}
 
 		return null;
 	}
