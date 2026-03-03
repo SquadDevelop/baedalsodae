@@ -44,6 +44,9 @@ public class OrderServiceTest {
 				.storeRequestMessage(storeRequestMessage)
 				.build();
 
+		given(cartRepository.findCartWithItemsByIdAndUserId(cartId, userId))
+				.willReturn(Optional.empty());
+
 		//when
 		Throwable throwable = catchThrowable(() -> orderService.createOrder(userId, request));
 		log.info("throwable = " + throwable);
