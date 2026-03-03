@@ -41,8 +41,8 @@ public class UserResponseDto {
                     .name(user.getName())
                     .nickname(user.getNickname())
                     .role(user.getRole())
-                    .createdAt(user.getCreatedAt())
-                    .updatedAt(user.getUpdatedAt())
+                    .createdAt(user.getLocalDateCreatedAt())
+                    .updatedAt(user.getLocalDateUpdatedAt())
                     .createdBy(user.getCreatedBy())
                     .updatedBy(user.getUpdatedBy())
                     .build();
@@ -62,7 +62,7 @@ public class UserResponseDto {
         public static Delete from(User user) {
             return Delete.builder()
                     .id(user.getId())
-                    .deletedAt(user.getDeletedAt())
+                    .deletedAt(user.getLocalDateDeletedAt())
                     .deletedBy(user.getDeletedBy())
                     .build();
         }
