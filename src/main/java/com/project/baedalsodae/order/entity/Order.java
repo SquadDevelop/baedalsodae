@@ -33,8 +33,11 @@ public class Order extends BaseAuditEntity {
 	@Column(name = "status", nullable = false)
 	private OrderStatus status = OrderStatus.CREATED;
 
-	@Column(name = "request_note", columnDefinition = "TEXT")
-	private String requestNote;
+	@Column(name = "store_request_note", columnDefinition = "TEXT")
+	private String storeRequestNote;
+
+	@Column(name = "delivery_request_note", columnDefinition = "TEXT")
+	private String deliveryRequestNote;
 
 	@Column(name = "delivery_address_snapshot", columnDefinition = "TEXT")
 	private String deliveryAddressSnapshot;
