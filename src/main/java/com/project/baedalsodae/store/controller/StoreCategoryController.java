@@ -1,7 +1,7 @@
 package com.project.baedalsodae.store.controller;
 
 import com.project.baedalsodae.global.common.ApiResponse;
-import com.project.baedalsodae.global.common.entity.SuccessCode;
+import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
 import com.project.baedalsodae.store.dto.request.PatchStoreCategoryRequest;
 import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
