@@ -19,7 +19,10 @@ import lombok.NoArgsConstructor;
     uniqueConstraints = {
       @UniqueConstraint(
           name = "uq_menu_item_order_no",
-          columnNames = {"menu_category_id", "order_no"})
+          columnNames = {"menu_category_id", "order_no"}),
+      @UniqueConstraint(
+          name = "uq_menu_item_name",
+          columnNames = {"menu_category_id", "name"})
     })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuItem extends BaseAuditEntity implements Orderable {
@@ -54,6 +57,25 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
   @Column(name = "menu_status")
   @Enumerated(EnumType.STRING)
   private MenuStatus menuStatus;
+
+  public static MenuItem createMenuItem(
+      String name,
+      String description,
+      int price,
+      boolean popular,
+      int orderNo,
+      MenuStatus menuStatus,
+      MenuCategory category) {
+    MenuItem menuItem = new MenuItem();
+    menuItem.name = name;
+    menuItem.description = description;
+    menuItem.price = price;
+    menuItem.isPopular = popular;
+    menuItem.menuStatus = menuStatus;
+    menuItem.menuCategory = category;
+    menuItem.orderNo = orderNo;
+    return menuItem;
+  }
 
   public void changeMenuInfo(
       String name,
