@@ -30,13 +30,17 @@ public class OrderServiceImpl implements OrderService {
 		Cart cart = cartRepository.findCartWithItemsByIdAndUserId(cartId, userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		if(cart.hasNoItems()){
+		if(cart.hasNoItems())
 			throw new BusinessException(ErrorCode.CART_ITEM_EMPTY);
-		}
 
 		final UUID storeId = cart.getStore().getId();
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(()-> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+		if(cart.isInvalidTotalAmount())
+			throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
+
+
 
 		return null;
 	}

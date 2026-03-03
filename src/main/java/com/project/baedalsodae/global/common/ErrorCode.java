@@ -37,6 +37,9 @@ public enum ErrorCode {
     CART_ITEM_NOT_FOUND ("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 없습니다."),
     CART_ITEM_EMPTY ("CT005", HttpStatus.BAD_REQUEST, "장바구니 아이템이 비어있습니다."),
 
+    //order
+    ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 금액이 올바르지 않습니다."),
+
     //store
     STORE_NOT_FOUND("ST001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
 
