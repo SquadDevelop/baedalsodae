@@ -22,6 +22,10 @@ public enum ErrorCode {
     USER_NOT_FOUND("U001", HttpStatus.NOT_FOUND, "유저가 없습니다"),
     USER_DUPLICATED_EMAIL("U002", HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
     USER_DUPLICATED_PHONE_NUMBER("U003", HttpStatus.CONFLICT, "이미 가입된 전화번호입니다"),
+    USER_DUPLICATED_USERNAME("U004", HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
+    USER_DUPLICATED_NICKNAME("U005", HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
+    USER_ADDRESS_NOT_FOUND("U006", HttpStatus.NOT_FOUND, "해당 회원의 주소지를 찾을 수 없습니다."),
+    CANNOT_DELETE_LAST_ADDRESS("U007", HttpStatus.BAD_REQUEST, "최소 1개의 회원 주소가 존재해야 합니다."),
 
     MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),
 
