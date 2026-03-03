@@ -1,15 +1,12 @@
 package com.project.baedalsodae.order.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
+import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.Comment;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity

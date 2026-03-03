@@ -1,13 +1,13 @@
 package com.project.baedalsodae.order.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
+import com.project.baedalsodae.order.entity.enums.ActorType;
+import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Entity
