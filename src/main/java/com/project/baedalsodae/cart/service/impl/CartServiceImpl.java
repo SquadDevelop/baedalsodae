@@ -76,10 +76,14 @@ public class CartServiceImpl implements CartService {
 		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		CartItem cartItem = cart.findCartItemById(cartItemId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+		CartItem cartItem = getCartItemOrThrow(cart, cartItemId);
 
 		cartItem.changeQuantity(request.quantity());
+	}
+
+	private CartItem getCartItemOrThrow(Cart cart, UUID cartItemId) {
+		return cart.findCartItemById(cartItemId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
 	}
 
 	@Override
@@ -100,4 +104,6 @@ public class CartServiceImpl implements CartService {
 
 		cartRepository.delete(cart);
 	}
+
+
 }
