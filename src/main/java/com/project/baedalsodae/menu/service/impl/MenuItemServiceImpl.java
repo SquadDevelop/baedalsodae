@@ -67,6 +67,8 @@ public class MenuItemServiceImpl implements MenuItemService {
         request.menuStatus(),
         category,
         request.isPopular());
+    tagMappingService.deleteAllTagMappingByMenuItemId(menuItemId);
+    tagMappingService.createTagMappings(item, request.tagNames());
     return MenuItemResponseDto.fromEntity(item);
   }
 
@@ -89,6 +91,10 @@ public class MenuItemServiceImpl implements MenuItemService {
     if (request.price() != null) item.changePrice(request.price());
     if (request.isPopular() != null) item.changeIsPopular(request.isPopular());
     if (request.menuStatus() != null) item.changeMenuStatus(request.menuStatus());
+    if (request.tagNames() != null) {
+      tagMappingService.deleteAllTagMappingByMenuItemId(menuItemId);
+      tagMappingService.createTagMappings(item, request.tagNames());
+    }
     return MenuItemResponseDto.fromEntity(item);
   }
 

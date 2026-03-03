@@ -1,6 +1,7 @@
 package com.project.baedalsodae.menu.dto.requestDto.item;
 
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
+import java.util.List;
 import java.util.UUID;
 
 public record MenuItemPatchRequestDto(
@@ -9,4 +10,5 @@ public record MenuItemPatchRequestDto(
     Integer price,
     Boolean isPopular,
     UUID categoryId,
-    MenuStatus menuStatus) {}
+    MenuStatus menuStatus,
+    List<String> tagNames) {}
