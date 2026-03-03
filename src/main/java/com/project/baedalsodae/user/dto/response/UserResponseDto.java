@@ -1,7 +1,6 @@
 package com.project.baedalsodae.user.dto.response;
 
 import com.project.baedalsodae.user.entity.User;
-import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +27,7 @@ public class UserResponseDto {
         private String nickname;
         private UserRole role;
 
-        private List<UserAddress> addresses;
+        private List<UserAddressResponse> addresses;
 
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -37,6 +36,11 @@ public class UserResponseDto {
         private UUID updatedBy;
 
         public static Detail from(User user) {
+            UUID mainAddressId = user.getUserMainAddressId();
+            List<UserAddressResponse> addressResponses = user.getUserAddresses().stream()
+                    .map(address -> UserAddressResponse.from(address, mainAddressId))
+                    .toList();
+
             return Detail.builder()
                     .id(user.getId())
                     .username(user.getUsername())
@@ -45,7 +49,7 @@ public class UserResponseDto {
                     .name(user.getName())
                     .nickname(user.getNickname())
                     .role(user.getRole())
-                    .addresses(user.getUserAddresses())
+                    .addresses(addressResponses)
                     .createdAt(user.getCreatedAt())
                     .updatedAt(user.getUpdatedAt())
                     .createdBy(user.getCreatedBy())
