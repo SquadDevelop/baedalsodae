@@ -25,6 +25,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
   @Transactional
   public MenuCategoryResponseDto updateMenuCategory(
       UUID menuCategoryId, MenuCategoryPutRequestDto request) {
+
     MenuCategory menuCategory =
         menuCategoryRepository
             .findByIdAndDeletedIsFalse(menuCategoryId)
@@ -47,7 +48,6 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
   @Transactional
   public MenuCategoryResponseDto updateMenuCategoryOrder(
       UUID menuCategoryId, MenuCategoryPatchRequestDto request) {
-
     MenuCategory menuCategory =
         menuCategoryRepository
             .findByIdAndDeletedIsFalse(menuCategoryId)

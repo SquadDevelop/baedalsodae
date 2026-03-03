@@ -40,7 +40,6 @@ public class MenuItemServiceImpl implements MenuItemService {
         request.menuStatus(),
         category,
         request.isPopular());
-    item.changeMenuStatus(request.menuStatus());
     return MenuItemResponseDto.fromEntity(item);
   }
 

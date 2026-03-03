@@ -19,10 +19,7 @@ import lombok.NoArgsConstructor;
     uniqueConstraints = {
       @UniqueConstraint(
           name = "uq_menu_item_order_no",
-          columnNames = {"menu_category_id", "order_no"}),
-      @UniqueConstraint(
-          name = "uq_menu_item_name",
-          columnNames = {"menu_category_id", "name"})
+          columnNames = {"menu_category_id", "order_no"})
     })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuItem extends BaseAuditEntity implements Orderable {
