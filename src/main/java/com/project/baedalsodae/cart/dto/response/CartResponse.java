@@ -2,7 +2,7 @@ package com.project.baedalsodae.cart.dto.response;
 
 import com.project.baedalsodae.cart.entity.Cart;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -14,8 +14,8 @@ public record CartResponse(
 		int totalQuantity,
 		int totalAmount,
 		List<CartItemResponse> items,
-		LocalDateTime createdAt,
-		LocalDateTime updatedAt
+		Instant createdAt,
+		Instant updatedAt
 ) {
 	public static CartResponse from(Cart cart) {
 		List<CartItemResponse> items = cart.getItems().stream()
