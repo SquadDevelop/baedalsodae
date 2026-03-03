@@ -14,20 +14,22 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseAuditEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id", nullable = false)
 	private UUID id;
 
-	@Column(name = "store_id", nullable = false)
-	private UUID storeId;
+	@Column(name = "order_no", length = 100, unique = true)
+	private String orderNo;
 
 	@Column(name = "user_id", nullable = false)
 	private UUID userId;
 
-	@Column(name = "order_no", length = 100, unique = true)
-	private String orderNo;
+	@Column(name = "store_id", nullable = false)
+	private UUID storeId;
+
+	@Column(name = "store_name_snapshot", nullable = false, length = 50)
+	private String storeNameSnapshot;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
@@ -38,6 +40,9 @@ public class Order extends BaseAuditEntity {
 
 	@Column(name = "delivery_request_note", columnDefinition = "TEXT")
 	private String deliveryRequestNote;
+
+	@Column(name = "address_id", nullable = false)
+	private UUID addressId;
 
 	@Column(name = "delivery_address_snapshot", columnDefinition = "TEXT")
 	private String deliveryAddressSnapshot;
