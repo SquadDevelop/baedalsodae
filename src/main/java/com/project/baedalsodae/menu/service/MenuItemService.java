@@ -15,4 +15,5 @@ public interface MenuItemService {
   MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request);
 
   void deleteMenuItem(UUID menuItemId);
+  MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
 }

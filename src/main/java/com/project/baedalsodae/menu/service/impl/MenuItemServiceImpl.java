@@ -2,6 +2,7 @@ package com.project.baedalsodae.menu.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.menu.common.OrderUtil;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
@@ -12,6 +13,7 @@ import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.tag.service.TagMappingService;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -107,6 +109,34 @@ public class MenuItemServiceImpl implements MenuItemService {
             .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
     item.softDelete(null); // 토큰 기능 추가 시 수정 필요
   }
+
+
+  @Transactional
+  @Override
+  public MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order) {
+    MenuItem item =
+        menuItemRepository
+            .findByIdAndDeletedIsFalse(menuItemId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+    Integer from = item.getOrderNo();
+    if (from == null) {
+      throw new BusinessException(ErrorCode.INVALID_MENU_ITEM_ORDER);
+    }
+    int to = order;
+
+    if (from == to) {
+      return MenuItemResponseDto.fromEntity(item);
+    }
+
+    UUID menuCategoryId = item.getMenuCategory().getId();
+
+    List<MenuItem> menuItems =
+        menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(menuCategoryId);
+
+    OrderUtil.reorder(menuItems, item, from, to);
+    return MenuItemResponseDto.fromEntity(item);
+  }
+
   private boolean existsByNameAndMenuCategoryIdAndDeletedIsFalse(UUID menuCategoryId, String name) {
     return menuItemRepository.existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(
         menuCategoryId, name);
