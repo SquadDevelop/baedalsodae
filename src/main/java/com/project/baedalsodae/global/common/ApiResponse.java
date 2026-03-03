@@ -1,6 +1,5 @@
 package com.project.baedalsodae.global.common;
 
-import com.project.baedalsodae.global.common.entity.SuccessCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
