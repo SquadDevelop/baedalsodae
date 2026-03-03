@@ -193,4 +193,12 @@ public class OrderServiceTest {
 				.isInstanceOf(BusinessException.class)
 				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
 	}
+
+	//TODO 주소 도메인 완성 후 만들어야함
+	@Test
+	@DisplayName("실패 - 주문 생성 시 존재하지 않는 주소")
+	void createOrder_fail_addressNotFound() {
+
+	}
+
 }

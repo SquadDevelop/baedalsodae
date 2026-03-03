@@ -26,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
 	@Transactional
 	public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
 		final UUID cartId = request.cartId();
+		final UUID addressId = request.addressId();
 
 		Cart cart = cartRepository.findCartWithItemsByIdAndUserId(cartId, userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
@@ -40,7 +41,8 @@ public class OrderServiceImpl implements OrderService {
 		if(cart.isInvalidTotalAmount())
 			throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
 
-
+		//TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
+		String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
 
 		return null;
 	}
