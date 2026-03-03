@@ -1,11 +1,11 @@
 package com.project.baedalsodae.user.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -58,7 +58,7 @@ public class User extends BaseAuditEntity {
     @Column(name = "user_main_address_id")
     private UUID userMainAddressId;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> userAddresses = new ArrayList<>();
 
     public static User create(String username, String phone, String email, String encodedPassword, String name, String nickname, UserRole role) {
@@ -86,5 +86,22 @@ public class User extends BaseAuditEntity {
         if (nickname != null && !nickname.isBlank()) {
             this.nickname = nickname;
         }
+    }
+
+    public void addAddress(UserAddress address) {
+        if (this.userAddresses.contains(address)) {
+            this.userAddresses.add(address);
+        }
+        if (address.getUser() != this) {
+            address.changeUser(this);
+        }
+    }
+
+    public void addAddresses(List<UserAddress> addresses) {
+        addresses.forEach(this::addAddress);
+    }
+
+    public void changeMainAddress(UUID userMainAddressId) {
+        this.userMainAddressId = userMainAddressId;
     }
 }
