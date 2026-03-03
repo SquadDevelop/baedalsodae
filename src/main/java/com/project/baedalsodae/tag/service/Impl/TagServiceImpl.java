@@ -1,5 +1,6 @@
 package com.project.baedalsodae.tag.service.Impl;
 
+import com.project.baedalsodae.tag.dto.responseDto.TagResponseDto;
 import com.project.baedalsodae.tag.entity.Tag;
 import com.project.baedalsodae.tag.repository.TagBulkRepository;
 import com.project.baedalsodae.tag.repository.TagRepository;
@@ -26,5 +27,16 @@ public class TagServiceImpl implements TagService {
   public void createNewTagsIfNotExists(List<String> tagNames) {
     List<String> distinctNames = tagNames.stream().distinct().toList();
     tagBulkRepository.bulkInsertIgnore(distinctNames);
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public List<TagResponseDto> getTagListByParams(String keyword, int count) {
+    List<Tag> tags;
+    if (keyword == null || keyword.isBlank()) {
+      tags = tagRepository.findTopByMappingCount(count);
+    } else tags = tagRepository.findByKeywordOrderByRelevance(keyword, count);
+
+    return tags.stream().map(TagResponseDto::fromEntity).toList();
   }
 }
