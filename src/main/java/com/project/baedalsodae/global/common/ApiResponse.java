@@ -56,7 +56,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
-        return new ApiResponse<>(successCode, data);
+      return new ApiResponse<>(successCode, data);
     }
 
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
