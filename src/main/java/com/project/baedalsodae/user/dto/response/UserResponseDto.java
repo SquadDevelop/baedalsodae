@@ -1,8 +1,10 @@
 package com.project.baedalsodae.user.dto.response;
 
 import com.project.baedalsodae.user.entity.User;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,8 @@ public class UserResponseDto {
         private String nickname;
         private UserRole role;
 
+        private List<UserAddress> addresses;
+
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -41,6 +45,7 @@ public class UserResponseDto {
                     .name(user.getName())
                     .nickname(user.getNickname())
                     .role(user.getRole())
+                    .addresses(user.getUserAddresses())
                     .createdAt(user.getCreatedAt())
                     .updatedAt(user.getUpdatedAt())
                     .createdBy(user.getCreatedBy())
