@@ -3,8 +3,9 @@ package com.project.baedalsodae.global.common.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,4 +23,13 @@ public class BaseTimeEntity {
   @LastModifiedDate
   @Column(name = "updated_at")
   private Instant updatedAt;
+
+  public LocalDateTime getLocalDateCreatedAt() {
+    return createdAt != null ? LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault()) : null;
+  }
+
+  public LocalDateTime getLocalDateUpdatedAt() {
+    return updatedAt != null ? LocalDateTime.ofInstant(updatedAt, ZoneId.systemDefault()) : null;
+  }
+
 }
