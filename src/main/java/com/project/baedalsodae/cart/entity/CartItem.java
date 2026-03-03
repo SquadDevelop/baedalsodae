@@ -54,7 +54,7 @@ public class CartItem extends BaseTimeEntity {
 		this.quantity = quantity;
 	}
 
-	public CartItem(Cart cart, MenuItem menuItem, int quantity) {
+	private CartItem(Cart cart, MenuItem menuItem, int quantity) {
 		this.cart = cart;
 		this.menuItem = menuItem;
 		this.quantity = quantity;

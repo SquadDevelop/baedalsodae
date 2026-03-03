@@ -74,7 +74,7 @@ public class Cart extends BaseTimeEntity {
 		return this.items.removeIf(i -> i.getId().equals(cartItemId));
 	}
 
-	public Cart(UUID userId, Store store) {
+	private Cart(UUID userId, Store store) {
 		this.userId = userId;
 		this.store = store;
 	}
