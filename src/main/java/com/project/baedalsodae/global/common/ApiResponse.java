@@ -1,5 +1,6 @@
 package com.project.baedalsodae.global.common;
 
+import com.project.baedalsodae.global.common.entity.SuccessCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -54,9 +55,9 @@ public class ApiResponse<T> {
         return new ApiResponse<>("SUCCESS", HttpStatus.OK, message, null);
     }
 
-	public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
-		return new ApiResponse<>(successCode, data);
-	}
+    public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
+      return new ApiResponse<>(successCode, data);
+    }
 
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
         return new ApiResponse<>(errorCode, null);

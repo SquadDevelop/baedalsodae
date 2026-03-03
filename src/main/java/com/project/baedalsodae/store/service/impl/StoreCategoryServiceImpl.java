@@ -39,6 +39,7 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
     }
 
     @Override
+    @Transactional
     public void createStoreCategory(CreateStoreCategoryRequest request) {
         StoreCategory storeCategory =
                 StoreCategory.createStoreCategory(request.getName(), request.getDescription());
