@@ -1,9 +1,6 @@
 package com.project.baedalsodae.user.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
-import com.project.baedalsodae.location.entity.EndArea;
-import com.project.baedalsodae.location.entity.SidoArea;
-import com.project.baedalsodae.location.entity.SiggArea;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,17 +35,24 @@ public class UserAddress extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sido_id", nullable = false)
-    private SidoArea sido;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sigg_id", nullable = false)
-    private SiggArea sigungu;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dong_id", nullable = false)
-    private EndArea dong;
+    // 임시 주석 처리
+//    @Column(name = "sido_code", nullable = false)
+//    private String sidoCode;
+//
+//    @Column(name = "sido_name", nullable = false)
+//    private String sidoName;
+//
+//    @Column(name = "sigg_code", nullable = false)
+//    private String sigunguCode;
+//
+//    @Column(name = "sigg_name", nullable = false)
+//    private String sigunguName;
+//
+//    @Column(name = "dong_code", nullable = false)
+//    private String dongCode;
+//
+//    @Column(name = "dong_name", nullable = false)
+//    private String dongName;
 
     @Column(name = "road_address", nullable = false)
     private String roadAddress;
@@ -75,5 +80,22 @@ public class UserAddress extends BaseTimeEntity {
         this.roadAddress = roadAddress;
         this.detailAddress = detailAddress;
         this.description = description;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof UserAddress that)) {
+            return false;
+        }
+        return this.getId() != null
+                && Objects.equals(this.getId(), that.getId());
     }
 }

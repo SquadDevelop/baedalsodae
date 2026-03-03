@@ -13,7 +13,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,7 +66,8 @@ public class User extends BaseAuditEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> userAddresses = new ArrayList<>();
 
-    public static User create(String username, String phone, String email, String encodedPassword, String name, String nickname, UserRole role) {
+    public static User create(String username, String phone, String email, String encodedPassword, String name,
+                              String nickname, UserRole role) {
         return User.builder()
                 .username(username)
                 .phone(phone)
@@ -89,7 +95,7 @@ public class User extends BaseAuditEntity {
     }
 
     public void addAddress(UserAddress address) {
-        if (this.userAddresses.contains(address)) {
+        if (!this.userAddresses.contains(address)) {
             this.userAddresses.add(address);
         }
         if (address.getUser() != this) {
@@ -98,7 +104,39 @@ public class User extends BaseAuditEntity {
     }
 
     public void addAddresses(List<UserAddress> addresses) {
+        this.userAddresses.addAll(addresses);
         addresses.forEach(this::addAddress);
+    }
+
+    public void updateAddresses(List<UserAddress> newAddresses) {
+        Set<UUID> newIds = newAddresses.stream()
+                .map(UserAddress::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        this.userAddresses.removeIf(existing ->
+                existing.getId() != null && !newIds.contains(existing.getId()));
+
+        Map<UserAddress, UserAddress> existingMap = this.userAddresses.stream()
+                .collect(Collectors.toMap(a -> a, a -> a));
+
+        newAddresses.forEach(newAddr -> {
+            Optional.ofNullable(existingMap.get(newAddr)).ifPresentOrElse(
+                    existing -> existing.update(
+                            newAddr.getRoadAddress(),
+                            newAddr.getDetailAddress(),
+                            newAddr.getDescription()
+                    ),
+                    () -> this.addAddress(newAddr)
+            );
+        });
+    }
+
+    public UserAddress getMainAddress() {
+        return this.userAddresses.stream()
+                .filter(userAddress -> this.userMainAddressId != null && this.userMainAddressId.equals(
+                        userAddress.getId()))
+                .findAny()
+                .orElse(null);
     }
 
     public void changeMainAddress(UUID userMainAddressId) {
