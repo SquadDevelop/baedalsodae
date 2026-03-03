@@ -10,7 +10,8 @@ import org.springframework.data.repository.query.Param;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.id = :userId AND u.isDeleted = false")
-    Optional<User> findByUserId(@Param("userId") UUID userId);
+    Optional<User> findByUserIdAndIsDeletedFalse(@Param("userId") UUID userId);
 
-    Optional<User> findUserWithAddressesById(UUID userId);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.userAddresses WHERE u.id = :userId AND u.isDeleted = false")
+    Optional<User> findUserWithAddressesByIdAndIsDeletedFalse(@Param("userId") UUID userId);
 }
