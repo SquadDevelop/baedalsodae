@@ -8,6 +8,7 @@ import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -15,35 +16,35 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Service
 public class PaymentServiceImpl implements PaymentService {
 
-    private final PaymentRepository paymentRepository;
+  private final PaymentRepository paymentRepository;
 
-    @Override
-    public TimeCursorPage<PaymentResponse> getPayments(Instant cursor, int size) {
-        List<Payment> paymentList = paymentRepository.findNextPage(cursor, size + 1);
+  @Override
+  public TimeCursorPage<List<PaymentResponse>> getPayments(Instant cursor, int size) {
+    List<Payment> paymentList = paymentRepository.findNextPage(cursor, size + 1);
 
-        boolean hasNext = paymentList.size() > size;
+    boolean hasNext = paymentList.size() > size;
 
-        List<Payment> contentEntities = hasNext ? paymentList.subList(0, size) : paymentList;
+    List<Payment> contentEntities = hasNext ? paymentList.subList(0, size) : paymentList;
 
-        Instant nextCursor = hasNext ? contentEntities.get(contentEntities.size() - 1).getCreatedAt() : null;
+    LocalDateTime nextCursor =
+        hasNext ? LocalDateTime.from(contentEntities.get(contentEntities.size() - 1).getCreatedAt()) : null;
 
-        List<PaymentResponse> content = paymentList.stream()
-            .map(PaymentResponse::from).toList();
-        if (hasNext) {
-            content = content.subList(0, content.size() - 1);
-        }
-        return TimeCursorPage.of(
-            content,
-            hasNext,
-            nextCursor != null ? LocalDateTime.ofInstant(nextCursor, java.time.ZoneId.systemDefault()) : null);
-
+    List<PaymentResponse> content = paymentList.stream().map(PaymentResponse::from).toList();
+    if (hasNext) {
+      content = content.subList(0, content.size() - 1);
     }
+    return TimeCursorPage.of(content, hasNext, nextCursor);
+  }
 
-    @Override
-    public PaymentResponse getPayment(final UUID paymentId) {
-        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
-        return PaymentResponse.from(payment);
-    }
+  @Override
+  public PaymentResponse getPayment(final UUID paymentId) {
+    Payment payment =
+        paymentRepository
+            .findById(paymentId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_DETAIL_NOT_FOUND));
+    return PaymentResponse.from(payment);
+  }
 }
