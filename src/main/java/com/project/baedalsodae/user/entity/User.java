@@ -63,6 +63,7 @@ public class User extends BaseAuditEntity {
     @Column(name = "user_main_address_id")
     private UUID userMainAddressId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> userAddresses = new ArrayList<>();
 
