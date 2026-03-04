@@ -97,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
 
 		orderStatusHistoryRepository.save(orderStatusHistory);
 
-		eventPublisher.publishOrderCreated(order);
+		eventPublisher.publishOrderCreated(savedOrder);
 
 		return CreateOrderResponse.from(savedOrder);
 	}
