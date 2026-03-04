@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAddressResponse {
 
-    private UUID id;
+    private UUID userAddressId;
     private String roadAddress;
     private String detailAddress;
     private String description;
@@ -24,7 +24,7 @@ public class UserAddressResponse {
 
     public static UserAddressResponse from(UserAddress userAddress, UUID userMainAddressId) {
         return UserAddressResponse.builder()
-                .id(userAddress.getId())
+                .userAddressId(userAddress.getId())
                 .roadAddress(userAddress.getRoadAddress())
                 .detailAddress(userAddress.getDetailAddress())
                 .description(userAddress.getDescription())

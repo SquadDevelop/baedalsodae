@@ -57,7 +57,7 @@ class UserServiceTest {
 
         UserResponseDto.Detail result = userService.createUser(request);
 
-        assertThat(result.getId()).isNotNull();
+        assertThat(result.getUserId()).isNotNull();
         assertThat(result.getUsername()).isEqualTo(request.getUsername());
 
         verify(passwordEncoder).encode(request.getPassword());
@@ -85,7 +85,7 @@ class UserServiceTest {
 
         UserResponseDto.Detail result = userService.getUser(userId);
 
-        assertThat(result.getId()).isEqualTo(userId);
+        assertThat(result.getUserId()).isEqualTo(userId);
         assertThat(result.getUsername()).isEqualTo("tester");
         verify(userRepository).findUserWithAddressesByIdAndIsDeletedFalse(userId);
     }

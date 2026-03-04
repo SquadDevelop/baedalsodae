@@ -89,7 +89,7 @@ public class UserAddressServiceTest {
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).isMainAddress()).isFalse();
-        assertThat(result.get(1).getId()).isEqualTo(a2.getId());
+        assertThat(result.get(1).getUserAddressId()).isEqualTo(a2.getId());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UserAddressServiceTest {
     void updateAddress_Success() {
         UUID addrId = UUID.randomUUID();
         UserAddress addr = UserAddress.builder().id(addrId).user(user).roadAddress("기존").build();
-        UpdateUserAddressRequest req = UpdateUserAddressRequest.builder().id(addrId).roadAddress("수정").build();
+        UpdateUserAddressRequest req = UpdateUserAddressRequest.builder().userAddressId(addrId).roadAddress("수정").build();
         
         given(userAddressRepository.findByIdAndUserId(addrId, userId)).willReturn(Optional.of(addr));
 
@@ -200,7 +200,7 @@ public class UserAddressServiceTest {
 
     private UpdateUserAddressRequest createUpdateRequest(UUID userId, String roadAddress, String detailAddress, String description) {
         return UpdateUserAddressRequest.builder()
-                .id(userId)
+                .userAddressId(userId)
                 .roadAddress(roadAddress)
                 .detailAddress(detailAddress)
                 .description(description)

@@ -19,7 +19,7 @@ public class UserResponseDto {
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Detail {
 
-        private UUID id;
+        private UUID userId;
         private String username;
         private String phone;
         private String email;
@@ -43,7 +43,7 @@ public class UserResponseDto {
                     .toList();
 
             return Detail.builder()
-                    .id(user.getId())
+                    .userId(user.getId())
                     .username(user.getUsername())
                     .phone(user.getPhone())
                     .email(user.getEmail())

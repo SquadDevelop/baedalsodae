@@ -70,11 +70,11 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Override
     public UserAddressResponse updateAddress(UUID userId, UpdateUserAddressRequest request) {
         if (userAddressRepository.existsByRoadAddressAndDetailAddressAndIdNot(
-                request.getRoadAddress(), request.getDetailAddress(), request.getId())) {
+                request.getRoadAddress(), request.getDetailAddress(), request.getUserAddressId())) {
             throw new BusinessException(ErrorCode.USER_ADDRESS_DUPLICATED);
         }
 
-        UserAddress addressToUpdate = userAddressRepository.findByIdAndUserId(request.getId(), userId)
+        UserAddress addressToUpdate = userAddressRepository.findByIdAndUserId(request.getUserAddressId(), userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_ADDRESS_NOT_FOUND));
         User user = addressToUpdate.getUser();
 
@@ -98,10 +98,10 @@ public class UserAddressServiceImpl implements UserAddressService {
                 .collect(Collectors.toSet());
 
         List<UserAddress> newAddresses = updatedAddressReq.stream()
-                .filter(req -> req.getId() == null || userAddressIds.contains(req.getId())) // 타인의 주소 ID는 무시
+                .filter(req -> req.getUserAddressId() == null || userAddressIds.contains(req.getUserAddressId())) // 타인의 주소 ID는 무시
                 .map(req -> {
                     UserAddress userAddress = UserAddress.builder()
-                            .id(req.getId())
+                            .id(req.getUserAddressId())
                             .user(user)
                             .build();
                     userAddress.update(req.getRoadAddress(), req.getDetailAddress(), req.getDescription());

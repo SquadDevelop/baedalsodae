@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdateUserAddressRequest {
 
-    private UUID id;
+    private UUID userAddressId;
 
     @NotBlank
     private String roadAddress;
