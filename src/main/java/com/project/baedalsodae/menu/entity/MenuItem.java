@@ -55,6 +55,25 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
   @Enumerated(EnumType.STRING)
   private MenuStatus menuStatus;
 
+  public static MenuItem createMenuItem(
+      String name,
+      String description,
+      int price,
+      boolean popular,
+      int orderNo,
+      MenuStatus menuStatus,
+      MenuCategory category) {
+    MenuItem menuItem = new MenuItem();
+    menuItem.name = name;
+    menuItem.description = description;
+    menuItem.price = price;
+    menuItem.isPopular = popular;
+    menuItem.menuStatus = menuStatus;
+    menuItem.menuCategory = category;
+    menuItem.orderNo = orderNo;
+    return menuItem;
+  }
+
   public void changeMenuInfo(
       String name,
       String description,

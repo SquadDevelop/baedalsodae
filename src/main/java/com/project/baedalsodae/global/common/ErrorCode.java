@@ -32,20 +32,24 @@ public enum ErrorCode {
 	// menu-category
 	MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),
 	INVALID_MENU_CATEGORY_ORDER("MC002", HttpStatus.BAD_REQUEST, "메뉴 카테고리 순서가 잘못됐습니다."),
+	DUPLICATE_MENU_CATEGORY_NAME("MC003", HttpStatus.CONFLICT, "같은 가게에 같은 이름의 메뉴 카테고리가 존재합니다"),
 
 	// menuItem
 	MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 없습니다"),
+	INVALID_MENU_ITEM_ORDER("MI002", HttpStatus.BAD_REQUEST, "메뉴 순서가 유효하지 않습니다"),
+	DUPLICATE_MENU_ITEM_NAME("MI003", HttpStatus.CONFLICT, "같은 카테고리에 같은 이름의 메뉴 아이템이 존재합니다"),
+	MENU_ITEM_ORDER_CONFLICT("MI004", HttpStatus.CONFLICT, "메뉴 아이템 순서가 충돌했습니다. 다시 시도해주세요."),
 
 	// cart
 	CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND, "장바구니가 없습니다."),
 	CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST, "수량은 1 이상이어야 합니다."),
 	CART_DIFFERENT_STORE("CT003", HttpStatus.BAD_REQUEST, "다른 가게의 메뉴는 담을 수 없습니다."),
 	CART_ITEM_NOT_FOUND("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 없습니다."),
-    CART_ITEM_EMPTY("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 비어있습니다."),
+	CART_ITEM_EMPTY("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 비어있습니다."),
 
-    //order
-    ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
-    ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
+	//order
+	ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
+	ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
 
 	;
 
