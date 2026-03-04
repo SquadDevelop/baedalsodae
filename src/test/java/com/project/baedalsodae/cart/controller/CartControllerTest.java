@@ -7,6 +7,7 @@ import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.SuccessCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ class CartControllerTest {
 						.header("X-User-Id", userId))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code").value("CT200"));
+				.andExpect(jsonPath("$.code").value(SuccessCode.CART_FOUND.getCode()));
 	}
 
 	@Test
@@ -105,8 +106,8 @@ class CartControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code").value("CT201"));
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_ADDED.getCode()));
 	}
 
 	@Test
@@ -134,7 +135,7 @@ class CartControllerTest {
 						.content(objectMapper.writeValueAsString(request)))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code").value("CT202"));
+				.andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_QUANTITY_UPDATED.getCode()));
 	}
 
 	@Test
@@ -146,7 +147,7 @@ class CartControllerTest {
 						.header("X-User-Id", userId))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code").value("CT203"));
+				.andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_REMOVED.getCode()));
 	}
 
 	@Test
@@ -156,6 +157,6 @@ class CartControllerTest {
 						.header("X-User-Id", userId))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.code").value("CT204"));
+				.andExpect(jsonPath("$.code").value(SuccessCode.CART_CLEARED.getCode()));
 	}
 }
