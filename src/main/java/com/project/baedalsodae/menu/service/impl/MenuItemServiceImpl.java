@@ -110,6 +110,10 @@ public class MenuItemServiceImpl implements MenuItemService {
     item.softDelete(null); // 토큰 기능 추가 시 수정 필요
   }
 
+  @Override
+  public boolean isDuplicateMenuItemName(UUID menuCategoryId, String name) {
+    return existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, name);
+  }
 
   @Transactional
   @Override

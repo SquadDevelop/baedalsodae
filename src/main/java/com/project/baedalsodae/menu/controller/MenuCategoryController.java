@@ -50,4 +50,11 @@ public class MenuCategoryController {
     MenuItemResponseDto response = menuItemService.createMenuItem(menuCategoryId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }
+
+  @GetMapping("/{menuCategoryId}/menu-items/duplicate-check")
+  public ResponseEntity<ApiResponse<Boolean>> checkDuplicateMenuItemName(
+      @PathVariable UUID menuCategoryId, @RequestParam String name) {
+    boolean isDuplicate = menuItemService.isDuplicateMenuItemName(menuCategoryId, name);
+    return ResponseEntity.ok(ApiResponse.success("", isDuplicate));
+  }
 }

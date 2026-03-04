@@ -15,5 +15,8 @@ public interface MenuItemService {
   MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request);
 
   void deleteMenuItem(UUID menuItemId);
+
+  boolean isDuplicateMenuItemName(UUID menuCategoryId, String name);
+
   MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
 }
