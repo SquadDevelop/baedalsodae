@@ -105,7 +105,6 @@ public class User extends BaseAuditEntity {
     }
 
     public void addAddresses(List<UserAddress> addresses) {
-        this.userAddresses.addAll(addresses);
         addresses.forEach(this::addAddress);
         if (this.userMainAddressId == null) {
             this.changeMainAddress(this.userAddresses.get(0).getId());
