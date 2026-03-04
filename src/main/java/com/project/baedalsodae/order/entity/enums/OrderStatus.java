@@ -1,4 +1,4 @@
-package com.project.baedalsodae.order.entity;
+package com.project.baedalsodae.order.entity.enums;
 
 public enum OrderStatus {
 	CREATED,

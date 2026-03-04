@@ -1,6 +1,5 @@
 package com.project.baedalsodae.cart.entity;
 
-import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
@@ -72,6 +71,10 @@ public class Cart extends BaseTimeEntity {
 
 	public boolean removeItem(UUID cartItemId) {
 		return this.items.removeIf(i -> i.getId().equals(cartItemId));
+	}
+
+	public boolean hasNoItems() {
+		return this.items.isEmpty();
 	}
 
 	private Cart(UUID userId, Store store) {

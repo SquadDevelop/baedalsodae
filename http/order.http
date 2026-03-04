@@ -1,0 +1,11 @@
+### 주문 생성
+POST http://localhost:18082/api/v1/orders
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "cartId": "{{cartId}}",
+  "addressId": "{{addressId}}",
+  "storeRequestMessage": "리뷰이벤트 잽닝이 치킨 무 추가로 주시면 감사하겠습니다.",
+  "deliveryRequestMessage": "문 앞에 놓아주세요."
+}

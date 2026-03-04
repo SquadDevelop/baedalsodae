@@ -41,9 +41,16 @@ public enum ErrorCode {
 	CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST, "수량은 1 이상이어야 합니다."),
 	CART_DIFFERENT_STORE("CT003", HttpStatus.BAD_REQUEST, "다른 가게의 메뉴는 담을 수 없습니다."),
 	CART_ITEM_NOT_FOUND("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 없습니다."),
+    CART_ITEM_EMPTY("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 비어있습니다."),
+
+    //order
+    ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
+    ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
+
 	;
 
 	private final String code;
 	private final HttpStatus status;
 	private final String message;
+
 }
