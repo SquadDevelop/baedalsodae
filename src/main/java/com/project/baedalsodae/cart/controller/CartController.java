@@ -8,13 +8,14 @@ import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/carts")
+@RequestMapping("/carts")
 @RequiredArgsConstructor
 public class CartController {
 
@@ -32,7 +33,7 @@ public class CartController {
 			@RequestHeader("X-User-Id") UUID userId,
 			@RequestBody @Valid AddCartItemRequest request) {
 		CartResponse response = cartService.addCartItem(userId, request);
-		return ResponseEntity.ok(ApiResponse.success(SuccessCode.CART_ITEM_ADDED, response));
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(SuccessCode.CART_ITEM_ADDED, response));
 	}
 
 	@PatchMapping("/items/{cartItemId}")
