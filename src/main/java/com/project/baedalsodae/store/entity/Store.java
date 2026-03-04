@@ -4,17 +4,15 @@ import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(
         name = "p_store",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uq_store_business_number", columnNames = "business_number")
-        }
-)
+            @UniqueConstraint(name = "uq_store_business_number", columnNames = "business_number")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,7 +27,9 @@ public class Store extends BaseAuditEntity {
     private UUID userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_category_id", nullable = false,
+    @JoinColumn(
+            name = "store_category_id",
+            nullable = false,
             foreignKey = @ForeignKey(name = "fk_store_category"))
     private StoreCategory storeCategory;
 
@@ -42,8 +42,7 @@ public class Store extends BaseAuditEntity {
     @Column(name = "phone", length = 20, nullable = false)
     private String phone;
 
-    @Embedded
-    private Address address;
+    @Embedded private Address address;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -59,7 +58,11 @@ public class Store extends BaseAuditEntity {
     private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
 
     public void updateStore(
-            StoreCategory storeCategory, String name, String phone, Address address, String description) {
+            StoreCategory storeCategory,
+            String name,
+            String phone,
+            Address address,
+            String description) {
         this.storeCategory = storeCategory;
         this.name = name;
         this.phone = phone;
@@ -71,8 +74,14 @@ public class Store extends BaseAuditEntity {
         this.storeStatus = storeStatus;
     }
 
-    private Store (UUID userId, StoreCategory storeCategory, String name,
-                   String businessNumber, String phone, Address address, String description) {
+    private Store(
+            UUID userId,
+            StoreCategory storeCategory,
+            String name,
+            String businessNumber,
+            String phone,
+            Address address,
+            String description) {
         this.userId = userId;
         this.storeCategory = storeCategory;
         this.name = name;
@@ -82,9 +91,14 @@ public class Store extends BaseAuditEntity {
         this.description = description;
     }
 
-    public static Store createStore
-            (UUID userId, StoreCategory storeCategory, String name,
-             String businessNumber, String phone, Address address, String description) {
+    public static Store createStore(
+            UUID userId,
+            StoreCategory storeCategory,
+            String name,
+            String businessNumber,
+            String phone,
+            Address address,
+            String description) {
         return new Store(userId, storeCategory, name, businessNumber, phone, address, description);
     }
 }

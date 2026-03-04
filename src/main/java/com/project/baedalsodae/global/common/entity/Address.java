@@ -38,8 +38,22 @@ public class Address {
     private String detailAddress;
 
     public static Address createAddress(
-            String sidoCode, String sidoName, String sigunguCode, String sigunguName,
-            String dongCode, String dongName, String roadAddress, String detailAddress){
-        return new Address(sidoCode, sidoName, sigunguCode, sigunguName, dongCode, dongName, roadAddress, detailAddress);
+            String sidoCode,
+            String sidoName,
+            String sigunguCode,
+            String sigunguName,
+            String dongCode,
+            String dongName,
+            String roadAddress,
+            String detailAddress) {
+        return new Address(
+                sidoCode,
+                sidoName,
+                sigunguCode,
+                sigunguName,
+                dongCode,
+                dongName,
+                roadAddress,
+                detailAddress);
     }
 }

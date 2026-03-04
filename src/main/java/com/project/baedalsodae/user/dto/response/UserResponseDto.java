@@ -38,9 +38,10 @@ public class UserResponseDto {
 
         public static Detail from(User user) {
             UUID mainAddressId = user.getUserMainAddressId();
-            List<UserAddressResponse> addressResponses = user.getUserAddresses().stream()
-                    .map(address -> UserAddressResponse.from(address, mainAddressId))
-                    .toList();
+            List<UserAddressResponse> addressResponses =
+                    user.getUserAddresses().stream()
+                            .map(address -> UserAddressResponse.from(address, mainAddressId))
+                            .toList();
 
             return Detail.builder()
                     .userId(user.getId())

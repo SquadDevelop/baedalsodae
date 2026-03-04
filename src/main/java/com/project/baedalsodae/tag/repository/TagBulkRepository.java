@@ -10,19 +10,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TagBulkRepository {
 
-  private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-  @Transactional
-  public void bulkInsertIgnore(List<String> tagNames) {
-    if (tagNames == null || tagNames.isEmpty()) return;
+    @Transactional
+    public void bulkInsertIgnore(List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) return;
 
-    String sql =
-        """
+        String sql =
+                """
             INSERT INTO tag (name)
             VALUES (?)
             ON CONFLICT (name) DO NOTHING
         """;
 
-    jdbcTemplate.batchUpdate(sql, tagNames, tagNames.size(), (ps, name) -> ps.setString(1, name));
-  }
+        jdbcTemplate.batchUpdate(
+                sql, tagNames, tagNames.size(), (ps, name) -> ps.setString(1, name));
+    }
 }

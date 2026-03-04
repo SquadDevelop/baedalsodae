@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface TagMappingService {
 
-  void createTagMappings(MenuItem menuItem, List<String> tagNames);
+    void createTagMappings(MenuItem menuItem, List<String> tagNames);
 
-  void deleteAllTagMappingByMenuItemId(UUID menuItemId);
+    void deleteAllTagMappingByMenuItemId(UUID menuItemId);
 }

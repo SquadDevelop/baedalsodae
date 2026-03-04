@@ -1,8 +1,9 @@
 package com.project.baedalsodae.global.common;
 
 import jakarta.transaction.SystemException;
-import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.stream.Collectors;
-
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,30 +25,28 @@ public class GlobalExceptionHandler {
 
         ErrorCode errorCode = exception.getErrorCode();
 
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ApiResponse.error(errorCode));
+        return ResponseEntity.status(errorCode.getStatus()).body(ApiResponse.error(errorCode));
     }
 
     @ExceptionHandler(SystemException.class)
     public ResponseEntity<ApiResponse<Void>> handleSystemException(SystemException exception) {
         log.error("System Exception: ", exception);
 
-        return ResponseEntity
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<String>> handleValidationException(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ApiResponse<String>> handleValidationException(
+            MethodArgumentNotValidException exception) {
         log.warn("Validation Exception: ", exception);
 
-        String message = exception.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+        String message =
+                exception.getBindingResult().getFieldErrors().stream()
+                        .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                        .collect(Collectors.joining(", "));
 
-        return ResponseEntity
-                .status(ErrorCode.INVALID_REQUEST.getStatus())
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
     }
 
@@ -57,14 +54,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(
             MethodArgumentTypeMismatchException exception) {
 
-        log.warn("Type Mismatch: parameter={}, value={}, requiredType={}",
-                exception.getName(), exception.getValue(), exception.getRequiredType());
+        log.warn(
+                "Type Mismatch: parameter={}, value={}, requiredType={}",
+                exception.getName(),
+                exception.getValue(),
+                exception.getRequiredType());
 
-        String message = String.format("'%s' 파라미터의 값이 올바르지 않습니다: %s",
-                exception.getName(), exception.getValue());
+        String message =
+                String.format(
+                        "'%s' 파라미터의 값이 올바르지 않습니다: %s", exception.getName(), exception.getValue());
 
-        return ResponseEntity
-                .status(ErrorCode.INVALID_REQUEST.getStatus())
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
     }
 
@@ -73,12 +73,12 @@ public class GlobalExceptionHandler {
             ConstraintViolationException exception) {
         log.warn("Constraint Violation: ", exception);
 
-        String message = exception.getConstraintViolations().stream()
-                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
-                .collect(Collectors.joining(", "));
+        String message =
+                exception.getConstraintViolations().stream()
+                        .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                        .collect(Collectors.joining(", "));
 
-        return ResponseEntity
-                .status(ErrorCode.INVALID_REQUEST.getStatus())
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
     }
 
@@ -88,21 +88,18 @@ public class GlobalExceptionHandler {
 
         log.warn("Message Not Readable: ", exception);
 
-        String message =  "요청 본문을 읽을 수 없습니다";
+        String message = "요청 본문을 읽을 수 없습니다";
 
-        return ResponseEntity
-                .status(ErrorCode.INVALID_REQUEST.getStatus())
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(
-            AccessDeniedException exception) {
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException exception) {
 
         log.warn("Access Denied: ", exception);
 
-        return ResponseEntity
-                .status(ErrorCode.FORBIDDEN.getStatus())
+        return ResponseEntity.status(ErrorCode.FORBIDDEN.getStatus())
                 .body(ApiResponse.error(ErrorCode.FORBIDDEN));
     }
 
@@ -112,8 +109,7 @@ public class GlobalExceptionHandler {
 
         log.error("Redis Connection Failure: ", exception);
 
-        return ResponseEntity
-                .status(ErrorCode.DATABASE_UNAVAILABLE.getStatus())
+        return ResponseEntity.status(ErrorCode.DATABASE_UNAVAILABLE.getStatus())
                 .body(ApiResponse.error(ErrorCode.DATABASE_UNAVAILABLE));
     }
 
@@ -123,8 +119,7 @@ public class GlobalExceptionHandler {
 
         log.error("Data Access Exception: ", exception);
 
-        return ResponseEntity
-                .status(ErrorCode.DATA_ACCESS_ERROR.getStatus())
+        return ResponseEntity.status(ErrorCode.DATA_ACCESS_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorCode.DATA_ACCESS_ERROR));
     }
 
@@ -134,19 +129,16 @@ public class GlobalExceptionHandler {
 
         log.warn("Data Integrity Violation: ", exception);
 
-        return ResponseEntity
-                .status(ErrorCode.DATA_INTEGRITY_VIOLATION.getStatus())
+        return ResponseEntity.status(ErrorCode.DATA_INTEGRITY_VIOLATION.getStatus())
                 .body(ApiResponse.error(ErrorCode.DATA_INTEGRITY_VIOLATION));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(
-            Exception exception) {
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception exception) {
 
         log.error("Unhandled Exception: ", exception);
 
-        return ResponseEntity
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }

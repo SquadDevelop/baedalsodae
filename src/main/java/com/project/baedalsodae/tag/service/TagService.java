@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface TagService {
 
-  List<Tag> findAllByNames(List<String> names);
+    List<Tag> findAllByNames(List<String> names);
 
-  void createNewTagsIfNotExists(List<String> distinctNames);
+    void createNewTagsIfNotExists(List<String> distinctNames);
 
-  List<TagResponseDto> getTagListByParams(String keyword, int count);
+    List<TagResponseDto> getTagListByParams(String keyword, int count);
 }

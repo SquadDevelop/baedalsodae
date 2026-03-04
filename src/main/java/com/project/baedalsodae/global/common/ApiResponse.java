@@ -1,9 +1,8 @@
 package com.project.baedalsodae.global.common;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class ApiResponse<T> {
@@ -55,7 +54,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
-      return new ApiResponse<>(successCode, data);
+        return new ApiResponse<>(successCode, data);
     }
 
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
@@ -63,7 +62,6 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> error(ErrorCode errorCode, String customMessage) {
-        return new ApiResponse<>(errorCode, customMessage,null);
+        return new ApiResponse<>(errorCode, customMessage, null);
     }
-
 }

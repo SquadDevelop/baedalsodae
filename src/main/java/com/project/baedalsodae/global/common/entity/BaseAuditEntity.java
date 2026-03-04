@@ -18,37 +18,39 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseAuditEntity extends BaseTimeEntity {
 
-  @CreatedBy
-  @Column(name = "created_by", updatable = false)
-  private UUID createdBy;
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
+    private UUID createdBy;
 
-  @LastModifiedBy
-  @Column(name = "updated_by")
-  private UUID updatedBy;
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private UUID updatedBy;
 
-  @Column(name = "deleted_at")
-  private Instant deletedAt;
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
-  @Column(name = "deleted_by")
-  private UUID deletedBy;
+    @Column(name = "deleted_by")
+    private UUID deletedBy;
 
-  @Column(name = "is_deleted")
-  @ColumnDefault("false")
-  private boolean isDeleted = false;
+    @Column(name = "is_deleted")
+    @ColumnDefault("false")
+    private boolean isDeleted = false;
 
-  public void softDelete(UUID userId) {
-    this.isDeleted = true;
-    this.deletedAt = Instant.now();
-    this.deletedBy = userId;
-  }
+    public void softDelete(UUID userId) {
+        this.isDeleted = true;
+        this.deletedAt = Instant.now();
+        this.deletedBy = userId;
+    }
 
-  public void restore() {
-    this.isDeleted = false;
-    this.deletedAt = null;
-    this.deletedBy = null;
-  }
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+        this.deletedBy = null;
+    }
 
-  public LocalDateTime getLocalDateDeletedAt() {
-    return deletedAt != null ? LocalDateTime.ofInstant(deletedAt, ZoneId.systemDefault()) : null;
-  }
+    public LocalDateTime getLocalDateDeletedAt() {
+        return deletedAt != null
+                ? LocalDateTime.ofInstant(deletedAt, ZoneId.systemDefault())
+                : null;
+    }
 }

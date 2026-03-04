@@ -29,22 +29,22 @@ public class UserServiceImpl implements UserService {
     public Detail createUser(UserRequestDto.Create createRequest) {
         String encodedPassword = passwordEncoder.encode(createRequest.getPassword());
 
-        User newUser = User.create(
-                createRequest.getUsername(),
-                createRequest.getPhone(),
-                createRequest.getEmail(),
-                encodedPassword,
-                createRequest.getName(),
-                createRequest.getNickname(),
-                createRequest.getRole()
-        );
+        User newUser =
+                User.create(
+                        createRequest.getUsername(),
+                        createRequest.getPhone(),
+                        createRequest.getEmail(),
+                        encodedPassword,
+                        createRequest.getName(),
+                        createRequest.getNickname(),
+                        createRequest.getRole());
 
         User savedUser = userRepository.save(newUser);
-        CreateUserAddressRequest addressRequest = CreateUserAddressRequest.from(
-                createRequest.getRoadAddress(),
-                createRequest.getDetailAddress(),
-                createRequest.getDescription()
-        );
+        CreateUserAddressRequest addressRequest =
+                CreateUserAddressRequest.from(
+                        createRequest.getRoadAddress(),
+                        createRequest.getDetailAddress(),
+                        createRequest.getDescription());
         userAddressService.createAddress(savedUser.getId(), addressRequest);
 
         return Detail.from(savedUser);
@@ -69,11 +69,10 @@ public class UserServiceImpl implements UserService {
         }
 
         user.update(
-            updateRequest.getPhone(),
-            updateRequest.getEmail(),
-            encodedPassword,
-            updateRequest.getNickname()
-        );
+                updateRequest.getPhone(),
+                updateRequest.getEmail(),
+                encodedPassword,
+                updateRequest.getNickname());
 
         if (updateRequest.getAddresses() != null) {
             userAddressService.updateAddressList(userId, updateRequest.getAddresses());
@@ -94,7 +93,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private User findByUserId(UUID userId) {
-        return userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)
+        return userRepository
+                .findUserWithAddressesByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 }

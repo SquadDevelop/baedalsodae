@@ -6,5 +6,4 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class StoreQueryServiceImpl implements StoreQueryService {
-}
+public class StoreQueryServiceImpl implements StoreQueryService {}

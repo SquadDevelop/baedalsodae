@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TagMappingRepository extends JpaRepository<TagMapping, UUID> {
 
-  @Modifying(clearAutomatically = true, flushAutomatically = true)
-  @Query("DELETE FROM TagMapping tm WHERE tm.menuItem.id = :menuItemId")
-  void deleteByMenuItemId(UUID menuItemId);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM TagMapping tm WHERE tm.menuItem.id = :menuItemId")
+    void deleteByMenuItemId(UUID menuItemId);
 }

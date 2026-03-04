@@ -2,9 +2,8 @@ package com.project.baedalsodae.store.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.UUID;
+import lombok.*;
 
 @Entity
 @Table(name = "p_store_category")
@@ -24,7 +23,7 @@ public class StoreCategory extends BaseAuditEntity {
     private String description;
 
     public void patchStoreCategory(String name, String description) {
-        if(name != null) {
+        if (name != null) {
             this.name = name;
         }
         this.description = description;

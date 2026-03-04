@@ -8,15 +8,15 @@ import java.util.UUID;
 
 public interface MenuItemService {
 
-  MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request);
+    MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request);
 
-  MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuItemPutRequestDto request);
+    MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuItemPutRequestDto request);
 
-  MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request);
+    MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request);
 
-  void deleteMenuItem(UUID menuItemId);
+    void deleteMenuItem(UUID menuItemId);
 
-  boolean isDuplicateMenuItemName(UUID menuCategoryId, String name);
+    boolean isDuplicateMenuItemName(UUID menuCategoryId, String name);
 
-  MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
+    MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
 }

@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/tags")
 public class TagController {
 
-  private final TagService tagService;
+    private final TagService tagService;
 
-  @GetMapping
-  public ResponseEntity<ApiResponse<List<TagResponseDto>>> getTagListByParams(
-      @RequestParam(required = false) String keyword,
-      @RequestParam(defaultValue = "10") Integer count) {
-    List<TagResponseDto> response = tagService.getTagListByParams(keyword, count);
-    return ResponseEntity.ok(ApiResponse.success("", response));
-  }
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<TagResponseDto>>> getTagListByParams(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "10") Integer count) {
+        List<TagResponseDto> response = tagService.getTagListByParams(keyword, count);
+        return ResponseEntity.ok(ApiResponse.success("", response));
+    }
 }

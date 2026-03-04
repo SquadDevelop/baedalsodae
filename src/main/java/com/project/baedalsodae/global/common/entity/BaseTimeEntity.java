@@ -16,20 +16,23 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseTimeEntity {
 
-  @CreatedDate
-  @Column(name = "created_at", updatable = false)
-  private Instant createdAt;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
-  @LastModifiedDate
-  @Column(name = "updated_at")
-  private Instant updatedAt;
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
-  public LocalDateTime getLocalDateCreatedAt() {
-    return createdAt != null ? LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault()) : null;
-  }
+    public LocalDateTime getLocalDateCreatedAt() {
+        return createdAt != null
+                ? LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault())
+                : null;
+    }
 
-  public LocalDateTime getLocalDateUpdatedAt() {
-    return updatedAt != null ? LocalDateTime.ofInstant(updatedAt, ZoneId.systemDefault()) : null;
-  }
-
+    public LocalDateTime getLocalDateUpdatedAt() {
+        return updatedAt != null
+                ? LocalDateTime.ofInstant(updatedAt, ZoneId.systemDefault())
+                : null;
+    }
 }

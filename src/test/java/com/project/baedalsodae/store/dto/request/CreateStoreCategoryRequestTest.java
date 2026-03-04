@@ -1,17 +1,16 @@
 package com.project.baedalsodae.store.dto.request;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class CreateStoreCategoryRequestTest {
 
@@ -45,7 +44,8 @@ class CreateStoreCategoryRequestTest {
         CreateStoreCategoryRequest request = new CreateStoreCategoryRequest("", "설명");
 
         // when
-        Set<ConstraintViolation<CreateStoreCategoryRequest>> violations = validator.validate(request);
+        Set<ConstraintViolation<CreateStoreCategoryRequest>> violations =
+                validator.validate(request);
 
         // then (에러가 존재해야 함)
         assertThat(violations).isNotEmpty();
@@ -60,7 +60,8 @@ class CreateStoreCategoryRequestTest {
         CreateStoreCategoryRequest request = new CreateStoreCategoryRequest("한식", longDesc);
 
         // when
-        Set<ConstraintViolation<CreateStoreCategoryRequest>> violations = validator.validate(request);
+        Set<ConstraintViolation<CreateStoreCategoryRequest>> violations =
+                validator.validate(request);
 
         // then
         assertThat(violations).isNotEmpty();

@@ -27,19 +27,15 @@ public class UserRequestDto {
         @Pattern(regexp = "^01(?:0|1|[6-9])[-]?(\\d{3}|\\d{4})[-]?(\\d{4})$")
         private String phone;
 
-        @NotBlank
-        @Email
-        private String email;
+        @NotBlank @Email private String email;
 
         @NotBlank
         @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]{8,15}$")
         private String password;
 
-        @NotBlank
-        private String name;
+        @NotBlank private String name;
 
-        @NotBlank
-        private String nickname;
+        @NotBlank private String nickname;
 
         private UserRole role;
 
@@ -57,8 +53,7 @@ public class UserRequestDto {
         @Pattern(regexp = "^01(?:0|1|[6-9])[-]?(\\d{3}|\\d{4})[-]?(\\d{4})$")
         private String phone;
 
-        @Email
-        private String email;
+        @Email private String email;
 
         @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]{8,15}$")
         private String password;

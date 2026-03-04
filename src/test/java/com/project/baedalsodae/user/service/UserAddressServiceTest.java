@@ -1,16 +1,16 @@
 package com.project.baedalsodae.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserAddressRequest;
 import com.project.baedalsodae.user.dto.response.UserAddressResponse;
-import com.project.baedalsodae.global.common.BusinessException;
-import com.project.baedalsodae.global.common.ErrorCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -34,14 +34,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 public class UserAddressServiceTest {
 
-    @Mock
-    private UserAddressRepository userAddressRepository;
+    @Mock private UserAddressRepository userAddressRepository;
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @InjectMocks
-    private UserAddressServiceImpl userAddressService;
+    @InjectMocks private UserAddressServiceImpl userAddressService;
 
     private UUID userId;
     private User user;
@@ -49,8 +46,15 @@ public class UserAddressServiceTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        user = User.create("tester", "010-1234-5678", "tester@test.com",
-                "pwd1234", "testerName", "testerNickname", UserRole.CUSTOMER);
+        user =
+                User.create(
+                        "tester",
+                        "010-1234-5678",
+                        "tester@test.com",
+                        "pwd1234",
+                        "testerName",
+                        "testerNickname",
+                        UserRole.CUSTOMER);
         ReflectionTestUtils.setField(user, "id", userId);
     }
 
@@ -60,11 +64,13 @@ public class UserAddressServiceTest {
         CreateUserAddressRequest request = createCreateRequest("도로명1", "상세1");
 
         given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
-        given(userAddressRepository.save(any())).willAnswer(invocationOnMock -> {
-            UserAddress userAddress = invocationOnMock.getArgument(0);
-            ReflectionTestUtils.setField(userAddress, "id", user.getId());
-            return userAddress;
-        });
+        given(userAddressRepository.save(any()))
+                .willAnswer(
+                        invocationOnMock -> {
+                            UserAddress userAddress = invocationOnMock.getArgument(0);
+                            ReflectionTestUtils.setField(userAddress, "id", user.getId());
+                            return userAddress;
+                        });
 
         userAddressService.createAddress(userId, request);
 
@@ -97,9 +103,11 @@ public class UserAddressServiceTest {
     void updateAddress_Success() {
         UUID addrId = UUID.randomUUID();
         UserAddress addr = UserAddress.builder().id(addrId).user(user).roadAddress("기존").build();
-        UpdateUserAddressRequest req = UpdateUserAddressRequest.builder().userAddressId(addrId).roadAddress("수정").build();
-        
-        given(userAddressRepository.findByIdAndUserId(addrId, userId)).willReturn(Optional.of(addr));
+        UpdateUserAddressRequest req =
+                UpdateUserAddressRequest.builder().userAddressId(addrId).roadAddress("수정").build();
+
+        given(userAddressRepository.findByIdAndUserId(addrId, userId))
+                .willReturn(Optional.of(addr));
 
         userAddressService.updateAddress(userId, req);
 
@@ -111,15 +119,18 @@ public class UserAddressServiceTest {
     void updateAddressList_Success() {
         UUID myId1 = UUID.randomUUID();
         UUID myId2 = UUID.randomUUID();
-        UserAddress myAddr1 = UserAddress.builder().id(myId1).user(user).roadAddress("기존도로1").build();
-        UserAddress myAddr2 = UserAddress.builder().id(myId2).user(user).roadAddress("기존도로2(삭제)").build();
+        UserAddress myAddr1 =
+                UserAddress.builder().id(myId1).user(user).roadAddress("기존도로1").build();
+        UserAddress myAddr2 =
+                UserAddress.builder().id(myId2).user(user).roadAddress("기존도로2(삭제)").build();
         user.addAddresses(List.of(myAddr1, myAddr2));
-        
+
         UpdateUserAddressRequest req1 = createUpdateRequest(myId1, "수정된도로명", "101호", "설명수정");
         UpdateUserAddressRequest req3 = createUpdateRequest(null, "신규도로명", "303호", "신규주소");
         List<UpdateUserAddressRequest> updatedAddressReq = List.of(req1, req3);
 
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.of(user));
 
         userAddressService.updateAddressList(userId, updatedAddressReq);
 
@@ -128,12 +139,17 @@ public class UserAddressServiceTest {
         assertThat(myAddr1.getDetailAddress()).isEqualTo("101호");
         assertThat(myAddr1.getDescription()).isEqualTo("설명수정");
 
-        boolean hasMyAddr2 = user.getUserAddresses().stream()
-                .anyMatch(addr -> addr.getId() != null && addr.getId().equals(myAddr2.getId()));
+        boolean hasMyAddr2 =
+                user.getUserAddresses().stream()
+                        .anyMatch(
+                                addr ->
+                                        addr.getId() != null
+                                                && addr.getId().equals(myAddr2.getId()));
         assertThat(hasMyAddr2).isFalse();
 
-        boolean hasMyAddr3 = user.getUserAddresses().stream()
-                .anyMatch(addr -> addr.getRoadAddress().equals("신규도로명"));
+        boolean hasMyAddr3 =
+                user.getUserAddresses().stream()
+                        .anyMatch(addr -> addr.getRoadAddress().equals("신규도로명"));
         assertThat(hasMyAddr3).isTrue();
     }
 
@@ -174,7 +190,8 @@ public class UserAddressServiceTest {
     void setMainAddress_Success() {
         UUID addrId = UUID.randomUUID();
         UserAddress addr = UserAddress.builder().id(addrId).user(user).build();
-        given(userAddressRepository.findByIdAndUserId(addrId, userId)).willReturn(Optional.of(addr));
+        given(userAddressRepository.findByIdAndUserId(addrId, userId))
+                .willReturn(Optional.of(addr));
 
         userAddressService.setMainAddress(userId, addrId);
 
@@ -185,7 +202,8 @@ public class UserAddressServiceTest {
     @DisplayName("성공 - 회원탈퇴 시 모든 주소 일괄 삭제")
     void deleteAllAddresses_Success() {
         user.addAddress(UserAddress.builder().id(UUID.randomUUID()).user(user).build());
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.of(user));
 
         userAddressService.deleteAllAddressesByUserId(userId);
 
@@ -198,7 +216,8 @@ public class UserAddressServiceTest {
         return CreateUserAddressRequest.from(roadAddress, detailAddress, "");
     }
 
-    private UpdateUserAddressRequest createUpdateRequest(UUID userId, String roadAddress, String detailAddress, String description) {
+    private UpdateUserAddressRequest createUpdateRequest(
+            UUID userId, String roadAddress, String detailAddress, String description) {
         return UpdateUserAddressRequest.builder()
                 .userAddressId(userId)
                 .roadAddress(roadAddress)
