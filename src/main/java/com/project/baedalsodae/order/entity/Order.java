@@ -2,7 +2,6 @@ package com.project.baedalsodae.order.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

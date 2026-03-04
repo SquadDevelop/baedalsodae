@@ -9,14 +9,12 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.entity.Order;
-import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
-import com.project.baedalsodae.order.util.OrderNoGenerator;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -177,7 +175,7 @@ public class OrderServiceTest {
 	}
 
 	@Test
-	@DisplayName("실패 - 주문 생성 시 총 금액이 0 이하")
+	@DisplayName("실패 - 주문 생성 시 총 메뉴 금액이 0 이하")
 	void createOrder_fail_invalidTotalAmount() {
 		//given
 		UUID userId = UUID.randomUUID();
@@ -281,6 +279,5 @@ public class OrderServiceTest {
 		then(eventPublisher).should().publishOrderCreated(any(Order.class));
 		assertThat(response).isNotNull();
 		assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
-
 	}
 }

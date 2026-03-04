@@ -13,7 +13,7 @@ public class OrderEventPublisher {
 	private final ApplicationEventPublisher eventPublisher;
 
 	public void publishOrderCreated(Order order) {
-        final OrderCreatedEvent event = OrderCreatedEvent.from(order);
-        eventPublisher.publishEvent(event);
+		final OrderCreatedEvent event = OrderCreatedEvent.from(order);
+		eventPublisher.publishEvent(event);
 	}
 }

@@ -42,22 +42,22 @@ public class OrderServiceImpl implements OrderService {
 		Cart cart = cartRepository.findCartWithItemsByIdAndUserId(cartId, userId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		if(cart.hasNoItems())
+		if (cart.hasNoItems())
 			throw new BusinessException(ErrorCode.CART_ITEM_EMPTY);
 
 		final UUID storeId = cart.getStore().getId();
 		Store store = storeRepository.findById(storeId)
-				.orElseThrow(()-> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+				.orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
 		int totalAmount = cart.getTotalAmount();
-		if(totalAmount <= 0)
+		if (totalAmount <= 0)
 			throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
 
 		// 할인 쿠폰 도메인, 배달 도메인이 없음
 		final int deliveryFee = 0;
 		final int discountAmount = 0;
 		final int finalAmount = totalAmount - discountAmount + deliveryFee;
-		if(finalAmount < 0)
+		if (finalAmount < 0)
 			throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
 
 		//TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환

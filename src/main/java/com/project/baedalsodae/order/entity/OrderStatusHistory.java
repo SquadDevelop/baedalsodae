@@ -16,31 +16,31 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderStatusHistory extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id", nullable = false)
+	private UUID id;
 
-    @Column(name = "order_id", nullable = false)
-    private UUID orderId;
+	@Column(name = "order_id", nullable = false)
+	private UUID orderId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "from_status")
-    private OrderStatus fromStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "from_status")
+	private OrderStatus fromStatus;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "to_status")
-    private OrderStatus toStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "to_status")
+	private OrderStatus toStatus;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "actor_type", nullable = false)
-    private ActorType actorType;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "actor_type", nullable = false)
+	private ActorType actorType;
 
-    @Column(name = "actor_id")
-    private UUID actorId;
+	@Column(name = "actor_id")
+	private UUID actorId;
 
-    @Column(name = "reason", columnDefinition = "TEXT")
-    private String reason;
+	@Column(name = "reason", columnDefinition = "TEXT")
+	private String reason;
 
 
 	private OrderStatusHistory(
