@@ -2,14 +2,19 @@ package com.project.baedalsodae.order.dto.response;
 
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
+import lombok.Builder;
 
 import java.util.UUID;
 
+@Builder
 public record CreateOrderResponse(
-    UUID orderId,
-	OrderStatus status
+		UUID orderId,
+		OrderStatus status
 ) {
 	public static CreateOrderResponse from(Order order) {
-		return new CreateOrderResponse(order.getId(), order.getStatus());
+		return CreateOrderResponse.builder()
+				.orderId(order.getId())
+				.status(order.getStatus())
+				.build();
 	}
 }
