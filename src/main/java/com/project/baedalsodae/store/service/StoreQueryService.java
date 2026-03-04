@@ -1,4 +1,4 @@
 package com.project.baedalsodae.store.service;
 
-public interface StoreService {
+public interface StoreQueryService {
 }
