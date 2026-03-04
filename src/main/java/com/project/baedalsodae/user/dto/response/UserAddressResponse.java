@@ -1,6 +1,7 @@
 package com.project.baedalsodae.user.dto.response;
 
 import com.project.baedalsodae.user.entity.UserAddress;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class UserAddressResponse {
                 .roadAddress(userAddress.getRoadAddress())
                 .detailAddress(userAddress.getDetailAddress())
                 .description(userAddress.getDescription())
-                .isMainAddress(userMainAddressId.equals(userAddress.getId()))
+                .isMainAddress(Objects.equals(userMainAddressId, userAddress.getId()))
                 .build();
     }
 }

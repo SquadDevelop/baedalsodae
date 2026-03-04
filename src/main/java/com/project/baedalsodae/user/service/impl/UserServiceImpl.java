@@ -2,11 +2,13 @@ package com.project.baedalsodae.user.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.UserRequestDto;
 import com.project.baedalsodae.user.dto.response.UserResponseDto.Delete;
 import com.project.baedalsodae.user.dto.response.UserResponseDto.Detail;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.repository.UserRepository;
+import com.project.baedalsodae.user.service.UserAddressService;
 import com.project.baedalsodae.user.service.UserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserAddressService userAddressService;
 
     @Transactional
     @Override
@@ -36,7 +39,15 @@ public class UserServiceImpl implements UserService {
                 createRequest.getRole()
         );
 
-        return Detail.from(userRepository.save(newUser));
+        User savedUser = userRepository.save(newUser);
+        CreateUserAddressRequest addressRequest = CreateUserAddressRequest.from(
+                createRequest.getRoadAddress(),
+                createRequest.getDetailAddress(),
+                createRequest.getDescription()
+        );
+        userAddressService.createAddress(savedUser.getId(), addressRequest);
+
+        return Detail.from(savedUser);
     }
 
     @Transactional(readOnly = true)
@@ -64,6 +75,10 @@ public class UserServiceImpl implements UserService {
             updateRequest.getNickname()
         );
 
+        if (updateRequest.getAddresses() != null) {
+            userAddressService.updateAddressList(userId, updateRequest.getAddresses());
+        }
+
         return Detail.from(user);
     }
 
@@ -72,13 +87,14 @@ public class UserServiceImpl implements UserService {
     public Delete deleteUser(UUID userId) {
         User user = findByUserId(userId);
 
+        userAddressService.deleteAllAddressesByUserId(userId);
         user.softDelete(userId);
 
         return Delete.from(user);
     }
 
     private User findByUserId(UUID userId) {
-        return userRepository.findByUserId(userId)
+        return userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 }
