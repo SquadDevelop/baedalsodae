@@ -26,24 +26,34 @@ public enum ErrorCode {
     // store-category
     STORE_CATEGORY_NOT_FOUND("SC001", HttpStatus.NOT_FOUND, "가게 카테고리가 존재하지 않습니다"),
 
-    // store
+	  // store
+	  STORE_NOT_FOUND("S001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
     STORE_NOT_FOUND("S001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
     STORE_DUPLICATED_BUSINESS_NUMBER("S002", HttpStatus.CONFLICT, "이미 가입된 사업자입니다"),
     STORE_FORBIDDEN("S002", HttpStatus.FORBIDDEN, "해당 가게에 대한 수정 권한이 없습니다."),
     STORE_STATUS_CHANGE_FORBIDDEN("S003", HttpStatus.FORBIDDEN, "가게 상태를 변경할 권한이 없습니다."),
 
-    // MenuItem
+    // menu-category
     MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),
+    INVALID_MENU_CATEGORY_ORDER("MC002", HttpStatus.BAD_REQUEST, "메뉴 카테고리 순서가 잘못됐습니다."),
+
+    // menuItem
     MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 없습니다"),
 
-    //cart
-    CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND,"장바구니가 없습니다."),
-    CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST,"수량은 1 이상이어야 합니다."),
+    // cart
+    CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND, "장바구니가 없습니다."),
+    CART_INVALID_QUANTITY("CT002", HttpStatus.BAD_REQUEST, "수량은 1 이상이어야 합니다."),
     CART_DIFFERENT_STORE("CT003", HttpStatus.BAD_REQUEST, "다른 가게의 메뉴는 담을 수 없습니다."),
-    CART_ITEM_NOT_FOUND ("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 없습니다."),
-    ;
+    CART_ITEM_NOT_FOUND("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 없습니다."),
+    CART_ITEM_EMPTY("CT004", HttpStatus.NOT_FOUND, "장바구니 아이템이 비어있습니다."),
 
-    private final String code;
-    private final HttpStatus status;
-    private final String message;
+    //order
+    ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
+    ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
+
+	;
+
+	private final String code;
+	private final HttpStatus status;
+	private final String message;
 }
