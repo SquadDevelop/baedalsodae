@@ -13,11 +13,13 @@ import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.tag.service.TagMappingService;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +49,11 @@ public class MenuItemServiceImpl implements MenuItemService {
             maxOrderNo + 1,
             request.menuStatus(),
             category);
-    tagMappingService.createTagMappings(menuItemRepository.save(item), request.tagNames());
+    try {
+      tagMappingService.createTagMappings(menuItemRepository.save(item), request.tagNames());
+    } catch (DataIntegrityViolationException e) {
+      throw new BusinessException(ErrorCode.MENU_ITEM_ORDER_CONFLICT);
+    }
     return MenuItemResponseDto.fromEntity(item);
   }
 
