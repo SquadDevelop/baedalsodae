@@ -30,13 +30,13 @@ public class MenuItemServiceImpl implements MenuItemService {
   @Transactional
   @Override
   public MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request) {
-    if (existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, request.name())) {
-      throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
-    }
     MenuCategory category =
         menuCategoryRepository
             .findByIdAndDeletedIsFalse(menuCategoryId)
             .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    if (existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, request.name())) {
+      throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+    }
     int maxOrderNo = menuItemRepository.findMaxOrderNoByMenuCategoryId((menuCategoryId)).orElse(0);
     MenuItem item =
         MenuItem.createMenuItem(
