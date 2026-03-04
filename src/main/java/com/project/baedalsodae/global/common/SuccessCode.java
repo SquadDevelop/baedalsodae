@@ -25,6 +25,12 @@ public enum SuccessCode {
 	STORE_CATEGORY_CREATED("SC202", HttpStatus.CREATED, "가게 카테고리 생성 성공"),
 	STORE_CATEGORY_PATCHED("SC203", HttpStatus.OK, "가게 카테고리 수정 성공"),
 	STORE_CATEGORY_DELETED("SC204", HttpStatus.OK, "가게 카테고리 삭제 성공"),
+
+	// store
+	STORE_CREATED("ST201", HttpStatus.CREATED, "가게 등록 성공"),
+	STORE_UPDATED("ST200", HttpStatus.OK, "가게 정보 수정 성공"),
+	STORE_STATUS_UPDATED("ST200", HttpStatus.OK, "가게 영업 상태 변경 성공"),
+	STORE_DELETED("ST200", HttpStatus.OK, "가게 삭제 성공"),
 	;
 
 	private final String code;
