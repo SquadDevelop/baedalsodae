@@ -1,10 +1,11 @@
 package com.project.baedalsodae.store.entity;
 
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
-import com.project.baedalsodae.user.entity.User;
+import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+
 import java.util.UUID;
 
 @Entity
@@ -24,10 +25,8 @@ public class Store extends BaseAuditEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_user_id"))
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_category_id", nullable = false,
@@ -37,39 +36,55 @@ public class Store extends BaseAuditEntity {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @Column(name = "business_number", length = 10, nullable = false)
+    @Column(name = "business_number", length = 15, nullable = false)
     private String businessNumber;
 
     @Column(name = "phone", length = 20, nullable = false)
     private String phone;
 
-    @Column(name = "sido_id", nullable = false)
-    private UUID sidoId;
-
-    @Column(name = "sigungu_id", nullable = false)
-    private UUID sigunguId;
-
-    @Column(name = "dong_id", nullable = false)
-    private UUID dongId;
-
-    @Column(name = "road_address", length = 255, nullable = false)
-    private String roadAddress;
-
-    @Column(name = "detail_address", length = 255, nullable = false)
-    private String detailAddress;
+    @Embedded
+    private Address address;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "rating_sum", nullable = false)
-    @ColumnDefault("0")
     private int ratingSum = 0;
 
     @Column(name = "review_count", nullable = false)
-    @ColumnDefault("0")
     private int reviewCount = 0;
 
-    @Column(name = "is_closed", nullable = false)
-    @ColumnDefault("true")
-    private boolean isClosed = true;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "store_status", nullable = false)
+    private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
+
+    public void updateStore(
+            StoreCategory storeCategory, String name, String phone, Address address, String description) {
+        this.storeCategory = storeCategory;
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+        this.description = description;
+    }
+
+    public void patchStoreOpened(StoreStatus storeStatus) {
+        this.storeStatus = storeStatus;
+    }
+
+    private Store (UUID userId, StoreCategory storeCategory, String name,
+                   String businessNumber, String phone, Address address, String description) {
+        this.userId = userId;
+        this.storeCategory = storeCategory;
+        this.name = name;
+        this.businessNumber = businessNumber;
+        this.phone = phone;
+        this.address = address;
+        this.description = description;
+    }
+
+    public static Store createStore
+            (UUID userId, StoreCategory storeCategory, String name,
+             String businessNumber, String phone, Address address, String description) {
+        return new Store(userId, storeCategory, name, businessNumber, phone, address, description);
+    }
 }
