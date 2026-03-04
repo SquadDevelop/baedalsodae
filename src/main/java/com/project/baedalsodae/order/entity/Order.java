@@ -2,11 +2,15 @@ package com.project.baedalsodae.order.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
+import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
+import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -48,15 +52,81 @@ public class Order extends BaseAuditEntity {
 	private String deliveryAddressSnapshot;
 
 	@Column(name = "total_amount")
-	private Long totalAmount;
+	private int totalAmount;
 
 	@Column(name = "delivery_fee")
-	private Long deliveryFee;
+	private int deliveryFee;
 
 	@Column(name = "discount_amount")
-	private Long discountAmount;
+	private int discountAmount;
 
 	@Column(name = "final_amount")
-	private Long finalAmount;
+	private int finalAmount;
 
+	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+	private List<OrderItem> orderItems = new ArrayList<>();
+
+	public void addOrderItems(List<OrderItem> orderItems) {
+		this.orderItems.addAll(orderItems);
+	}
+
+	private Order(
+			UUID userId,
+			UUID storeId,
+			String storeNameSnapshot,
+			UUID addressId,
+			String deliveryAddressSnapshot,
+			String orderNo,
+			String storeRequestNote,
+			String deliveryRequestNote,
+			int totalAmount,
+			int deliveryFee,
+			int discountAmount,
+			int finalAmount,
+			OrderStatus status
+	) {
+		this.userId = userId;
+		this.storeId = storeId;
+		this.storeNameSnapshot = storeNameSnapshot;
+		this.addressId = addressId;
+		this.deliveryAddressSnapshot = deliveryAddressSnapshot;
+		this.orderNo = orderNo;
+		this.storeRequestNote = storeRequestNote;
+		this.deliveryRequestNote = deliveryRequestNote;
+		this.totalAmount = totalAmount;
+		this.deliveryFee = deliveryFee;
+		this.discountAmount = discountAmount;
+		this.finalAmount = finalAmount;
+		this.status = status;
+	}
+
+	public static Order create(
+			UUID userId,
+			Store store,
+			UUID addressId,
+			String deliveryAddressSnapshot,
+			String orderNo,
+			String storeRequestNote,
+			String deliveryRequestNote,
+			int totalAmount,
+			int deliveryFee,
+			int discountAmount,
+			int finalAmount
+	) {
+		return new Order(
+				userId,
+				store.getId(),
+				store.getName(),
+				addressId,
+				deliveryAddressSnapshot,
+				orderNo,
+				storeRequestNote,
+				deliveryRequestNote,
+				totalAmount,
+				deliveryFee,
+				discountAmount,
+				finalAmount,
+				OrderStatus.CREATED
+		);
+	}
 }

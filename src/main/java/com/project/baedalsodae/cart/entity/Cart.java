@@ -46,10 +46,6 @@ public class Cart extends BaseTimeEntity {
 		return items.stream().mapToInt(CartItem::getLineAmount).sum();
 	}
 
-	public boolean isInvalidTotalAmount() {
-		return this.getTotalAmount() <= 0;
-	}
-
 	public void addItem(CartItem item) {
 		for (CartItem existingCartItem : this.items) {
 			if (existingCartItem.isSameMenuItem(item.getMenuItem().getId())) {

@@ -1,5 +1,6 @@
 package com.project.baedalsodae.order.entity;
 
+import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,8 +32,35 @@ public class OrderItem extends BaseTimeEntity {
 	private String nameSnapshot;
 
 	@Column(name = "price_snapshot")
-	private Long priceSnapshot;
+	private int priceSnapshot;
 
 	@Column(name = "quantity")
-	private Long quantity;
+	private int quantity;
+
+	private OrderItem(
+			Order order,
+			UUID menuItemId,
+			String nameSnapshot,
+			int priceSnapshot,
+			int quantity
+	) {
+		this.order = order;
+		this.menuItemId = menuItemId;
+		this.nameSnapshot = nameSnapshot;
+		this.priceSnapshot = priceSnapshot;
+		this.quantity = quantity;
+	}
+
+	public static OrderItem create(
+			Order order,
+			CartItem cartItem
+	) {
+		return new OrderItem(
+				order,
+				cartItem.getMenuItem().getId(),
+				cartItem.getMenuItem().getName(),
+				cartItem.getMenuItem().getPrice(),
+				cartItem.getQuantity()
+		);
+	}
 }

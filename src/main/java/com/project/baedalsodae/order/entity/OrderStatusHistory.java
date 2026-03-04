@@ -42,4 +42,31 @@ public class OrderStatusHistory extends BaseTimeEntity {
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
 
+
+	private OrderStatusHistory(
+			UUID orderId,
+			OrderStatus fromStatus,
+			OrderStatus toStatus,
+			ActorType actorType,
+			UUID actorId
+	) {
+		this.orderId = orderId;
+		this.fromStatus = fromStatus;
+		this.toStatus = toStatus;
+		this.actorType = actorType;
+		this.actorId = actorId;
+	}
+
+	public static OrderStatusHistory create(
+			Order order,
+			UUID userId
+	) {
+		return new OrderStatusHistory(
+				order.getId(),
+				null,
+				order.getStatus(),
+				ActorType.CUSTOMER,
+				userId
+		);
+	}
 }
