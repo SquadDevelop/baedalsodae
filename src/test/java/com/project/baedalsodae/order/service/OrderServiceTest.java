@@ -33,6 +33,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -275,6 +276,78 @@ public class OrderServiceTest {
 
 		//then
 		then(orderRepository).should().save(any(Order.class));
+		then(orderStatusHistoryRepository).should().save(any(OrderStatusHistory.class));
+		then(eventPublisher).should().publishOrderCreated(any(Order.class));
+		assertThat(response).isNotNull();
+		assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
+	}
+
+	@Test
+	@DisplayName("성공 - 정상적인 주문 생성 (복수 아이템)")
+	void createOrder_success_multipleItems() {
+		//given
+		UUID userId = UUID.randomUUID();
+		UUID cartId = UUID.randomUUID();
+		UUID storeId = UUID.randomUUID();
+		UUID addressId = UUID.randomUUID();
+		UUID menuItemId1 = UUID.randomUUID();
+		UUID menuItemId2 = UUID.randomUUID();
+
+		String storeRequestMessage = "리뷰이벤트 잽닝이 치킨 무 추가로 주시면 감사하겠습니다.";
+
+		CreateOrderRequest request = CreateOrderRequest.builder()
+				.cartId(cartId)
+				.addressId(addressId)
+				.storeRequestMessage(storeRequestMessage)
+				.build();
+
+		given(cartRepository.findCartWithItemsByIdAndUserId(cartId, userId))
+				.willReturn(Optional.of(cart));
+
+		given(cart.getStore()).willReturn(store);
+		given(store.getId()).willReturn(storeId);
+
+		given(cart.hasNoItems()).willReturn(false);
+
+		given(storeRepository.findById(storeId))
+				.willReturn(Optional.of(store));
+
+		given(cart.getTotalAmount()).willReturn(26000);
+
+		given(cartItem1.getMenuItem()).willReturn(menuItem1);
+		given(menuItem1.getId()).willReturn(menuItemId1);
+		given(menuItem1.getName()).willReturn("치킨");
+		given(menuItem1.getPrice()).willReturn(18000);
+		given(cartItem1.getQuantity()).willReturn(1);
+
+		given(cartItem2.getMenuItem()).willReturn(menuItem2);
+		given(menuItem2.getId()).willReturn(menuItemId2);
+		given(menuItem2.getName()).willReturn("짜장면");
+		given(menuItem2.getPrice()).willReturn(8000);
+		given(cartItem2.getQuantity()).willReturn(1);
+
+		List<CartItem> cartItems = new ArrayList<>();
+		cartItems.add(cartItem1);
+		cartItems.add(cartItem2);
+
+		given(cart.getItems()).willReturn(cartItems);
+
+		given(orderRepository.save(any(Order.class)))
+				.willAnswer(inv -> inv.getArgument(0));
+
+		given(orderStatusHistoryRepository.save(any(OrderStatusHistory.class)))
+				.willAnswer(inv -> inv.getArgument(0));
+
+		//when
+		CreateOrderResponse response = orderService.createOrder(userId, request);
+		log.info("response = {}", response);
+
+		//then
+		then(orderRepository).should().save(any(Order.class));
+		then(orderRepository).should().save(argThat(order ->
+				order.getOrderItems().size() == 2 &&
+						order.getTotalAmount() == 26000
+		));
 		then(orderStatusHistoryRepository).should().save(any(OrderStatusHistory.class));
 		then(eventPublisher).should().publishOrderCreated(any(Order.class));
 		assertThat(response).isNotNull();
