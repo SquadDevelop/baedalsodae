@@ -59,7 +59,7 @@ class OrderControllerTest {
 		CreateOrderResponse response = new CreateOrderResponse(orderId, OrderStatus.CREATED);
 		given(orderService.createOrder(userId, request)).willReturn(response);
 
-		mockMvc.perform(post("/api/v1/orders")
+		mockMvc.perform(post("/orders")
 						.header("X-User-Id", userId)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
@@ -79,7 +79,7 @@ class OrderControllerTest {
 		given(orderService.createOrder(userId, request))
 				.willThrow(new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		mockMvc.perform(post("/api/v1/orders")
+		mockMvc.perform(post("/orders")
 						.header("X-User-Id", userId)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
