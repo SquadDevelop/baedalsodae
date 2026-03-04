@@ -73,6 +73,9 @@ public class UserAddress extends BaseTimeEntity {
     }
 
     public void changeUser(User user) {
+        if (this.user != null) {
+            this.user.getUserAddresses().remove(this);
+        }
         this.user = user;
     }
 
@@ -95,7 +98,7 @@ public class UserAddress extends BaseTimeEntity {
         if (!(obj instanceof UserAddress that)) {
             return false;
         }
-        return this.getId() != null
+        return this.getId() != null && that.getId() != null
                 && Objects.equals(this.getId(), that.getId());
     }
 }
