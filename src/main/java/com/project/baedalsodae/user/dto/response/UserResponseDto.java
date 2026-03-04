@@ -27,6 +27,7 @@ public class UserResponseDto {
         private String nickname;
         private UserRole role;
 
+        private UUID userMainAddressId;
         private List<UserAddressResponse> addresses;
 
         private LocalDateTime createdAt;
@@ -49,6 +50,7 @@ public class UserResponseDto {
                     .name(user.getName())
                     .nickname(user.getNickname())
                     .role(user.getRole())
+                    .userMainAddressId(user.getUserMainAddressId())
                     .addresses(addressResponses)
                     .createdAt(user.getCreatedAt())
                     .updatedAt(user.getUpdatedAt())
