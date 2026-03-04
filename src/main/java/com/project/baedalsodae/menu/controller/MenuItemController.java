@@ -1,9 +1,9 @@
 package com.project.baedalsodae.menu.controller;
 
 import com.project.baedalsodae.global.common.ApiResponse;
-import com.project.baedalsodae.menu.dto.requestDto.MenuPatchRequestDto;
-import com.project.baedalsodae.menu.dto.requestDto.MenuPutRequestDto;
-import com.project.baedalsodae.menu.dto.responseDto.MenuItemResponseDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
+import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +25,14 @@ public class MenuItemController {
 
   @PutMapping("/{menuItemId}")
   public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItem(
-      @PathVariable UUID menuItemId, @RequestBody MenuPutRequestDto request) {
+      @PathVariable UUID menuItemId, @RequestBody MenuItemPutRequestDto request) {
     MenuItemResponseDto response = menuItemService.updateMenuItem(menuItemId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }
 
   @PatchMapping("/{menuItemId}")
   public ResponseEntity<ApiResponse<MenuItemResponseDto>> patchMenuItem(
-      @PathVariable UUID menuItemId, @RequestBody MenuPatchRequestDto request) {
+      @PathVariable UUID menuItemId, @RequestBody MenuItemPatchRequestDto request) {
     MenuItemResponseDto response = menuItemService.patchMenuItem(menuItemId, request);
     return ResponseEntity.ok(ApiResponse.success("", response));
   }

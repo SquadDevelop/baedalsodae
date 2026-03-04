@@ -2,9 +2,9 @@ package com.project.baedalsodae.menu.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.menu.dto.requestDto.MenuPatchRequestDto;
-import com.project.baedalsodae.menu.dto.requestDto.MenuPutRequestDto;
-import com.project.baedalsodae.menu.dto.responseDto.MenuItemResponseDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
+import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
@@ -24,7 +24,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
   @Transactional
   @Override
-  public MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuPutRequestDto request) {
+  public MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuItemPutRequestDto request) {
     MenuItem item =
         menuItemRepository
             .findByIdAndDeletedIsFalse(menuItemId)
@@ -38,7 +38,6 @@ public class MenuItemServiceImpl implements MenuItemService {
         request.description(),
         request.price(),
         request.menuStatus(),
-        request.orderNo(),
         category,
         request.isPopular());
     item.changeMenuStatus(request.menuStatus());
@@ -47,7 +46,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
   @Transactional
   @Override
-  public MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuPatchRequestDto request) {
+  public MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request) {
     MenuItem item =
         menuItemRepository
             .findByIdAndDeletedIsFalse(menuItemId)
@@ -62,7 +61,6 @@ public class MenuItemServiceImpl implements MenuItemService {
     if (request.name() != null) item.changeName(request.name());
     if (request.description() != null) item.changeDescription(request.description());
     if (request.price() != null) item.changePrice(request.price());
-    if (request.orderNo() != null) item.changeOrderNo(request.orderNo());
     if (request.isPopular() != null) item.changeIsPopular(request.isPopular());
     if (request.menuStatus() != null) item.changeMenuStatus(request.menuStatus());
     return MenuItemResponseDto.fromEntity(item);
