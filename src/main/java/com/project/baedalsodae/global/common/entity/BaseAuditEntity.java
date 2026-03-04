@@ -3,9 +3,10 @@ package com.project.baedalsodae.global.common.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
-
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedBy;
@@ -26,7 +27,7 @@ public class BaseAuditEntity extends BaseTimeEntity {
   private UUID updatedBy;
 
   @Column(name = "deleted_at")
-  private LocalDateTime deletedAt;
+  private Instant deletedAt;
 
   @Column(name = "deleted_by")
   private UUID deletedBy;
@@ -37,7 +38,7 @@ public class BaseAuditEntity extends BaseTimeEntity {
 
   public void softDelete(UUID userId) {
     this.isDeleted = true;
-    this.deletedAt = LocalDateTime.now();
+    this.deletedAt = Instant.now();
     this.deletedBy = userId;
   }
 
@@ -45,5 +46,9 @@ public class BaseAuditEntity extends BaseTimeEntity {
     this.isDeleted = false;
     this.deletedAt = null;
     this.deletedBy = null;
+  }
+
+  public LocalDateTime getLocalDateDeletedAt() {
+    return deletedAt != null ? LocalDateTime.ofInstant(deletedAt, ZoneId.systemDefault()) : null;
   }
 }

@@ -18,3 +18,12 @@ spring:
   sql:
     init:
       mode: never
+
+server:
+  port: 18082
+
+logging:
+  level:
+    org.springframework.boot.diagnostics: DEBUG
+    org.springframework.boot.web.embedded.tomcat: DEBUG
+    org.apache.catalina: DEBUG

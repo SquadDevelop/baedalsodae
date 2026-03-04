@@ -2,12 +2,14 @@ package com.project.baedalsodae.menu.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
+import com.project.baedalsodae.tag.entity.TagMapping;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Getter
 @Entity
@@ -15,32 +17,79 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuItem extends BaseAuditEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(name = "id", nullable = false)
+  private UUID id;
 
-    @Column(name = "is_popular", nullable = false)
-    private boolean isPopular =false;
+  @Column(name = "is_popular", nullable = false)
+  private boolean isPopular = false;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "order_no", nullable = false)
-    private int orderNo;
+  @Column(name = "order_no", nullable = false)
+  private int orderNo;
 
-    @Column(name = "price", nullable = false)
-    private int price;
+  @Column(name = "price", nullable = false)
+  private int price;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+  @Column(name = "description", columnDefinition = "TEXT")
+  private String description;
 
-    @JoinColumn(name = "menu_category_id", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private MenuCategory menuCategory;
+  @JoinColumn(name = "menu_category_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY)
+  private MenuCategory menuCategory;
 
-    @Column(name = "menu_status")
-    @Enumerated(EnumType.STRING)
-    private MenuStatus menuStatus;
+  @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<TagMapping> tagMappings = new ArrayList<>();
 
+  @Column(name = "menu_status")
+  @Enumerated(EnumType.STRING)
+  private MenuStatus menuStatus;
+
+  public void changeMenuInfo(
+      String name,
+      String description,
+      int price,
+      MenuStatus menuStatus,
+      int orderNo,
+      MenuCategory menuCategory,
+      boolean popular) {
+    this.name = name;
+    this.description = description;
+    this.price = price;
+    this.menuStatus = menuStatus;
+    this.orderNo = orderNo;
+    this.menuCategory = menuCategory;
+    this.isPopular = popular;
+  }
+
+  public void changeName(String name) {
+    this.name = name;
+  }
+
+  public void changeDescription(String description) {
+    this.description = description;
+  }
+
+  public void changePrice(Integer price) {
+    this.price = price;
+  }
+
+  public void changeMenuStatus(MenuStatus menuStatus) {
+    this.menuStatus = menuStatus;
+  }
+
+  public void changeOrderNo(Integer integer) {
+    this.orderNo = integer;
+  }
+
+  public void changeIsPopular(Boolean popular) {
+    this.isPopular = popular;
+  }
+
+  public void changeMenuCategory(MenuCategory category) {
+    this.menuCategory = category;
+  }
 }

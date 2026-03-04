@@ -1,0 +1,45 @@
+package com.project.baedalsodae.order.entity;
+
+import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+@Table(name = "p_order_status_history")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class OrderStatusHistory extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
+
+    @Column(name = "order_id", nullable = false)
+    private UUID orderId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "from_status")
+    private OrderStatus fromStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "to_status")
+    private OrderStatus toStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "actor_type", nullable = false)
+    private ActorType actorType;
+
+    @Column(name = "actor_id")
+    private UUID actorId;
+
+    @Column(name = "reason", columnDefinition = "TEXT")
+    private String reason;
+
+}
