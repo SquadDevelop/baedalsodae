@@ -14,45 +14,45 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(
-    name = "p_menu_category",
-    uniqueConstraints = {
-      @UniqueConstraint(
-          name = "uq_menu_category_order_no",
-          columnNames = {"store_id", "order_no"})
-    })
+        name = "p_menu_category",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uq_menu_category_order_no",
+                    columnNames = {"store_id", "order_no"})
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MenuCategory extends BaseAuditEntity implements Orderable {
 
-  @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-  private final List<MenuItem> menuItems = new ArrayList<>();
+    @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<MenuItem> menuItems = new ArrayList<>();
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  @Column(name = "id", nullable = false)
-  private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "order_no")
-  private Integer orderNo;
+    @Column(name = "order_no")
+    private Integer orderNo;
 
-  @JoinColumn(name = "store_id", nullable = false)
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Store store;
+    @JoinColumn(name = "store_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Store store;
 
-  public void changeMenuCategoryName(String name) {
-    this.name = name;
-  }
+    public void changeMenuCategoryName(String name) {
+        this.name = name;
+    }
 
-  @Override
-  public void changeOrderNo(int orderNo) {
-    this.orderNo = orderNo;
-  }
+    @Override
+    public void changeOrderNo(int orderNo) {
+        this.orderNo = orderNo;
+    }
 
-  @Override
-  public void softDelete(UUID userId) {
-    super.softDelete(userId);
-    this.orderNo = null;
-  }
+    @Override
+    public void softDelete(UUID userId) {
+        super.softDelete(userId);
+        this.orderNo = null;
+    }
 }

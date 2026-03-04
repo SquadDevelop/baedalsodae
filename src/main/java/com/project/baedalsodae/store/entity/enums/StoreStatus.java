@@ -14,5 +14,4 @@ public enum StoreStatus {
     StoreStatus(String description) {
         this.description = description;
     }
-
 }

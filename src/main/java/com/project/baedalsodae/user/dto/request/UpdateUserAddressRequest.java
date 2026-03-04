@@ -16,11 +16,9 @@ public class UpdateUserAddressRequest {
 
     private UUID userAddressId;
 
-    @NotBlank
-    private String roadAddress;
+    @NotBlank private String roadAddress;
 
-    @NotBlank
-    private String detailAddress;
+    @NotBlank private String detailAddress;
 
     private String description;
 }

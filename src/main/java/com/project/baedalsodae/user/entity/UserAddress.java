@@ -36,23 +36,23 @@ public class UserAddress extends BaseTimeEntity {
     private User user;
 
     // 임시 주석 처리
-//    @Column(name = "sido_code", nullable = false)
-//    private String sidoCode;
-//
-//    @Column(name = "sido_name", nullable = false)
-//    private String sidoName;
-//
-//    @Column(name = "sigg_code", nullable = false)
-//    private String sigunguCode;
-//
-//    @Column(name = "sigg_name", nullable = false)
-//    private String sigunguName;
-//
-//    @Column(name = "dong_code", nullable = false)
-//    private String dongCode;
-//
-//    @Column(name = "dong_name", nullable = false)
-//    private String dongName;
+    //    @Column(name = "sido_code", nullable = false)
+    //    private String sidoCode;
+    //
+    //    @Column(name = "sido_name", nullable = false)
+    //    private String sidoName;
+    //
+    //    @Column(name = "sigg_code", nullable = false)
+    //    private String sigunguCode;
+    //
+    //    @Column(name = "sigg_name", nullable = false)
+    //    private String sigunguName;
+    //
+    //    @Column(name = "dong_code", nullable = false)
+    //    private String dongCode;
+    //
+    //    @Column(name = "dong_name", nullable = false)
+    //    private String dongName;
 
     @Column(name = "road_address", nullable = false)
     private String roadAddress;
@@ -63,7 +63,8 @@ public class UserAddress extends BaseTimeEntity {
     @Column(name = "description")
     private String description;
 
-    public static UserAddress create(User user, String roadAddress, String detailAddress, String description) {
+    public static UserAddress create(
+            User user, String roadAddress, String detailAddress, String description) {
         return UserAddress.builder()
                 .user(user)
                 .roadAddress(roadAddress)
@@ -98,7 +99,8 @@ public class UserAddress extends BaseTimeEntity {
         if (!(obj instanceof UserAddress that)) {
             return false;
         }
-        return this.getId() != null && that.getId() != null
+        return this.getId() != null
+                && that.getId() != null
                 && Objects.equals(this.getId(), that.getId());
     }
 }

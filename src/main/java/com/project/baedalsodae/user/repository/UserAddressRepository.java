@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface UserAddressRepository extends JpaRepository<UserAddress, UUID> {
 
     boolean existsByRoadAddressAndDetailAddress(String roadAddress, String detailAddress);
-    boolean existsByRoadAddressAndDetailAddressAndIdNot(String roadAddress, String detailAddress, UUID addressId);
+
+    boolean existsByRoadAddressAndDetailAddressAndIdNot(
+            String roadAddress, String detailAddress, UUID addressId);
 
     Optional<UserAddress> findByIdAndUserId(UUID addressId, UUID userId);
 

@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderEventPublisher {
 
-	private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
-	public void publishOrderCreated(Order order) {
-		final OrderCreatedEvent event = OrderCreatedEvent.from(order);
-		eventPublisher.publishEvent(event);
-	}
+    public void publishOrderCreated(Order order) {
+        final OrderCreatedEvent event = OrderCreatedEvent.from(order);
+        eventPublisher.publishEvent(event);
+    }
 }

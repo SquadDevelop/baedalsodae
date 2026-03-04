@@ -27,79 +27,74 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-	private final CartRepository cartRepository;
-	private final StoreRepository storeRepository;
-	private final OrderRepository orderRepository;
-	private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-	private final OrderEventPublisher eventPublisher;
+    private final CartRepository cartRepository;
+    private final StoreRepository storeRepository;
+    private final OrderRepository orderRepository;
+    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final OrderEventPublisher eventPublisher;
 
-	@Override
-	@Transactional
-	public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
-		final UUID cartId = request.cartId();
-		final UUID addressId = request.addressId();
+    @Override
+    @Transactional
+    public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
+        final UUID cartId = request.cartId();
+        final UUID addressId = request.addressId();
 
-		Cart cart = cartRepository.findCartWithItemsByIdAndUserId(cartId, userId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+        Cart cart =
+                cartRepository
+                        .findCartWithItemsByIdAndUserId(cartId, userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		if (cart.hasNoItems())
-			throw new BusinessException(ErrorCode.CART_ITEM_EMPTY);
+        if (cart.hasNoItems()) throw new BusinessException(ErrorCode.CART_ITEM_EMPTY);
 
-		final UUID storeId = cart.getStore().getId();
-		Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        final UUID storeId = cart.getStore().getId();
+        Store store =
+                storeRepository
+                        .findById(storeId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-		int totalAmount = cart.getTotalAmount();
-		if (totalAmount <= 0)
-			throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
+        int totalAmount = cart.getTotalAmount();
+        if (totalAmount <= 0) throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
 
-		// 할인 쿠폰 도메인, 배달 도메인이 없음
-		final int deliveryFee = 0;
-		final int discountAmount = 0;
-		final int finalAmount = totalAmount - discountAmount + deliveryFee;
-		if (finalAmount < 0)
-			throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
+        // 할인 쿠폰 도메인, 배달 도메인이 없음
+        final int deliveryFee = 0;
+        final int discountAmount = 0;
+        final int finalAmount = totalAmount - discountAmount + deliveryFee;
+        if (finalAmount < 0) throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
 
-		//TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
-		String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
+        // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
+        String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
 
-		final String createdOrderNo = OrderNoGenerator.generate();
+        final String createdOrderNo = OrderNoGenerator.generate();
 
-		Order order = Order.create(
-				userId,
-				store,
-				addressId,
-				deliveryAddressSnapshot,
-				createdOrderNo,
-				request.storeRequestMessage(),
-				request.deliveryRequestMessage(),
-				totalAmount,
-				deliveryFee,
-				discountAmount,
-				finalAmount
-		);
+        Order order =
+                Order.create(
+                        userId,
+                        store,
+                        addressId,
+                        deliveryAddressSnapshot,
+                        createdOrderNo,
+                        request.storeRequestMessage(),
+                        request.deliveryRequestMessage(),
+                        totalAmount,
+                        deliveryFee,
+                        discountAmount,
+                        finalAmount);
 
-		List<OrderItem> orderItems = cart.getItems().stream()
-				.map(cartItem -> OrderItem.create(
-						order,
-						cartItem
-				))
-				.toList();
+        List<OrderItem> orderItems =
+                cart.getItems().stream()
+                        .map(cartItem -> OrderItem.create(order, cartItem))
+                        .toList();
 
-		order.addOrderItems(orderItems);
+        order.addOrderItems(orderItems);
 
-		final Order savedOrder = orderRepository.save(order);
+        final Order savedOrder = orderRepository.save(order);
 
-		OrderStatusHistory orderStatusHistory = OrderStatusHistory.create(
-				savedOrder,
-				userId
-		);
+        OrderStatusHistory orderStatusHistory = OrderStatusHistory.create(savedOrder, userId);
 
-		orderStatusHistoryRepository.save(orderStatusHistory);
+        orderStatusHistoryRepository.save(orderStatusHistory);
 
-		eventPublisher.publishOrderCreated(savedOrder);
+        eventPublisher.publishOrderCreated(savedOrder);
 
-		return CreateOrderResponse.from(savedOrder);
-	}
-
+        return CreateOrderResponse.from(savedOrder);
+    }
 }

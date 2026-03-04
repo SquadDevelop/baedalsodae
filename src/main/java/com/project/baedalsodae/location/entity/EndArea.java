@@ -33,6 +33,5 @@ public class EndArea extends BaseTimeEntity {
     @Column(name = "location")
     private String location;
 
-    @Version
-    private Long version;
+    @Version private Long version;
 }

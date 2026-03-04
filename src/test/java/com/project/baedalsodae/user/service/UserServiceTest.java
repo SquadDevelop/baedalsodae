@@ -33,17 +33,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    @Mock private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private UserAddressService userAddressService;
+    @Mock private UserAddressService userAddressService;
 
-    @InjectMocks
-    private UserServiceImpl userService;
+    @InjectMocks private UserServiceImpl userService;
 
     @Test
     @DisplayName("성공 - 회원가입 시 비밀번호 암호화 및 주소 등록")
@@ -62,7 +58,8 @@ class UserServiceTest {
 
         verify(passwordEncoder).encode(request.getPassword());
         verify(userRepository).save(any(User.class));
-        verify(userAddressService).createAddress(eq(savedUser.getId()), any(CreateUserAddressRequest.class));
+        verify(userAddressService)
+                .createAddress(eq(savedUser.getId()), any(CreateUserAddressRequest.class));
     }
 
     @Test
@@ -70,7 +67,9 @@ class UserServiceTest {
     void createUser_Failed() {
         UserRequestDto.Create request = createCreateRequest();
         given(userRepository.save(any(User.class)))
-                .willThrow(new DataIntegrityViolationException(ErrorCode.DATA_INTEGRITY_VIOLATION.getMessage()));
+                .willThrow(
+                        new DataIntegrityViolationException(
+                                ErrorCode.DATA_INTEGRITY_VIOLATION.getMessage()));
 
         assertThatThrownBy(() -> userService.createUser(request))
                 .isInstanceOf(DataIntegrityViolationException.class);
@@ -81,7 +80,8 @@ class UserServiceTest {
     void getUser_Success() {
         UUID userId = UUID.randomUUID();
         User user = createTestUser(userId, "tester", "encodedPwd");
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.of(user));
 
         UserResponseDto.Detail result = userService.getUser(userId);
 
@@ -94,7 +94,8 @@ class UserServiceTest {
     @DisplayName("실패 - 존재하지 않는 회원 ID로 조회 시 예외 발생")
     void getUser_Failed() {
         UUID userId = UUID.randomUUID();
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.empty());
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.getUser(userId))
                 .isInstanceOf(BusinessException.class)
@@ -109,7 +110,8 @@ class UserServiceTest {
         UserRequestDto.Update updateRequest = createUpdateRequest("newPassword123");
         String newEncodedPassword = "newEncodedPassword";
 
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.of(user));
         given(passwordEncoder.encode(updateRequest.getPassword())).willReturn(newEncodedPassword);
 
         userService.updateUser(userId, updateRequest);
@@ -124,7 +126,8 @@ class UserServiceTest {
     void deleteUser_Success() {
         UUID userId = UUID.randomUUID();
         User user = createTestUser(userId, "tester", "password3");
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.of(user));
 
         userService.deleteUser(userId);
 
@@ -139,7 +142,8 @@ class UserServiceTest {
         User deletedUser = createTestUser(userId, "tester", "password4");
         deletedUser.softDelete(userId);
 
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId)).willReturn(Optional.empty());
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.deleteUser(userId))
                 .isInstanceOf(BusinessException.class);
@@ -161,10 +165,15 @@ class UserServiceTest {
     }
 
     private User createTestUser(UUID userId, String username, String password) {
-        User user = User.create(
-                username, "010-1234-5678", "tester@example.com",
-                password, "테스터", "테스터A", UserRole.CUSTOMER
-        );
+        User user =
+                User.create(
+                        username,
+                        "010-1234-5678",
+                        "tester@example.com",
+                        password,
+                        "테스터",
+                        "테스터A",
+                        UserRole.CUSTOMER);
         ReflectionTestUtils.setField(user, "id", userId);
 
         return user;

@@ -30,6 +30,5 @@ public class SiggArea extends BaseTimeEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Version
-    private Long version;
+    @Version private Long version;
 }

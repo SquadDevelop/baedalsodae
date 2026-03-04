@@ -67,8 +67,14 @@ public class User extends BaseAuditEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> userAddresses = new ArrayList<>();
 
-    public static User create(String username, String phone, String email, String encodedPassword, String name,
-                              String nickname, UserRole role) {
+    public static User create(
+            String username,
+            String phone,
+            String email,
+            String encodedPassword,
+            String name,
+            String nickname,
+            UserRole role) {
         return User.builder()
                 .username(username)
                 .phone(phone)
@@ -112,29 +118,32 @@ public class User extends BaseAuditEntity {
     }
 
     public void updateAddresses(List<UserAddress> newAddresses) {
-        Set<UUID> newIds = newAddresses.stream()
-                .map(UserAddress::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        this.userAddresses.removeIf(existing ->
-                existing.getId() != null && !newIds.contains(existing.getId()));
+        Set<UUID> newIds =
+                newAddresses.stream()
+                        .map(UserAddress::getId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+        this.userAddresses.removeIf(
+                existing -> existing.getId() != null && !newIds.contains(existing.getId()));
 
-        Map<UserAddress, UserAddress> existingMap = this.userAddresses.stream()
-                .collect(Collectors.toMap(a -> a, a -> a));
+        Map<UserAddress, UserAddress> existingMap =
+                this.userAddresses.stream().collect(Collectors.toMap(a -> a, a -> a));
 
-        newAddresses.forEach(newAddr -> {
-            Optional.ofNullable(existingMap.get(newAddr)).ifPresentOrElse(
-                    existing -> existing.update(
-                            newAddr.getRoadAddress(),
-                            newAddr.getDetailAddress(),
-                            newAddr.getDescription()
-                    ),
-                    () -> this.addAddress(newAddr)
-            );
-        });
+        newAddresses.forEach(
+                newAddr -> {
+                    Optional.ofNullable(existingMap.get(newAddr))
+                            .ifPresentOrElse(
+                                    existing ->
+                                            existing.update(
+                                                    newAddr.getRoadAddress(),
+                                                    newAddr.getDetailAddress(),
+                                                    newAddr.getDescription()),
+                                    () -> this.addAddress(newAddr));
+                });
 
         if (this.userMainAddressId != null && this.getMainAddress() == null) {
-            this.userMainAddressId = this.userAddresses.isEmpty() ? null : this.userAddresses.get(0).getId();
+            this.userMainAddressId =
+                    this.userAddresses.isEmpty() ? null : this.userAddresses.get(0).getId();
         } else if (!this.userAddresses.isEmpty()) {
             this.userMainAddressId = this.userAddresses.get(0).getId();
         }
@@ -142,8 +151,10 @@ public class User extends BaseAuditEntity {
 
     public UserAddress getMainAddress() {
         return this.userAddresses.stream()
-                .filter(userAddress -> this.userMainAddressId != null && this.userMainAddressId.equals(
-                        userAddress.getId()))
+                .filter(
+                        userAddress ->
+                                this.userMainAddressId != null
+                                        && this.userMainAddressId.equals(userAddress.getId()))
                 .findAny()
                 .orElse(null);
     }

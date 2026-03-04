@@ -8,11 +8,10 @@ import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import com.project.baedalsodae.store.service.StoreCategoryService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,16 +21,20 @@ public class StoreCategoryController {
 
     // TODO 인증 도메인 완료되면, userId 추가
     @GetMapping
-    public ResponseEntity<ApiResponse<StoreCategoryListResponse>> getStoreCategoryListForCustomer() {
+    public ResponseEntity<ApiResponse<StoreCategoryListResponse>>
+            getStoreCategoryListForCustomer() {
         StoreCategoryListResponse response = storeCategoryService.getActiveStoreCategories();
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_CATEGORY_LIST_FOUND, response));
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.STORE_CATEGORY_LIST_FOUND, response));
     }
 
     @GetMapping("/{storeCategoryId}")
     public ResponseEntity<ApiResponse<StoreCategoryDetailResponse>> getStoreCategoryDetail(
             @PathVariable UUID storeCategoryId) {
-        StoreCategoryDetailResponse response = storeCategoryService.getStoreCategoryDetail(storeCategoryId);
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_CATEGORY_DETAIL_FOUND, response));
+        StoreCategoryDetailResponse response =
+                storeCategoryService.getStoreCategoryDetail(storeCategoryId);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.STORE_CATEGORY_DETAIL_FOUND, response));
     }
 
     @PostMapping
@@ -43,7 +46,8 @@ public class StoreCategoryController {
 
     @PatchMapping("/{storeCategoryId}")
     public ResponseEntity<ApiResponse<Void>> patchStoreCategory(
-            @RequestBody @Valid PatchStoreCategoryRequest request, @PathVariable UUID storeCategoryId) {
+            @RequestBody @Valid PatchStoreCategoryRequest request,
+            @PathVariable UUID storeCategoryId) {
         storeCategoryService.patchStoreCategory(request, storeCategoryId);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_CATEGORY_PATCHED, null));
     }

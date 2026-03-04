@@ -13,17 +13,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
 
-  @Query(
-      "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted ="
-          + " false")
-  Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
+    @Query(
+            "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted ="
+                    + " false")
+    Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
 
-  Optional<Integer> findMaxOrderNoByMenuCategoryId(UUID menuCategoryId);
+    Optional<Integer> findMaxOrderNoByMenuCategoryId(UUID menuCategoryId);
 
-  boolean existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(UUID menuCategoryId, String name);
+    boolean existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(UUID menuCategoryId, String name);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query(
-      "SELECT i FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false ORDER BY i.orderNo ASC")
-  List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(UUID menuCategoryId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(
+            "SELECT i FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false ORDER BY i.orderNo ASC")
+    List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(UUID menuCategoryId);
 }

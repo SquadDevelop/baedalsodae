@@ -19,55 +19,58 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MenuCategoryServiceImpl implements MenuCategoryService {
 
-  private final MenuCategoryRepository menuCategoryRepository;
+    private final MenuCategoryRepository menuCategoryRepository;
 
-  @Override
-  @Transactional
-  public MenuCategoryResponseDto updateMenuCategory(
-      UUID menuCategoryId, MenuCategoryPutRequestDto request) {
+    @Override
+    @Transactional
+    public MenuCategoryResponseDto updateMenuCategory(
+            UUID menuCategoryId, MenuCategoryPutRequestDto request) {
 
-    MenuCategory menuCategory =
-        menuCategoryRepository
-            .findByIdAndDeletedIsFalse(menuCategoryId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-    menuCategory.changeMenuCategoryName(request.name());
-    return MenuCategoryResponseDto.fromEntity(menuCategory);
-  }
-
-  @Override
-  @Transactional
-  public void deleteMenuCategory(UUID menuCategoryId) {
-    MenuCategory menuCategory =
-        menuCategoryRepository
-            .findByIdAndDeletedIsFalse(menuCategoryId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-    menuCategory.softDelete(null); // / 토큰 기능 추가 시 수정 필요
-  }
-
-  @Override
-  @Transactional
-  public MenuCategoryResponseDto updateMenuCategoryOrder(
-      UUID menuCategoryId, MenuCategoryPatchRequestDto request) {
-    MenuCategory menuCategory =
-        menuCategoryRepository
-            .findByIdAndDeletedIsFalse(menuCategoryId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-    Integer from = menuCategory.getOrderNo();
-    if (from == null) {
-      throw new BusinessException(ErrorCode.INVALID_MENU_CATEGORY_ORDER);
-    }
-    int to = request.orderNo();
-
-    if (from == to) {
-      return MenuCategoryResponseDto.fromEntity(menuCategory);
+        MenuCategory menuCategory =
+                menuCategoryRepository
+                        .findByIdAndDeletedIsFalse(menuCategoryId)
+                        .orElseThrow(
+                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        menuCategory.changeMenuCategoryName(request.name());
+        return MenuCategoryResponseDto.fromEntity(menuCategory);
     }
 
-    UUID storeId = menuCategory.getStore().getId();
+    @Override
+    @Transactional
+    public void deleteMenuCategory(UUID menuCategoryId) {
+        MenuCategory menuCategory =
+                menuCategoryRepository
+                        .findByIdAndDeletedIsFalse(menuCategoryId)
+                        .orElseThrow(
+                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        menuCategory.softDelete(null); // / 토큰 기능 추가 시 수정 필요
+    }
 
-    List<MenuCategory> menuCategories =
-        menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseForUpdate(storeId);
+    @Override
+    @Transactional
+    public MenuCategoryResponseDto updateMenuCategoryOrder(
+            UUID menuCategoryId, MenuCategoryPatchRequestDto request) {
+        MenuCategory menuCategory =
+                menuCategoryRepository
+                        .findByIdAndDeletedIsFalse(menuCategoryId)
+                        .orElseThrow(
+                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        Integer from = menuCategory.getOrderNo();
+        if (from == null) {
+            throw new BusinessException(ErrorCode.INVALID_MENU_CATEGORY_ORDER);
+        }
+        int to = request.orderNo();
 
-    OrderUtil.reorder(menuCategories, menuCategory, from, to);
-    return MenuCategoryResponseDto.fromEntity(menuCategory);
-  }
+        if (from == to) {
+            return MenuCategoryResponseDto.fromEntity(menuCategory);
+        }
+
+        UUID storeId = menuCategory.getStore().getId();
+
+        List<MenuCategory> menuCategories =
+                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseForUpdate(storeId);
+
+        OrderUtil.reorder(menuCategories, menuCategory, from, to);
+        return MenuCategoryResponseDto.fromEntity(menuCategory);
+    }
 }

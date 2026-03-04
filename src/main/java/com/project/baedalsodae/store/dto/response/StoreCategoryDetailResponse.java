@@ -2,10 +2,9 @@ package com.project.baedalsodae.store.dto.response;
 
 import com.project.baedalsodae.global.common.dto.AuditInfoResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.UUID;
 
 @Getter
 @Builder

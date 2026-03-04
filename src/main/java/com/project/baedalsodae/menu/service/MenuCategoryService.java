@@ -7,11 +7,11 @@ import java.util.UUID;
 
 public interface MenuCategoryService {
 
-  MenuCategoryResponseDto updateMenuCategory(
-      UUID menuCategoryId, MenuCategoryPutRequestDto request);
+    MenuCategoryResponseDto updateMenuCategory(
+            UUID menuCategoryId, MenuCategoryPutRequestDto request);
 
-  void deleteMenuCategory(UUID menuCategoryId);
+    void deleteMenuCategory(UUID menuCategoryId);
 
-  MenuCategoryResponseDto updateMenuCategoryOrder(
-      UUID menuCategoryId, MenuCategoryPatchRequestDto request);
+    MenuCategoryResponseDto updateMenuCategoryOrder(
+            UUID menuCategoryId, MenuCategoryPatchRequestDto request);
 }

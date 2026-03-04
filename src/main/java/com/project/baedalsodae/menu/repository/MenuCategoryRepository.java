@@ -13,12 +13,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID> {
 
-  @Query("SELECT c FROM MenuCategory c join fetch c.store WHERE c.id = :id AND c.isDeleted = false")
-  Optional<MenuCategory> findByIdAndDeletedIsFalse(UUID id);
+    @Query(
+            "SELECT c FROM MenuCategory c join fetch c.store WHERE c.id = :id AND c.isDeleted = false")
+    Optional<MenuCategory> findByIdAndDeletedIsFalse(UUID id);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query(
-      "SELECT c FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false ORDER "
-          + "BY c.orderNo ASC")
-  List<MenuCategory> findAllByStoreIdAndDeletedIsFalseForUpdate(UUID storeId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(
+            "SELECT c FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false ORDER "
+                    + "BY c.orderNo ASC")
+    List<MenuCategory> findAllByStoreIdAndDeletedIsFalseForUpdate(UUID storeId);
 }

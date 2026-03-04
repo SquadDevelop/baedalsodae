@@ -13,15 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateUserAddressRequest {
 
-    @NotBlank
-    private String roadAddress;
+    @NotBlank private String roadAddress;
 
-    @NotBlank
-    private String detailAddress;
+    @NotBlank private String detailAddress;
 
     private String description;
 
-    public static CreateUserAddressRequest from(String roadAddress, String detailAddress, String description) {
+    public static CreateUserAddressRequest from(
+            String roadAddress, String detailAddress, String description) {
         return CreateUserAddressRequest.builder()
                 .roadAddress(roadAddress)
                 .detailAddress(detailAddress)

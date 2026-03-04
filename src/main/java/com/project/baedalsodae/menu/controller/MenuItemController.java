@@ -17,32 +17,32 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MenuItemController {
 
-  private final MenuItemService menuItemService;
+    private final MenuItemService menuItemService;
 
-  @PutMapping("/{menuItemId}")
-  public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItem(
-      @PathVariable UUID menuItemId, @RequestBody MenuItemPutRequestDto request) {
-    MenuItemResponseDto response = menuItemService.updateMenuItem(menuItemId, request);
-    return ResponseEntity.ok(ApiResponse.success("", response));
-  }
+    @PutMapping("/{menuItemId}")
+    public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItem(
+            @PathVariable UUID menuItemId, @RequestBody MenuItemPutRequestDto request) {
+        MenuItemResponseDto response = menuItemService.updateMenuItem(menuItemId, request);
+        return ResponseEntity.ok(ApiResponse.success("", response));
+    }
 
-  @PatchMapping("/{menuItemId}")
-  public ResponseEntity<ApiResponse<MenuItemResponseDto>> patchMenuItem(
-      @PathVariable UUID menuItemId, @RequestBody MenuItemPatchRequestDto request) {
-    MenuItemResponseDto response = menuItemService.patchMenuItem(menuItemId, request);
-    return ResponseEntity.ok(ApiResponse.success("", response));
-  }
+    @PatchMapping("/{menuItemId}")
+    public ResponseEntity<ApiResponse<MenuItemResponseDto>> patchMenuItem(
+            @PathVariable UUID menuItemId, @RequestBody MenuItemPatchRequestDto request) {
+        MenuItemResponseDto response = menuItemService.patchMenuItem(menuItemId, request);
+        return ResponseEntity.ok(ApiResponse.success("", response));
+    }
 
-  @PatchMapping("/{menuItemId}/orders")
-  public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItemOrder(
-      @PathVariable UUID menuItemId, @RequestParam @Validated @Positive Integer order) {
-    MenuItemResponseDto response = menuItemService.updateMenuItemOrder(menuItemId, order);
-    return ResponseEntity.ok(ApiResponse.success("", response));
-  }
+    @PatchMapping("/{menuItemId}/orders")
+    public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItemOrder(
+            @PathVariable UUID menuItemId, @RequestParam @Validated @Positive Integer order) {
+        MenuItemResponseDto response = menuItemService.updateMenuItemOrder(menuItemId, order);
+        return ResponseEntity.ok(ApiResponse.success("", response));
+    }
 
-  @DeleteMapping("/{menuItemId}")
-  public ResponseEntity<ApiResponse<Void>> deleteMenuItem(@PathVariable UUID menuItemId) {
-    menuItemService.deleteMenuItem(menuItemId);
-    return ResponseEntity.ok(ApiResponse.success(""));
-  }
+    @DeleteMapping("/{menuItemId}")
+    public ResponseEntity<ApiResponse<Void>> deleteMenuItem(@PathVariable UUID menuItemId) {
+        menuItemService.deleteMenuItem(menuItemId);
+        return ResponseEntity.ok(ApiResponse.success(""));
+    }
 }

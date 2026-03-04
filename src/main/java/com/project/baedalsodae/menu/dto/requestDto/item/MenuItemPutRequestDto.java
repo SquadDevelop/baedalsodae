@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.UUID;
 
 public record MenuItemPutRequestDto(
-    String name,
-    String description,
-    int price,
-    boolean isPopular,
-    UUID categoryId,
-    MenuStatus menuStatus,
-    List<String> tagNames) {}
+        String name,
+        String description,
+        int price,
+        boolean isPopular,
+        UUID categoryId,
+        MenuStatus menuStatus,
+        List<String> tagNames) {}

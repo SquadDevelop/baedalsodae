@@ -13,97 +13,108 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
-	private final CartRepository cartRepository;
-	private final StoreRepository storeRepository;
-	private final MenuItemRepository menuItemRepository;
+    private final CartRepository cartRepository;
+    private final StoreRepository storeRepository;
+    private final MenuItemRepository menuItemRepository;
 
-	@Override
-	@Transactional(readOnly = true)
-	public CartResponse getCart(UUID userId) {
-		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+    @Override
+    @Transactional(readOnly = true)
+    public CartResponse getCart(UUID userId) {
+        Cart cart =
+                cartRepository
+                        .findCartWithItemsByUserId(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		return CartResponse.from(cart);
-	}
+        return CartResponse.from(cart);
+    }
 
-	@Override
-	@Transactional
-	public CartResponse addCartItem(UUID userId, AddCartItemRequest request) {
-		if (!request.isValidQuantity())
-			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
+    @Override
+    @Transactional
+    public CartResponse addCartItem(UUID userId, AddCartItemRequest request) {
+        if (!request.isValidQuantity())
+            throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 
-		final UUID storeId = request.storeId();
-		final UUID menuItemId = request.menuItemId();
+        final UUID storeId = request.storeId();
+        final UUID menuItemId = request.menuItemId();
 
-		Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        Store store =
+                storeRepository
+                        .findById(storeId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-		MenuItem menuItem = menuItemRepository.findById(menuItemId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+        MenuItem menuItem =
+                menuItemRepository
+                        .findById(menuItemId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
-		Optional<Cart> optionalCart = cartRepository.findCartWithItemsByUserId(userId);
+        Optional<Cart> optionalCart = cartRepository.findCartWithItemsByUserId(userId);
 
-		optionalCart.ifPresent(existingCart -> {
-			if (!existingCart.isSameStore(storeId))
-				throw new BusinessException(ErrorCode.CART_DIFFERENT_STORE);
-		});
+        optionalCart.ifPresent(
+                existingCart -> {
+                    if (!existingCart.isSameStore(storeId))
+                        throw new BusinessException(ErrorCode.CART_DIFFERENT_STORE);
+                });
 
-		Cart cart = optionalCart.orElseGet(() -> Cart.create(userId, store));
-		cart.addItem(CartItem.create(cart, menuItem, request.quantity()));
+        Cart cart = optionalCart.orElseGet(() -> Cart.create(userId, store));
+        cart.addItem(CartItem.create(cart, menuItem, request.quantity()));
 
-		final Cart savedCart = cartRepository.save(cart);
+        final Cart savedCart = cartRepository.save(cart);
 
-		return CartResponse.from(savedCart);
-	}
+        return CartResponse.from(savedCart);
+    }
 
-	@Override
-	@Transactional
-	public void updateCartItemQuantity(UUID userId, UUID cartItemId, UpdateCartItemQuantityRequest request) {
-		if (!request.isValidQuantity())
-			throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
+    @Override
+    @Transactional
+    public void updateCartItemQuantity(
+            UUID userId, UUID cartItemId, UpdateCartItemQuantityRequest request) {
+        if (!request.isValidQuantity())
+            throw new BusinessException(ErrorCode.CART_INVALID_QUANTITY);
 
-		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+        Cart cart =
+                cartRepository
+                        .findCartWithItemsByUserId(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		CartItem cartItem = getCartItemOrThrow(cart, cartItemId);
+        CartItem cartItem = getCartItemOrThrow(cart, cartItemId);
 
-		cartItem.changeQuantity(request.quantity());
-	}
+        cartItem.changeQuantity(request.quantity());
+    }
 
-	private CartItem getCartItemOrThrow(Cart cart, UUID cartItemId) {
-		return cart.findCartItemById(cartItemId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
-	}
+    private CartItem getCartItemOrThrow(Cart cart, UUID cartItemId) {
+        return cart.findCartItemById(cartItemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND));
+    }
 
-	@Override
-	@Transactional
-	public void removeCartItem(UUID userId, UUID cartItemId) {
-		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+    @Override
+    @Transactional
+    public void removeCartItem(UUID userId, UUID cartItemId) {
+        Cart cart =
+                cartRepository
+                        .findCartWithItemsByUserId(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		final boolean isRemoved = cart.removeItem(cartItemId);
-		if(!isRemoved) throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
-	}
+        final boolean isRemoved = cart.removeItem(cartItemId);
+        if (!isRemoved) throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
+    }
 
-	@Override
-	@Transactional
-	public void clearCart(UUID userId) {
-		Cart cart = cartRepository.findCartWithItemsByUserId(userId)
-				.orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
+    @Override
+    @Transactional
+    public void clearCart(UUID userId) {
+        Cart cart =
+                cartRepository
+                        .findCartWithItemsByUserId(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-		cartRepository.delete(cart);
-	}
-
-
+        cartRepository.delete(cart);
+    }
 }

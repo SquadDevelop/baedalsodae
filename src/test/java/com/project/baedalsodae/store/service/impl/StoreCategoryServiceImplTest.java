@@ -1,5 +1,11 @@
 package com.project.baedalsodae.store.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
@@ -8,6 +14,10 @@ import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,25 +26,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 class StoreCategoryServiceImplTest {
 
-    @Mock
-    private StoreCategoryRepository storeCategoryRepository;
+    @Mock private StoreCategoryRepository storeCategoryRepository;
 
-    @InjectMocks
-    private StoreCategoryServiceImpl storeCategoryService;
+    @InjectMocks private StoreCategoryServiceImpl storeCategoryService;
 
     @Test
     @DisplayName("Soft 삭제된 카테고리는 목록 조회에서 제외된다")
@@ -42,13 +39,12 @@ class StoreCategoryServiceImplTest {
         StoreCategory category1 = StoreCategory.createStoreCategory("한식", "맛있는 한식");
         StoreCategory category2 = StoreCategory.createStoreCategory("일식", "맛있는 일식");
         StoreCategory category3 = StoreCategory.createStoreCategory("양식", "진짜 양식");
-        List<StoreCategory> repositoryData = new ArrayList<>(List.of(category1, category2, category3));
+        List<StoreCategory> repositoryData =
+                new ArrayList<>(List.of(category1, category2, category3));
 
-        given(storeCategoryRepository.findAllByIsDeletedFalse()).willAnswer(invocation ->
-                repositoryData.stream()
-                        .filter(c -> !c.isDeleted())
-                        .toList()
-        );
+        given(storeCategoryRepository.findAllByIsDeletedFalse())
+                .willAnswer(
+                        invocation -> repositoryData.stream().filter(c -> !c.isDeleted()).toList());
 
         UUID deleteId = UUID.randomUUID();
         given(storeCategoryRepository.findById(deleteId)).willReturn(Optional.of(category2));

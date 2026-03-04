@@ -3,15 +3,14 @@ package com.project.baedalsodae.store.controller;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.store.dto.request.CreateStoreRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
+import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,8 +47,7 @@ public class StoreController {
 
     @DeleteMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> deleteStore(
-            @RequestHeader("X-User-Id") UUID userId,
-            @PathVariable UUID storeId) {
+            @RequestHeader("X-User-Id") UUID userId, @PathVariable UUID storeId) {
         storeCommandService.deleteStore(storeId, userId);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DELETED, null));
     }
