@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -17,7 +17,6 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 public class StoreHours {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,16 +33,16 @@ public class StoreHours {
     private DayOfWeek dayOfWeek;
 
     @Column(name = "open_time")
-    private LocalTime openTime;
+    private Instant openTime;
 
     @Column(name = "close_time")
-    private LocalTime closeTime;
+    private Instant closeTime;
 
     @Column(name = "break_start")
-    private LocalTime breakStart;
+    private Instant breakStart;
 
     @Column(name = "break_end")
-    private LocalTime breakEnd;
+    private Instant breakEnd;
 
     @Column(name = "is_open", nullable = false)
     @ColumnDefault("true")

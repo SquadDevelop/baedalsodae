@@ -1,6 +1,7 @@
 package com.project.baedalsodae.menu.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
+import com.project.baedalsodae.menu.common.Orderable;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
 import com.project.baedalsodae.tag.entity.TagMapping;
 import jakarta.persistence.*;
@@ -13,9 +14,15 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "p_menu_item")
+@Table(
+    name = "p_menu_item",
+    uniqueConstraints = {
+      @UniqueConstraint(
+          name = "uq_menu_item_order_no",
+          columnNames = {"menu_category_id", "order_no"})
+    })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MenuItem extends BaseAuditEntity {
+public class MenuItem extends BaseAuditEntity implements Orderable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,8 +35,8 @@ public class MenuItem extends BaseAuditEntity {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "order_no", nullable = false)
-  private int orderNo;
+  @Column(name = "order_no")
+  private Integer orderNo;
 
   @Column(name = "price", nullable = false)
   private int price;
@@ -48,19 +55,36 @@ public class MenuItem extends BaseAuditEntity {
   @Enumerated(EnumType.STRING)
   private MenuStatus menuStatus;
 
+  public static MenuItem createMenuItem(
+      String name,
+      String description,
+      int price,
+      boolean popular,
+      int orderNo,
+      MenuStatus menuStatus,
+      MenuCategory category) {
+    MenuItem menuItem = new MenuItem();
+    menuItem.name = name;
+    menuItem.description = description;
+    menuItem.price = price;
+    menuItem.isPopular = popular;
+    menuItem.menuStatus = menuStatus;
+    menuItem.menuCategory = category;
+    menuItem.orderNo = orderNo;
+    return menuItem;
+  }
+
   public void changeMenuInfo(
       String name,
       String description,
       int price,
       MenuStatus menuStatus,
-      int orderNo,
       MenuCategory menuCategory,
       boolean popular) {
     this.name = name;
     this.description = description;
     this.price = price;
     this.menuStatus = menuStatus;
-    this.orderNo = orderNo;
     this.menuCategory = menuCategory;
     this.isPopular = popular;
   }
@@ -81,15 +105,22 @@ public class MenuItem extends BaseAuditEntity {
     this.menuStatus = menuStatus;
   }
 
-  public void changeOrderNo(Integer integer) {
-    this.orderNo = integer;
-  }
-
   public void changeIsPopular(Boolean popular) {
     this.isPopular = popular;
   }
 
   public void changeMenuCategory(MenuCategory category) {
     this.menuCategory = category;
+  }
+
+  @Override
+  public void changeOrderNo(int orderNo) {
+    this.orderNo = orderNo;
+  }
+
+  @Override
+  public void softDelete(UUID userId) {
+    super.softDelete(userId);
+    this.orderNo = null;
   }
 }

@@ -1,6 +1,8 @@
 package com.project.baedalsodae.menu.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
+import com.project.baedalsodae.menu.common.Orderable;
+import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +13,18 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "p_menu_category")
+@Table(
+    name = "p_menu_category",
+    uniqueConstraints = {
+      @UniqueConstraint(
+          name = "uq_menu_category_order_no",
+          columnNames = {"store_id", "order_no"})
+    })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MenuCategory extends BaseAuditEntity {
+public class MenuCategory extends BaseAuditEntity implements Orderable {
+
+  @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+  private final List<MenuItem> menuItems = new ArrayList<>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,9 +34,25 @@ public class MenuCategory extends BaseAuditEntity {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "order_no", nullable = false)
-  private int orderNo;
+  @Column(name = "order_no")
+  private Integer orderNo;
 
-  @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<MenuItem> menuItems = new ArrayList<>();
+  @JoinColumn(name = "store_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Store store;
+
+  public void changeMenuCategoryName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public void changeOrderNo(int orderNo) {
+    this.orderNo = orderNo;
+  }
+
+  @Override
+  public void softDelete(UUID userId) {
+    super.softDelete(userId);
+    this.orderNo = null;
+  }
 }

@@ -22,6 +22,14 @@ public class ApiResponse<T> {
         this.timestamp = LocalDateTime.now();
     }
 
+    private ApiResponse(SuccessCode successCode, T data) {
+        this.code = successCode.getCode();
+        this.status = successCode.getStatus();
+        this.message = successCode.getMessage();
+        this.data = data;
+        this.timestamp = LocalDateTime.now();
+    }
+
     private ApiResponse(ErrorCode errorCode, T data) {
         this.code = errorCode.getCode();
         this.status = errorCode.getStatus();
@@ -44,6 +52,10 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> success(String message) {
         return new ApiResponse<>("SUCCESS", HttpStatus.OK, message, null);
+    }
+
+    public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
+      return new ApiResponse<>(successCode, data);
     }
 
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
