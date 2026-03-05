@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.service.impl;
+package com.project.baedalsodae.store.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,6 +18,8 @@ import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.project.baedalsodae.store.service.impl.StoreCommandServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +32,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class StoreCommandServiceImplTest {
+class StoreCommandServiceTest {
 
     @Mock private StoreRepository storeRepository;
 

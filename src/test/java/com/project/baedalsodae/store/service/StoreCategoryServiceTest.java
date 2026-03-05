@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.service.impl;
+package com.project.baedalsodae.store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.project.baedalsodae.store.service.impl.StoreCategoryServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class StoreCategoryServiceImplTest {
+class StoreCategoryServiceTest {
 
     @Mock private StoreCategoryRepository storeCategoryRepository;
 
