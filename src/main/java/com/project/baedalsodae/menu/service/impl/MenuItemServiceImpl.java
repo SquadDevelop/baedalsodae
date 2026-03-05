@@ -14,6 +14,7 @@ import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,7 +37,8 @@ public class MenuItemServiceImpl implements MenuItemService {
                         .findByIdAndDeletedIsFalse(menuCategoryId)
                         .orElseThrow(
                                 () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-        if (existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, request.name())) {
+        UUID storeId = category.getStore().getId();
+        if (existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
             throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
         }
         int maxOrderNo =
@@ -70,6 +72,12 @@ public class MenuItemServiceImpl implements MenuItemService {
                         .findByIdAndDeletedIsFalse(request.categoryId())
                         .orElseThrow(
                                 () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+
+        UUID storeId = category.getStore().getId();
+        if (!Objects.equals(item.getName(), request.name())
+                && existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+        }
         item.changeMenuInfo(
                 request.name(),
                 request.description(),
@@ -89,15 +97,28 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
-        if (request.categoryId() != null) {
-            MenuCategory category =
+        UUID currentCategoryId = item.getMenuCategory().getId();
+        MenuCategory category =
+                menuCategoryRepository
+                        .findByIdAndDeletedIsFalse(currentCategoryId)
+                        .orElseThrow(
+                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        UUID storeId = category.getStore().getId();
+        if (request.name() != null) {
+            if (!Objects.equals(item.getName(), request.name())
+                    && existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
+                throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+            }
+            item.changeName(request.name());
+        }
+        if (request.categoryId() != null && !currentCategoryId.equals(request.categoryId())) {
+            MenuCategory newCategory =
                     menuCategoryRepository
                             .findByIdAndDeletedIsFalse(request.categoryId())
                             .orElseThrow(
                                     () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-            item.changeMenuCategory(category);
+            item.changeMenuCategory(newCategory);
         }
-        if (request.name() != null) item.changeName(request.name());
         if (request.description() != null) item.changeDescription(request.description());
         if (request.price() != null) item.changePrice(request.price());
         if (request.isPopular() != null) item.changeIsPopular(request.isPopular());
@@ -126,8 +147,8 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public boolean isDuplicateMenuItemName(UUID menuCategoryId, String name) {
-        return existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, name);
+    public boolean isDuplicateMenuItemName(UUID storeId, String name) {
+        return existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
     }
 
     @Transactional
@@ -166,9 +187,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         return menuItems.stream().map(MenuItemResponseDto::fromEntity).toList();
     }
 
-    private boolean existsByNameAndMenuCategoryIdAndDeletedIsFalse(
-            UUID menuCategoryId, String name) {
-        return menuItemRepository.existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(
-                menuCategoryId, name);
+    private boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name) {
+        return menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
     }
 }

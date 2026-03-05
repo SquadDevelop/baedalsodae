@@ -5,6 +5,7 @@ import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
 import com.project.baedalsodae.menu.service.MenuCategoryService;
+import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.store.dto.request.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
     private final StoreCommandService storeCommandService;
     private final MenuCategoryService menuCategoryService;
+    private final MenuItemService menuItemService;
 
     // TODO 인증 도메인 완료되면, userId 추가
     @PostMapping
@@ -78,5 +80,13 @@ public class StoreController {
         boolean isDuplicate = menuCategoryService.isDuplicateMenuCategoryName(storeId, name);
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessCode.MENU_CATEGORY_NAME_DUPLICATE_CHECKED, isDuplicate));
+    }
+
+    @GetMapping("/{storeId}/menu-items/duplicate-check")
+    public ResponseEntity<ApiResponse<Boolean>> checkDuplicateMenuItemName(
+            @PathVariable UUID storeId, @RequestParam String name) {
+        boolean isDuplicate = menuItemService.isDuplicateMenuItemName(storeId, name);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.MENU_ITEM_NAME_DUPLICATE_CHECKED, isDuplicate));
     }
 }

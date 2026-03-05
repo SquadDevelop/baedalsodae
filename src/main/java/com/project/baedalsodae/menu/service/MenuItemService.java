@@ -17,7 +17,7 @@ public interface MenuItemService {
 
     void deleteMenuItem(UUID menuItemId);
 
-    boolean isDuplicateMenuItemName(UUID menuCategoryId, String name);
+    boolean isDuplicateMenuItemName(UUID storeId, String name);
 
     MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
 
