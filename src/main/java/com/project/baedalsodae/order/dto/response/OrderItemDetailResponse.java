@@ -1,11 +1,10 @@
 package com.project.baedalsodae.order.dto.response;
 
 import com.project.baedalsodae.order.entity.OrderItem;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.UUID;
 
 @Getter
 @Builder

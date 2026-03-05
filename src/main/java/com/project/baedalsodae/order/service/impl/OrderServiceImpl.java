@@ -20,14 +20,12 @@ import com.project.baedalsodae.order.util.OrderNoGenerator;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -115,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
         validateDateRange(request.startDate(), request.endDate());
-        //TODO 인증 도메인 완성 시 AOP로 권한 체크
+        // TODO 인증 도메인 완성 시 AOP로 권한 체크
         if (UserRole.OWNER.getRole().equals(role)) {
             return getOwnerOrders(userId, request);
         }
@@ -133,7 +131,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderListResponse getOwnerOrders(UUID userId, OrderListRequest request) {
-        Store store = storeRepository.findById(request.storeId())
+        Store store =
+                storeRepository
+                        .findById(request.storeId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         if (!store.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
@@ -141,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
         OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
 
         List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
-        boolean hasNext = orders.size() >  query.resolvedSize();
+        boolean hasNext = orders.size() > query.resolvedSize();
         if (hasNext) orders = orders.subList(0, query.resolvedSize());
 
         return OrderListResponse.from(orders, hasNext);
@@ -155,10 +155,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderDetailResponse getOrderDetail(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
 
-        Order order = orderRepository.findOrderWithItemsById(orderId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        Order order =
+                orderRepository
+                        .findOrderWithItemsById(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
                 && !order.getUserId().equals(userId)) {
@@ -175,9 +178,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderStatusResponse getOrderStatus(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
-        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+    public OrderStatusResponse getOrderStatus(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
                 && !order.getUserId().equals(userId)) {
@@ -189,8 +195,8 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
 
-         List<OrderStatusHistory> histories =
-            orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId);
+        List<OrderStatusHistory> histories =
+                orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId);
 
         return OrderStatusResponse.from(order, histories);
     }

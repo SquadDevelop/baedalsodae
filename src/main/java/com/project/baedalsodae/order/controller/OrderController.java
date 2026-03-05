@@ -11,12 +11,11 @@ import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/orders")
@@ -53,16 +52,14 @@ public class OrderController {
         OrderDetailResponse response =
                 orderService.getOrderDetail(userId, userRole, storeId, orderId);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(SuccessCode.ORDER_DETAIL, response)
-        );
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_DETAIL, response));
     }
 
     @GetMapping("/{orderId}/status")
     public ResponseEntity<ApiResponse<OrderStatusResponse>> getOrderStatus(
             @RequestHeader("X-User-Id") UUID userId,
             @RequestHeader("X-User-Role") UserRole userRole,
-            @RequestParam(name="storeId", required = false) UUID storeId,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
             @PathVariable("orderId") UUID orderId) {
 
         OrderStatusResponse response =
@@ -70,5 +67,4 @@ public class OrderController {
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_STATUS, response));
     }
-
 }

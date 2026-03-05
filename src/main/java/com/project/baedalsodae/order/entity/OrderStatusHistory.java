@@ -4,11 +4,10 @@ import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.order.entity.enums.ActorType;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "p_order_status_history")

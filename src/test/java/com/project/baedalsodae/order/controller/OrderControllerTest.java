@@ -17,17 +17,16 @@ import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
 import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
+import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.user.entity.UserRole;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.project.baedalsodae.user.entity.UserRole;
-import org.mockito.ArgumentMatchers;
-import com.project.baedalsodae.order.service.OrderService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -101,10 +100,11 @@ class OrderControllerTest {
     @Test
     @DisplayName("성공 - CUSTOMER 주문 목록 조회 (빈 목록)")
     void getOrders_customer_emptyList() throws Exception {
-        given(orderService.getOrders(
-                        ArgumentMatchers.eq(userId),
-                        ArgumentMatchers.eq("CUSTOMER"),
-                        ArgumentMatchers.any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq("CUSTOMER"),
+                                ArgumentMatchers.any(OrderListRequest.class)))
                 .willReturn(OrderListResponse.empty());
 
         mockMvc.perform(
@@ -121,22 +121,24 @@ class OrderControllerTest {
     @Test
     @DisplayName("성공 - CUSTOMER 주문 목록 조회 (페이징, hasNext=true)")
     void getOrders_customer_paged() throws Exception {
-        OrderSummaryResponse summary = OrderSummaryResponse.builder()
-                .orderId(UUID.randomUUID())
-                .orderNo("ORD-001")
-                .status(OrderStatus.CREATED)
-                .storeNameSnapshot("테스트 가게")
-                .finalAmount(20000)
-                .createdAt(LocalDateTime.now())
-                .createdAtCursor(Instant.now())
-                .build();
+        OrderSummaryResponse summary =
+                OrderSummaryResponse.builder()
+                        .orderId(UUID.randomUUID())
+                        .orderNo("ORD-001")
+                        .status(OrderStatus.CREATED)
+                        .storeNameSnapshot("테스트 가게")
+                        .finalAmount(20000)
+                        .createdAt(LocalDateTime.now())
+                        .createdAtCursor(Instant.now())
+                        .build();
 
         OrderListResponse response = OrderListResponse.from(List.of(summary), true);
 
-        given(orderService.getOrders(
-                        ArgumentMatchers.eq(userId),
-                        ArgumentMatchers.eq("CUSTOMER"),
-                        ArgumentMatchers.any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq("CUSTOMER"),
+                                ArgumentMatchers.any(OrderListRequest.class)))
                 .willReturn(response);
 
         mockMvc.perform(
@@ -154,10 +156,11 @@ class OrderControllerTest {
     @Test
     @DisplayName("실패 - 잘못된 날짜 범위")
     void getOrders_fail_invalidDateRange() throws Exception {
-        given(orderService.getOrders(
-                        ArgumentMatchers.eq(userId),
-                        ArgumentMatchers.eq("CUSTOMER"),
-                        ArgumentMatchers.any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq("CUSTOMER"),
+                                ArgumentMatchers.any(OrderListRequest.class)))
                 .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_DATE_RANGE));
 
         mockMvc.perform(
@@ -176,22 +179,24 @@ class OrderControllerTest {
     void getOrders_owner_success() throws Exception {
         UUID storeId = UUID.randomUUID();
 
-        OrderSummaryResponse summary = OrderSummaryResponse.builder()
-                .orderId(UUID.randomUUID())
-                .orderNo("ORD-002")
-                .status(OrderStatus.CREATED)
-                .storeNameSnapshot("사장 가게")
-                .finalAmount(15000)
-                .createdAt(LocalDateTime.now())
-                .createdAtCursor(Instant.now())
-                .build();
+        OrderSummaryResponse summary =
+                OrderSummaryResponse.builder()
+                        .orderId(UUID.randomUUID())
+                        .orderNo("ORD-002")
+                        .status(OrderStatus.CREATED)
+                        .storeNameSnapshot("사장 가게")
+                        .finalAmount(15000)
+                        .createdAt(LocalDateTime.now())
+                        .createdAtCursor(Instant.now())
+                        .build();
 
         OrderListResponse response = OrderListResponse.from(List.of(summary), false);
 
-        given(orderService.getOrders(
-                        ArgumentMatchers.eq(userId),
-                        ArgumentMatchers.eq("OWNER"),
-                        ArgumentMatchers.any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq("OWNER"),
+                                ArgumentMatchers.any(OrderListRequest.class)))
                 .willReturn(response);
 
         mockMvc.perform(
@@ -210,10 +215,11 @@ class OrderControllerTest {
     void getOrders_owner_fail_storeNotFound() throws Exception {
         UUID storeId = UUID.randomUUID();
 
-        given(orderService.getOrders(
-                        ArgumentMatchers.eq(userId),
-                        ArgumentMatchers.eq("OWNER"),
-                        ArgumentMatchers.any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq("OWNER"),
+                                ArgumentMatchers.any(OrderListRequest.class)))
                 .willThrow(new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         mockMvc.perform(
@@ -231,10 +237,11 @@ class OrderControllerTest {
     void getOrders_owner_fail_forbidden() throws Exception {
         UUID storeId = UUID.randomUUID();
 
-        given(orderService.getOrders(
-                        ArgumentMatchers.eq(userId),
-                        ArgumentMatchers.eq("OWNER"),
-                        ArgumentMatchers.any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq("OWNER"),
+                                ArgumentMatchers.any(OrderListRequest.class)))
                 .willThrow(new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN));
 
         mockMvc.perform(
@@ -257,11 +264,12 @@ class OrderControllerTest {
         OrderStatusResponse response =
                 new OrderStatusResponse(orderId, OrderStatus.CREATED, List.of());
 
-        given(orderService.getOrderStatus(
-                ArgumentMatchers.eq(userId),
-                ArgumentMatchers.eq(UserRole.CUSTOMER),
-                ArgumentMatchers.isNull(),
-                ArgumentMatchers.eq(orderId)))
+        given(
+                        orderService.getOrderStatus(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                                ArgumentMatchers.isNull(),
+                                ArgumentMatchers.eq(orderId)))
                 .willReturn(response);
 
         mockMvc.perform(
@@ -280,11 +288,12 @@ class OrderControllerTest {
 
         UUID orderId = UUID.randomUUID();
 
-        given(orderService.getOrderStatus(
-                ArgumentMatchers.eq(userId),
-                ArgumentMatchers.eq(UserRole.CUSTOMER),
-                ArgumentMatchers.isNull(),
-                ArgumentMatchers.eq(orderId)))
+        given(
+                        orderService.getOrderStatus(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                                ArgumentMatchers.isNull(),
+                                ArgumentMatchers.eq(orderId)))
                 .willThrow(new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         mockMvc.perform(
@@ -302,11 +311,12 @@ class OrderControllerTest {
 
         UUID orderId = UUID.randomUUID();
 
-        given(orderService.getOrderStatus(
-                ArgumentMatchers.eq(userId),
-                ArgumentMatchers.eq(UserRole.CUSTOMER),
-                ArgumentMatchers.isNull(),
-                ArgumentMatchers.eq(orderId)))
+        given(
+                        orderService.getOrderStatus(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                                ArgumentMatchers.isNull(),
+                                ArgumentMatchers.eq(orderId)))
                 .willThrow(new BusinessException(ErrorCode.ORDER_FORBIDDEN));
 
         mockMvc.perform(

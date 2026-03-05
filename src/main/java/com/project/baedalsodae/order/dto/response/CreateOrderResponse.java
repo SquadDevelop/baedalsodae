@@ -2,9 +2,8 @@ package com.project.baedalsodae.order.dto.response;
 
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import lombok.Builder;
-
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record CreateOrderResponse(UUID orderId, OrderStatus status) {

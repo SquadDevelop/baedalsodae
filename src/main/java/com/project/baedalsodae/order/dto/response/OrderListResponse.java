@@ -1,17 +1,16 @@
 package com.project.baedalsodae.order.dto.response;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
 @Getter
 @Builder
 @AllArgsConstructor
-public class OrderListResponse{
+public class OrderListResponse {
 
     private List<OrderSummaryResponse> orders;
     private boolean hasNext;
@@ -19,13 +18,10 @@ public class OrderListResponse{
     private UUID nextCursorId;
 
     public static OrderListResponse empty() {
-        return OrderListResponse.builder()
-                .orders(List.of())
-                .hasNext(false)
-                .build();
+        return OrderListResponse.builder().orders(List.of()).hasNext(false).build();
     }
 
-     public static OrderListResponse from(List<OrderSummaryResponse> orders, boolean hasNext) {
+    public static OrderListResponse from(List<OrderSummaryResponse> orders, boolean hasNext) {
         if (orders.isEmpty()) return empty();
 
         OrderSummaryResponse lastOrder = orders.get(orders.size() - 1);

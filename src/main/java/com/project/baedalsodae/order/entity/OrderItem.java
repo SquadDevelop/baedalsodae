@@ -3,11 +3,10 @@ package com.project.baedalsodae.order.entity;
 import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "p_order_item")

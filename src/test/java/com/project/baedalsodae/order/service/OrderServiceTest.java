@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -18,21 +17,20 @@ import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.*;
-import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
+import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserRole;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
-
-import com.project.baedalsodae.user.entity.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +38,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -388,7 +385,8 @@ public class OrderServiceTest {
                 .willReturn(List.of());
 
         // when
-        OrderListResponse result = orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
         log.info("result = {}", result);
 
         // then
@@ -405,10 +403,14 @@ public class OrderServiceTest {
         OrderListRequest request = OrderListRequest.builder().size(size).build();
 
         given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
-        .willReturn(new ArrayList<>(Collections.nCopies(size + 1, OrderSummaryResponse.builder().build())));
+                .willReturn(
+                        new ArrayList<>(
+                                Collections.nCopies(
+                                        size + 1, OrderSummaryResponse.builder().build())));
 
         // when
-        OrderListResponse result = orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
         log.info("result = {}", result);
 
         // then
@@ -425,7 +427,9 @@ public class OrderServiceTest {
                 OrderListRequest.builder().size(20).status(OrderStatus.CREATED).build();
 
         List<OrderSummaryResponse> filteredOrders =
-                List.of(OrderSummaryResponse.builder().build(), OrderSummaryResponse.builder().build());
+                List.of(
+                        OrderSummaryResponse.builder().build(),
+                        OrderSummaryResponse.builder().build());
 
         given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
                 .willReturn(filteredOrders);
@@ -494,7 +498,7 @@ public class OrderServiceTest {
         // then
         then(orderQueryRepository)
                 .should()
-                .findOrdersByCustomer( argThat(r -> keyword.equals(r.keyword())));
+                .findOrdersByCustomer(argThat(r -> keyword.equals(r.keyword())));
         assertThat(result.getOrders()).hasSize(1);
     }
 
@@ -552,11 +556,14 @@ public class OrderServiceTest {
                         .size(size)
                         .build();
 
-        List<OrderSummaryResponse> orders = new ArrayList<>(
-            Collections.nCopies(size + 1, OrderSummaryResponse.builder()
-                    .createdAtCursor(Instant.now().minusSeconds(200))
-                    .orderId(UUID.randomUUID())
-                    .build()));
+        List<OrderSummaryResponse> orders =
+                new ArrayList<>(
+                        Collections.nCopies(
+                                size + 1,
+                                OrderSummaryResponse.builder()
+                                        .createdAtCursor(Instant.now().minusSeconds(200))
+                                        .orderId(UUID.randomUUID())
+                                        .build()));
 
         given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
                 .willReturn(orders);
@@ -590,7 +597,6 @@ public class OrderServiceTest {
                         .cursorId(UUID.randomUUID())
                         .size(20)
                         .build();
-
 
         given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
                 .willReturn(List.of());
@@ -687,12 +693,12 @@ public class OrderServiceTest {
         OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(size).build();
 
         List<OrderSummaryResponse> orders =
-    new ArrayList<>(Collections.nCopies(size + 1, OrderSummaryResponse.builder().build()));
+                new ArrayList<>(
+                        Collections.nCopies(size + 1, OrderSummaryResponse.builder().build()));
 
         given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
-        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
-                .willReturn(orders);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class))).willReturn(orders);
 
         // when
         OrderListResponse result =
@@ -715,12 +721,11 @@ public class OrderServiceTest {
                 OrderListRequest.builder().storeId(storeId).orderNo(orderNo).size(20).build();
 
         List<OrderSummaryResponse> orders =
-            new ArrayList<>(Collections.nCopies(21, OrderSummaryResponse.builder().build()));
+                new ArrayList<>(Collections.nCopies(21, OrderSummaryResponse.builder().build()));
 
         given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
-        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
-                .willReturn(orders);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class))).willReturn(orders);
 
         // when
         OrderListResponse result =
@@ -786,8 +791,7 @@ public class OrderServiceTest {
         UserRole userRole = UserRole.CUSTOMER;
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findOrderWithItemsById(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable =
@@ -814,8 +818,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId2);
 
-        given(orderRepository.findOrderWithItemsById(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
 
         // when
         Throwable throwable =
@@ -823,11 +826,10 @@ public class OrderServiceTest {
                         () -> orderService.getOrderDetail(userId1, userRole, storeId, orderId));
         log.info("throwable = " + throwable);
 
-        //then
+        // then
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
-
     }
 
     @Test
@@ -843,8 +845,7 @@ public class OrderServiceTest {
 
         given(order.getStoreId()).willReturn(storeId2);
 
-        given(orderRepository.findOrderWithItemsById(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
 
         // when
         Throwable throwable =
@@ -869,8 +870,7 @@ public class OrderServiceTest {
         UserRole userRole = UserRole.CUSTOMER;
 
         given(order.getUserId()).willReturn(userId);
-        given(orderRepository.findOrderWithItemsById(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
 
         // when
         OrderDetailResponse response =
@@ -893,8 +893,7 @@ public class OrderServiceTest {
 
         given(order.getStoreId()).willReturn(storeId);
 
-        given(orderRepository.findOrderWithItemsById(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
 
         // when
         OrderDetailResponse response =
@@ -915,8 +914,7 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole userRole = UserRole.CUSTOMER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable =
@@ -942,8 +940,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId2);
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         // when
         Throwable throwable =
@@ -969,8 +966,7 @@ public class OrderServiceTest {
 
         given(order.getStoreId()).willReturn(storeId2);
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         // when
         Throwable throwable =
@@ -997,8 +993,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId))
                 .willReturn(histories);
@@ -1026,8 +1021,7 @@ public class OrderServiceTest {
 
         given(order.getStoreId()).willReturn(storeId);
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId))
                 .willReturn(histories);

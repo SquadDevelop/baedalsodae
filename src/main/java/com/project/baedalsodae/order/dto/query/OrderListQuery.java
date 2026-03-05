@@ -2,11 +2,10 @@ package com.project.baedalsodae.order.dto.query;
 
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import lombok.Builder;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record OrderListQuery(
@@ -19,10 +18,9 @@ public record OrderListQuery(
         UUID storeId,
         Integer size,
         Instant cursorCreatedAt,
-        UUID cursorId
-) {
+        UUID cursorId) {
 
-    public Integer resolvedSize(){
+    public Integer resolvedSize() {
         return size != null ? size : 20;
     }
 
@@ -60,5 +58,4 @@ public record OrderListQuery(
                 .cursorId(request.cursorId())
                 .build();
     }
-
 }

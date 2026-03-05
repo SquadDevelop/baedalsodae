@@ -9,8 +9,7 @@ public final class TimeUtils {
 
     private static final ZoneId ASIA_SEOUL = ZoneId.of("Asia/Seoul");
 
-    private TimeUtils() {
-    }
+    private TimeUtils() {}
 
     public static Instant toInstant(LocalDateTime localDateTime) {
         if (localDateTime == null) {
