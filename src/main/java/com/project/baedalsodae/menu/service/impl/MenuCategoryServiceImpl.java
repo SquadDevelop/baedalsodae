@@ -15,6 +15,7 @@ import com.project.baedalsodae.store.repository.StoreRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
                         .findMaxOrderNoByStoreIdAndDeletedIsFalse((storeId))
                         .orElse(0);
         MenuCategory menuCategory = MenuCategory.create(store, request.name(), maxOrderNo + 1);
-        menuCategoryRepository.save(menuCategory);
+        try {
+            menuCategoryRepository.save(menuCategory);
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(ErrorCode.MENU_CATEGORY_ORDER_CONFLICT);
+        }
         return MenuCategoryResponseDto.fromEntity(menuCategory);
     }
 
