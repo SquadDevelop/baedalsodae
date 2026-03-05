@@ -27,4 +27,6 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID
             "SELECT MAX(c.orderNo) FROM MenuCategory c WHERE c.store.id = :storeId "
                     + "AND c.isDeleted = false")
     Optional<Integer> findMaxOrderNoByStoreIdAndDeletedIsFalse(UUID storeId);
+
+    List<MenuCategory> findAllByStoreIdAndDeletedIsFalse(UUID storeId);
 }

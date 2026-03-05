@@ -93,4 +93,12 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         OrderUtil.reorder(menuCategories, menuCategory, from, to);
         return MenuCategoryResponseDto.fromEntity(menuCategory);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuCategoryResponseDto> getMenuCategories(UUID storeId) {
+        List<MenuCategory> menuCategories =
+                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId);
+        return MenuCategoryResponseDto.fromEntityList(menuCategories);
+    }
 }

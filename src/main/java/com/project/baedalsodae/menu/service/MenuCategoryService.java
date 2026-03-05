@@ -4,6 +4,7 @@ import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPatchReq
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
+import java.util.List;
 import java.util.UUID;
 
 public interface MenuCategoryService {
@@ -17,4 +18,6 @@ public interface MenuCategoryService {
 
     MenuCategoryResponseDto updateMenuCategoryOrder(
             UUID menuCategoryId, MenuCategoryPatchRequestDto request);
+
+    List<MenuCategoryResponseDto> getMenuCategories(UUID storeId);
 }
