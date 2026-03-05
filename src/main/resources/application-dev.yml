@@ -18,3 +18,7 @@ spring:
   sql:
     init:
       mode: never
+
+encryption:
+  aes:
+    key: ${ENCRYPTION_AES_KEY}

@@ -22,7 +22,7 @@ public class StoreCategory extends BaseAuditEntity {
     @Column(name = "description", length = 200)
     private String description;
 
-    public void patchStoreCategory(String name, String description) {
+    public void updateInfo(String name, String description) {
         if (name != null) {
             this.name = name;
         }

@@ -4,14 +4,18 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.common.OrderUtil;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.service.MenuCategoryService;
+import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.repository.StoreRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +24,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     private final MenuCategoryRepository menuCategoryRepository;
+    private final StoreRepository storeRepository;
+
+    @Override
+    @Transactional
+    public MenuCategoryResponseDto createMenuCategory(
+            UUID storeId, MenuCategoryPostRequestDto request) {
+        Store store =
+                storeRepository
+                        .findByIdAndIsDeletedIsFalse(storeId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        int maxOrderNo =
+                menuCategoryRepository
+                        .findMaxOrderNoByStoreIdAndDeletedIsFalse((storeId))
+                        .orElse(0);
+        MenuCategory menuCategory = MenuCategory.create(store, request.name(), maxOrderNo + 1);
+        try {
+            menuCategoryRepository.save(menuCategory);
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(ErrorCode.MENU_CATEGORY_ORDER_CONFLICT);
+        }
+        return MenuCategoryResponseDto.fromEntity(menuCategory);
+    }
 
     @Override
     @Transactional
     public MenuCategoryResponseDto updateMenuCategory(
             UUID menuCategoryId, MenuCategoryPutRequestDto request) {
-
         MenuCategory menuCategory =
                 menuCategoryRepository
                         .findByIdAndDeletedIsFalse(menuCategoryId)
@@ -68,9 +93,17 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         UUID storeId = menuCategory.getStore().getId();
 
         List<MenuCategory> menuCategories =
-                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseForUpdate(storeId);
+                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId);
 
         OrderUtil.reorder(menuCategories, menuCategory, from, to);
         return MenuCategoryResponseDto.fromEntity(menuCategory);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuCategoryResponseDto> getMenuCategories(UUID storeId) {
+        List<MenuCategory> menuCategories =
+                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId);
+        return MenuCategoryResponseDto.fromEntityList(menuCategories);
     }
 }
