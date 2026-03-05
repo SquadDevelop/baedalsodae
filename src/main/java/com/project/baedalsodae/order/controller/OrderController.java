@@ -6,7 +6,9 @@ import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
+import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -38,4 +40,18 @@ public class OrderController {
         OrderListResponse response = orderService.getOrders(userId, role, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_LIST, response));
     }
+
+    @GetMapping("/{orderId}/status")
+    public ResponseEntity<ApiResponse<OrderStatusResponse>> getOrderStatus(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name="storeId", required = false) UUID storeId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderStatusResponse response =
+                orderService.getOrderStatus(userId, userRole, storeId, orderId);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_STATUS, response));
+    }
+
 }

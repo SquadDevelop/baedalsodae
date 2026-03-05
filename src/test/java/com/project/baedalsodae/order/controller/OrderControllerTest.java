@@ -14,11 +14,14 @@ import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
+import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
 import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.project.baedalsodae.user.entity.UserRole;
 import org.mockito.ArgumentMatchers;
 import com.project.baedalsodae.order.service.OrderService;
 import java.util.UUID;
@@ -242,5 +245,76 @@ class OrderControllerTest {
                 .andDo(print())
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_STORE_FORBIDDEN.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 상태 조회")
+    void getOrderStatus_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        OrderStatusResponse response =
+                new OrderStatusResponse(orderId, OrderStatus.CREATED, List.of());
+
+        given(orderService.getOrderStatus(
+                ArgumentMatchers.eq(userId),
+                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.eq(orderId)))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        get("/orders/{orderId}/status", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "CUSTOMER"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_STATUS.getCode()))
+                .andExpect(jsonPath("$.data.orderId").value(orderId.toString()));
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문 상태 조회")
+    void getOrderStatus_fail_orderNotFound() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        given(orderService.getOrderStatus(
+                ArgumentMatchers.eq(userId),
+                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.eq(orderId)))
+                .willThrow(new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        mockMvc.perform(
+                        get("/orders/{orderId}/status", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "CUSTOMER"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 주문 상태 조회 아님")
+    void getOrderStatus_fail_forbidden() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        given(orderService.getOrderStatus(
+                ArgumentMatchers.eq(userId),
+                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                ArgumentMatchers.isNull(),
+                ArgumentMatchers.eq(orderId)))
+                .willThrow(new BusinessException(ErrorCode.ORDER_FORBIDDEN));
+
+        mockMvc.perform(
+                        get("/orders/{orderId}/status", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "CUSTOMER"))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_FORBIDDEN.getCode()));
     }
 }
