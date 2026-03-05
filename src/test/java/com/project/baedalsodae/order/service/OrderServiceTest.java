@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -414,5 +415,33 @@ public class OrderServiceTest {
         // then
         assertThat(result.orders()).hasSize(size);
         assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("성공 - status 필터 조회")
+    void getOrders_success_statusFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder().status(OrderStatus.CREATED).build();
+
+        List<OrderSummaryResponse> filteredOrders =
+                List.of(new OrderSummaryResponse(), new OrderSummaryResponse());
+        OrderListResponse filteredResponse =
+                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(filteredResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(eq(userId), argThat(r -> r.status() == OrderStatus.CREATED));
+        assertThat(result.orders()).hasSize(2);
     }
 }
