@@ -9,7 +9,6 @@ import com.querydsl.jpa.JPAExpressions;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 
 public class OrderQueryCondition {
 	private static final QOrder order = QOrder.order;

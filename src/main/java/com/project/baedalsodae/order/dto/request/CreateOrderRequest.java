@@ -1,8 +1,9 @@
 package com.project.baedalsodae.order.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 import lombok.Builder;
+
+import java.util.UUID;
 
 @Builder
 public record CreateOrderRequest(

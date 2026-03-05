@@ -4,12 +4,13 @@ import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "p_order")
