@@ -1,5 +1,6 @@
 package com.project.baedalsodae.order.repository.impl;
 
+import com.project.baedalsodae.global.common.util.TimeUtils;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.entity.QOrder;
@@ -27,8 +28,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .select(Projections.constructor(
                         OrderSummaryResponse.class,
                         order.id,
-                        order.orderNo,
                         order.storeId,
+                        order.orderNo,
                         order.status,
                         order.storeNameSnapshot,
                         order.finalAmount,
@@ -52,8 +53,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         .select(Projections.constructor(
                                 OrderSummaryResponse.class,
                                 order.id,
-                                order.orderNo,
                                 order.storeId,
+                                order.orderNo,
                                 order.status,
                                 order.storeNameSnapshot,
                                 order.finalAmount,

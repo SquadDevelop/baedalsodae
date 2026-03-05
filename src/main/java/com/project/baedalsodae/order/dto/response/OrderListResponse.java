@@ -26,8 +26,8 @@ public record OrderListResponse(
         return OrderListResponse.builder()
                 .orders(orders)
                 .hasNext(hasNext)
-                .nextCursorCreatedAt(hasNext ? lastOrder.createdAtCursor() : null)
-                .nextCursorId(hasNext ? lastOrder.orderId() : null)
+                .nextCursorCreatedAt(hasNext ? lastOrder.getCreatedAtCursor() : null)
+                .nextCursorId(hasNext ? lastOrder.getOrderId() : null)
                 .build();
     }
 }
