@@ -1,11 +1,63 @@
+
 ### 주문 생성
 POST http://localhost:18082/api/v1/orders
-X-User-Id: {{userId}}
 Content-Type: application/json
+X-User-Id: {{userId}}
 
 {
   "cartId": "{{cartId}}",
-  "addressId": "{{addressId}}",
-  "storeRequestMessage": "리뷰이벤트 잽닝이 치킨 무 추가로 주시면 감사하겠습니다.",
-  "deliveryRequestMessage": "문 앞에 놓아주세요."
+  "addressId": "{{addressId}}"
 }
+
+
+### CUSTOMER 주문 목록 조회
+GET http://localhost:18082/api/v1/orders
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+### CUSTOMER 주문 목록 조회 (페이징)
+GET http://localhost:18082/api/v1/orders?size=2
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+### CUSTOMER 주문 목록 조회 (페이징, 커서)
+GET http://localhost:18082/api/v1/orders?size=2&cursorCreatedAt=2026-03-05T17:18:12.101535Z&cursorId=89208ca9-c0f1-4e79-b71e-e2dfb9f45a64
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+### CUSTOMER 주문 목록 조회 (페이징, 필터)
+GET http://localhost:18082/api/v1/orders?size=10&status=CREATED&keyword=치킨
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+
+### OWNER 가게 주문 목록 조회
+GET http://localhost:18082/api/v1/orders?storeId={{storeId}}
+X-User-Id: {{userId}}
+X-User-Role: OWNER
+
+
+
+### 주문 상세 조회 (CUSTOMER)
+GET http://localhost:18082/api/v1/orders/{{orderId}}
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+
+
+### 주문 상세 조회 (OWNER)
+GET http://localhost:18082/api/v1/orders/{{orderId}}?storeId={{storeId}}
+X-User-Id: {{userId}}
+X-User-Role: OWNER
+
+
+### 주문 상태 조회 (CUSTOMER)
+GET http://localhost:18082/api/v1/orders/{{orderId}}/status
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+
+### 주문 상태 조회 (OWNER)
+GET http://localhost:18082/api/v1/orders/{{orderId}}/status?storeId={{storeId}}
+X-User-Id: {{userId}}
+X-User-Role: OWNER
