@@ -12,6 +12,7 @@ import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
+import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderService;
@@ -35,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final OrderEventPublisher eventPublisher;
+    private final OrderQueryRepository orderQueryRepository;
 
     @Override
     @Transactional
@@ -105,7 +107,12 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
         validateDateRange(request.startDate(), request.endDate());
-        return null;
+        final LocalDate startDate = request.resolvedStartDate();
+        final LocalDate endDate = request.resolvedEndDate();
+
+        final OrderListResponse orderListResponse = orderQueryRepository.findOrdersByCustomer(userId, request);
+
+        return orderListResponse;
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {

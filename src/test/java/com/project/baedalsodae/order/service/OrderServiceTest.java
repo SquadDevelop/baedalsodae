@@ -16,6 +16,8 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.response.OrderListResponse;
+import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
@@ -65,6 +67,8 @@ public class OrderServiceTest {
     @Mock private MenuItem menuItem2;
 
     @Mock private OrderEventPublisher eventPublisher;
+
+    @Mock private OrderQueryRepository orderQueryRepository;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -366,5 +370,24 @@ public class OrderServiceTest {
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_DATE_RANGE);
+    }
+
+    @Test
+    @DisplayName("성공 - 내 주문 목록 조회 (빈 목록)")
+    void getOrders_success_emptyList() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(OrderListResponse.empty());
+
+        // when
+        OrderListResponse result = orderService.getOrders(userId, "CUSTOMER", request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.orders()).isEmpty();
+        assertThat(result.hasNext()).isFalse();
     }
 }

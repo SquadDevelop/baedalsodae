@@ -4,4 +4,13 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record OrderListRequest(LocalDate startDate, LocalDate endDate) {}
+public record OrderListRequest(LocalDate startDate, LocalDate endDate) {
+
+	public LocalDate resolvedStartDate() {
+        return startDate != null ? startDate : LocalDate.now().minusMonths(3);
+    }
+
+    public LocalDate resolvedEndDate() {
+        return endDate != null ? endDate : LocalDate.now();
+    }
+}
