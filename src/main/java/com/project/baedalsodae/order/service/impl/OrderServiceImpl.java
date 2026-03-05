@@ -72,9 +72,15 @@ public class OrderServiceImpl implements OrderService {
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
+        // TODO 인증 도메인 완료 시 넣어줌
+        final String userNickName = "잽닝";
+        final String userPhone = "01011111111";
+
         Order order =
                 Order.create(
                         userId,
+                        userNickName,
+                        userPhone,
                         store,
                         addressId,
                         deliveryAddressSnapshot,
