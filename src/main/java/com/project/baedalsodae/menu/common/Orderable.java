@@ -4,5 +4,5 @@ public interface Orderable {
 
     Integer getOrderNo();
 
-    void changeOrderNo(int order);
+    void changeOrderNo(Integer order);
 }
