@@ -29,6 +29,7 @@ import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -546,5 +547,77 @@ public class OrderServiceTest {
                                                 && startDate.equals(r.startDate())
                                                 && endDate.equals(r.endDate())));
         assertThat(result.orders()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("성공 - 커서 기반 다음 페이지 조회 (hasNext=true)")
+    void getOrders_success_cursorNextPage() {
+        // given
+        UUID userId = UUID.randomUUID();
+        Instant cursorCreatedAt = Instant.now().minusSeconds(100);
+        UUID cursorId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .cursorCreatedAt(cursorCreatedAt)
+                        .cursorId(cursorId)
+                        .build();
+
+        Instant nextCursorCreatedAt = Instant.now().minusSeconds(200);
+        UUID nextCursorId = UUID.randomUUID();
+        OrderListResponse pagedResponse =
+                OrderListResponse.builder()
+                        .orders(List.of(new OrderSummaryResponse()))
+                        .hasNext(true)
+                        .nextCursorCreatedAt(nextCursorCreatedAt)
+                        .nextCursorId(nextCursorId)
+                        .build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(pagedResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        eq(userId),
+                        argThat(
+                                r ->
+                                        cursorCreatedAt.equals(r.cursorCreatedAt())
+                                                && cursorId.equals(r.cursorId())));
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.nextCursorCreatedAt()).isEqualTo(nextCursorCreatedAt);
+        assertThat(result.nextCursorId()).isEqualTo(nextCursorId);
+    }
+
+    @Test
+    @DisplayName("성공 - 커서 기반 마지막 페이지 조회")
+    void getOrders_success_cursorLastPage() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .cursorCreatedAt(Instant.now().minusSeconds(100))
+                        .cursorId(UUID.randomUUID())
+                        .build();
+
+        OrderListResponse lastPageResponse = OrderListResponse.empty();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(lastPageResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.hasNext()).isFalse();
+        assertThat(result.nextCursorCreatedAt()).isNull();
+        assertThat(result.nextCursorId()).isNull();
     }
 }
