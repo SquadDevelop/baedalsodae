@@ -22,7 +22,7 @@ public record OrderListQuery(
         UUID cursorId
 ) {
 
-    public int resolvedSize(){
+    public Integer resolvedSize(){
         return size != null ? size : 20;
     }
 
