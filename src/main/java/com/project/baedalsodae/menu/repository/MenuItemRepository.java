@@ -18,6 +18,9 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
                     + " false")
     Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
 
+    @Query(
+            "SELECT MAX(i.orderNo) FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId "
+                    + "AND i.isDeleted = false")
     Optional<Integer> findMaxOrderNoByMenuCategoryId(UUID menuCategoryId);
 
     boolean existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(UUID menuCategoryId, String name);

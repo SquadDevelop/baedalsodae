@@ -4,11 +4,14 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.common.OrderUtil;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.service.MenuCategoryService;
+import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.repository.StoreRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     private final MenuCategoryRepository menuCategoryRepository;
+    private final StoreRepository storeRepository;
+
+    @Override
+    @Transactional
+    public MenuCategoryResponseDto createMenuCategory(
+            UUID storeId, MenuCategoryPostRequestDto request) {
+        Store store =
+                storeRepository
+                        .findByIdAndDeletedIsFalse(storeId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        int maxOrderNo =
+                menuCategoryRepository
+                        .findMaxOrderNoByStoreIdAndDeletedIsFalse((storeId))
+                        .orElse(0);
+        MenuCategory menuCategory = MenuCategory.create(store, request.name(), maxOrderNo + 1);
+        menuCategoryRepository.save(menuCategory);
+        return MenuCategoryResponseDto.fromEntity(menuCategory);
+    }
 
     @Override
     @Transactional
