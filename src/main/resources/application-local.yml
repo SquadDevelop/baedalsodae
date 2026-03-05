@@ -6,7 +6,7 @@ spring:
     password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     defer-datasource-initialization: false
     show-sql: true
     open-in-view: false
@@ -27,3 +27,10 @@ logging:
     org.springframework.boot.diagnostics: DEBUG
     org.springframework.boot.web.embedded.tomcat: DEBUG
     org.apache.catalina: DEBUG
+
+encryption:
+  aes:
+    key: ${ENCRYPTION_AES_KEY}
+
+pg:
+  url: http://localhost:8089
