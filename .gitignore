@@ -41,3 +41,8 @@ out/
 CLAUDE.md
 
 docs/baedalsodae-schema.md
+
+# Querydsl Q classes (generated)
+**/build/generated/**
+**/build/generated-src/**
+**/src/main/generated/**

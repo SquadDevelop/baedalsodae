@@ -20,7 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class AuthConfig {
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+            throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -28,16 +29,20 @@ public class AuthConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.sessionManagement((sessionManagement) ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
+        http.sessionManagement(
+                (sessionManagement) ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.authorizeHttpRequests((authorizeHttpRequests) ->
-                authorizeHttpRequests
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .anyRequest().permitAll()
-//                        .anyRequest().authenticated()
-        );
+        http.authorizeHttpRequests(
+                (authorizeHttpRequests) ->
+                        authorizeHttpRequests
+                                .requestMatchers(
+                                        PathRequest.toStaticResources().atCommonLocations())
+                                .permitAll()
+                                .anyRequest()
+                                .permitAll()
+                //                        .anyRequest().authenticated()
+                );
 
         // JWT 필터 추가 예정
 

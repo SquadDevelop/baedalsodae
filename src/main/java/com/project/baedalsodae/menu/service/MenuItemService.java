@@ -1,15 +1,22 @@
 package com.project.baedalsodae.menu.service;
 
-import com.project.baedalsodae.menu.dto.requestDto.MenuPatchRequestDto;
-import com.project.baedalsodae.menu.dto.requestDto.MenuPutRequestDto;
-import com.project.baedalsodae.menu.dto.responseDto.MenuItemResponseDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
+import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
 import java.util.UUID;
 
 public interface MenuItemService {
 
-  MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuPutRequestDto request);
+    MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request);
 
-  MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuPatchRequestDto request);
+    MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuItemPutRequestDto request);
 
-  void deleteMenuItem(UUID menuItemId);
+    MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request);
+
+    void deleteMenuItem(UUID menuItemId);
+
+    boolean isDuplicateMenuItemName(UUID menuCategoryId, String name);
+
+    MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
 }

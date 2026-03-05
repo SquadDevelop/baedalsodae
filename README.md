@@ -287,6 +287,24 @@ npm run dev
   - 인텔레제이 환경 변수 설정 후 실행
 
 ---
+## 🧹 코드 포맷팅 (Spotless)
+
+이 프로젝트는 일관된 Java 코드 스타일을 유지하기 위해 **Spotless(Google Java Format)** 를 사용합니다.
+`main`, `dev` 브랜치로 PR(Pull Request)을 올릴 때 GitHub Actions CI를 통해 자동으로 코드 포맷을 검사하며, 포맷이 어긋난 코드의 머지를 차단합니다.
+
+### 사용 방법
+
+로컬에서 코드를 수정한 후 커밋 및 푸시하기 전에, 반드시 아래 명령어를 실행하여 코드를 자동 정렬해야 합니다.
+
+```bash
+# 소스코드 포맷 자동 정렬 적용 (커밋 전 필수 실행 ✅)
+./gradlew spotlessApply
+
+# 현재 코드의 포맷 준수 여부 검사 (CI 검증 명령어)
+./gradlew spotlessCheck
+```
+
+---
 
 ## 🧪 테스트
 

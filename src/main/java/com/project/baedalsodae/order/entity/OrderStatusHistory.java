@@ -1,14 +1,13 @@
 package com.project.baedalsodae.order.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
+import com.project.baedalsodae.order.entity.enums.ActorType;
+import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(name = "p_order_status_history")
@@ -42,4 +41,21 @@ public class OrderStatusHistory extends BaseTimeEntity {
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
 
+    private OrderStatusHistory(
+            UUID orderId,
+            OrderStatus fromStatus,
+            OrderStatus toStatus,
+            ActorType actorType,
+            UUID actorId) {
+        this.orderId = orderId;
+        this.fromStatus = fromStatus;
+        this.toStatus = toStatus;
+        this.actorType = actorType;
+        this.actorId = actorId;
+    }
+
+    public static OrderStatusHistory create(Order order, UUID userId) {
+        return new OrderStatusHistory(
+                order.getId(), null, order.getStatus(), ActorType.CUSTOMER, userId);
+    }
 }

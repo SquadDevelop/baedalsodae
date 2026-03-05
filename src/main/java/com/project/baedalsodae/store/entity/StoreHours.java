@@ -1,19 +1,20 @@
 package com.project.baedalsodae.store.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(
         name = "p_store_hours",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uq_store_hours_day", columnNames = {"store_id", "day_of_week"})
-        }
-)
+            @UniqueConstraint(
+                    name = "uq_store_hours_day",
+                    columnNames = {"store_id", "day_of_week"})
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -24,7 +25,9 @@ public class StoreHours {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false,
+    @JoinColumn(
+            name = "store_id",
+            nullable = false,
             foreignKey = @ForeignKey(name = "fk_store_hours_store"))
     private Store store;
 

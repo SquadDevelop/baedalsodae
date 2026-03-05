@@ -21,63 +21,60 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class TagMappingServiceImplTest {
 
-  @Mock
-  private TagService tagService;
+    @Mock private TagService tagService;
 
-  @Mock
-  private TagMappingRepository tagMappingRepository;
+    @Mock private TagMappingRepository tagMappingRepository;
 
-  @InjectMocks
-  private TagMappingServiceImpl tagMappingService;
+    @InjectMocks private TagMappingServiceImpl tagMappingService;
 
-  @Test
-  @DisplayName("태그를 upsert 후 전체 조회하여 TagMapping을 저장한다")
-  void createTagMappings_upsertAndSaveMappings() {
-    // given
-    MenuItem menuItem = mock(MenuItem.class);
-    Tag tag1 = mock(Tag.class);
-    Tag tag2 = mock(Tag.class);
-    given(tag1.getName()).willReturn("치킨");
-    given(tag2.getName()).willReturn("피자");
-    given(tagService.findAllByNames(List.of("치킨", "피자"))).willReturn(List.of(tag1, tag2));
+    @Test
+    @DisplayName("태그를 upsert 후 전체 조회하여 TagMapping을 저장한다")
+    void createTagMappings_upsertAndSaveMappings() {
+        // given
+        MenuItem menuItem = mock(MenuItem.class);
+        Tag tag1 = mock(Tag.class);
+        Tag tag2 = mock(Tag.class);
+        given(tag1.getName()).willReturn("치킨");
+        given(tag2.getName()).willReturn("피자");
+        given(tagService.findAllByNames(List.of("치킨", "피자"))).willReturn(List.of(tag1, tag2));
 
-    // when
-    tagMappingService.createTagMappings(menuItem, List.of("치킨", "피자"));
+        // when
+        tagMappingService.createTagMappings(menuItem, List.of("치킨", "피자"));
 
-    // then
-    then(tagService).should().createNewTagsIfNotExists(List.of("치킨", "피자"));
-    then(tagService).should().findAllByNames(List.of("치킨", "피자"));
-    then(tagMappingRepository).should().saveAll(anyList());
-  }
+        // then
+        then(tagService).should().createNewTagsIfNotExists(List.of("치킨", "피자"));
+        then(tagService).should().findAllByNames(List.of("치킨", "피자"));
+        then(tagMappingRepository).should().saveAll(anyList());
+    }
 
-  @Test
-  @DisplayName("중복 태그명이 포함된 경우 distinct 처리 후 upsert하고 TagMapping은 원본 순서대로 저장한다")
-  void createTagMappings_withDuplicateTagNames_distinctBeforeUpsert() {
-    // given
-    MenuItem menuItem = mock(MenuItem.class);
-    Tag tag = mock(Tag.class);
-    given(tag.getName()).willReturn("치킨");
-    given(tagService.findAllByNames(List.of("치킨"))).willReturn(List.of(tag));
+    @Test
+    @DisplayName("중복 태그명이 포함된 경우 distinct 처리 후 upsert하고 TagMapping은 원본 순서대로 저장한다")
+    void createTagMappings_withDuplicateTagNames_distinctBeforeUpsert() {
+        // given
+        MenuItem menuItem = mock(MenuItem.class);
+        Tag tag = mock(Tag.class);
+        given(tag.getName()).willReturn("치킨");
+        given(tagService.findAllByNames(List.of("치킨"))).willReturn(List.of(tag));
 
-    // when
-    tagMappingService.createTagMappings(menuItem, List.of("치킨", "치킨"));
+        // when
+        tagMappingService.createTagMappings(menuItem, List.of("치킨", "치킨"));
 
-    // then
-    then(tagService).should().createNewTagsIfNotExists(List.of("치킨"));
-    then(tagService).should().findAllByNames(List.of("치킨"));
-    then(tagMappingRepository).should().saveAll(anyList());
-  }
+        // then
+        then(tagService).should().createNewTagsIfNotExists(List.of("치킨"));
+        then(tagService).should().findAllByNames(List.of("치킨"));
+        then(tagMappingRepository).should().saveAll(anyList());
+    }
 
-  @Test
-  @DisplayName("menuItemId로 해당 메뉴 아이템의 TagMapping을 전체 삭제한다")
-  void deleteAllTagMappingByMenuItemId_deletesAllMappingsForMenuItem() {
-    // given
-    UUID menuItemId = UUID.randomUUID();
+    @Test
+    @DisplayName("menuItemId로 해당 메뉴 아이템의 TagMapping을 전체 삭제한다")
+    void deleteAllTagMappingByMenuItemId_deletesAllMappingsForMenuItem() {
+        // given
+        UUID menuItemId = UUID.randomUUID();
 
-    // when
-    tagMappingService.deleteAllTagMappingByMenuItemId(menuItemId);
+        // when
+        tagMappingService.deleteAllTagMappingByMenuItemId(menuItemId);
 
-    // then
-    then(tagMappingRepository).should().deleteByMenuItemId(menuItemId);
-  }
+        // then
+        then(tagMappingRepository).should().deleteByMenuItemId(menuItemId);
+    }
 }

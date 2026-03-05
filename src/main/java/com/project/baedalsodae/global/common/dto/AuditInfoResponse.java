@@ -1,10 +1,9 @@
 package com.project.baedalsodae.global.common.dto;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
-import lombok.Getter;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
 @Getter
 public class AuditInfoResponse {
@@ -24,7 +23,7 @@ public class AuditInfoResponse {
         this.deletedAt = entity.getDeletedAt();
     }
 
-    public static AuditInfoResponse fromEntity(BaseAuditEntity entity){
+    public static AuditInfoResponse fromEntity(BaseAuditEntity entity) {
         if (entity == null) return null;
         return new AuditInfoResponse(entity);
     }

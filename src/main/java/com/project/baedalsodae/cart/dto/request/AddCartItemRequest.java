@@ -1,16 +1,12 @@
 package com.project.baedalsodae.cart.dto.request;
 
 import jakarta.validation.constraints.Min;
-import lombok.NonNull;
-
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record AddCartItemRequest(
-		@NonNull UUID storeId,
-		@NonNull UUID menuItemId,
-		@Min(1) int quantity
-) {
-	public boolean isValidQuantity() {
-		return this.quantity > 0;
-	}
+        @NotNull UUID storeId, @NotNull UUID menuItemId, @Min(1) int quantity) {
+    public boolean isValidQuantity() {
+        return this.quantity > 0;
+    }
 }

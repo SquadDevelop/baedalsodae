@@ -17,31 +17,31 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class TagMapping {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  @Column(name = "id", nullable = false)
-  private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-  @Column(name = "order_no", nullable = false)
-  private int orderNo;
+    @Column(name = "order_no", nullable = false)
+    private int orderNo;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "tag_id", nullable = false)
-  private Tag tag;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id", nullable = false)
+    private Tag tag;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "menu_item", nullable = false)
-  private MenuItem menuItem;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_item", nullable = false)
+    private MenuItem menuItem;
 
-  @CreatedDate
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private Instant createdAt;
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
-  public static TagMapping create(Tag tag, MenuItem menuItem, int orderNo) {
-    TagMapping tagMapping = new TagMapping();
-    tagMapping.tag = tag;
-    tagMapping.menuItem = menuItem;
-    tagMapping.orderNo = orderNo;
-    return tagMapping;
-  }
+    public static TagMapping create(Tag tag, MenuItem menuItem, int orderNo) {
+        TagMapping tagMapping = new TagMapping();
+        tagMapping.tag = tag;
+        tagMapping.menuItem = menuItem;
+        tagMapping.orderNo = orderNo;
+        return tagMapping;
+    }
 }

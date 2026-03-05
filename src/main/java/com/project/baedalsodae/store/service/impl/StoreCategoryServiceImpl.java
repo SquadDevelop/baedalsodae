@@ -10,12 +10,11 @@ import com.project.baedalsodae.store.dto.response.StoreCategoryResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.service.StoreCategoryService;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +23,10 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
 
     @Override
     public StoreCategoryListResponse getActiveStoreCategories() {
-        List<StoreCategoryResponse> storeCategoryResponseList = storeCategoryRepository.findAllByIsDeletedFalse()
-                .stream()
-                .map(StoreCategoryResponse::from)
-                .toList();
+        List<StoreCategoryResponse> storeCategoryResponseList =
+                storeCategoryRepository.findAllByIsDeletedFalse().stream()
+                        .map(StoreCategoryResponse::from)
+                        .toList();
 
         return StoreCategoryListResponse.fromList(storeCategoryResponseList);
     }
@@ -61,9 +60,8 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
     }
 
     private StoreCategory getStoreCategory(UUID StoreCategoryId) {
-        return storeCategoryRepository.findById(StoreCategoryId)
-                .orElseThrow(()->new BusinessException(ErrorCode.STORE_CATEGORY_NOT_FOUND));
+        return storeCategoryRepository
+                .findById(StoreCategoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_CATEGORY_NOT_FOUND));
     }
-
-
 }

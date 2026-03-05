@@ -1,5 +1,6 @@
 package com.project.baedalsodae.tag.service.Impl;
 
+import com.project.baedalsodae.tag.dto.responseDto.TagResponseDto;
 import com.project.baedalsodae.tag.entity.Tag;
 import com.project.baedalsodae.tag.repository.TagBulkRepository;
 import com.project.baedalsodae.tag.repository.TagRepository;
@@ -13,18 +14,29 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
-  private final TagRepository tagRepository;
-  private final TagBulkRepository tagBulkRepository;
+    private final TagRepository tagRepository;
+    private final TagBulkRepository tagBulkRepository;
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<Tag> findAllByNames(List<String> names) {
-    return tagRepository.findAllByNameIn(names);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> findAllByNames(List<String> names) {
+        return tagRepository.findAllByNameIn(names);
+    }
 
-  @Override
-  public void createNewTagsIfNotExists(List<String> tagNames) {
-    List<String> distinctNames = tagNames.stream().distinct().toList();
-    tagBulkRepository.bulkInsertIgnore(distinctNames);
-  }
+    @Override
+    public void createNewTagsIfNotExists(List<String> tagNames) {
+        List<String> distinctNames = tagNames.stream().distinct().toList();
+        tagBulkRepository.bulkInsertIgnore(distinctNames);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<TagResponseDto> getTagListByParams(String keyword, int count) {
+        List<Tag> tags;
+        if (keyword == null || keyword.isBlank()) {
+            tags = tagRepository.findTopByMappingCount(count);
+        } else tags = tagRepository.findByKeywordOrderByRelevance(keyword, count);
+
+        return tags.stream().map(TagResponseDto::fromEntity).toList();
+    }
 }
