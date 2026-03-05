@@ -754,4 +754,50 @@ public class OrderServiceTest {
                 .findOrdersByStore(eq(storeId), argThat(r -> orderNo.equals(r.orderNo())));
         assertThat(result.orders()).hasSize(1);
     }
+
+    @Test
+    @DisplayName("성공 - 복합 필터 조회 (status + orderNo + 날짜 범위)")
+    void getOrders_owner_success_combinedFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2026, 3, 1);
+        LocalDate endDate = LocalDate.of(2026, 3, 5);
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .storeId(storeId)
+                        .status(OrderStatus.CREATED)
+                        .orderNo("ORD-20260305-001")
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
+        OrderListResponse filteredResponse =
+                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(store.getId()).willReturn(storeId);
+        given(orderQueryRepository.findOrdersByStore(storeId, request))
+                .willReturn(filteredResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByStore(
+                        eq(storeId),
+                        argThat(
+                                r ->
+                                        r.status() == OrderStatus.CREATED
+                                                && "ORD-20260305-001".equals(r.orderNo())
+                                                && startDate.equals(r.startDate())
+                                                && endDate.equals(r.endDate())));
+        assertThat(result.orders()).hasSize(1);
+    }
 }
