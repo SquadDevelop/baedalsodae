@@ -1,5 +1,6 @@
 package com.project.baedalsodae.order.repository.condition;
 
+import com.project.baedalsodae.global.common.util.TimeUtils;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.entity.QOrder;
 import com.project.baedalsodae.order.entity.QOrderItem;
@@ -21,8 +22,8 @@ public class OrderQueryCondition {
 	public static BooleanExpression dateRange(OrderListQuery query) {
 		LocalDate start = query.resolvedStartDate();
 		LocalDate end = query.resolvedEndDate();
-		Instant startInstant = start.atStartOfDay(ZoneOffset.UTC).toInstant();
-		Instant endInstant = end.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+		Instant startInstant = TimeUtils.toStartOfDayInstant(start);
+		Instant endInstant = TimeUtils.toStartOfNextDayInstant(end);
 		return order.createdAt.goe(startInstant).and(order.createdAt.lt(endInstant));
 	}
 
