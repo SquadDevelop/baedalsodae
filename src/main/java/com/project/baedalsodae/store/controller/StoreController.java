@@ -10,6 +10,7 @@ import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -61,5 +62,13 @@ public class StoreController {
             @PathVariable UUID storeId, @RequestBody @Valid MenuCategoryPostRequestDto request) {
         MenuCategoryResponseDto response = menuCategoryService.createMenuCategory(storeId, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_CREATED, response));
+    }
+
+    @GetMapping("/{storeId}/menu-categories")
+    public ResponseEntity<ApiResponse<List<MenuCategoryResponseDto>>> getMenuCategories(
+            @PathVariable UUID storeId) {
+        List<MenuCategoryResponseDto> response = menuCategoryService.getMenuCategories(storeId);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.MENU_CATEGORY_LIST_FOUND, response));
     }
 }
