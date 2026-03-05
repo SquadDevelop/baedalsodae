@@ -58,6 +58,10 @@ public enum ErrorCode {
     // order
     ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
     ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
+
+    // payment
+    PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),
+    PAYMENT_DETAIL_NOT_FOUND("PY002", HttpStatus.NOT_FOUND, "결제 상세 정보가 없습니다."),
     ;
 
     private final String code;

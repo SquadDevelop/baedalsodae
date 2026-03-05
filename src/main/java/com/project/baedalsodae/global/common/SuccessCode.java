@@ -4,20 +4,16 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-
 @Getter
 @RequiredArgsConstructor
 public enum SuccessCode {
 
-	//cart
-	CART_FOUND("CT200", HttpStatus.OK, "장바구니 조회 성공"),
-	CART_ITEM_ADDED("CT201", HttpStatus.CREATED, "장바구니 아이템 추가 성공"),
-	CART_ITEM_QUANTITY_UPDATED("CT202", HttpStatus.OK, "장바구니 아이템 수량 변경 성공"),
-	CART_ITEM_REMOVED("CT203", HttpStatus.OK, "장바구니 아이템 삭제 성공"),
-	CART_CLEARED("CT204", HttpStatus.OK, "장바구니 비우기 성공"),
+    // cart
+    CART_FOUND("CT200", HttpStatus.OK, "장바구니 조회 성공"),
+    CART_ITEM_ADDED("CT201", HttpStatus.CREATED, "장바구니 아이템 추가 성공"),
+    CART_ITEM_QUANTITY_UPDATED("CT202", HttpStatus.OK, "장바구니 아이템 수량 변경 성공"),
+    CART_ITEM_REMOVED("CT203", HttpStatus.OK, "장바구니 아이템 삭제 성공"),
+    CART_CLEARED("CT204", HttpStatus.OK, "장바구니 비우기 성공"),
 
     // order
     ORDER_CREATED("OR201", HttpStatus.CREATED, "주문 생성 성공"),
@@ -35,12 +31,11 @@ public enum SuccessCode {
     STORE_STATUS_UPDATED("ST200", HttpStatus.OK, "가게 영업 상태 변경 성공"),
     STORE_DELETED("ST200", HttpStatus.OK, "가게 삭제 성공"),
 
-	// payment
-	PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),
-	PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공");
+    // payment
+    PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),
+    PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공");
 
-
-	private final String code;
-	private final HttpStatus status;
-	private final String message;
+    private final String code;
+    private final HttpStatus status;
+    private final String message;
 }
