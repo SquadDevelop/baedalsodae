@@ -17,12 +17,4 @@ public record OrderListRequest(
         Integer size,
         Instant cursorCreatedAt,
         UUID cursorId) {
-
-	public LocalDate resolvedStartDate() {
-        return startDate != null ? startDate : LocalDate.now().minusMonths(3);
-    }
-
-    public LocalDate resolvedEndDate() {
-        return endDate != null ? endDate : LocalDate.now();
-    }
 }

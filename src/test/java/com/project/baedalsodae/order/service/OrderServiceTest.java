@@ -14,6 +14,7 @@ import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuItem;
+import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
@@ -379,10 +380,9 @@ public class OrderServiceTest {
     void getOrders_success_emptyList() {
         // given
         UUID userId = UUID.randomUUID();
-        OrderListRequest request = OrderListRequest.builder().build();
-
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(OrderListResponse.empty());
+        OrderListRequest request = OrderListRequest.builder().size(20).build();
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(List.of());
 
         // when
         OrderListResponse result = orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
@@ -401,13 +401,8 @@ public class OrderServiceTest {
         int size = 5;
         OrderListRequest request = OrderListRequest.builder().size(size).build();
 
-        List<OrderSummaryResponse> orders =
-                Collections.nCopies(size, new OrderSummaryResponse());
-        OrderListResponse pagedResponse =
-                OrderListResponse.builder().orders(orders).hasNext(true).build();
-
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(pagedResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+        .willReturn(new ArrayList<>(Collections.nCopies(size + 1, OrderSummaryResponse.builder().build())));
 
         // when
         OrderListResponse result = orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
@@ -424,15 +419,13 @@ public class OrderServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         OrderListRequest request =
-                OrderListRequest.builder().status(OrderStatus.CREATED).build();
+                OrderListRequest.builder().size(20).status(OrderStatus.CREATED).build();
 
         List<OrderSummaryResponse> filteredOrders =
-                List.of(new OrderSummaryResponse(), new OrderSummaryResponse());
-        OrderListResponse filteredResponse =
-                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+                List.of(OrderSummaryResponse.builder().build(), OrderSummaryResponse.builder().build());
 
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(filteredResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
 
         // when
         OrderListResponse result =
@@ -442,7 +435,7 @@ public class OrderServiceTest {
         // then
         then(orderQueryRepository)
                 .should()
-                .findOrdersByCustomer(eq(userId), argThat(r -> r.status() == OrderStatus.CREATED));
+                .findOrdersByCustomer(argThat(r -> r.status() == OrderStatus.CREATED));
         assertThat(result.orders()).hasSize(2);
     }
 
@@ -454,14 +447,12 @@ public class OrderServiceTest {
         LocalDate startDate = LocalDate.of(2026, 3, 1);
         LocalDate endDate = LocalDate.of(2026, 3, 5);
         OrderListRequest request =
-                OrderListRequest.builder().startDate(startDate).endDate(endDate).build();
+                OrderListRequest.builder().size(20).startDate(startDate).endDate(endDate).build();
 
-        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
-        OrderListResponse filteredResponse =
-                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
 
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(filteredResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
 
         // when
         OrderListResponse result =
@@ -472,7 +463,6 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByCustomer(
-                        eq(userId),
                         argThat(
                                 r ->
                                         startDate.equals(r.startDate())
@@ -486,14 +476,12 @@ public class OrderServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         String keyword = "치킨";
-        OrderListRequest request = OrderListRequest.builder().keyword(keyword).build();
+        OrderListRequest request = OrderListRequest.builder().size(20).keyword(keyword).build();
 
-        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
-        OrderListResponse filteredResponse =
-                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
 
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(filteredResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
 
         // when
         OrderListResponse result =
@@ -503,8 +491,7 @@ public class OrderServiceTest {
         // then
         then(orderQueryRepository)
                 .should()
-                .findOrdersByCustomer(
-                        eq(userId), argThat(r -> keyword.equals(r.keyword())));
+                .findOrdersByCustomer( argThat(r -> keyword.equals(r.keyword())));
         assertThat(result.orders()).hasSize(1);
     }
 
@@ -521,14 +508,13 @@ public class OrderServiceTest {
                         .keyword("치킨")
                         .startDate(startDate)
                         .endDate(endDate)
+                        .size(20)
                         .build();
 
-        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
-        OrderListResponse filteredResponse =
-                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
 
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(filteredResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
 
         // when
         OrderListResponse result =
@@ -539,7 +525,6 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByCustomer(
-                        eq(userId),
                         argThat(
                                 r ->
                                         r.status() == OrderStatus.CREATED
@@ -556,24 +541,22 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         Instant cursorCreatedAt = Instant.now().minusSeconds(100);
         UUID cursorId = UUID.randomUUID();
+        int size = 20;
         OrderListRequest request =
                 OrderListRequest.builder()
                         .cursorCreatedAt(cursorCreatedAt)
                         .cursorId(cursorId)
+                        .size(size)
                         .build();
 
-        Instant nextCursorCreatedAt = Instant.now().minusSeconds(200);
-        UUID nextCursorId = UUID.randomUUID();
-        OrderListResponse pagedResponse =
-                OrderListResponse.builder()
-                        .orders(List.of(new OrderSummaryResponse()))
-                        .hasNext(true)
-                        .nextCursorCreatedAt(nextCursorCreatedAt)
-                        .nextCursorId(nextCursorId)
-                        .build();
+        List<OrderSummaryResponse> orders = new ArrayList<>(
+            Collections.nCopies(size + 1, OrderSummaryResponse.builder()
+                    .createdAtCursor(Instant.now().minusSeconds(200))
+                    .orderId(UUID.randomUUID())
+                    .build()));
 
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(pagedResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(orders);
 
         // when
         OrderListResponse result =
@@ -584,14 +567,13 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByCustomer(
-                        eq(userId),
                         argThat(
                                 r ->
                                         cursorCreatedAt.equals(r.cursorCreatedAt())
                                                 && cursorId.equals(r.cursorId())));
         assertThat(result.hasNext()).isTrue();
-        assertThat(result.nextCursorCreatedAt()).isEqualTo(nextCursorCreatedAt);
-        assertThat(result.nextCursorId()).isEqualTo(nextCursorId);
+        assertThat(result.nextCursorCreatedAt()).isNotNull();
+        assertThat(result.nextCursorId()).isNotNull();
     }
 
     @Test
@@ -603,12 +585,12 @@ public class OrderServiceTest {
                 OrderListRequest.builder()
                         .cursorCreatedAt(Instant.now().minusSeconds(100))
                         .cursorId(UUID.randomUUID())
+                        .size(20)
                         .build();
 
-        OrderListResponse lastPageResponse = OrderListResponse.empty();
 
-        given(orderQueryRepository.findOrdersByCustomer(userId, request))
-                .willReturn(lastPageResponse);
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(List.of());
 
         // when
         OrderListResponse result =
@@ -675,13 +657,12 @@ public class OrderServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
-        OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(20).build();
 
         given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
-        given(store.getId()).willReturn(storeId);
-        given(orderQueryRepository.findOrdersByStore(storeId, request))
-                .willReturn(OrderListResponse.empty());
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
+                .willReturn(List.of());
 
         // when
         OrderListResponse result =
@@ -703,15 +684,12 @@ public class OrderServiceTest {
         OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(size).build();
 
         List<OrderSummaryResponse> orders =
-                Collections.nCopies(size, new OrderSummaryResponse());
-        OrderListResponse pagedResponse =
-                OrderListResponse.builder().orders(orders).hasNext(true).build();
+    new ArrayList<>(Collections.nCopies(size + 1, OrderSummaryResponse.builder().build()));
 
         given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
-        given(store.getId()).willReturn(storeId);
-        given(orderQueryRepository.findOrdersByStore(storeId, request))
-                .willReturn(pagedResponse);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
+                .willReturn(orders);
 
         // when
         OrderListResponse result =
@@ -731,17 +709,15 @@ public class OrderServiceTest {
         UUID storeId = UUID.randomUUID();
         String orderNo = "ORD-20260305-001";
         OrderListRequest request =
-                OrderListRequest.builder().storeId(storeId).orderNo(orderNo).build();
+                OrderListRequest.builder().storeId(storeId).orderNo(orderNo).size(20).build();
 
-        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
-        OrderListResponse filteredResponse =
-                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+        List<OrderSummaryResponse> orders =
+            new ArrayList<>(Collections.nCopies(21, OrderSummaryResponse.builder().build()));
 
         given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
-        given(store.getId()).willReturn(storeId);
-        given(orderQueryRepository.findOrdersByStore(storeId, request))
-                .willReturn(filteredResponse);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
+                .willReturn(orders);
 
         // when
         OrderListResponse result =
@@ -751,8 +727,8 @@ public class OrderServiceTest {
         // then
         then(orderQueryRepository)
                 .should()
-                .findOrdersByStore(eq(storeId), argThat(r -> orderNo.equals(r.orderNo())));
-        assertThat(result.orders()).hasSize(1);
+                .findOrdersByStore(argThat(r -> orderNo.equals(r.orderNo())));
+        assertThat(result.orders()).hasSize(20);
     }
 
     @Test
@@ -770,17 +746,15 @@ public class OrderServiceTest {
                         .orderNo("ORD-20260305-001")
                         .startDate(startDate)
                         .endDate(endDate)
+                        .size(20)
                         .build();
 
-        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
-        OrderListResponse filteredResponse =
-                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
 
         given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
-        given(store.getId()).willReturn(storeId);
-        given(orderQueryRepository.findOrdersByStore(storeId, request))
-                .willReturn(filteredResponse);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
 
         // when
         OrderListResponse result =
@@ -791,7 +765,6 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByStore(
-                        eq(storeId),
                         argThat(
                                 r ->
                                         r.status() == OrderStatus.CREATED

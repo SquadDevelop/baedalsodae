@@ -18,4 +18,16 @@ public record OrderListResponse(
                 .hasNext(false)
                 .build();
     }
+
+     public static OrderListResponse from(List<OrderSummaryResponse> orders, boolean hasNext) {
+        if (orders.isEmpty()) return empty();
+
+        OrderSummaryResponse lastOrder = orders.get(orders.size() - 1);
+        return OrderListResponse.builder()
+                .orders(orders)
+                .hasNext(hasNext)
+                .nextCursorCreatedAt(hasNext ? lastOrder.createdAtCursor() : null)
+                .nextCursorId(hasNext ? lastOrder.orderId() : null)
+                .build();
+    }
 }

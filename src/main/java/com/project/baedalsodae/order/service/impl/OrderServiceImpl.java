@@ -4,10 +4,12 @@ import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
+import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
@@ -116,7 +118,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderListResponse getCustomerOrders(UUID userId, OrderListRequest request) {
-        return orderQueryRepository.findOrdersByCustomer(userId, request);
+        OrderListQuery query = OrderListQuery.forCustomer(userId, request);
+        List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByCustomer(query);
+
+        boolean hasNext = orders.size() > query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
     }
 
     private OrderListResponse getOwnerOrders(UUID userId, OrderListRequest request) {
@@ -125,7 +133,13 @@ public class OrderServiceImpl implements OrderService {
         if (!store.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
-        return orderQueryRepository.findOrdersByStore(store.getId(), request);
+        OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
+
+        List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+        boolean hasNext = orders.size() >  query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
