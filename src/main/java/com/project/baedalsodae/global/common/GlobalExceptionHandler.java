@@ -14,6 +14,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -28,26 +30,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus()).body(ApiResponse.error(errorCode));
     }
 
-    @ExceptionHandler(SystemException.class)
-    public ResponseEntity<ApiResponse<Void>> handleSystemException(SystemException exception) {
+  @ExceptionHandler({
+          SystemException.class,
+          SystemException.class,
+          SystemException.class,
+          SystemException.class,
+          SystemException.class,
+          SystemException.class,
+          SystemException.class
+  })
+  public ResponseEntity<ApiResponse<Void>> handleSystemException(Exception exception) {
         log.error("System Exception: ", exception);
-
-        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<String>> handleValidationException(
-            MethodArgumentNotValidException exception) {
-        log.warn("Validation Exception: ", exception);
-
-        String message =
-                exception.getBindingResult().getFieldErrors().stream()
-                        .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                        .collect(Collectors.joining(", "));
-
-        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
+      ApiResponse apiResponse = ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR);
+        return ResponseEntity
+                .status(exception.getStatusCode)
+                .body(apiResponse);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -63,20 +60,6 @@ public class GlobalExceptionHandler {
         String message =
                 String.format(
                         "'%s' 파라미터의 값이 올바르지 않습니다: %s", exception.getName(), exception.getValue());
-
-        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiResponse<String>> handleConstraintViolation(
-            ConstraintViolationException exception) {
-        log.warn("Constraint Violation: ", exception);
-
-        String message =
-                exception.getConstraintViolations().stream()
-                        .map(v -> v.getPropertyPath() + ": " + v.getMessage())
-                        .collect(Collectors.joining(", "));
 
         return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
@@ -133,6 +116,41 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ErrorCode.DATA_INTEGRITY_VIOLATION));
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(
+            DataIntegrityViolationException exception) {
+        return 응답_생성(ErrorCode.DATA_INTEGRITY_VIOLATION);
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<String>> handleConstraintViolation(
+            ConstraintViolationException exception) {
+        log.warn("Constraint Violation: ", exception);
+
+        String message =
+                exception.getConstraintViolations().stream()
+                        .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                        .collect(Collectors.joining(", "));
+
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
+                .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<String>> handleValidationException(
+            MethodArgumentNotValidException exception) {
+        log.warn("Validation Exception: ", exception);
+
+        String message =
+                exception.getBindingResult().getFieldErrors().stream()
+                        .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                        .collect(Collectors.joining(", "));
+
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
+                .body(ApiResponse.error(ErrorCode.INVALID_REQUEST, message));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception exception) {
 
@@ -140,5 +158,12 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
+    }
+
+    // debug, info, error, warn, trace, fetal : log level
+    private ResponseEntity 응답_생성(ErrorCode errorCode) {
+        log.error("some Exception : {},{}", errorCode.getCode(), errorCode.getMessage());
+        return ResponseEntity.status(errorCode.getStatus())
+                .body(ApiResponse.error(errorCode));
     }
 }

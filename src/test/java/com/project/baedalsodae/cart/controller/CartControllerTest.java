@@ -11,6 +11,7 @@ import com.project.baedalsodae.cart.dto.request.AddCartItemRequest;
 import com.project.baedalsodae.cart.dto.request.UpdateCartItemQuantityRequest;
 import com.project.baedalsodae.cart.dto.response.CartResponse;
 import com.project.baedalsodae.cart.service.CartService;
+import com.project.baedalsodae.common.WebMvcTestBase;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.SuccessCode;
@@ -29,20 +30,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CartController.class)
 @AutoConfigureMockMvc(addFilters = false)
-class CartControllerTest {
-
-    @Autowired private MockMvc mockMvc;
-
-    @Autowired private ObjectMapper objectMapper;
+class CartControllerTest extends WebMvcTestBase {
 
     @MockitoBean private CartService cartService;
-
-    private UUID userId;
-
-    @BeforeEach
-    void setUp() {
-        userId = UUID.randomUUID();
-    }
 
     @Test
     @DisplayName("성공 - 장바구니 조회")
