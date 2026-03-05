@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.service.impl;
+package com.project.baedalsodae.store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,11 +9,12 @@ import static org.mockito.Mockito.verify;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.PatchStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
 import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
+import com.project.baedalsodae.store.service.impl.StoreCategoryServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class StoreCategoryServiceImplTest {
+class StoreCategoryServiceTest {
 
     @Mock private StoreCategoryRepository storeCategoryRepository;
 
@@ -89,11 +90,11 @@ class StoreCategoryServiceImplTest {
     void patchStoreCategory_Success() {
         UUID id = UUID.randomUUID();
         StoreCategory existingCategory = StoreCategory.createStoreCategory("일식", "초밥");
-        PatchStoreCategoryRequest request = new PatchStoreCategoryRequest("새로운 일식", "라멘 포함");
+        UpdateStoreCategoryRequest request = new UpdateStoreCategoryRequest("새로운 일식", "라멘 포함");
 
         given(storeCategoryRepository.findById(id)).willReturn(Optional.of(existingCategory));
 
-        storeCategoryService.patchStoreCategory(request, id);
+        storeCategoryService.updateStoreCategory(request, id);
 
         assertThat(existingCategory.getName()).isEqualTo("새로운 일식");
         assertThat(existingCategory.getDescription()).isEqualTo("라멘 포함");
@@ -115,10 +116,10 @@ class StoreCategoryServiceImplTest {
     @DisplayName("존재하지 않는 카테고리 수정 시 예외 발생")
     void patchStoreCategory_NotFound() {
         UUID id = UUID.randomUUID();
-        PatchStoreCategoryRequest request = new PatchStoreCategoryRequest("이름", "설명");
+        UpdateStoreCategoryRequest request = new UpdateStoreCategoryRequest("이름", "설명");
         given(storeCategoryRepository.findById(id)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> storeCategoryService.patchStoreCategory(request, id))
+        assertThatThrownBy(() -> storeCategoryService.updateStoreCategory(request, id))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.STORE_CATEGORY_NOT_FOUND.getMessage());
     }

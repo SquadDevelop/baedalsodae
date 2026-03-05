@@ -47,8 +47,8 @@ public class Store extends BaseAuditEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "rating_sum", nullable = false)
-    private int ratingSum = 0;
+    @Column(name = "avg_rating", nullable = false)
+    private double avgRating = 0;
 
     @Column(name = "review_count", nullable = false)
     private int reviewCount = 0;
@@ -57,7 +57,7 @@ public class Store extends BaseAuditEntity {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
 
-    public void updateStore(
+    public void updateInfo(
             StoreCategory storeCategory,
             String name,
             String phone,

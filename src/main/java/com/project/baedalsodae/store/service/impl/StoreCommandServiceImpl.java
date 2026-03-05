@@ -55,7 +55,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
 
         StoreCategory storeCategory = getStoreCategory(request.getStoreCategoryId());
         Address address = request.getAddress().toEntity();
-        store.updateStore(
+        store.updateInfo(
                 storeCategory,
                 request.getStoreName(),
                 request.getStorePhone(),

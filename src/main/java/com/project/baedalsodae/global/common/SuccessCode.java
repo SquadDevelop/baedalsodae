@@ -26,10 +26,11 @@ public enum SuccessCode {
     STORE_CATEGORY_DELETED("SC204", HttpStatus.OK, "가게 카테고리 삭제 성공"),
 
     // store
+    STORE_LIST_FOUND("ST200", HttpStatus.OK, "가게 목록 조회 성공"),
     STORE_CREATED("ST201", HttpStatus.CREATED, "가게 등록 성공"),
-    STORE_UPDATED("ST200", HttpStatus.OK, "가게 정보 수정 성공"),
-    STORE_STATUS_UPDATED("ST200", HttpStatus.OK, "가게 영업 상태 변경 성공"),
-    STORE_DELETED("ST200", HttpStatus.OK, "가게 삭제 성공"),
+    STORE_UPDATED("ST202", HttpStatus.OK, "가게 정보 수정 성공"),
+    STORE_STATUS_UPDATED("ST203", HttpStatus.OK, "가게 영업 상태 변경 성공"),
+    STORE_DELETED("ST204", HttpStatus.OK, "가게 삭제 성공"),
 
     // menu category
     MENU_CATEGORY_CREATED("MC201", HttpStatus.CREATED, "메뉴 카테고리 생성 성공"),

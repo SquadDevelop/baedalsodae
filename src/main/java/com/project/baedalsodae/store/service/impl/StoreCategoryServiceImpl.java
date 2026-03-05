@@ -3,7 +3,7 @@ package com.project.baedalsodae.store.service.impl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.PatchStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
 import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryResponse;
@@ -25,7 +25,7 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
     public StoreCategoryListResponse getActiveStoreCategories() {
         List<StoreCategoryResponse> storeCategoryResponseList =
                 storeCategoryRepository.findAllByIsDeletedFalse().stream()
-                        .map(StoreCategoryResponse::from)
+                        .map(StoreCategoryResponse::fromEntity)
                         .toList();
 
         return StoreCategoryListResponse.fromList(storeCategoryResponseList);
@@ -34,7 +34,7 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
     @Override
     public StoreCategoryDetailResponse getStoreCategoryDetail(UUID storeCategoryId) {
         StoreCategory storeCategory = getStoreCategory(storeCategoryId);
-        return StoreCategoryDetailResponse.fromStoreCategory(storeCategory);
+        return StoreCategoryDetailResponse.fromEntity(storeCategory);
     }
 
     @Override
@@ -47,9 +47,9 @@ public class StoreCategoryServiceImpl implements StoreCategoryService {
 
     @Override
     @Transactional
-    public void patchStoreCategory(PatchStoreCategoryRequest request, UUID storeCategoryId) {
+    public void updateStoreCategory(UpdateStoreCategoryRequest request, UUID storeCategoryId) {
         StoreCategory storeCategory = getStoreCategory(storeCategoryId);
-        storeCategory.patchStoreCategory(request.getName(), request.getDescription());
+        storeCategory.updateInfo(request.getName(), request.getDescription());
     }
 
     @Override
