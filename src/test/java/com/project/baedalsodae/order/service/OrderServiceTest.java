@@ -478,4 +478,32 @@ public class OrderServiceTest {
                                                 && endDate.equals(r.endDate())));
         assertThat(result.orders()).hasSize(1);
     }
+
+    @Test
+    @DisplayName("성공 - 가게명 혹은 메뉴명 검색")
+    void getOrders_success_keywordFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        String keyword = "치킨";
+        OrderListRequest request = OrderListRequest.builder().keyword(keyword).build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
+        OrderListResponse filteredResponse =
+                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(filteredResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        eq(userId), argThat(r -> keyword.equals(r.keyword())));
+        assertThat(result.orders()).hasSize(1);
+    }
 }

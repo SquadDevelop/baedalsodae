@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record OrderListRequest(
-        OrderStatus status, LocalDate startDate, LocalDate endDate, Integer size) {
+        OrderStatus status, LocalDate startDate, LocalDate endDate, String keyword, Integer size) {
 
 	public LocalDate resolvedStartDate() {
         return startDate != null ? startDate : LocalDate.now().minusMonths(3);
