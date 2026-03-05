@@ -30,7 +30,10 @@ public enum SuccessCode {
     STORE_UPDATED("ST200", HttpStatus.OK, "가게 정보 수정 성공"),
     STORE_STATUS_UPDATED("ST200", HttpStatus.OK, "가게 영업 상태 변경 성공"),
     STORE_DELETED("ST200", HttpStatus.OK, "가게 삭제 성공"),
-    ;
+
+    // payment
+    PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),
+    PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공");
 
     private final String code;
     private final HttpStatus status;
