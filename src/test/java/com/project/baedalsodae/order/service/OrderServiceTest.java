@@ -876,6 +876,31 @@ public class OrderServiceTest {
         // when
         OrderDetailResponse response =
                 orderService.getOrderDetail(userId, userRole, storeId, orderId);
+        log.info("response = " + response);
+
+        // then
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("성공 - OWNER 단건 정상 조회")
+    void getOrderDetail_success_owner() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        given(order.getStoreId()).willReturn(storeId);
+
+        given(orderRepository.findOrderWithItemsById(orderId))
+                .willReturn(Optional.of(order));
+
+        // when
+        OrderDetailResponse response =
+                orderService.getOrderDetail(userId, userRole, storeId, orderId);
+        log.info("response = " + response);
 
         // then
         assertThat(response).isNotNull();
