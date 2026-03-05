@@ -18,6 +18,7 @@ public enum SuccessCode {
     // order
     ORDER_CREATED("OR201", HttpStatus.CREATED, "주문 생성 성공"),
     ORDER_LIST("OR202", HttpStatus.OK, "주문 목록 조회 성공"),
+    ORDER_DETAIL("OR202", HttpStatus.OK, "주문 상세 조회 성공"),
     ORDER_STATUS("OR203", HttpStatus.OK, "주문 상태 조회 성공"),
 
     // store category
