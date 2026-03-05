@@ -33,4 +33,4 @@ encryption:
     key: ${ENCRYPTION_AES_KEY}
 
 pg:
-  url: http://localhost:8999
+  url: http://localhost:8089
