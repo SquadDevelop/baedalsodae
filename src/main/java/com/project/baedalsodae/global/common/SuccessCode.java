@@ -40,8 +40,7 @@ public enum SuccessCode {
 
     // payment
     PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),
-    PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공")
-    ;
+    PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공");
 
     private final String code;
     private final HttpStatus status;
