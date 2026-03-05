@@ -16,10 +16,9 @@ import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.store.service.impl.StoreCommandServiceImpl;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.project.baedalsodae.store.service.impl.StoreCommandServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

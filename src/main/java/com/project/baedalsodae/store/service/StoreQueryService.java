@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface StoreQueryService {
     void getStoreDetail(UUID storeId, UUID userId);
+
     StorePageResponse getStorePage(
             UUID storeCategoryId, StoreCursorRequest cursorRequest, SortType sortType);
 }

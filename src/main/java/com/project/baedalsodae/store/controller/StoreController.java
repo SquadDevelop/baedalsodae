@@ -12,7 +12,6 @@ import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
 import jakarta.validation.Valid;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +28,9 @@ public class StoreController {
     public ResponseEntity<ApiResponse<StorePageResponse>> getStorePageByStoreCategory(
             @RequestParam UUID storeCategoryId,
             @ModelAttribute StoreCursorRequest cursorRequest,
-            @RequestParam SortType sortType
-    ){
-        StorePageResponse response = storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
+            @RequestParam SortType sortType) {
+        StorePageResponse response =
+                storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
         return ResponseEntity.ok(ApiResponse.success("", response));
     }
 

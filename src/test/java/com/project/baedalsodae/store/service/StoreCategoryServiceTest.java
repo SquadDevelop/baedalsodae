@@ -14,12 +14,11 @@ import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
+import com.project.baedalsodae.store.service.impl.StoreCategoryServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.project.baedalsodae.store.service.impl.StoreCategoryServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

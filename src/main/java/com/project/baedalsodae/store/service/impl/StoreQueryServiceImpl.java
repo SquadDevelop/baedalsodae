@@ -10,11 +10,10 @@ import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
 import com.project.baedalsodae.store.service.StoreQueryService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +22,11 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final StoreCategoryRepository storeCategoryRepository;
 
     @Override
-    public void getStoreDetail(UUID storeId, UUID userId) {
-
-    }
+    public void getStoreDetail(UUID storeId, UUID userId) {}
 
     @Override
-    public StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest, SortType sortType) {
+    public StorePageResponse getStorePage(
+            UUID storeCategoryId, StoreCursorRequest cursorRequest, SortType sortType) {
         cursorRequest.validate(sortType);
 
         StoreCategory storeCategory = getStoreCategory(storeCategoryId);
