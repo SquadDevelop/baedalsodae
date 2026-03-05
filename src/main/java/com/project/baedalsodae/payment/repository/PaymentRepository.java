@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     @Query(
-        """
+            """
             SELECT p
             FROM Payment p
             WHERE (:cursor IS NULL OR p.createdAt < :cursor)

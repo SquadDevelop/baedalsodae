@@ -1,7 +1,6 @@
 package com.project.baedalsodae.payment.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
-import com.project.baedalsodae.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +20,12 @@ public class Payment extends BaseTimeEntity {
     private UUID id;
 
     //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "order_id", nullable = false)
+    //    @JoinColumn(name = "order_id", nullable = false)
     @Column(name = "order_id", nullable = false)
     private UUID order;
 
     //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
+    //    @JoinColumn(name = "user_id", nullable = false)
     @Column(name = "user_id", nullable = false)
     private UUID user;
 
@@ -48,7 +47,15 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "updated_by", nullable = false)
     private UUID updatedBy;
 
-    public Payment(UUID order, UUID user, BigDecimal amount, PaymentMethod paymentMethod, PaymentStatus status, LocalDateTime paidAt, UUID createdBy, UUID updatedBy) {
+    public Payment(
+            UUID order,
+            UUID user,
+            BigDecimal amount,
+            PaymentMethod paymentMethod,
+            PaymentStatus status,
+            LocalDateTime paidAt,
+            UUID createdBy,
+            UUID updatedBy) {
         validate(order, user, amount, paymentMethod, status, paidAt);
         this.order = order;
         this.user = user;
@@ -60,7 +67,13 @@ public class Payment extends BaseTimeEntity {
         this.updatedBy = updatedBy;
     }
 
-    private void validate(UUID order, UUID user, BigDecimal amount, PaymentMethod paymentMethod, PaymentStatus status, LocalDateTime paidAt) {
+    private void validate(
+            UUID order,
+            UUID user,
+            BigDecimal amount,
+            PaymentMethod paymentMethod,
+            PaymentStatus status,
+            LocalDateTime paidAt) {
         if (order == null) {
             throw new IllegalArgumentException("주문 ID는 null일 수 없습니다.");
         }
@@ -70,18 +83,26 @@ public class Payment extends BaseTimeEntity {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("금액은 0보다 커야 합니다.");
         }
-        if(paymentMethod == null) {
+        if (paymentMethod == null) {
             throw new IllegalArgumentException("결제 수단은 null일 수 없습니다.");
         }
-        if(status != PaymentStatus.PENDING) {
+        if (status != PaymentStatus.PENDING) {
             throw new IllegalArgumentException("결제 상태는 PENDING으로 초기화되어야 합니다.");
         }
-        if(paidAt != null) {
+        if (paidAt != null) {
             throw new IllegalArgumentException("결제 시각은 null로 초기화되어야 합니다.");
         }
     }
 
-    public static Payment create(UUID order, UUID user, BigDecimal amount, PaymentMethod paymentMethod, PaymentStatus status, LocalDateTime paidAt, UUID createdBy) {
-        return new Payment(order, user, amount, paymentMethod, status, paidAt, createdBy, createdBy);
+    public static Payment create(
+            UUID order,
+            UUID user,
+            BigDecimal amount,
+            PaymentMethod paymentMethod,
+            PaymentStatus status,
+            LocalDateTime paidAt,
+            UUID createdBy) {
+        return new Payment(
+                order, user, amount, paymentMethod, status, paidAt, createdBy, createdBy);
     }
 }

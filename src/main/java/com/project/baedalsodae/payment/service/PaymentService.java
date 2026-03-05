@@ -2,14 +2,13 @@ package com.project.baedalsodae.payment.service;
 
 import com.project.baedalsodae.global.common.TimeCursorPage;
 import com.project.baedalsodae.payment.dto.response.PaymentResponse;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public interface PaymentService {
 
-  TimeCursorPage<List<PaymentResponse>> getPayments(Instant cursor, int size);
+    TimeCursorPage<List<PaymentResponse>> getPayments(Instant cursor, int size);
 
-  PaymentResponse getPayment(UUID paymentId);
+    PaymentResponse getPayment(UUID paymentId);
 }

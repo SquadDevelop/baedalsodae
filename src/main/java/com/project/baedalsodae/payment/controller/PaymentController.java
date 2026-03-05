@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,13 +23,18 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<TimeCursorPage<PaymentResponse>>> getPayments(Instant cursor, int size) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.PAYMENT_HISTORY_FOUND, paymentService.getPayments(cursor, size)));
+    public ResponseEntity<ApiResponse<TimeCursorPage<List<PaymentResponse>>>> getPayments(
+            Instant cursor, int size) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        SuccessCode.PAYMENT_HISTORY_FOUND,
+                        paymentService.getPayments(cursor, size)));
     }
 
     @GetMapping("/{paymentId}")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPayment(@PathVariable UUID paymentId) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.PAYMENT_DETAIL_FOUND, paymentService.getPayment(paymentId)));
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        SuccessCode.PAYMENT_DETAIL_FOUND, paymentService.getPayment(paymentId)));
     }
-
 }
