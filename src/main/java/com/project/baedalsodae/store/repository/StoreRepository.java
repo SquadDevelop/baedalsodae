@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface StoreRepository extends JpaRepository<Store, UUID> {
     Boolean existsByBusinessNumber(String businessNumber);
 
-    Optional<Store> findByIdAndDeletedIsFalse(UUID id);
+    Optional<Store> findByIdAndIsDeletedIsFalse(UUID id);
 }

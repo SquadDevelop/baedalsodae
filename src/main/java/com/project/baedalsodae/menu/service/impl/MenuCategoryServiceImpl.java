@@ -32,7 +32,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
             UUID storeId, MenuCategoryPostRequestDto request) {
         Store store =
                 storeRepository
-                        .findByIdAndDeletedIsFalse(storeId)
+                        .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         int maxOrderNo =
                 menuCategoryRepository
