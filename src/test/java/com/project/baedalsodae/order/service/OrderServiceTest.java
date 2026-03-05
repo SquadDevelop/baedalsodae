@@ -773,4 +773,26 @@ public class OrderServiceTest {
                                                 && endDate.equals(r.endDate())));
         assertThat(result.getOrders()).hasSize(1);
     }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문 조회")
+    void getOrderDetail_fail_not_found() {
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderDetail(userId, orderId));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
 }

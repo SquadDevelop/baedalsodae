@@ -8,6 +8,7 @@ import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.entity.Order;
@@ -146,5 +147,15 @@ public class OrderServiceImpl implements OrderService {
         if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_DATE_RANGE);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetail(UUID userId, UUID orderId) {
+
+        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        return null;
     }
 }
