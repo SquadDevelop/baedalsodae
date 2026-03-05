@@ -506,4 +506,45 @@ public class OrderServiceTest {
                         eq(userId), argThat(r -> keyword.equals(r.keyword())));
         assertThat(result.orders()).hasSize(1);
     }
+
+    @Test
+    @DisplayName("성공 - 복합 필터 조회 (status + keyword + 날짜 범위)")
+    void getOrders_success_combinedFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2026, 3, 1);
+        LocalDate endDate = LocalDate.of(2026, 3, 5);
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .status(OrderStatus.CREATED)
+                        .keyword("치킨")
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
+        OrderListResponse filteredResponse =
+                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(filteredResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        eq(userId),
+                        argThat(
+                                r ->
+                                        r.status() == OrderStatus.CREATED
+                                                && "치킨".equals(r.keyword())
+                                                && startDate.equals(r.startDate())
+                                                && endDate.equals(r.endDate())));
+        assertThat(result.orders()).hasSize(1);
+    }
 }
