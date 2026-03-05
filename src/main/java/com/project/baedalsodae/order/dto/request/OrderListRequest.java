@@ -12,6 +12,7 @@ public record OrderListRequest(
         LocalDate startDate,
         LocalDate endDate,
         String keyword,
+        String orderNo,
         UUID storeId,
         Integer size,
         Instant cursorCreatedAt,

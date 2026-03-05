@@ -722,4 +722,36 @@ public class OrderServiceTest {
         assertThat(result.orders()).hasSize(size);
         assertThat(result.hasNext()).isTrue();
     }
+
+    @Test
+    @DisplayName("성공 - 주문번호(orderNo) 검색")
+    void getOrders_owner_success_orderNoFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        String orderNo = "ORD-20260305-001";
+        OrderListRequest request =
+                OrderListRequest.builder().storeId(storeId).orderNo(orderNo).build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
+        OrderListResponse filteredResponse =
+                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(store.getId()).willReturn(storeId);
+        given(orderQueryRepository.findOrdersByStore(storeId, request))
+                .willReturn(filteredResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByStore(eq(storeId), argThat(r -> orderNo.equals(r.orderNo())));
+        assertThat(result.orders()).hasSize(1);
+    }
 }
