@@ -14,6 +14,7 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
+import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
@@ -24,6 +25,7 @@ import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -340,5 +342,29 @@ public class OrderServiceTest {
         then(eventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
+    }
+
+    // ======================== getOrders ========================
+
+    @Test
+    @DisplayName("실패 - 잘못된 날짜 범위 (endDate < startDate)")
+    void getOrders_fail_invalidDateRange() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .startDate(LocalDate.of(2026, 3, 5))
+                        .endDate(LocalDate.of(2026, 3, 1))
+                        .build();
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.getOrders(userId, "CUSTOMER", request));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_DATE_RANGE);
     }
 }

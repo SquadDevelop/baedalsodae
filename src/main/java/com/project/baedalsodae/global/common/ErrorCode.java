@@ -58,6 +58,7 @@ public enum ErrorCode {
     // order
     ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
     ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
+    ORDER_INVALID_DATE_RANGE("OD003", HttpStatus.BAD_REQUEST, "종료일은 시작일보다 이후여야 합니다."),
     ;
 
     private final String code;

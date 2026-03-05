@@ -5,7 +5,9 @@ import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
+import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -96,5 +99,18 @@ public class OrderServiceImpl implements OrderService {
         eventPublisher.publishOrderCreated(savedOrder);
 
         return CreateOrderResponse.from(savedOrder);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
+        validateDateRange(request.startDate(), request.endDate());
+        return null;
+    }
+
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_DATE_RANGE);
+        }
     }
 }
