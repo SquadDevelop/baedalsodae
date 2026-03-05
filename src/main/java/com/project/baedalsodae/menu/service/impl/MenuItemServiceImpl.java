@@ -116,6 +116,12 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+        UUID menuCategoryId = item.getMenuCategory().getId();
+
+        List<MenuItem> menuItems =
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(
+                        menuCategoryId);
+        OrderUtil.deleteAndShift(menuItems, item);
         item.softDelete(null); // 토큰 기능 추가 시 수정 필요
     }
 

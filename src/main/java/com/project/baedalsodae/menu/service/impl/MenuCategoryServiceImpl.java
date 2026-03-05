@@ -68,6 +68,12 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
                         .findByIdAndDeletedIsFalse(menuCategoryId)
                         .orElseThrow(
                                 () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+
+        UUID storeId = menuCategory.getStore().getId();
+        List<MenuCategory> menuCategories =
+                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId);
+
+        OrderUtil.deleteAndShift(menuCategories, menuCategory);
         menuCategory.softDelete(null); // / 토큰 기능 추가 시 수정 필요
     }
 
