@@ -30,10 +30,14 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Transactional
     public MenuCategoryResponseDto createMenuCategory(
             UUID storeId, MenuCategoryPostRequestDto request) {
+
         Store store =
                 storeRepository
                         .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        if (existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
+        }
         int maxOrderNo =
                 menuCategoryRepository
                         .findMaxOrderNoByStoreIdAndDeletedIsFalse((storeId))
@@ -56,6 +60,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
                         .findByIdAndDeletedIsFalse(menuCategoryId)
                         .orElseThrow(
                                 () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        if (!menuCategory.getName().equals(request.name())
+                && existsByStoreIdAndNameAndDeletedIsFalse(
+                        menuCategory.getStore().getId(), request.name())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
+        }
         menuCategory.changeMenuCategoryName(request.name());
         return MenuCategoryResponseDto.fromEntity(menuCategory);
     }
@@ -112,5 +121,14 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         List<MenuCategory> menuCategories =
                 menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId);
         return MenuCategoryResponseDto.fromEntityList(menuCategories);
+    }
+
+    @Override
+    public boolean isDuplicateMenuCategoryName(UUID storeId, String name) {
+        return existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
+    }
+
+    private boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name) {
+        return menuCategoryRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
     }
 }

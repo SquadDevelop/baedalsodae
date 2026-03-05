@@ -71,4 +71,12 @@ public class StoreController {
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessCode.MENU_CATEGORY_LIST_FOUND, response));
     }
+
+    @GetMapping("/{storeId}/menu-categories/duplicate-check")
+    public ResponseEntity<ApiResponse<Boolean>> checkDuplicateMenuCategoryName(
+            @PathVariable UUID storeId, @RequestParam String name) {
+        boolean isDuplicate = menuCategoryService.isDuplicateMenuCategoryName(storeId, name);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.MENU_CATEGORY_NAME_DUPLICATE_CHECKED, isDuplicate));
+    }
 }
