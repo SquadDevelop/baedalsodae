@@ -41,6 +41,16 @@ public class MenuCategory extends BaseAuditEntity implements Orderable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Store store;
 
+    private MenuCategory(Store store, String name, int orderNo) {
+        this.store = store;
+        this.name = name;
+        this.orderNo = orderNo;
+    }
+
+    public static MenuCategory create(Store store, String name, int orderNo) {
+        return new MenuCategory(store, name, orderNo);
+    }
+
     public void changeMenuCategoryName(String name) {
         this.name = name;
     }

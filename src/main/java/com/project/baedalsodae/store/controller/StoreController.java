@@ -2,11 +2,15 @@ package com.project.baedalsodae.store.controller;
 
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
+import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
+import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
+import com.project.baedalsodae.menu.service.MenuCategoryService;
 import com.project.baedalsodae.store.dto.request.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/stores")
 public class StoreController {
     private final StoreCommandService storeCommandService;
+    private final MenuCategoryService menuCategoryService;
 
     // TODO 인증 도메인 완료되면, userId 추가
     @PostMapping
@@ -50,5 +55,20 @@ public class StoreController {
             @RequestHeader("X-User-Id") UUID userId, @PathVariable UUID storeId) {
         storeCommandService.deleteStore(storeId, userId);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DELETED, null));
+    }
+
+    @PostMapping("/{storeId}/menu-categories")
+    public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(
+            @PathVariable UUID storeId, @RequestBody @Valid MenuCategoryPostRequestDto request) {
+        MenuCategoryResponseDto response = menuCategoryService.createMenuCategory(storeId, request);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_CREATED, response));
+    }
+
+    @GetMapping("/{storeId}/menu-categories")
+    public ResponseEntity<ApiResponse<List<MenuCategoryResponseDto>>> getMenuCategories(
+            @PathVariable UUID storeId) {
+        List<MenuCategoryResponseDto> response = menuCategoryService.getMenuCategories(storeId);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.MENU_CATEGORY_LIST_FOUND, response));
     }
 }

@@ -144,11 +144,20 @@ public class MenuItemServiceImpl implements MenuItemService {
         UUID menuCategoryId = item.getMenuCategory().getId();
 
         List<MenuItem> menuItems =
-                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(
                         menuCategoryId);
 
         OrderUtil.reorder(menuItems, item, from, to);
         return MenuItemResponseDto.fromEntity(item);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId) {
+        List<MenuItem> menuItems =
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId);
+
+        return menuItems.stream().map(MenuItemResponseDto::fromEntity).toList();
     }
 
     private boolean existsByNameAndMenuCategoryIdAndDeletedIsFalse(
