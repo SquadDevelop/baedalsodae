@@ -7,10 +7,7 @@ import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
-import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
-import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
-import com.project.baedalsodae.order.dto.response.OrderListResponse;
-import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
+import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
@@ -167,5 +164,23 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return OrderDetailResponse.from(order);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderStatusResponse getOrderStatus(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
+                && !order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+        return null;
     }
 }

@@ -905,4 +905,82 @@ public class OrderServiceTest {
         // then
         assertThat(response).isNotNull();
     }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void getOrderStatus_fail_order_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderStatus(userId, userRole, storeId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 주문이 아님 (CUSTOMER)")
+    void getOrderStatus_fail_not_my_order() {
+
+        // given
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(order.getUserId()).willReturn(userId2);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderStatus(userId1, userRole, storeId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님 (OWNER)")
+    void getOrderStatus_fail_not_my_store_order() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId1 = UUID.randomUUID();
+        UUID storeId2 = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        given(order.getStoreId()).willReturn(storeId2);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderStatus(userId, userRole, storeId1, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
 }
