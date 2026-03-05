@@ -42,6 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -72,6 +73,8 @@ public class OrderServiceTest {
     @Mock private OrderEventPublisher eventPublisher;
 
     @Mock private OrderQueryRepository orderQueryRepository;
+
+    @Mock private Order order;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -780,6 +783,7 @@ public class OrderServiceTest {
         // given
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
 
         given(orderRepository.findByIdAndIsDeletedFalse(orderId))
                 .willReturn(Optional.empty());
@@ -787,12 +791,40 @@ public class OrderServiceTest {
         // when
         Throwable throwable =
                 catchThrowable(
-                        () -> orderService.getOrderDetail(userId, orderId));
+                        () -> orderService.getOrderDetail(userId, userRole, orderId));
         log.info("throwable = " + throwable);
 
         // then
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 주문이 아님 (CUSTOMER)")
+    void getOrderDetail_fail_not_my_order() {
+
+        // given
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(order.getUserId()).willReturn(userId2);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderDetail(userId1, userRole, orderId));
+        log.info("throwable = " + throwable);
+
+        //then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
+
     }
 }
