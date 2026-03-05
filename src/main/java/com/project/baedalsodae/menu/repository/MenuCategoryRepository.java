@@ -21,5 +21,5 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID
     @Query(
             "SELECT c FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false ORDER "
                     + "BY c.orderNo ASC")
-    List<MenuCategory> findAllByStoreIdAndDeletedIsFalseForUpdate(UUID storeId);
+    List<MenuCategory> findAllByStoreIdAndDeletedIsFalseWithLock(UUID storeId);
 }

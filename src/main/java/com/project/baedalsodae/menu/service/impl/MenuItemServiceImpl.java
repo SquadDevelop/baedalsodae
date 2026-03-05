@@ -144,7 +144,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         UUID menuCategoryId = item.getMenuCategory().getId();
 
         List<MenuItem> menuItems =
-                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(
                         menuCategoryId);
 
         OrderUtil.reorder(menuItems, item, from, to);

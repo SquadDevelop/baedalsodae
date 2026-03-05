@@ -25,7 +25,6 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Transactional
     public MenuCategoryResponseDto updateMenuCategory(
             UUID menuCategoryId, MenuCategoryPutRequestDto request) {
-
         MenuCategory menuCategory =
                 menuCategoryRepository
                         .findByIdAndDeletedIsFalse(menuCategoryId)
@@ -68,7 +67,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         UUID storeId = menuCategory.getStore().getId();
 
         List<MenuCategory> menuCategories =
-                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseForUpdate(storeId);
+                menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId);
 
         OrderUtil.reorder(menuCategories, menuCategory, from, to);
         return MenuCategoryResponseDto.fromEntity(menuCategory);
