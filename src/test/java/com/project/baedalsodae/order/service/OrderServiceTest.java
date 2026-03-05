@@ -17,6 +17,7 @@ import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
+import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
@@ -28,10 +29,9 @@ import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
+import com.project.baedalsodae.user.entity.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -383,11 +383,36 @@ public class OrderServiceTest {
                 .willReturn(OrderListResponse.empty());
 
         // when
-        OrderListResponse result = orderService.getOrders(userId, "CUSTOMER", request);
+        OrderListResponse result = orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
         log.info("result = {}", result);
 
         // then
         assertThat(result.orders()).isEmpty();
         assertThat(result.hasNext()).isFalse();
+    }
+
+    @Test
+    @DisplayName("성공 - 내 주문 목록 조회 (페이징)")
+    void getOrders_success_paging() {
+        // given
+        UUID userId = UUID.randomUUID();
+        int size = 5;
+        OrderListRequest request = OrderListRequest.builder().size(size).build();
+
+        List<OrderSummaryResponse> orders =
+                Collections.nCopies(size, new OrderSummaryResponse());
+        OrderListResponse pagedResponse =
+                OrderListResponse.builder().orders(orders).hasNext(true).build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(pagedResponse);
+
+        // when
+        OrderListResponse result = orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.orders()).hasSize(size);
+        assertThat(result.hasNext()).isTrue();
     }
 }
