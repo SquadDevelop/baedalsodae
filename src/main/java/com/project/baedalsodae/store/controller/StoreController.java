@@ -31,7 +31,7 @@ public class StoreController {
             @RequestParam SortType sortType) {
         StorePageResponse response =
                 storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
-        return ResponseEntity.ok(ApiResponse.success("", response));
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_LIST_FOUND, response));
     }
 
     @PostMapping
