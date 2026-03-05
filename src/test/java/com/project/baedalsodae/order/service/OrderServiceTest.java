@@ -692,4 +692,34 @@ public class OrderServiceTest {
         assertThat(result.orders()).isEmpty();
         assertThat(result.hasNext()).isFalse();
     }
+
+    @Test
+    @DisplayName("성공 - 가게 주문 목록 조회 (페이징)")
+    void getOrders_owner_success_paging() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        int size = 5;
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(size).build();
+
+        List<OrderSummaryResponse> orders =
+                Collections.nCopies(size, new OrderSummaryResponse());
+        OrderListResponse pagedResponse =
+                OrderListResponse.builder().orders(orders).hasNext(true).build();
+
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(store.getId()).willReturn(storeId);
+        given(orderQueryRepository.findOrdersByStore(storeId, request))
+                .willReturn(pagedResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.orders()).hasSize(size);
+        assertThat(result.hasNext()).isTrue();
+    }
 }
