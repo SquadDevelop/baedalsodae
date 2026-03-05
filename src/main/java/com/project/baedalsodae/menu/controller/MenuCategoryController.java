@@ -9,6 +9,8 @@ import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
 import com.project.baedalsodae.menu.service.MenuCategoryService;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import jakarta.validation.Valid;
+
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,14 @@ public class MenuCategoryController {
     public ResponseEntity<ApiResponse<Void>> deleteMenuCategory(@PathVariable UUID menuCategoryId) {
         menuCategoryService.deleteMenuCategory(menuCategoryId);
         return ResponseEntity.ok(ApiResponse.success(""));
+    }
+
+
+    @GetMapping("/{menuCategoryId}/menu-items")
+    public ResponseEntity<ApiResponse<List<MenuItemResponseDto>>> getMenuItem(
+            @PathVariable UUID menuCategoryId) {
+        List<MenuItemResponseDto> response = menuItemService.getMenuItem(menuCategoryId);
+        return ResponseEntity.ok(ApiResponse.success("", response));
     }
 
     @PostMapping("/{menuCategoryId}/menu-items")

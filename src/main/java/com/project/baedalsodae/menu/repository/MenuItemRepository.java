@@ -29,4 +29,8 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
     @Query(
             "SELECT i FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false ORDER BY i.orderNo ASC")
     List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(UUID menuCategoryId);
+
+    @Query(
+            "SELECT i FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false ORDER BY i.orderNo ASC")
+    List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalse(UUID menuCategoryId);
 }
