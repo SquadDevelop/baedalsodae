@@ -668,4 +668,28 @@ public class OrderServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
     }
+
+    @Test
+    @DisplayName("성공 - 가게 주문 목록 조회 (빈 목록)")
+    void getOrders_owner_success_emptyList() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
+
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(store.getId()).willReturn(storeId);
+        given(orderQueryRepository.findOrdersByStore(storeId, request))
+                .willReturn(OrderListResponse.empty());
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.orders()).isEmpty();
+        assertThat(result.hasNext()).isFalse();
+    }
 }
