@@ -123,7 +123,7 @@ class StoreCommandServiceTest {
             storeCommandService.updateStore(request, storeId, userId);
 
             verify(store)
-                    .updateStore(
+                    .updateInfo(
                             eq(category),
                             eq("BHC치킨"),
                             eq("02-987-6543"),

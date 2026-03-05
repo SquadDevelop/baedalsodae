@@ -57,7 +57,7 @@ public class Store extends BaseAuditEntity {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
 
-    public void updateStore(
+    public void updateInfo(
             StoreCategory storeCategory,
             String name,
             String phone,

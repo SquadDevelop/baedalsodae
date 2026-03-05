@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PatchStoreCategoryRequest {
+public class UpdateStoreCategoryRequest {
     @NotEmpty
     @NotNull
     @Size(min = 2, max = 50)
