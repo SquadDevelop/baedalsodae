@@ -153,7 +153,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
 
-        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+        Order order = orderRepository.findOrderWithItemsById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
@@ -166,6 +166,6 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
 
-        return null;
+        return OrderDetailResponse.from(order);
     }
 }

@@ -18,6 +18,7 @@ import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
@@ -346,7 +347,7 @@ public class OrderServiceTest {
                 .save(
                         argThat(
                                 order ->
-                                        order.getOrderItems().size() == 2
+                                        order.getItems().size() == 2
                                                 && order.getTotalAmount() == 26000));
         then(orderStatusHistoryRepository).should().save(any(OrderStatusHistory.class));
         then(eventPublisher).should().publishOrderCreated(any(Order.class));
@@ -786,7 +787,7 @@ public class OrderServiceTest {
         UserRole userRole = UserRole.CUSTOMER;
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+        given(orderRepository.findOrderWithItemsById(orderId))
                 .willReturn(Optional.empty());
 
         // when
@@ -814,7 +815,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId2);
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+        given(orderRepository.findOrderWithItemsById(orderId))
                 .willReturn(Optional.of(order));
 
         // when
@@ -843,7 +844,7 @@ public class OrderServiceTest {
 
         given(order.getStoreId()).willReturn(storeId2);
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+        given(orderRepository.findOrderWithItemsById(orderId))
                 .willReturn(Optional.of(order));
 
         // when
@@ -856,5 +857,27 @@ public class OrderServiceTest {
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("성공 - CUSTOMER 단건 정상 조회")
+    void getOrderDetail_success_customer() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(order.getUserId()).willReturn(userId);
+        given(orderRepository.findOrderWithItemsById(orderId))
+                .willReturn(Optional.of(order));
+
+        // when
+        OrderDetailResponse response =
+                orderService.getOrderDetail(userId, userRole, storeId, orderId);
+
+        // then
+        assertThat(response).isNotNull();
     }
 }
