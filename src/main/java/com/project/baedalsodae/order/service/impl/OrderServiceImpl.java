@@ -181,6 +181,10 @@ public class OrderServiceImpl implements OrderService {
                 && !order.getStoreId().equals(storeId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
-        return null;
+
+         List<OrderStatusHistory> histories =
+            orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId);
+
+        return OrderStatusResponse.from(order, histories);
     }
 }
