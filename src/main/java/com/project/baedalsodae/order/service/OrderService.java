@@ -15,5 +15,5 @@ public interface OrderService {
 
     OrderListResponse getOrders(UUID userId, String role, OrderListRequest request);
 
-    OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID orderId);
+    OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

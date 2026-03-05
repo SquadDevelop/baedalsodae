@@ -151,13 +151,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID orderId) {
+    public OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
 
         Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (userRole.getRole().equals(UserRole.CUSTOMER.getRole()) && !order.getUserId().equals(userId)) {
+        if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
+                && !order.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
 
         return null;

@@ -784,6 +784,7 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UserRole userRole = UserRole.CUSTOMER;
+        UUID storeId = UUID.randomUUID();
 
         given(orderRepository.findByIdAndIsDeletedFalse(orderId))
                 .willReturn(Optional.empty());
@@ -791,7 +792,7 @@ public class OrderServiceTest {
         // when
         Throwable throwable =
                 catchThrowable(
-                        () -> orderService.getOrderDetail(userId, userRole, orderId));
+                        () -> orderService.getOrderDetail(userId, userRole, storeId, orderId));
         log.info("throwable = " + throwable);
 
         // then
@@ -808,6 +809,7 @@ public class OrderServiceTest {
         UUID userId1 = UUID.randomUUID();
         UUID userId2 = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
         UserRole userRole = UserRole.CUSTOMER;
 
         given(order.getUserId()).willReturn(userId2);
@@ -818,7 +820,7 @@ public class OrderServiceTest {
         // when
         Throwable throwable =
                 catchThrowable(
-                        () -> orderService.getOrderDetail(userId1, userRole, orderId));
+                        () -> orderService.getOrderDetail(userId1, userRole, storeId, orderId));
         log.info("throwable = " + throwable);
 
         //then
@@ -826,5 +828,33 @@ public class OrderServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
 
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님 (OWNER)")
+    void getOrderDetail_fail_not_my_store_order() {
+
+        // given
+        UUID storeId1 = UUID.randomUUID();
+        UUID storeId2 = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        given(order.getStoreId()).willReturn(storeId2);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderDetail(userId, userRole, storeId1, orderId));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
     }
 }
