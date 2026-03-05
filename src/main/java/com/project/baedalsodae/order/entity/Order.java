@@ -27,6 +27,12 @@ public class Order extends BaseAuditEntity {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "user_nickname_snapshot", nullable = false)
+    private String userNicknameSnapshot;
+
+    @Column(name = "user_phone_snapshot", nullable = false)
+    private String userPhoneSnapshot;
+
     @Column(name = "store_id", nullable = false)
     private UUID storeId;
 
