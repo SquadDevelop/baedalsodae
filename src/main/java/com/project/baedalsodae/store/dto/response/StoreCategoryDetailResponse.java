@@ -14,7 +14,7 @@ public class StoreCategoryDetailResponse {
     private String description;
     private AuditInfoResponse auditInfo;
 
-    public static StoreCategoryDetailResponse fromStoreCategory(StoreCategory storeCategory) {
+    public static StoreCategoryDetailResponse fromEntity(StoreCategory storeCategory) {
         return StoreCategoryDetailResponse.builder()
                 .id(storeCategory.getId())
                 .name(storeCategory.getName())
