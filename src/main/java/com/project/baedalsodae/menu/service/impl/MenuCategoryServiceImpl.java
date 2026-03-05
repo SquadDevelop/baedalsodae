@@ -68,6 +68,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
                         .findByIdAndDeletedIsFalse(menuCategoryId)
                         .orElseThrow(
                                 () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        if (menuCategory.hasItem()) throw new BusinessException(ErrorCode.MENU_CATEGORY_HAS_ITEMS);
 
         UUID storeId = menuCategory.getStore().getId();
         List<MenuCategory> menuCategories =

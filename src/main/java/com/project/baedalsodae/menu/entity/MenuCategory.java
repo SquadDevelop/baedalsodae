@@ -65,4 +65,8 @@ public class MenuCategory extends BaseAuditEntity implements Orderable {
         super.softDelete(userId);
         this.orderNo = null;
     }
+
+    public boolean hasItem() {
+        return menuItems.stream().anyMatch(item -> !item.isDeleted());
+    }
 }
