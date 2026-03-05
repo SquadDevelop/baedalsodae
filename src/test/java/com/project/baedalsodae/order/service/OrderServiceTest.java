@@ -389,8 +389,8 @@ public class OrderServiceTest {
         log.info("result = {}", result);
 
         // then
-        assertThat(result.orders()).isEmpty();
-        assertThat(result.hasNext()).isFalse();
+        assertThat(result.getOrders()).isEmpty();
+        assertThat(result.isHasNext()).isFalse();
     }
 
     @Test
@@ -409,8 +409,8 @@ public class OrderServiceTest {
         log.info("result = {}", result);
 
         // then
-        assertThat(result.orders()).hasSize(size);
-        assertThat(result.hasNext()).isTrue();
+        assertThat(result.getOrders()).hasSize(size);
+        assertThat(result.isHasNext()).isTrue();
     }
 
     @Test
@@ -436,7 +436,7 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByCustomer(argThat(r -> r.status() == OrderStatus.CREATED));
-        assertThat(result.orders()).hasSize(2);
+        assertThat(result.getOrders()).hasSize(2);
     }
 
     @Test
@@ -467,7 +467,7 @@ public class OrderServiceTest {
                                 r ->
                                         startDate.equals(r.startDate())
                                                 && endDate.equals(r.endDate())));
-        assertThat(result.orders()).hasSize(1);
+        assertThat(result.getOrders()).hasSize(1);
     }
 
     @Test
@@ -492,7 +492,7 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByCustomer( argThat(r -> keyword.equals(r.keyword())));
-        assertThat(result.orders()).hasSize(1);
+        assertThat(result.getOrders()).hasSize(1);
     }
 
     @Test
@@ -531,7 +531,7 @@ public class OrderServiceTest {
                                                 && "치킨".equals(r.keyword())
                                                 && startDate.equals(r.startDate())
                                                 && endDate.equals(r.endDate())));
-        assertThat(result.orders()).hasSize(1);
+        assertThat(result.getOrders()).hasSize(1);
     }
 
     @Test
@@ -571,9 +571,9 @@ public class OrderServiceTest {
                                 r ->
                                         cursorCreatedAt.equals(r.cursorCreatedAt())
                                                 && cursorId.equals(r.cursorId())));
-        assertThat(result.hasNext()).isTrue();
-        assertThat(result.nextCursorCreatedAt()).isNotNull();
-        assertThat(result.nextCursorId()).isNotNull();
+        assertThat(result.isHasNext()).isTrue();
+        assertThat(result.getNextCursorCreatedAt()).isNotNull();
+        assertThat(result.getNextCursorId()).isNotNull();
     }
 
     @Test
@@ -598,9 +598,9 @@ public class OrderServiceTest {
         log.info("result = {}", result);
 
         // then
-        assertThat(result.hasNext()).isFalse();
-        assertThat(result.nextCursorCreatedAt()).isNull();
-        assertThat(result.nextCursorId()).isNull();
+        assertThat(result.isHasNext()).isFalse();
+        assertThat(result.getNextCursorCreatedAt()).isNull();
+        assertThat(result.getNextCursorId()).isNull();
     }
 
     // ======================== getOrders - OWNER ========================
@@ -670,8 +670,8 @@ public class OrderServiceTest {
         log.info("result = {}", result);
 
         // then
-        assertThat(result.orders()).isEmpty();
-        assertThat(result.hasNext()).isFalse();
+        assertThat(result.getOrders()).isEmpty();
+        assertThat(result.isHasNext()).isFalse();
     }
 
     @Test
@@ -697,8 +697,8 @@ public class OrderServiceTest {
         log.info("result = {}", result);
 
         // then
-        assertThat(result.orders()).hasSize(size);
-        assertThat(result.hasNext()).isTrue();
+        assertThat(result.getOrders()).hasSize(size);
+        assertThat(result.isHasNext()).isTrue();
     }
 
     @Test
@@ -728,7 +728,7 @@ public class OrderServiceTest {
         then(orderQueryRepository)
                 .should()
                 .findOrdersByStore(argThat(r -> orderNo.equals(r.orderNo())));
-        assertThat(result.orders()).hasSize(20);
+        assertThat(result.getOrders()).hasSize(20);
     }
 
     @Test
@@ -771,6 +771,6 @@ public class OrderServiceTest {
                                                 && "ORD-20260305-001".equals(r.orderNo())
                                                 && startDate.equals(r.startDate())
                                                 && endDate.equals(r.endDate())));
-        assertThat(result.orders()).hasSize(1);
+        assertThat(result.getOrders()).hasSize(1);
     }
 }

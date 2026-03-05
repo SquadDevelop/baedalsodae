@@ -3,14 +3,20 @@ package com.project.baedalsodae.order.dto.response;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import lombok.Builder;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
 @Builder
-public record OrderListResponse(
-        List<OrderSummaryResponse> orders,
-        boolean hasNext,
-        Instant nextCursorCreatedAt,
-        UUID nextCursorId) {
+@AllArgsConstructor
+public class OrderListResponse{
+
+    private List<OrderSummaryResponse> orders;
+    private boolean hasNext;
+    private Instant nextCursorCreatedAt;
+    private UUID nextCursorId;
 
     public static OrderListResponse empty() {
         return OrderListResponse.builder()
