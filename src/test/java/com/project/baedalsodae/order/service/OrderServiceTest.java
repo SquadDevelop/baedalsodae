@@ -444,4 +444,38 @@ public class OrderServiceTest {
                 .findOrdersByCustomer(eq(userId), argThat(r -> r.status() == OrderStatus.CREATED));
         assertThat(result.orders()).hasSize(2);
     }
+
+    @Test
+    @DisplayName("성공 - 날짜 범위(startDate~endDate) 필터 조회")
+    void getOrders_success_dateRangeFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2026, 3, 1);
+        LocalDate endDate = LocalDate.of(2026, 3, 5);
+        OrderListRequest request =
+                OrderListRequest.builder().startDate(startDate).endDate(endDate).build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(new OrderSummaryResponse());
+        OrderListResponse filteredResponse =
+                OrderListResponse.builder().orders(filteredOrders).hasNext(false).build();
+
+        given(orderQueryRepository.findOrdersByCustomer(userId, request))
+                .willReturn(filteredResponse);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        eq(userId),
+                        argThat(
+                                r ->
+                                        startDate.equals(r.startDate())
+                                                && endDate.equals(r.endDate())));
+        assertThat(result.orders()).hasSize(1);
+    }
 }
