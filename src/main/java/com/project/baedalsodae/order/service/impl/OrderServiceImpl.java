@@ -19,6 +19,7 @@ import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.order.util.OrderNoGenerator;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,12 +108,24 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
         validateDateRange(request.startDate(), request.endDate());
-        final LocalDate startDate = request.resolvedStartDate();
-        final LocalDate endDate = request.resolvedEndDate();
+        //TODO 인증 도메인 완성 시 AOP로 권한 체크
+        if (UserRole.OWNER.getRole().equals(role)) {
+            return getOwnerOrders(userId, request);
+        }
+        return getCustomerOrders(userId, request);
+    }
 
-        final OrderListResponse orderListResponse = orderQueryRepository.findOrdersByCustomer(userId, request);
+    private OrderListResponse getCustomerOrders(UUID userId, OrderListRequest request) {
+        return orderQueryRepository.findOrdersByCustomer(userId, request);
+    }
 
-        return orderListResponse;
+    private OrderListResponse getOwnerOrders(UUID userId, OrderListRequest request) {
+        Store store = storeRepository.findById(request.storeId())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        if (!store.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+        return orderQueryRepository.findOrdersByStore(store.getId(), request);
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {

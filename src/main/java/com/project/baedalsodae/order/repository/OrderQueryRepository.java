@@ -7,4 +7,6 @@ import java.util.UUID;
 public interface OrderQueryRepository {
 
     OrderListResponse findOrdersByCustomer(UUID userId, OrderListRequest request);
+
+    OrderListResponse findOrdersByStore(UUID storeId, OrderListRequest request);
 }

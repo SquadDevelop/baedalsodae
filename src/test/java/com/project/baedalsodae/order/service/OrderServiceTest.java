@@ -620,4 +620,52 @@ public class OrderServiceTest {
         assertThat(result.nextCursorCreatedAt()).isNull();
         assertThat(result.nextCursorId()).isNull();
     }
+
+    // ======================== getOrders - OWNER ========================
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 가게")
+    void getOrders_owner_fail_storeNotFound() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
+
+        given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrders(userId, UserRole.OWNER.getRole(), request));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아닌 조회")
+    void getOrders_owner_fail_storeForbidden() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID otherOwnerId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
+
+        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(otherOwnerId);
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrders(userId, UserRole.OWNER.getRole(), request));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
 }
