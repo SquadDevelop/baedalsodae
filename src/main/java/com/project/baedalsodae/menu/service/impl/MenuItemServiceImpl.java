@@ -151,8 +151,8 @@ public class MenuItemServiceImpl implements MenuItemService {
         return MenuItemResponseDto.fromEntity(item);
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId) {
         List<MenuItem> menuItems =
                 menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId);
