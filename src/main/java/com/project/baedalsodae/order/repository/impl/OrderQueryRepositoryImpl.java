@@ -20,6 +20,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static com.project.baedalsodae.order.repository.condition.OrderQueryCondition.*;
+
 @Repository
 @RequiredArgsConstructor
 public class OrderQueryRepositoryImpl implements OrderQueryRepository {
@@ -27,7 +29,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     private static final QOrder order = QOrder.order;
-    private static final QOrderItem orderItemSub = new QOrderItem("orderItemSub");
 
     @Override
     public List<OrderSummaryResponse> findOrdersByCustomer(OrderListQuery query) {
@@ -70,54 +71,11 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                                 order.isDeleted.isFalse(),
                                 statusEq(query),
                                 dateRange(query),
-                                orderNoContains(query),
+                                orderNoEqIgnoreCase(query),
                                 cursorCondition(query))
                         .orderBy(order.createdAt.desc(), order.id.desc())
                         .limit(query.resolvedSize() + 1)
                         .fetch();
 
-    }
-
-
-    private BooleanExpression statusEq(OrderListQuery query) {
-        return query.status() != null ? order.status.eq(query.status()) : null;
-    }
-
-    private BooleanExpression dateRange(OrderListQuery query) {
-        LocalDate start = query.resolvedStartDate();
-        LocalDate end = query.resolvedEndDate();
-        Instant startInstant = start.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endInstant = end.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-        return order.createdAt.goe(startInstant).and(order.createdAt.lt(endInstant));
-    }
-
-    private BooleanExpression keywordContains(OrderListQuery query) {
-        if (query.keyword() == null || query.keyword().isBlank()) return null;
-        String keyword = query.keyword();
-        return order.storeNameSnapshot
-                .containsIgnoreCase(keyword)
-                .or(
-                        order.id.in(
-                                JPAExpressions.select(orderItemSub.order.id)
-                                        .from(orderItemSub)
-                                        .where(
-                                                orderItemSub.nameSnapshot.containsIgnoreCase(
-                                                        keyword))));
-    }
-
-    private BooleanExpression orderNoContains(OrderListQuery query) {
-        return query.orderNo() != null
-                ? order.orderNo.containsIgnoreCase(query.orderNo())
-                : null;
-    }
-
-    private BooleanExpression cursorCondition(OrderListQuery query) {
-        if (query.cursorCreatedAt() == null || query.cursorId() == null) return null;
-        return order.createdAt
-                .lt(query.cursorCreatedAt())
-                .or(
-                        order.createdAt
-                                .eq(query.cursorCreatedAt())
-                                .and(order.id.lt(query.cursorId())));
     }
 }
