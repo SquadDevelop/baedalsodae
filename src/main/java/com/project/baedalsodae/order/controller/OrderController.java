@@ -3,7 +3,9 @@ package com.project.baedalsodae.order.controller;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
+import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.service.OrderService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -26,5 +28,14 @@ public class OrderController {
         CreateOrderResponse response = orderService.createOrder(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SuccessCode.ORDER_CREATED, response));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<OrderListResponse>> getOrders(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") String role,
+            @ModelAttribute OrderListRequest request) {
+        OrderListResponse response = orderService.getOrders(userId, role, request);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_LIST, response));
     }
 }
