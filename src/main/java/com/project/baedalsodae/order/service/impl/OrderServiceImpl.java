@@ -43,7 +43,6 @@ public class OrderServiceImpl implements OrderService {
     public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
         final UUID cartId = request.cartId();
         final UUID addressId = request.addressId();
-
         Cart cart =
                 cartRepository
                         .findCartWithItemsByIdAndUserId(cartId, userId)
@@ -95,13 +94,10 @@ public class OrderServiceImpl implements OrderService {
                 cart.getItems().stream()
                         .map(cartItem -> OrderItem.create(order, cartItem))
                         .toList();
-
         order.addOrderItems(orderItems);
-
         final Order savedOrder = orderRepository.save(order);
 
         OrderStatusHistory orderStatusHistory = OrderStatusHistory.create(savedOrder, userId);
-
         orderStatusHistoryRepository.save(orderStatusHistory);
 
         eventPublisher.publishOrderCreated(savedOrder);
@@ -138,9 +134,10 @@ public class OrderServiceImpl implements OrderService {
         if (!store.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
-        OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
 
+        OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
         List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+
         boolean hasNext = orders.size() > query.resolvedSize();
         if (hasNext) orders = orders.subList(0, query.resolvedSize());
 
