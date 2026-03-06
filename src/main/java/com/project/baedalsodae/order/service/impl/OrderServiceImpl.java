@@ -206,6 +206,10 @@ public class OrderServiceImpl implements OrderService {
                         .findByIdAndIsDeletedFalse(orderId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
         return null;
     }
 }

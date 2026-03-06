@@ -1055,4 +1055,24 @@ public class OrderServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
     }
+
+    @Test
+    @DisplayName("실패 - 본인 주문이 아님")
+    void requestOrder_fail_notOwner() {
+
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(UUID.randomUUID());
+
+        Throwable throwable =
+                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
+    }
 }
