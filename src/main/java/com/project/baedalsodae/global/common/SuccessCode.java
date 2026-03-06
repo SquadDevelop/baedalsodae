@@ -30,6 +30,13 @@ public enum SuccessCode {
     STORE_UPDATED("ST200", HttpStatus.OK, "가게 정보 수정 성공"),
     STORE_STATUS_UPDATED("ST200", HttpStatus.OK, "가게 영업 상태 변경 성공"),
     STORE_DELETED("ST200", HttpStatus.OK, "가게 삭제 성공"),
+
+    // user+auth
+    USER_FOUND("UR200", HttpStatus.OK, "회원 정보 조회 성공"),
+    USER_CREATED("UR201", HttpStatus.CREATED, "회원가입 성공"),
+    USER_UPDATED("UR202", HttpStatus.OK, "회원 정보 수정 성공"),
+    USER_DELETED("UR203", HttpStatus.OK, "회원 탈퇴 성공"),
+
     ;
 
     private final String code;
