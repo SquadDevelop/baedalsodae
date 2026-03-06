@@ -48,7 +48,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<?>> logout() {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("로그아웃되었습니다."));
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(SuccessCode.LOGOUT_SUCCESS.getMessage()));
     }
 }

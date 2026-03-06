@@ -38,6 +38,7 @@ public enum SuccessCode {
     USER_DELETED("UR203", HttpStatus.OK, "회원 탈퇴 성공"),
 
     LOGIN_SUCCESS("AU200", HttpStatus.OK, "로그인 성공"),
+    LOGOUT_SUCCESS("AU201", HttpStatus.OK, "로그아웃 성공")
     ;
 
     private final String code;
