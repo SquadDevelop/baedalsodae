@@ -82,7 +82,7 @@ public class Order extends BaseAuditEntity {
         this.status = OrderStatus.REQUESTED;
     }
 
-    public boolean canAccept() {
+    public boolean canAcceptOrReject() {
         return this.status == OrderStatus.REQUESTED;
     }
 

@@ -247,7 +247,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
 
-        if (!order.canAccept()){
+        if (!order.canAcceptOrReject()){
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
@@ -258,5 +258,25 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
 
         return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse rejectOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canAcceptOrReject()){
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        return null;
     }
 }
