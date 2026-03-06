@@ -13,21 +13,24 @@ import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuItem;
+import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
-import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.request.OrderListRequest;
+import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
+import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import com.project.baedalsodae.user.entity.UserRole;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,6 +66,12 @@ public class OrderServiceTest {
     @Mock private MenuItem menuItem2;
 
     @Mock private OrderEventPublisher eventPublisher;
+
+    @Mock private OrderQueryRepository orderQueryRepository;
+
+    @Mock private Order order;
+
+    @Mock private OrderStatusHistory orderStatusHistory;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -152,7 +161,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable = catchThrowable(() -> orderService.createOrder(userId, request));
@@ -190,7 +199,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
         given(cart.getTotalAmount()).willReturn(0);
 
@@ -236,7 +245,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
         given(cart.getTotalAmount()).willReturn(18000);
 
@@ -296,7 +305,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
         given(cart.getTotalAmount()).willReturn(26000);
 
@@ -334,11 +343,695 @@ public class OrderServiceTest {
                 .save(
                         argThat(
                                 order ->
-                                        order.getOrderItems().size() == 2
+                                        order.getItems().size() == 2
                                                 && order.getTotalAmount() == 26000));
         then(orderStatusHistoryRepository).should().save(any(OrderStatusHistory.class));
         then(eventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
+    }
+
+    // ======================== getOrders ========================
+
+    @Test
+    @DisplayName("실패 - 잘못된 날짜 범위 (endDate < startDate)")
+    void getOrders_fail_invalidDateRange() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .startDate(LocalDate.of(2026, 3, 5))
+                        .endDate(LocalDate.of(2026, 3, 1))
+                        .build();
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.getOrders(userId, "CUSTOMER", request));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_DATE_RANGE);
+    }
+
+    @Test
+    @DisplayName("성공 - 내 주문 목록 조회 (빈 목록)")
+    void getOrders_success_emptyList() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().size(20).build();
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(List.of());
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.getOrders()).isEmpty();
+        assertThat(result.isHasNext()).isFalse();
+    }
+
+    @Test
+    @DisplayName("성공 - 내 주문 목록 조회 (페이징)")
+    void getOrders_success_paging() {
+        // given
+        UUID userId = UUID.randomUUID();
+        int size = 5;
+        OrderListRequest request = OrderListRequest.builder().size(size).build();
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(
+                        new ArrayList<>(
+                                Collections.nCopies(
+                                        size + 1, OrderSummaryResponse.builder().build())));
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.getOrders()).hasSize(size);
+        assertThat(result.isHasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("성공 - status 필터 조회")
+    void getOrders_success_statusFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder().size(20).status(OrderStatus.CREATED).build();
+
+        List<OrderSummaryResponse> filteredOrders =
+                List.of(
+                        OrderSummaryResponse.builder().build(),
+                        OrderSummaryResponse.builder().build());
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(argThat(r -> r.status() == OrderStatus.CREATED));
+        assertThat(result.getOrders()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("성공 - 날짜 범위(startDate~endDate) 필터 조회")
+    void getOrders_success_dateRangeFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2026, 3, 1);
+        LocalDate endDate = LocalDate.of(2026, 3, 5);
+        OrderListRequest request =
+                OrderListRequest.builder().size(20).startDate(startDate).endDate(endDate).build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        argThat(
+                                r ->
+                                        startDate.equals(r.startDate())
+                                                && endDate.equals(r.endDate())));
+        assertThat(result.getOrders()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("성공 - 가게명 혹은 메뉴명 검색")
+    void getOrders_success_keywordFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        String keyword = "치킨";
+        OrderListRequest request = OrderListRequest.builder().size(20).keyword(keyword).build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(argThat(r -> keyword.equals(r.keyword())));
+        assertThat(result.getOrders()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("성공 - 복합 필터 조회 (status + keyword + 날짜 범위)")
+    void getOrders_success_combinedFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2026, 3, 1);
+        LocalDate endDate = LocalDate.of(2026, 3, 5);
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .status(OrderStatus.CREATED)
+                        .keyword("치킨")
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .size(20)
+                        .build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        argThat(
+                                r ->
+                                        r.status() == OrderStatus.CREATED
+                                                && "치킨".equals(r.keyword())
+                                                && startDate.equals(r.startDate())
+                                                && endDate.equals(r.endDate())));
+        assertThat(result.getOrders()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("성공 - 커서 기반 다음 페이지 조회 (hasNext=true)")
+    void getOrders_success_cursorNextPage() {
+        // given
+        UUID userId = UUID.randomUUID();
+        Instant cursorCreatedAt = Instant.now().minusSeconds(100);
+        UUID cursorId = UUID.randomUUID();
+        int size = 20;
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .cursorCreatedAt(cursorCreatedAt)
+                        .cursorId(cursorId)
+                        .size(size)
+                        .build();
+
+        List<OrderSummaryResponse> orders =
+                new ArrayList<>(
+                        Collections.nCopies(
+                                size + 1,
+                                OrderSummaryResponse.builder()
+                                        .createdAtCursor(Instant.now().minusSeconds(200))
+                                        .orderId(UUID.randomUUID())
+                                        .build()));
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(orders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByCustomer(
+                        argThat(
+                                r ->
+                                        cursorCreatedAt.equals(r.cursorCreatedAt())
+                                                && cursorId.equals(r.cursorId())));
+        assertThat(result.isHasNext()).isTrue();
+        assertThat(result.getNextCursorCreatedAt()).isNotNull();
+        assertThat(result.getNextCursorId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("성공 - 커서 기반 마지막 페이지 조회")
+    void getOrders_success_cursorLastPage() {
+        // given
+        UUID userId = UUID.randomUUID();
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .cursorCreatedAt(Instant.now().minusSeconds(100))
+                        .cursorId(UUID.randomUUID())
+                        .size(20)
+                        .build();
+
+        given(orderQueryRepository.findOrdersByCustomer(any(OrderListQuery.class)))
+                .willReturn(List.of());
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.CUSTOMER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.isHasNext()).isFalse();
+        assertThat(result.getNextCursorCreatedAt()).isNull();
+        assertThat(result.getNextCursorId()).isNull();
+    }
+
+    // ======================== getOrders - OWNER ========================
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 가게")
+    void getOrders_owner_fail_storeNotFound() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
+
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrders(userId, UserRole.OWNER.getRole(), request));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.STORE_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아닌 조회")
+    void getOrders_owner_fail_storeForbidden() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID otherOwnerId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
+
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(otherOwnerId);
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrders(userId, UserRole.OWNER.getRole(), request));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("성공 - 가게 주문 목록 조회 (빈 목록)")
+    void getOrders_owner_success_emptyList() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(20).build();
+
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
+                .willReturn(List.of());
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.getOrders()).isEmpty();
+        assertThat(result.isHasNext()).isFalse();
+    }
+
+    @Test
+    @DisplayName("성공 - 가게 주문 목록 조회 (페이징)")
+    void getOrders_owner_success_paging() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        int size = 5;
+        OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(size).build();
+
+        List<OrderSummaryResponse> orders =
+                new ArrayList<>(
+                        Collections.nCopies(size + 1, OrderSummaryResponse.builder().build()));
+
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class))).willReturn(orders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        assertThat(result.getOrders()).hasSize(size);
+        assertThat(result.isHasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("성공 - 주문번호(orderNo) 검색")
+    void getOrders_owner_success_orderNoFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        String orderNo = "ORD-20260305-001";
+        OrderListRequest request =
+                OrderListRequest.builder().storeId(storeId).orderNo(orderNo).size(20).build();
+
+        List<OrderSummaryResponse> orders =
+                new ArrayList<>(Collections.nCopies(21, OrderSummaryResponse.builder().build()));
+
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class))).willReturn(orders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByStore(argThat(r -> orderNo.equals(r.orderNo())));
+        assertThat(result.getOrders()).hasSize(20);
+    }
+
+    @Test
+    @DisplayName("성공 - 복합 필터 조회 (status + orderNo + 날짜 범위)")
+    void getOrders_owner_success_combinedFilter() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2026, 3, 1);
+        LocalDate endDate = LocalDate.of(2026, 3, 5);
+        OrderListRequest request =
+                OrderListRequest.builder()
+                        .storeId(storeId)
+                        .status(OrderStatus.CREATED)
+                        .orderNo("ORD-20260305-001")
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .size(20)
+                        .build();
+
+        List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
+
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+        given(store.getUserId()).willReturn(userId);
+        given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
+                .willReturn(filteredOrders);
+
+        // when
+        OrderListResponse result =
+                orderService.getOrders(userId, UserRole.OWNER.getRole(), request);
+        log.info("result = {}", result);
+
+        // then
+        then(orderQueryRepository)
+                .should()
+                .findOrdersByStore(
+                        argThat(
+                                r ->
+                                        r.status() == OrderStatus.CREATED
+                                                && "ORD-20260305-001".equals(r.orderNo())
+                                                && startDate.equals(r.startDate())
+                                                && endDate.equals(r.endDate())));
+        assertThat(result.getOrders()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문 조회")
+    void getOrderDetail_fail_not_found() {
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderDetail(userId, userRole, storeId, orderId));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 주문이 아님 (CUSTOMER)")
+    void getOrderDetail_fail_not_my_order() {
+
+        // given
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(order.getUserId()).willReturn(userId2);
+
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderDetail(userId1, userRole, storeId, orderId));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님 (OWNER)")
+    void getOrderDetail_fail_not_my_store_order() {
+
+        // given
+        UUID storeId1 = UUID.randomUUID();
+        UUID storeId2 = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        given(order.getStoreId()).willReturn(storeId2);
+
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderDetail(userId, userRole, storeId1, orderId));
+        log.info("throwable = " + throwable);
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("성공 - CUSTOMER 단건 정상 조회")
+    void getOrderDetail_success_customer() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(order.getUserId()).willReturn(userId);
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
+
+        // when
+        OrderDetailResponse response =
+                orderService.getOrderDetail(userId, userRole, storeId, orderId);
+        log.info("response = " + response);
+
+        // then
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("성공 - OWNER 단건 정상 조회")
+    void getOrderDetail_success_owner() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        given(order.getStoreId()).willReturn(storeId);
+
+        given(orderRepository.findOrderWithItemsById(orderId)).willReturn(Optional.of(order));
+
+        // when
+        OrderDetailResponse response =
+                orderService.getOrderDetail(userId, userRole, storeId, orderId);
+        log.info("response = " + response);
+
+        // then
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void getOrderStatus_fail_order_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderStatus(userId, userRole, storeId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 주문이 아님 (CUSTOMER)")
+    void getOrderStatus_fail_not_my_order() {
+
+        // given
+        UUID userId1 = UUID.randomUUID();
+        UUID userId2 = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        given(order.getUserId()).willReturn(userId2);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderStatus(userId1, userRole, storeId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님 (OWNER)")
+    void getOrderStatus_fail_not_my_store_order() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId1 = UUID.randomUUID();
+        UUID storeId2 = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        given(order.getStoreId()).willReturn(storeId2);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        // when
+        Throwable throwable =
+                catchThrowable(
+                        () -> orderService.getOrderStatus(userId, userRole, storeId1, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("성공 - CUSTOMER 주문 상태 조회")
+    void getOrderStatus_success_customer() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.CUSTOMER;
+
+        List<OrderStatusHistory> histories = List.of(orderStatusHistory);
+
+        given(order.getUserId()).willReturn(userId);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId))
+                .willReturn(histories);
+
+        // when
+        OrderStatusResponse response =
+                orderService.getOrderStatus(userId, userRole, storeId, orderId);
+        log.info("response = " + response);
+
+        // then
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("성공 - OWNER 주문 상태 조회")
+    void getOrderStatus_success_owner() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+
+        List<OrderStatusHistory> histories = List.of(orderStatusHistory);
+
+        given(order.getStoreId()).willReturn(storeId);
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId))
+                .willReturn(histories);
+
+        // when
+        OrderStatusResponse response =
+                orderService.getOrderStatus(userId, userRole, storeId, orderId);
+        log.info("response = " + response);
+
+        // then
+        assertThat(response).isNotNull();
     }
 }

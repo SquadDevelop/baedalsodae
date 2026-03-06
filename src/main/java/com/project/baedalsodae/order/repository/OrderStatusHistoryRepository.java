@@ -1,9 +1,12 @@
 package com.project.baedalsodae.order.repository;
 
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrderStatusHistoryRepository extends JpaRepository<OrderStatusHistory, UUID> {}
+public interface OrderStatusHistoryRepository extends JpaRepository<OrderStatusHistory, UUID> {
+    List<OrderStatusHistory> findByOrderIdOrderByCreatedAtAsc(UUID orderId);
+}
