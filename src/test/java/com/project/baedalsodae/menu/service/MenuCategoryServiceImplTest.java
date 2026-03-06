@@ -12,6 +12,7 @@ import static org.mockito.Mockito.*;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
@@ -149,6 +150,85 @@ class MenuCategoryServiceImplTest {
             // then
             assertThat(result.name()).isEqualTo(DEFAULT_CATEGORY_NAME);
             assertThat(result.orderNo()).isEqualTo(EXISTING_MAX_ORDER_NUMBER + 1);
+        }
+    }
+
+    @Nested
+    @DisplayName("메뉴 카테고리 전체 수정")
+    class UpdateMenuCategory {
+
+        @Test
+        @DisplayName("실패: 카테고리가 존재하지 않으면 예외가 발생한다")
+        void updateMenuCategory_fail_notFound() {
+            // given
+            MenuCategoryPutRequestDto request = createPutRequestWithName(NEW_CATEGORY_NAME);
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(
+                            () -> menuCategoryService.updateMenuCategory(menuCategoryId, request))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: 변경하려는 이름이 이미 존재하면 예외가 발생한다")
+        void updateMenuCategory_fail_duplicateName() {
+            // given
+            MenuCategoryPutRequestDto request = createPutRequestWithName(DUPLICATE_CATEGORY_NAME);
+            createMockCategoryWithRepository(menuCategoryRepository, menuCategoryId, storeId);
+            given(
+                            menuCategoryRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                                    storeId, DUPLICATE_CATEGORY_NAME))
+                    .willReturn(true);
+
+            // when & then
+            assertThatThrownBy(
+                            () -> menuCategoryService.updateMenuCategory(menuCategoryId, request))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
+        }
+
+        @Test
+        @DisplayName("성공: 이름이 같으면 중복 체크 없이 수정된다")
+        void updateMenuCategory_success_sameName() {
+            // given
+            MenuCategoryPutRequestDto request = createDefaultPutRequest();
+            MenuCategory category =
+                    createMockCategoryWithRepository(
+                            menuCategoryRepository, menuCategoryId, storeId);
+            given(category.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
+
+            // when
+            menuCategoryService.updateMenuCategory(menuCategoryId, request);
+
+            // then
+            verify(menuCategoryRepository, never())
+                    .existsByStoreIdAndNameAndDeletedIsFalse(any(), any());
+        }
+
+        @Test
+        @DisplayName("성공: 카테고리 이름을 변경한다")
+        void updateMenuCategory_success() {
+            // given
+            MenuCategoryPutRequestDto request = createPutRequestWithName(NEW_CATEGORY_NAME);
+            MenuCategory category =
+                    createMockCategoryWithRepository(
+                            menuCategoryRepository, menuCategoryId, storeId);
+            given(
+                            menuCategoryRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                                    storeId, NEW_CATEGORY_NAME))
+                    .willReturn(false);
+            given(category.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
+
+            // when
+            menuCategoryService.updateMenuCategory(menuCategoryId, request);
+
+            // then
+            verify(category).changeMenuCategoryName(NEW_CATEGORY_NAME);
         }
     }
 
