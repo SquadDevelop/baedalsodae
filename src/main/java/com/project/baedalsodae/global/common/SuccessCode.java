@@ -45,7 +45,7 @@ public enum SuccessCode {
 
     LOGIN_SUCCESS("AU200", HttpStatus.OK, "로그인 성공"),
     LOGOUT_SUCCESS("AU201", HttpStatus.OK, "로그아웃 성공"),
-  
+
     // menu category
     MENU_CATEGORY_CREATED("MC200", HttpStatus.CREATED, "메뉴 카테고리 등록 성공"),
     MENU_CATEGORY_UPDATED("MC201", HttpStatus.OK, "메뉴 카테고리 수정 성공"),
@@ -65,7 +65,6 @@ public enum SuccessCode {
     // payment
     PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),
     PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공");
-
 
     private final String code;
     private final HttpStatus status;
