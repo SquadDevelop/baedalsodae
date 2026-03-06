@@ -15,11 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PaymentListenerTest {
 
-    @InjectMocks
-    private PaymentListener paymentListener;
+    @InjectMocks private PaymentListener paymentListener;
 
-    @Mock
-    private PaymentService paymentService;
+    @Mock private PaymentService paymentService;
 
     @Test
     @DisplayName("성공 - OrderCreatedEvent를 받으면 paymentService.processPayment()가 호출됨")

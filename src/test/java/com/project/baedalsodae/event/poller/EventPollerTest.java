@@ -27,17 +27,13 @@ import org.springframework.context.ApplicationEventPublisher;
 @ExtendWith(MockitoExtension.class)
 class EventPollerTest {
 
-    @InjectMocks
-    private EventPoller eventPoller;
+    @InjectMocks private EventPoller eventPoller;
 
-    @Mock
-    private EventRepository eventRepository;
+    @Mock private EventRepository eventRepository;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
-    @Spy
-    private ObjectMapper objectMapper;
+    @Spy private ObjectMapper objectMapper;
 
     // ======================== poll - 이벤트 없음 ========================
 
@@ -65,8 +61,9 @@ class EventPollerTest {
         UUID userId = UUID.randomUUID();
         int finalAmount = 18000;
 
-        String payload = objectMapper.writeValueAsString(
-                new OrderCreatedEvent(orderId, userId, finalAmount));
+        String payload =
+                objectMapper.writeValueAsString(
+                        new OrderCreatedEvent(orderId, userId, finalAmount));
 
         Event event = Event.create(AggregateType.ORDER, orderId, EventType.ORDER_CREATED, payload);
 
@@ -89,7 +86,12 @@ class EventPollerTest {
     void poll_dispatchFails_incrementsRetryAndStaysPending() {
         // given
         // payload가 잘못된 JSON이면 dispatch 시 JsonProcessingException 발생
-        Event event = Event.create(AggregateType.ORDER, UUID.randomUUID(), EventType.ORDER_CREATED, "invalid-json");
+        Event event =
+                Event.create(
+                        AggregateType.ORDER,
+                        UUID.randomUUID(),
+                        EventType.ORDER_CREATED,
+                        "invalid-json");
 
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));
@@ -106,7 +108,12 @@ class EventPollerTest {
     @DisplayName("poll() - dispatch 3회 실패 시 FAILED 상태로 변경됨")
     void poll_dispatchFailsMaxRetryTimes_becomesFailed() {
         // given
-        Event event = Event.create(AggregateType.ORDER, UUID.randomUUID(), EventType.ORDER_CREATED, "invalid-json");
+        Event event =
+                Event.create(
+                        AggregateType.ORDER,
+                        UUID.randomUUID(),
+                        EventType.ORDER_CREATED,
+                        "invalid-json");
 
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));
@@ -127,7 +134,12 @@ class EventPollerTest {
     @DisplayName("poll() - retryCount가 MAX_RETRY(3) 이상인 이벤트는 dispatch 시도 없이 skip됨")
     void poll_exhaustedEvent_isSkipped() {
         // given
-        Event event = Event.create(AggregateType.ORDER, UUID.randomUUID(), EventType.ORDER_CREATED, "invalid-json");
+        Event event =
+                Event.create(
+                        AggregateType.ORDER,
+                        UUID.randomUUID(),
+                        EventType.ORDER_CREATED,
+                        "invalid-json");
         // 3번 실패시켜 retryCount=3 (FAILED 상태)
         event.markFailed(3);
         event.markFailed(3);
@@ -149,7 +161,9 @@ class EventPollerTest {
     @DisplayName("poll() - 처리되지 않은 EventType이면 dispatch 없이 무시됨 (PAYMENT_CREATED)")
     void poll_unknownEventType_isIgnored() throws Exception {
         // given - EventPoller는 현재 ORDER_CREATED만 처리하므로 PAYMENT_CREATED는 dispatch 안 됨
-        Event event = Event.create(AggregateType.PAYMENT, UUID.randomUUID(), EventType.PAYMENT_CREATED, "{}");
+        Event event =
+                Event.create(
+                        AggregateType.PAYMENT, UUID.randomUUID(), EventType.PAYMENT_CREATED, "{}");
 
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));

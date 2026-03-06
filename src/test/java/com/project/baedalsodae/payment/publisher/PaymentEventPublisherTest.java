@@ -20,20 +20,17 @@ import org.springframework.context.ApplicationEventPublisher;
 @ExtendWith(MockitoExtension.class)
 class PaymentEventPublisherTest {
 
-    @InjectMocks
-    private PaymentEventPublisher paymentEventPublisher;
+    @InjectMocks private PaymentEventPublisher paymentEventPublisher;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    private EventService eventService;
+    @Mock private EventService eventService;
 
-    @Mock
-    private Payment payment;
+    @Mock private Payment payment;
 
     @Test
-    @DisplayName("성공 - publishPaymentResult 호출 시 ApplicationEventPublisher로 PaymentResultEvent가 발행됨")
+    @DisplayName(
+            "성공 - publishPaymentResult 호출 시 ApplicationEventPublisher로 PaymentResultEvent가 발행됨")
     void publishPaymentResult_publishesPaymentResultEvent() {
         // given
         UUID orderId = UUID.randomUUID();
@@ -69,7 +66,8 @@ class PaymentEventPublisherTest {
     }
 
     @Test
-    @DisplayName("성공 - publishPaymentResult 호출 시 ApplicationEventPublisher와 EventService 모두 정확히 1번씩 호출됨")
+    @DisplayName(
+            "성공 - publishPaymentResult 호출 시 ApplicationEventPublisher와 EventService 모두 정확히 1번씩 호출됨")
     void publishPaymentResult_callsBothPublisherAndService_exactlyOnce() {
         // given
         UUID orderId = UUID.randomUUID();

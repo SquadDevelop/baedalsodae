@@ -21,14 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class OrderEventHandlerTest {
 
-    @InjectMocks
-    private OrderEventHandler orderEventHandler;
+    @InjectMocks private OrderEventHandler orderEventHandler;
 
-    @Mock
-    private EventRepository eventRepository;
+    @Mock private EventRepository eventRepository;
 
-    @Spy
-    private ObjectMapper objectMapper;
+    @Spy private ObjectMapper objectMapper;
 
     @Test
     @DisplayName("성공 - OrderCreatedEvent를 받으면 ORDER_CREATED 타입의 Event가 저장됨")
@@ -43,12 +40,16 @@ class OrderEventHandlerTest {
         orderEventHandler.handleOrderCreated(event);
 
         // then
-        then(eventRepository).should().save(
-                argThat(savedEvent ->
-                        savedEvent.getAggregateType() == AggregateType.ORDER
-                                && savedEvent.getAggregateId().equals(orderId)
-                                && savedEvent.getEventType() == EventType.ORDER_CREATED
-                                && savedEvent.getStatus() == EventStatus.PENDING));
+        then(eventRepository)
+                .should()
+                .save(
+                        argThat(
+                                savedEvent ->
+                                        savedEvent.getAggregateType() == AggregateType.ORDER
+                                                && savedEvent.getAggregateId().equals(orderId)
+                                                && savedEvent.getEventType()
+                                                        == EventType.ORDER_CREATED
+                                                && savedEvent.getStatus() == EventStatus.PENDING));
     }
 
     @Test
@@ -64,11 +65,20 @@ class OrderEventHandlerTest {
         orderEventHandler.handleOrderCreated(event);
 
         // then
-        then(eventRepository).should().save(
-                argThat(savedEvent ->
-                        savedEvent.getPayload() != null
-                                && savedEvent.getPayload().contains(orderId.toString())
-                                && savedEvent.getPayload().contains(userId.toString())
-                                && savedEvent.getPayload().contains(String.valueOf(finalAmount))));
+        then(eventRepository)
+                .should()
+                .save(
+                        argThat(
+                                savedEvent ->
+                                        savedEvent.getPayload() != null
+                                                && savedEvent
+                                                        .getPayload()
+                                                        .contains(orderId.toString())
+                                                && savedEvent
+                                                        .getPayload()
+                                                        .contains(userId.toString())
+                                                && savedEvent
+                                                        .getPayload()
+                                                        .contains(String.valueOf(finalAmount))));
     }
 }
