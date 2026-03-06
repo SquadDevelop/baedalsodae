@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -15,7 +16,7 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
 
     @Query(
             "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted = false")
-    Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
+    Optional<MenuItem> findByIdAndDeletedIsFalse(@Param("id") UUID id);
 
     @Query(
             "SELECT MAX(i.orderNo) FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false")
