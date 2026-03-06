@@ -444,4 +444,81 @@ class MenuItemServiceImplTest {
     }
   }
 
+
+  @Nested
+  @DisplayName("메뉴 아이템 순서 변경")
+  class UpdateMenuItemOrder {
+
+    private MenuItem item;
+
+    private void givenItemExists(int orderNo) {
+      item = mock(MenuItem.class);
+      MenuCategory category = mock(MenuCategory.class);
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.of(item));
+      givenMenuItemFields(item, category, orderNo);
+      given(category.getId()).willReturn(menuCategoryId);
+      given(category.getName()).willReturn(DEFAULT_CATEGORY_NAME);
+    }
+
+    @Test
+    @DisplayName("실패: 메뉴 아이템이 없으면 예외가 발생한다")
+    void updateMenuItemOrder_fail_notFound() {
+      // given
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.updateMenuItemOrder(menuItemId, THIRD_ORDER_NUMBER))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패: orderNo가 null이면 예외가 발생한다")
+    void updateMenuItemOrder_fail_invalidOrder() {
+      // given
+      item = mock(MenuItem.class);
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.of(item));
+      given(item.getOrderNo()).willReturn(null);
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.updateMenuItemOrder(menuItemId, THIRD_ORDER_NUMBER))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.INVALID_MENU_ITEM_ORDER);
+    }
+
+    @Test
+    @DisplayName("성공: 현재 순서와 동일하면 목록 조회 없이 바로 반환한다")
+    void updateMenuItemOrder_success_sameOrder() {
+      // given
+      givenItemExists(SECOND_ORDER_NUMBER);
+
+      // when
+      menuItemService.updateMenuItemOrder(menuItemId, SECOND_ORDER_NUMBER);
+
+      // then
+      verify(menuItemRepository, never()).findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(any());
+    }
+
+    @Test
+    @DisplayName("성공: 1번에서 3번으로 이동 시 사이 순서가 앞으로 당겨진다")
+    void updateMenuItemOrder_success_moveDown() {
+      // given
+      MenuItem item2 = mock(MenuItem.class);
+      MenuItem item3 = mock(MenuItem.class);
+      givenItemExists(FIRST_ORDER_NUMBER);
+      given(item2.getOrderNo()).willReturn(SECOND_ORDER_NUMBER);
+      given(item3.getOrderNo()).willReturn(THIRD_ORDER_NUMBER);
+      given(menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(menuCategoryId))
+          .willReturn(List.of(item, item2, item3));
+
+      // when
+      menuItemService.updateMenuItemOrder(menuItemId, THIRD_ORDER_NUMBER);
+
+      // then
+      verify(item).changeOrderNo(THIRD_ORDER_NUMBER);
+      verify(item2).changeOrderNo(FIRST_ORDER_NUMBER);
+      verify(item3).changeOrderNo(SECOND_ORDER_NUMBER);
+    }
+  }
+
 }
