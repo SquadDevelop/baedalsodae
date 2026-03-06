@@ -2,8 +2,7 @@ package com.project.baedalsodae.order.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -25,6 +24,7 @@ import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
+import com.project.baedalsodae.order.service.impl.OrderStatusHistoryServiceImpl;
 import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
@@ -47,6 +47,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class OrderServiceTest {
 
     @InjectMocks private OrderServiceImpl orderService;
+
+    @Mock private OrderStatusHistoryServiceImpl orderStatusHistoryService;
 
     @Mock private OrderRepository orderRepository;
 
@@ -269,16 +271,15 @@ public class OrderServiceTest {
 
         given(orderRepository.save(any(Order.class))).willAnswer(inv -> inv.getArgument(0));
 
-        given(orderStatusHistoryRepository.save(any(OrderStatusHistory.class)))
-                .willAnswer(inv -> inv.getArgument(0));
-
         // when
         CreateOrderResponse response = orderService.createOrder(userId, request);
         log.info("response = {}", response);
 
         // then
         then(orderRepository).should().save(any(Order.class));
-        then(orderStatusHistoryRepository).should().save(any(OrderStatusHistory.class));
+        then(orderStatusHistoryService)
+                .should()
+                .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
         then(eventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
@@ -336,9 +337,6 @@ public class OrderServiceTest {
 
         given(orderRepository.save(any(Order.class))).willAnswer(inv -> inv.getArgument(0));
 
-        given(orderStatusHistoryRepository.save(any(OrderStatusHistory.class)))
-                .willAnswer(inv -> inv.getArgument(0));
-
         // when
         CreateOrderResponse response = orderService.createOrder(userId, request);
         log.info("response = {}", response);
@@ -352,7 +350,9 @@ public class OrderServiceTest {
                                 order ->
                                         order.getItems().size() == 2
                                                 && order.getTotalAmount() == 26000));
-        then(orderStatusHistoryRepository).should().save(any(OrderStatusHistory.class));
+        then(orderStatusHistoryService)
+                .should()
+                .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
         then(eventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
@@ -1170,5 +1170,36 @@ public class OrderServiceTest {
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_STATUS);
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 요청 시 상태 변경 및 상태 이력 생성")
+    void requestOrder_success_create_history() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+
+        given(paymentRepository.findByOrderId(orderId))
+                .willReturn(Optional.of(payment));
+
+        given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
+
+        given(order.canRequest()).willReturn(true);
+
+        // when
+        orderService.requestOrder(userId, orderId);
+
+        // then
+        then(order).should().request();
+        then(orderStatusHistoryService)
+                .should()
+                .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
+
     }
 }

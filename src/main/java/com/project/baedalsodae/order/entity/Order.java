@@ -78,6 +78,10 @@ public class Order extends BaseAuditEntity {
         return this.status == OrderStatus.CREATED;
     }
 
+    public void request() {
+        this.status = OrderStatus.REQUESTED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,
@@ -142,4 +146,5 @@ public class Order extends BaseAuditEntity {
                 finalAmount,
                 OrderStatus.CREATED);
     }
+
 }

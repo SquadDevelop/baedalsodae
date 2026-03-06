@@ -17,6 +17,7 @@ import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.order.service.OrderStatusHistoryService;
 import com.project.baedalsodae.order.util.OrderNoGenerator;
 import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
+    private final OrderStatusHistoryService orderStatusHistoryService;
     private final CartRepository cartRepository;
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
@@ -102,8 +104,7 @@ public class OrderServiceImpl implements OrderService {
         order.addOrderItems(orderItems);
         final Order savedOrder = orderRepository.save(order);
 
-        OrderStatusHistory orderStatusHistory = OrderStatusHistory.create(savedOrder, userId);
-        orderStatusHistoryRepository.save(orderStatusHistory);
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
         eventPublisher.publishOrderCreated(savedOrder);
 
@@ -226,8 +227,10 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
+        order.request();
 
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
-        return null;
+        return OrderActionStatusResponse.from(order, payment);
     }
 }

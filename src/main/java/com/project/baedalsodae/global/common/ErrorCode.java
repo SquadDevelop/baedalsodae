@@ -66,7 +66,7 @@ public enum ErrorCode {
     ORDER_NOT_FOUND("OD005", HttpStatus.NOT_FOUND, "주문이 없습니다."),
     ORDER_FORBIDDEN("OD006", HttpStatus.FORBIDDEN, "본인의 주문이 아닙니다."),
     ORDER_INVALID_STATUS("OD007", HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
-    ORDER_PAYMENT_NOT_COMPLETED("OD007", HttpStatus.BAD_REQUEST, "주문의 결제가 완료되지 않았습니다."),
+    ORDER_PAYMENT_NOT_COMPLETED("OD008", HttpStatus.BAD_REQUEST, "주문의 결제가 완료되지 않았습니다."),
 
     // payment
     PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),
