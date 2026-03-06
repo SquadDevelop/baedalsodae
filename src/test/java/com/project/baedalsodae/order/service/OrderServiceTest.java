@@ -1394,4 +1394,39 @@ public class OrderServiceTest {
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_INVALID_STATUS);
     }
+
+    @Test
+    @DisplayName("성공 - 주문 거절 시 상태 변경 및 상태 이력 생성")
+    void rejectOrder_success() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
+        OrderStatus fromStatus = OrderStatus.REQUESTED;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+
+        given(order.canAcceptOrReject()).willReturn(true);
+
+        given(order.getStatus()).willReturn(OrderStatus.REQUESTED);
+
+        // when
+        OrderActionStatusResponse response =
+                orderService.rejectOrder(userId, userRole, storeId, orderId);
+
+        // then
+        then(order).should().reject();
+
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
+
+        assertThat(response).isNotNull();
+    }
+
 }

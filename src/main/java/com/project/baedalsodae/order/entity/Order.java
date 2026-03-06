@@ -90,6 +90,10 @@ public class Order extends BaseAuditEntity {
          this.status = OrderStatus.ACCEPTED;
     }
 
+    public void reject() {
+        this.status = OrderStatus.REJECTED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,
