@@ -31,17 +31,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     public MenuCategoryResponseDto createMenuCategory(
             UUID storeId, MenuCategoryPostRequestDto request) {
 
-        Store store =
-                storeRepository
-                        .findByIdAndIsDeletedIsFalse(storeId)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        Store store = getStoreByStoreId(storeId);
         if (existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
             throw new BusinessException(ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
         }
-        int maxOrderNo =
-                menuCategoryRepository
-                        .findMaxOrderNoByStoreIdAndDeletedIsFalse((storeId))
-                        .orElse(0);
+        int maxOrderNo = getMaxOrderNo(storeId);
         MenuCategory menuCategory = MenuCategory.create(store, request.name(), maxOrderNo + 1);
         try {
             menuCategoryRepository.save(menuCategory);
@@ -55,11 +49,8 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Transactional
     public MenuCategoryResponseDto updateMenuCategory(
             UUID menuCategoryId, MenuCategoryPutRequestDto request) {
-        MenuCategory menuCategory =
-                menuCategoryRepository
-                        .findByIdAndDeletedIsFalse(menuCategoryId)
-                        .orElseThrow(
-                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+
+        MenuCategory menuCategory = getMenuCategoryByMenuCategoryId(menuCategoryId);
         if (!menuCategory.getName().equals(request.name())
                 && existsByStoreIdAndNameAndDeletedIsFalse(
                         menuCategory.getStore().getId(), request.name())) {
@@ -72,11 +63,8 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Override
     @Transactional
     public void deleteMenuCategory(UUID menuCategoryId) {
-        MenuCategory menuCategory =
-                menuCategoryRepository
-                        .findByIdAndDeletedIsFalse(menuCategoryId)
-                        .orElseThrow(
-                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+
+        MenuCategory menuCategory = getMenuCategoryByMenuCategoryId(menuCategoryId);
         if (menuCategory.hasItem()) throw new BusinessException(ErrorCode.MENU_CATEGORY_HAS_ITEMS);
 
         UUID storeId = menuCategory.getStore().getId();
@@ -91,11 +79,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Transactional
     public MenuCategoryResponseDto updateMenuCategoryOrder(
             UUID menuCategoryId, MenuCategoryPatchRequestDto request) {
-        MenuCategory menuCategory =
-                menuCategoryRepository
-                        .findByIdAndDeletedIsFalse(menuCategoryId)
-                        .orElseThrow(
-                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        MenuCategory menuCategory = getMenuCategoryByMenuCategoryId(menuCategoryId);
         Integer from = menuCategory.getOrderNo();
         if (from == null) {
             throw new BusinessException(ErrorCode.INVALID_MENU_CATEGORY_ORDER);
@@ -130,5 +114,21 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     private boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name) {
         return menuCategoryRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
+    }
+
+    private Store getStoreByStoreId(UUID storeId) {
+        return storeRepository
+                .findByIdAndIsDeletedIsFalse(storeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+    }
+
+    private MenuCategory getMenuCategoryByMenuCategoryId(UUID menuCategoryId) {
+        return menuCategoryRepository
+                .findByIdAndDeletedIsFalse(menuCategoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    }
+
+    private int getMaxOrderNo(UUID storeId) {
+        return menuCategoryRepository.findMaxOrderNoByStoreIdAndDeletedIsFalse(storeId).orElse(0);
     }
 }
