@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<SignupResponse>> signup(
             @Valid @RequestBody SignupRequest request) {
@@ -38,6 +40,7 @@ public class AuthController {
                 .body(ApiResponse.success(SuccessCode.USER_CREATED, response));
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody LoginRequest request) {
         String accessToken = authService.login(request);
@@ -47,6 +50,7 @@ public class AuthController {
                 .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS.getMessage()));
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
         return ResponseEntity.status(HttpStatus.OK)

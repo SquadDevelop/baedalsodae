@@ -60,7 +60,7 @@ public class AuthConfig {
                                 .requestMatchers(
                                         PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                                .requestMatchers("/user/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                                .requestMatchers("/users/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
                                 .anyRequest().permitAll()
 //                                .anyRequest().authenticated()
                 );
