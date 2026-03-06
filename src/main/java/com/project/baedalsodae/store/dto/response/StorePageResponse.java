@@ -15,7 +15,7 @@ public class StorePageResponse {
 
     private boolean hasNext;
     private int pageSize;
-    private List<StoreResponse> stores;
+    private List<StoreSummaryResponse> stores;
 
     public static StorePageResponse of(UUID categoryId, String categoryName, Slice<Store> slice) {
         return StorePageResponse.builder()
@@ -23,7 +23,7 @@ public class StorePageResponse {
                 .storeCategoryName(categoryName)
                 .hasNext(slice.hasNext())
                 .pageSize(slice.getSize())
-                .stores(slice.getContent().stream().map(StoreResponse::fromEntity).toList())
+                .stores(slice.getContent().stream().map(StoreSummaryResponse::fromEntity).toList())
                 .build();
     }
 }
