@@ -27,6 +27,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -41,6 +42,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 setAuthentication(username);
             } catch (BusinessException e) {
                 sendErrorResponse(response, e.getErrorCode());
+                return;
+            } catch (Exception e) {
+                sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
                 return;
             }
         }
@@ -65,8 +69,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode)
             throws IOException {
         response.setStatus(errorCode.getStatus().value());
-        response.setContentType("application/json;charset=UTF=8");
-        String json = new ObjectMapper().writeValueAsString(ApiResponse.error(errorCode));
+        response.setContentType("application/json;charset=UTF-8");
+        String json = objectMapper.writeValueAsString(ApiResponse.error(errorCode));
         response.getWriter().write(json);
     }
 }

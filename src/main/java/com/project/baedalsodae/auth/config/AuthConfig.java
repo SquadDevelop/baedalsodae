@@ -43,7 +43,7 @@ public class AuthConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, userDetailsService);
+        return new JwtAuthorizationFilter(jwtProvider, userDetailsService, objectMapper);
     }
 
     @Bean
@@ -58,15 +58,11 @@ public class AuthConfig {
                 (authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers(
-                                        PathRequest.toStaticResources().atCommonLocations())
-                                .permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/signup")
-                                .permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/logout")
-                                .authenticated()
-                                .anyRequest()
-                                .permitAll()
-                //                .anyRequest().authenticated()
+                                        PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                                .requestMatchers("/user/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                                .anyRequest().permitAll()
+//                                .anyRequest().authenticated()
                 );
 
         http.exceptionHandling(
