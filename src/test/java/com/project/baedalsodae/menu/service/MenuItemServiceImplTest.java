@@ -61,6 +61,18 @@ class MenuItemServiceImplTest {
   private void givenCategoryAndStoreExist() {
     createCategoryAndStoreFixture(menuCategoryRepository, menuCategoryId, storeId);
   }
+
+  private void givenMenuItemFields(MenuItem item, MenuCategory category, int orderNo) {
+    lenient().when(item.getId()).thenReturn(menuItemId);
+    lenient().when(item.getName()).thenReturn(DEFAULT_MENU_ITEM_NAME);
+    lenient().when(item.getDescription()).thenReturn(DEFAULT_ITEM_DESCRIPTION);
+    lenient().when(item.getPrice()).thenReturn(DEFAULT_ITEM_PRICE);
+    lenient().when(item.getOrderNo()).thenReturn(orderNo);
+    lenient().when(item.isPopular()).thenReturn(false);
+    lenient().when(item.getMenuStatus()).thenReturn(MenuStatus.AVAILABLE);
+    lenient().when(item.getMenuCategory()).thenReturn(category);
+  }
+
   @Nested
   @DisplayName("메뉴 아이템 생성")
   class CreateMenuItem {
@@ -175,4 +187,138 @@ class MenuItemServiceImplTest {
     }
   }
 
+  @Nested
+  @DisplayName("메뉴 아이템 전체 수정")
+  class UpdateMenuItem {
+
+    private MenuItemPutRequestDto request;
+    private MenuItem item;
+    private MenuCategory newCategory;
+
+    @BeforeEach
+    void setUp() {
+      UUID newCategoryId = UUID.randomUUID();
+      request = aPutRequest().withCategoryId(newCategoryId).build();
+    }
+
+    private void givenItemAndNewCategoryExist(UUID newCategoryId) {
+      item = mock(MenuItem.class);
+      newCategory = mock(MenuCategory.class);
+      Store newStore = mock(Store.class);
+      UUID newStoreId = UUID.randomUUID();
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.of(item));
+      given(menuCategoryRepository.findByIdAndDeletedIsFalse(newCategoryId))
+          .willReturn(Optional.of(newCategory));
+      given(newCategory.getStore()).willReturn(newStore);
+      given(newStore.getId()).willReturn(newStoreId);
+    }
+
+    @Test
+    @DisplayName("실패: 메뉴 아이템이 없으면 예외가 발생한다")
+    void updateMenuItem_fail_notFound() {
+      // given
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.updateMenuItem(menuItemId, request))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패: 카테고리가 없으면 예외가 발생한다")
+    void updateMenuItem_fail_categoryNotFound() {
+      // given
+      UUID newCategoryId = UUID.randomUUID();
+      MenuItemPutRequestDto testRequest = aPutRequest().withCategoryId(newCategoryId).build();
+      item = mock(MenuItem.class);
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.of(item));
+      given(menuCategoryRepository.findByIdAndDeletedIsFalse(newCategoryId))
+          .willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.updateMenuItem(menuItemId, testRequest))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패: 변경하려는 이름이 같은 가게에 이미 존재하면 예외가 발생한다")
+    void updateMenuItem_fail_duplicateName() {
+      // given
+      UUID newCategoryId = request.categoryId();
+      UUID newStoreId = UUID.randomUUID();
+      givenItemAndNewCategoryExist(newCategoryId);
+      given(item.getName()).willReturn(DEFAULT_MENU_ITEM_NAME);
+      given(newCategory.getStore().getId()).willReturn(newStoreId);
+      given(
+              menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                  newStoreId, ALTERNATIVE_MENU_ITEM_NAME))
+          .willReturn(true);
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.updateMenuItem(menuItemId, request))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+    }
+
+    @Test
+    @DisplayName("성공: 이름이 동일한 경우 중복 체크 없이 수정된다")
+    void updateMenuItem_success_sameName() {
+      // given
+      UUID newCategoryId = UUID.randomUUID();
+      MenuItemPutRequestDto sameNameRequest =
+          aPutRequest()
+              .withName(DEFAULT_MENU_ITEM_NAME)
+              .withDescription("새로운 설명")
+              .withPrice(20000)
+              .withIsPopular(false)
+              .withCategoryId(newCategoryId)
+              .withMenuStatus(MenuStatus.SOLD_OUT)
+              .withTagNames(List.of())
+              .build();
+      givenItemAndNewCategoryExist(newCategoryId);
+      given(newCategory.getId()).willReturn(newCategoryId);
+      given(newCategory.getName()).willReturn(DEFAULT_CATEGORY_NAME);
+      givenMenuItemFields(item, newCategory, FIRST_ORDER_NUMBER);
+
+      // when
+      menuItemService.updateMenuItem(menuItemId, sameNameRequest);
+
+      // then
+      verify(menuItemRepository, never()).existsByStoreIdAndNameAndDeletedIsFalse(any(), any());
+    }
+
+    @Test
+    @DisplayName("성공: 메뉴 아이템 정보를 전체 수정하고 태그를 갱신한다")
+    void updateMenuItem_success() {
+      // given
+      UUID newCategoryId = request.categoryId();
+      UUID newStoreId = UUID.randomUUID();
+      givenItemAndNewCategoryExist(newCategoryId);
+      given(newCategory.getStore().getId()).willReturn(newStoreId);
+      given(
+              menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                  newStoreId, ALTERNATIVE_MENU_ITEM_NAME))
+          .willReturn(false);
+      given(newCategory.getId()).willReturn(newCategoryId);
+      given(newCategory.getName()).willReturn(DEFAULT_CATEGORY_NAME);
+      givenMenuItemFields(item, newCategory, FIRST_ORDER_NUMBER);
+
+      // when
+      menuItemService.updateMenuItem(menuItemId, request);
+
+      // then
+      verify(item)
+          .changeMenuInfo(
+              ALTERNATIVE_MENU_ITEM_NAME,
+              ALTERNATIVE_ITEM_DESCRIPTION,
+              ALTERNATIVE_ITEM_PRICE,
+              MenuStatus.AVAILABLE,
+              newCategory,
+              true);
+      verify(tagMappingService).deleteAllTagMappingByMenuItemId(menuItemId);
+      verify(tagMappingService).createTagMappings(item, List.of("치킨"));
+    }
+  }
 }

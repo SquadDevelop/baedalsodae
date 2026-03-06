@@ -19,6 +19,9 @@ public class MenuItemRequestFixture {
     return new MenuItemPostRequestBuilder();
   }
 
+  public static MenuItemPutRequestBuilder aPutRequest() {
+    return new MenuItemPutRequestBuilder();
+  }
   public static MenuItemPostRequestDto createDefaultPostRequest() {
     return aPostRequest().build();
   }
@@ -65,5 +68,54 @@ public class MenuItemRequestFixture {
     }
   }
 
+  public static class MenuItemPutRequestBuilder {
+    private String name = ALTERNATIVE_MENU_ITEM_NAME;
+    private String description = ALTERNATIVE_ITEM_DESCRIPTION;
+    private Integer price = ALTERNATIVE_ITEM_PRICE;
+    private Boolean isPopular = true;
+    private UUID categoryId;
+    private MenuStatus menuStatus = MenuStatus.AVAILABLE;
+    private List<String> tagNames = List.of("치킨");
+
+    public MenuItemPutRequestBuilder withName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public MenuItemPutRequestBuilder withDescription(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public MenuItemPutRequestBuilder withPrice(Integer price) {
+      this.price = price;
+      return this;
+    }
+
+    public MenuItemPutRequestBuilder withIsPopular(Boolean isPopular) {
+      this.isPopular = isPopular;
+      return this;
+    }
+
+    public MenuItemPutRequestBuilder withCategoryId(UUID categoryId) {
+      this.categoryId = categoryId;
+      return this;
+    }
+
+    public MenuItemPutRequestBuilder withMenuStatus(MenuStatus menuStatus) {
+      this.menuStatus = menuStatus;
+      return this;
+    }
+
+    public MenuItemPutRequestBuilder withTagNames(List<String> tagNames) {
+      this.tagNames = tagNames;
+      return this;
+    }
+
+    public MenuItemPutRequestDto build() {
+      return new MenuItemPutRequestDto(
+          name, description, price, isPopular, categoryId, menuStatus, tagNames);
+    }
+  }
 
 }
