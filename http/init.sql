@@ -40,7 +40,7 @@ VALUES (DEFAULT, true, 1, 18000, null, null, null, null, null, '00000000-0000-00
         '00000000-0000-0000-0000-000000000001', null, null, null, '치킨');
 
 -- 결제 정보 생성
-    INSERT INTO baedalsodae.p_payment (amount, payment_method, payment_status, created_at, paid_at, updated_at, created_by, id, order_id, updated_by, user_id) VALUES (36000.00, 0, 1, null, null, null, '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', '5186c2ed-c444-41ff-9bae-a4716791a91c', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010')
+    INSERT INTO baedalsodae.p_payment (amount, payment_method, payment_status, created_at, paid_at, updated_at, created_by, id, order_id, updated_by, user_id) VALUES (36000.00, 0, 'SUCCESS', null, null, null, '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', '5186c2ed-c444-41ff-9bae-a4716791a91c', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010')
 
 --
 -- -- 장바구니 추가
