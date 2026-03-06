@@ -136,9 +136,7 @@ class CartControllerTest {
     void removeCartItem_success() throws Exception {
         UUID cartItemId = UUID.randomUUID();
 
-        mockMvc.perform(
-                        delete("/carts/items/{cartItemId}", cartItemId)
-                                .header("X-User-Id", userId))
+        mockMvc.perform(delete("/carts/items/{cartItemId}", cartItemId).header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_REMOVED.getCode()));
