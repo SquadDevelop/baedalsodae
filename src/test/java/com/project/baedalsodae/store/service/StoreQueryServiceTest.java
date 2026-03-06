@@ -1,5 +1,10 @@
 package com.project.baedalsodae.store.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.Address;
@@ -16,6 +21,9 @@ import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
 import com.project.baedalsodae.store.service.impl.StoreQueryServiceImpl;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,15 +36,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class StoreQueryServiceTest {
 
@@ -45,8 +44,7 @@ class StoreQueryServiceTest {
     @Mock private StoreCustomRepository storeCustomRepository;
     @Mock private MenuCategoryCustomRepository menuCategoryCustomRepository;
 
-    @InjectMocks
-    private StoreQueryServiceImpl storeQueryService;
+    @InjectMocks private StoreQueryServiceImpl storeQueryService;
 
     private UUID userId;
     private UUID storeId;
@@ -60,18 +58,18 @@ class StoreQueryServiceTest {
         storeId = UUID.randomUUID();
         storeCategoryId = UUID.randomUUID();
 
-        storeCategory = StoreCategory.createStoreCategory("치킨","짱짱 맛있음");
+        storeCategory = StoreCategory.createStoreCategory("치킨", "짱짱 맛있음");
 
         Address address = Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세");
-        store = Store.createStore(
-                userId,
-                storeCategory,
-                "감자네 치킨",
-                "123-45-67890",
-                "02-1234-5678",
-                address,
-                "맛있는 치킨집"
-        );
+        store =
+                Store.createStore(
+                        userId,
+                        storeCategory,
+                        "감자네 치킨",
+                        "123-45-67890",
+                        "02-1234-5678",
+                        address,
+                        "맛있는 치킨집");
 
         // ReflectionTestUtils 사용
         ReflectionTestUtils.setField(store, "id", storeId);
@@ -87,8 +85,10 @@ class StoreQueryServiceTest {
             // given
             given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
 
-            List<MenuCategoryItemsResponse> mockMenuList = List.of(mock(MenuCategoryItemsResponse.class));
-            given(menuCategoryCustomRepository.getStoreCategoryItems(storeId)).willReturn(mockMenuList);
+            List<MenuCategoryItemsResponse> mockMenuList =
+                    List.of(mock(MenuCategoryItemsResponse.class));
+            given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
+                    .willReturn(mockMenuList);
 
             // when
             StoreDetailResponse response = storeQueryService.getStoreDetail(storeId);
@@ -127,8 +127,10 @@ class StoreQueryServiceTest {
             String role = "OWNER";
 
             // when & then
-            BusinessException exception = assertThrows(BusinessException.class,
-                    () -> storeQueryService.getStoreForOwner(storeId, otherUserId, role));
+            BusinessException exception =
+                    assertThrows(
+                            BusinessException.class,
+                            () -> storeQueryService.getStoreForOwner(storeId, otherUserId, role));
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.STORE_FORBIDDEN);
         }
 
@@ -140,8 +142,10 @@ class StoreQueryServiceTest {
             String role = "ADMIN";
 
             // when & then
-            BusinessException exception = assertThrows(BusinessException.class,
-                    () -> storeQueryService.getStoreForOwner(storeId, userId, role));
+            BusinessException exception =
+                    assertThrows(
+                            BusinessException.class,
+                            () -> storeQueryService.getStoreForOwner(storeId, userId, role));
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.STORE_FORBIDDEN);
         }
     }
@@ -156,20 +160,25 @@ class StoreQueryServiceTest {
             StoreCursorRequest cursorRequest = mock(StoreCursorRequest.class);
             SortType sortType = SortType.LATEST;
 
-            given(storeCategoryRepository.findById(storeCategoryId)).willReturn(Optional.of(storeCategory));
+            given(storeCategoryRepository.findById(storeCategoryId))
+                    .willReturn(Optional.of(storeCategory));
 
             Slice<Store> mockSlice = new SliceImpl<>(List.of(store));
-            given(storeCustomRepository.findStoresByCursor(eq(storeCategoryId), any(), eq(sortType)))
+            given(
+                            storeCustomRepository.findStoresByCursor(
+                                    eq(storeCategoryId), any(), eq(sortType)))
                     .willReturn(mockSlice);
 
             // when
-            StorePageResponse response = storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
+            StorePageResponse response =
+                    storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
 
             // then
             assertThat(response).isNotNull();
             assertThat(response.getStoreCategoryId()).isEqualTo(storeCategoryId);
             verify(cursorRequest).normalize(sortType);
-            verify(storeCustomRepository).findStoresByCursor(eq(storeCategoryId), any(), eq(sortType));
+            verify(storeCustomRepository)
+                    .findStoresByCursor(eq(storeCategoryId), any(), eq(sortType));
         }
     }
 }

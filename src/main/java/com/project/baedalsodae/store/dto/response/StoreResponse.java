@@ -2,11 +2,9 @@ package com.project.baedalsodae.store.dto.response;
 
 import com.project.baedalsodae.global.common.dto.AddressResponse;
 import com.project.baedalsodae.store.entity.Store;
-import com.project.baedalsodae.store.entity.enums.StoreStatus;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.UUID;
 
 @Getter
 @Builder

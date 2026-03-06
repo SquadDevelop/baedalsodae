@@ -1,21 +1,18 @@
 package com.project.baedalsodae.menu.repository.custom;
 
+import static com.project.baedalsodae.menu.entity.QMenuCategory.menuCategory;
+import static com.project.baedalsodae.menu.entity.QMenuItem.menuItem;
+
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryItemsResponse;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
-
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Repository;
-
 import java.util.*;
-
-import static com.project.baedalsodae.menu.entity.QMenuCategory.menuCategory;
-import static com.project.baedalsodae.menu.entity.QMenuItem.menuItem;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -38,12 +35,8 @@ public class MenuCategoryCustomRepositoryImpl implements MenuCategoryCustomRepos
                         menuCategory.store.id.eq(storeId),
                         menuCategory.isDeleted.isFalse(),
                         menuItem.isDeleted.isFalse(),
-                        menuItem.menuStatus.ne(MenuStatus.HIDDEN)
-                )
-                .orderBy(
-                        menuCategory.orderNo.asc(),
-                        menuItem.orderNo.asc()
-                )
+                        menuItem.menuStatus.ne(MenuStatus.HIDDEN))
+                .orderBy(menuCategory.orderNo.asc(), menuItem.orderNo.asc())
                 .fetch();
     }
 
@@ -54,10 +47,11 @@ public class MenuCategoryCustomRepositoryImpl implements MenuCategoryCustomRepos
                     .add(tuple.get(menuItem));
         }
         return grouped.entrySet().stream()
-                .map(entry -> MenuCategoryItemsResponse.of(
-                        MenuCategoryResponseDto.fromEntity(entry.getKey()),
-                        entry.getValue()
-                ))
+                .map(
+                        entry ->
+                                MenuCategoryItemsResponse.of(
+                                        MenuCategoryResponseDto.fromEntity(entry.getKey()),
+                                        entry.getValue()))
                 .toList();
     }
 }

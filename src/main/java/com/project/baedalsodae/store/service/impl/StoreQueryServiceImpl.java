@@ -16,11 +16,9 @@ import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
 import com.project.baedalsodae.store.service.StoreQueryService;
-
+import com.project.baedalsodae.user.entity.UserRole;
 import java.util.List;
 import java.util.UUID;
-
-import com.project.baedalsodae.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -52,10 +50,11 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     public StoreDetailResponse getStoreDetail(UUID storeId) {
         Store store = getStore(storeId);
 
-        List<MenuCategoryItemsResponse> storeMenuCategoryItemsList
-                = menuCategoryCustomRepository.getStoreCategoryItems(storeId);
+        List<MenuCategoryItemsResponse> storeMenuCategoryItemsList =
+                menuCategoryCustomRepository.getStoreCategoryItems(storeId);
 
-        return StoreDetailResponse.of(StoreSummaryResponse.fromEntity(store), storeMenuCategoryItemsList);
+        return StoreDetailResponse.of(
+                StoreSummaryResponse.fromEntity(store), storeMenuCategoryItemsList);
     }
 
     @Override

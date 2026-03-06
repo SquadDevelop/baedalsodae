@@ -52,8 +52,7 @@ public class StoreController {
     public ResponseEntity<ApiResponse<StoreResponse>> getStoreForOwner(
             @RequestHeader("X-User-Id") UUID userId,
             @RequestHeader("X-User-Role") String role,
-            @PathVariable("storeId") UUID storeId
-            ) {
+            @PathVariable("storeId") UUID storeId) {
         StoreResponse response = storeQueryService.getStoreForOwner(storeId, userId, role);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_FOUND_FOR_OWNER, response));
     }

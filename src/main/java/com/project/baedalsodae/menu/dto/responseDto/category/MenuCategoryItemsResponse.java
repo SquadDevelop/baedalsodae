@@ -1,11 +1,10 @@
 package com.project.baedalsodae.menu.dto.responseDto.category;
 
 import com.project.baedalsodae.menu.entity.MenuItem;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 @Getter
@@ -43,9 +42,7 @@ public class MenuCategoryItemsResponse {
         }
 
         public static List<MenuItemSummary> fromList(List<MenuItem> menuItems) {
-            return menuItems.stream()
-                    .map(MenuItemSummary::fromEntity)
-                    .toList();
+            return menuItems.stream().map(MenuItemSummary::fromEntity).toList();
         }
     }
 }

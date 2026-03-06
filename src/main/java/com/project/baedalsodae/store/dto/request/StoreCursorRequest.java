@@ -10,8 +10,7 @@ public record StoreCursorRequest(
         Instant lastCreatedAt,
         Double lastRating,
         Integer lastReviewCount,
-        @Min(1) Integer size
-) {
+        @Min(1) Integer size) {
     public StoreCursorRequest normalize(SortType sortType) {
         if (lastId != null) return this; // 첫 페이지 아니면 그대로
 
