@@ -58,11 +58,15 @@ public class AuthConfig {
                 (authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .requestMatchers(
-                                        PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                                .requestMatchers("/users/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
-                                .anyRequest().permitAll()
-//                                .anyRequest().authenticated()
+                                        PathRequest.toStaticResources().atCommonLocations())
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/**")
+                                .permitAll()
+                                .requestMatchers("/users/me")
+                                .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                                .anyRequest()
+                                .permitAll()
+                //                                .anyRequest().authenticated()
                 );
 
         http.exceptionHandling(

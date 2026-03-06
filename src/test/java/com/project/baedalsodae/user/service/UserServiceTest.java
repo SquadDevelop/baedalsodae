@@ -166,15 +166,15 @@ class UserServiceTest {
     }
 
     private User createTestUser(UUID userId, String username, String password) {
-        User user = User.create(
-                username,
-                "010-1234-5678",
-                "tester@example.com",
-                password,
-                "테스터",
-                "테스터A",
-                UserRole.CUSTOMER
-        );
+        User user =
+                User.create(
+                        username,
+                        "010-1234-5678",
+                        "tester@example.com",
+                        password,
+                        "테스터",
+                        "테스터A",
+                        UserRole.CUSTOMER);
         ReflectionTestUtils.setField(user, "id", userId);
 
         return user;

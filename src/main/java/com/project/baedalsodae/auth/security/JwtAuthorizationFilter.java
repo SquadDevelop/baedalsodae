@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,7 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             } catch (BusinessException e) {
                 sendErrorResponse(response, e.getErrorCode());
                 return;
-            } catch (Exception e) {
+            } catch (AuthenticationException e) {
                 sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
                 return;
             }
