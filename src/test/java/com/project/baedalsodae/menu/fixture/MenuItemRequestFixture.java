@@ -1,0 +1,66 @@
+package com.project.baedalsodae.menu.fixture;
+
+import static com.project.baedalsodae.menu.fixture.MenuTestConstants.*;
+
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
+import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
+import com.project.baedalsodae.menu.entity.enums.MenuStatus;
+import java.util.List;
+import java.util.UUID;
+
+public class MenuItemRequestFixture {
+
+  private MenuItemRequestFixture() {
+    throw new AssertionError("Utility class should not be instantiated");
+  }
+
+  public static MenuItemPostRequestBuilder aPostRequest() {
+    return new MenuItemPostRequestBuilder();
+  }
+
+  public static class MenuItemPostRequestBuilder {
+    private String name = DEFAULT_MENU_ITEM_NAME;
+    private String description = DEFAULT_ITEM_DESCRIPTION;
+    private Integer price = DEFAULT_ITEM_PRICE;
+    private Boolean isPopular = false;
+    private MenuStatus menuStatus = MenuStatus.AVAILABLE;
+    private List<String> tagNames = List.of("치킨", "바삭");
+
+    public MenuItemPostRequestBuilder withName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public MenuItemPostRequestBuilder withDescription(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public MenuItemPostRequestBuilder withPrice(Integer price) {
+      this.price = price;
+      return this;
+    }
+
+    public MenuItemPostRequestBuilder withIsPopular(Boolean isPopular) {
+      this.isPopular = isPopular;
+      return this;
+    }
+
+    public MenuItemPostRequestBuilder withMenuStatus(MenuStatus menuStatus) {
+      this.menuStatus = menuStatus;
+      return this;
+    }
+
+    public MenuItemPostRequestBuilder withTagNames(List<String> tagNames) {
+      this.tagNames = tagNames;
+      return this;
+    }
+
+    public MenuItemPostRequestDto build() {
+      return new MenuItemPostRequestDto(name, description, price, isPopular, menuStatus, tagNames);
+    }
+  }
+
+
+}
