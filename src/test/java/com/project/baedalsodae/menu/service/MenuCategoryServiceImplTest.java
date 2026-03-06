@@ -233,6 +233,79 @@ class MenuCategoryServiceImplTest {
         }
     }
 
+    @Nested
+    @DisplayName("메뉴 카테고리 삭제")
+    class DeleteMenuCategory {
+
+        private MenuCategory targetCategory;
+        private MenuCategory category1;
+        private MenuCategory category3;
+
+        private void givenCategoriesForDeletion() {
+            targetCategory = mock(MenuCategory.class);
+            Store store = mock(Store.class);
+            given(targetCategory.getStore()).willReturn(store);
+            given(store.getId()).willReturn(storeId);
+            given(targetCategory.getOrderNo()).willReturn(SECOND_ORDER_NUMBER);
+            given(targetCategory.hasItem()).willReturn(false);
+
+            category1 = mock(MenuCategory.class);
+            given(category1.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
+
+            category3 = mock(MenuCategory.class);
+            given(category3.getOrderNo()).willReturn(THIRD_ORDER_NUMBER);
+
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.of(targetCategory));
+            given(menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId))
+                    .willReturn(List.of(category1, targetCategory, category3));
+        }
+
+        @Test
+        @DisplayName("실패: 카테고리가 존재하지 않으면 예외가 발생한다")
+        void deleteMenuCategory_fail_notFound() {
+            // given
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(menuCategoryId))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: 카테고리에 아이템이 존재하면 예외가 발생한다")
+        void deleteMenuCategory_fail_hasItems() {
+            // given
+            MenuCategory category = mock(MenuCategory.class);
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.of(category));
+            given(category.hasItem()).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(menuCategoryId))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_HAS_ITEMS);
+        }
+
+        @Test
+        @DisplayName("성공: 카테고리를 소프트 삭제하고 뒤의 순서를 앞으로 당긴다")
+        void deleteMenuCategory_success() {
+            // given
+            givenCategoriesForDeletion();
+
+            // when
+            menuCategoryService.deleteMenuCategory(menuCategoryId);
+
+            // then
+            verify(targetCategory).softDelete(null);
+            verify(category3).changeOrderNo(SECOND_ORDER_NUMBER);
+            verify(category1, never()).changeOrderNo(any());
+        }
+    }
 
     @Nested
     @DisplayName("메뉴 카테고리 순서 변경")
