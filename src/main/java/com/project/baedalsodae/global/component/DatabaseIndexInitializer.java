@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DatabaseIndexInitializer implements ApplicationRunner {
 
-  private final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-  @Override
-  public void run(ApplicationArguments args) {
-    jdbcTemplate.execute(
-        """
+    @Override
+    public void run(ApplicationArguments args) {
+        jdbcTemplate.execute(
+                """
       CREATE UNIQUE INDEX IF NOT EXISTS uq_menu_category_name_active
       ON baedalsodae.p_menu_category (store_id, name)
       WHERE is_deleted = false
       """);
-  }
+    }
 }

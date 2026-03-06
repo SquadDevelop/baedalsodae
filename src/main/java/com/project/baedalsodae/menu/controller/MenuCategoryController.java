@@ -26,7 +26,8 @@ public class MenuCategoryController {
 
     @PutMapping("/{menuCategoryId}")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> updateMenuCategory(
-            @PathVariable UUID menuCategoryId, @Valid @RequestBody MenuCategoryPutRequestDto request) {
+            @PathVariable UUID menuCategoryId,
+            @Valid @RequestBody MenuCategoryPutRequestDto request) {
         MenuCategoryResponseDto response =
                 menuCategoryService.updateMenuCategory(menuCategoryId, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_UPDATED, response));
