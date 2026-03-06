@@ -161,7 +161,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable = catchThrowable(() -> orderService.createOrder(userId, request));
@@ -199,7 +199,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
         given(cart.getTotalAmount()).willReturn(0);
 
@@ -245,7 +245,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
         given(cart.getTotalAmount()).willReturn(18000);
 
@@ -305,7 +305,7 @@ public class OrderServiceTest {
 
         given(cart.hasNoItems()).willReturn(false);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
         given(cart.getTotalAmount()).willReturn(26000);
 
@@ -622,7 +622,7 @@ public class OrderServiceTest {
         UUID storeId = UUID.randomUUID();
         OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable =
@@ -645,7 +645,7 @@ public class OrderServiceTest {
         UUID otherOwnerId = UUID.randomUUID();
         OrderListRequest request = OrderListRequest.builder().storeId(storeId).build();
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(otherOwnerId);
 
         // when
@@ -668,7 +668,7 @@ public class OrderServiceTest {
         UUID storeId = UUID.randomUUID();
         OrderListRequest request = OrderListRequest.builder().storeId(storeId).size(20).build();
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
         given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
                 .willReturn(List.of());
@@ -696,7 +696,7 @@ public class OrderServiceTest {
                 new ArrayList<>(
                         Collections.nCopies(size + 1, OrderSummaryResponse.builder().build()));
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
         given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class))).willReturn(orders);
 
@@ -723,7 +723,7 @@ public class OrderServiceTest {
         List<OrderSummaryResponse> orders =
                 new ArrayList<>(Collections.nCopies(21, OrderSummaryResponse.builder().build()));
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
         given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class))).willReturn(orders);
 
@@ -759,7 +759,7 @@ public class OrderServiceTest {
 
         List<OrderSummaryResponse> filteredOrders = List.of(OrderSummaryResponse.builder().build());
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
         given(store.getUserId()).willReturn(userId);
         given(orderQueryRepository.findOrdersByStore(any(OrderListQuery.class)))
                 .willReturn(filteredOrders);
