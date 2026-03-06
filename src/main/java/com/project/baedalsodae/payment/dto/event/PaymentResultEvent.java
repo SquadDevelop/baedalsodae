@@ -1,7 +1,7 @@
 package com.project.baedalsodae.payment.dto.event;
 
 import com.project.baedalsodae.payment.entity.Payment;
-import com.project.baedalsodae.payment.entity.enums.PaymentStatus;
+import com.project.baedalsodae.payment.entity.PaymentStatus;
 import java.util.UUID;
 
 public record PaymentResultEvent(

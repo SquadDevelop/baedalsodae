@@ -40,6 +40,9 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
+    @Column(name = "pg_transaction_id")
+    private String pgTransactionId;
+
     @Column(name = "created_by", nullable = false)
     private UUID createdBy;
 
@@ -111,6 +114,7 @@ public class Payment extends BaseTimeEntity {
         }
         this.status = PaymentStatus.SUCCESS;
         this.paidAt = LocalDateTime.now();
+        this.pgTransactionId = pgTransactionId;
     }
 
     public void markAsFailed() {
