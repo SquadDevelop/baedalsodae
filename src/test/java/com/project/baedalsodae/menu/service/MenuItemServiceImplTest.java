@@ -576,6 +576,61 @@ class MenuItemServiceImplTest {
     }
   }
 
+  @Nested
+  @DisplayName("메뉴 아이템 목록 조회")
+  class GetMenuItem {
+
+    @Test
+    @DisplayName("성공: 카테고리에 메뉴가 없으면 빈 목록을 반환한다")
+    void getMenuItem_success_empty() {
+      // given
+      given(menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId))
+          .willReturn(List.of());
+
+      // when
+      List<MenuItemResponseDto> result = menuItemService.getMenuItem(menuCategoryId);
+
+      // then
+      assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("성공: 카테고리에 속한 메뉴 아이템 목록을 orderNo 순으로 반환한다")
+    void getMenuItem_success() {
+      // given
+      MenuCategory category = createMockCategory(menuCategoryId, DEFAULT_CATEGORY_NAME);
+      MenuItem item1 =
+          createMockMenuItem(
+              UUID.randomUUID(),
+              DEFAULT_MENU_ITEM_NAME,
+              DEFAULT_ITEM_DESCRIPTION,
+              DEFAULT_ITEM_PRICE,
+              FIRST_ORDER_NUMBER,
+              true,
+              MenuStatus.AVAILABLE,
+              category);
+      MenuItem item2 =
+          createMockMenuItem(
+              UUID.randomUUID(),
+              ALTERNATIVE_MENU_ITEM_NAME,
+              "달콤",
+              ALTERNATIVE_ITEM_PRICE,
+              SECOND_ORDER_NUMBER,
+              false,
+              MenuStatus.AVAILABLE,
+              category);
+      given(menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId))
+          .willReturn(List.of(item1, item2));
+
+      // when
+      List<MenuItemResponseDto> result = menuItemService.getMenuItem(menuCategoryId);
+
+      // then
+      assertThat(result).hasSize(2);
+      assertThat(result.get(0).name()).isEqualTo(DEFAULT_MENU_ITEM_NAME);
+      assertThat(result.get(1).name()).isEqualTo(ALTERNATIVE_MENU_ITEM_NAME);
+    }
+  }
 
   @Nested
   @DisplayName("메뉴 아이템 이름 중복 확인")
