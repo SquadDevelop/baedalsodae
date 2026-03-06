@@ -42,6 +42,8 @@ public enum ErrorCode {
     INVALID_MENU_CATEGORY_ORDER("MC002", HttpStatus.BAD_REQUEST, "메뉴 카테고리 순서가 잘못됐습니다."),
     DUPLICATE_MENU_CATEGORY_NAME("MC003", HttpStatus.CONFLICT, "같은 가게에 같은 이름의 메뉴 카테고리가 존재합니다"),
     MENU_CATEGORY_ORDER_CONFLICT("MC004", HttpStatus.CONFLICT, "메뉴 카테고리 순서가 충돌했습니다. 다시 시도해주세요."),
+    MENU_CATEGORY_HAS_ITEMS(
+            "MC005", HttpStatus.BAD_REQUEST, "메뉴 카테고리에 메뉴 아이템이 존재합니다. 먼저 메뉴 아이템을 삭제해주세요."),
 
     // menuItem
     MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 없습니다"),
@@ -59,6 +61,10 @@ public enum ErrorCode {
     // order
     ORDER_INVALID_TOTAL_AMOUNT("OD001", HttpStatus.BAD_REQUEST, "총 메뉴 금액이 올바르지 않습니다."),
     ORDER_INVALID_FINAL_AMOUNT("OD002", HttpStatus.BAD_REQUEST, "총 결제 금액이 올바르지 않습니다."),
+    ORDER_INVALID_DATE_RANGE("OD003", HttpStatus.BAD_REQUEST, "종료일은 시작일보다 이후여야 합니다."),
+    ORDER_STORE_FORBIDDEN("OD004", HttpStatus.FORBIDDEN, "본인 가게의 주문만 조회할 수 있습니다."),
+    ORDER_NOT_FOUND("OD005", HttpStatus.NOT_FOUND, "주문이 없습니다."),
+    ORDER_FORBIDDEN("OD006", HttpStatus.FORBIDDEN, "본인의 주문이 아닙니다."),
 
     // payment
     PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),

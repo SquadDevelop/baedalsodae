@@ -28,4 +28,12 @@ public class OrderUtil {
         shiftBetween(items, from, to);
         target.changeOrderNo(to);
     }
+
+    public static <T extends Orderable> void deleteAndShift(List<T> items, T target) {
+        int deletedOrderNo = target.getOrderNo();
+        target.changeOrderNo(null);
+        items.stream()
+                .filter(item -> item.getOrderNo() != null && item.getOrderNo() > deletedOrderNo)
+                .forEach(item -> item.changeOrderNo(item.getOrderNo() - 1));
+    }
 }
