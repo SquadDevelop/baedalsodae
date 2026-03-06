@@ -18,7 +18,6 @@ public class StoreResponse {
     private Integer reviewCount;
     private Double avgRating;
     private String storeStatus;
-    private StoreStatus status;
     private AddressResponse address;
 
     // TODO: 가게 운영시간 추가
