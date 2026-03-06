@@ -17,7 +17,7 @@ INSERT INTO baedalsodae.p_store_category (is_deleted, created_at, deleted_at, up
 VALUES (DEFAULT, null, null, null, null, null, '00000000-0000-0000-0000-000000000001', null, '중식', null);
 
 -- 가게 추가
-INSERT INTO baedalsodae.p_store (is_deleted, rating_sum, review_count, created_at, deleted_at, updated_at,
+INSERT INTO baedalsodae.p_store (is_deleted, avg_rating, review_count, created_at, deleted_at, updated_at,
                                  business_number, created_by, deleted_by, id, store_category_id, updated_by, user_id,
                                  dong_code, phone, sido_code, sigungu_code, dong_name, name, sido_name, sigungu_name,
                                  description, detail_address, road_address, store_status)
@@ -27,9 +27,12 @@ VALUES (DEFAULT, 0, 0, null, null, null, '1111111111', null, null, '00000000-000
 
 
 -- 가게 테이블 수정에 따른 추가 데이터
-INSERT INTO baedalsodae.p_store (id, user_id, created_by, store_category_id, avg_rating, review_count, is_deleted, created_at, updated_at, business_number, dong_code, phone, sido_code, sigungu_code, dong_name, name, sido_name, sigungu_name, description, detail_address, road_address, store_status)
+INSERT INTO baedalsodae.p_store (id, user_id, created_by, store_category_id, avg_rating, review_count,
+                                 is_deleted, created_at, updated_at, business_number, dong_code, phone,
+                                 sido_code, sigungu_code, dong_name, name, sido_name, sigungu_name,
+                                 description, detail_address, road_address, store_status)
 VALUES
-    ('aaaaaaaa-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 4.9, 320, false, '2024-01-05 09:00:00+09', '2024-01-05 09:00:00+09', '1001-01-00001', '1168010100', '02-1234-0001', '11', '11680', '개포동', '맛있는 족발집', '서울특별시', '강남구', '족발 전문점입니다.', '1층', '서울특별시 강남구 개포로 1', 'OPEN'),
+    ('aaaaaaaa-0000-0000-0000-000000000051', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 4.9, 320, false, '2024-01-05 09:00:00+09', '2024-01-05 09:00:00+09', '1001-01-00001', '1168010100', '02-1234-0001', '11', '11680', '개포동', '맛있는 족발집', '서울특별시', '강남구', '족발 전문점입니다.', '1층', '서울특별시 강남구 개포로 1', 'OPEN'),
     ('aaaaaaaa-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 4.8, 295, false, '2024-01-12 10:30:00+09', '2024-01-12 10:30:00+09', '1001-01-00002', '1168010200', '02-1234-0002', '11', '11680', '일원동', '행복한 보쌈', '서울특별시', '강남구', '보쌈 전문점입니다.', '2층', '서울특별시 강남구 일원로 2', 'OPEN'),
     ('aaaaaaaa-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 4.7, 278, false, '2024-01-20 11:00:00+09', '2024-01-20 11:00:00+09', '1001-01-00003', '1168010300', '02-1234-0003', '11', '11680', '수서동', '든든한 삼겹살', '서울특별시', '강남구', '삼겹살 전문점입니다.', '1층', '서울특별시 강남구 수서로 3', 'OPEN'),
     ('aaaaaaaa-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 4.6, 261, false, '2024-02-03 12:00:00+09', '2024-02-03 12:00:00+09', '1001-01-00004', '1168010400', '02-1234-0004', '11', '11680', '세곡동', '신선한 회집', '서울특별시', '강남구', '회 전문점입니다.', '3층', '서울특별시 강남구 세곡로 4', 'OPEN'),
@@ -103,3 +106,96 @@ VALUES (DEFAULT, true, 1, 18000, null, null, null, null, null, '00000000-0000-00
 -- VALUES (1, null, null, '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
 --         '00000000-0000-0000-0000-000000000003');
 
+-- 메뉴 카테고리 추가
+INSERT INTO baedalsodae.p_menu_category
+(is_deleted, order_no, created_at, deleted_at, updated_at, created_by,
+ deleted_by, id, store_id, updated_by, name)
+VALUES
+    (DEFAULT, 1, now(), null, null, null, null,
+     '00000000-0000-0000-0000-000000000101',
+     'aaaaaaaa-0000-0000-0000-000000000001',
+     null, '인기 메뉴'),
+
+    (DEFAULT, 2, now(), null, null, null, null,
+     '00000000-0000-0000-0000-000000000102',
+     'aaaaaaaa-0000-0000-0000-000000000001',
+     null, '치킨'),
+
+    (DEFAULT, 3, now(), null, null, null, null,
+     '00000000-0000-0000-0000-000000000103',
+     'aaaaaaaa-0000-0000-0000-000000000001',
+     null, '사이드'),
+
+    (DEFAULT, 4, now(), null, null, null, null,
+     '00000000-0000-0000-0000-000000000104',
+     'aaaaaaaa-0000-0000-0000-000000000001',
+     null, '음료');
+
+-- 메뉴 추가
+INSERT INTO baedalsodae.p_menu_item
+(is_deleted, is_popular, order_no, price, created_at, deleted_at, updated_at,
+ created_by, deleted_by, id, menu_category_id, updated_by, description, menu_status, name)
+VALUES
+-- 인기 메뉴
+(DEFAULT, true, 1, 18000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000201',
+ '00000000-0000-0000-0000-000000000101',
+ null, '바삭한 후라이드 치킨', 'AVAILABLE', '후라이드 치킨'),
+
+(DEFAULT, true, 2, 19000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000202',
+ '00000000-0000-0000-0000-000000000101',
+ null, '달콤한 양념 치킨', 'AVAILABLE', '양념 치킨'),
+
+(DEFAULT, true, 3, 20000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000203',
+ '00000000-0000-0000-0000-000000000101',
+ null, '마늘 간장 치킨', 'AVAILABLE', '간장 치킨'),
+
+-- 치킨
+(DEFAULT, false, 1, 18000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000204',
+ '00000000-0000-0000-0000-000000000102',
+ null, '기본 후라이드', 'AVAILABLE', '후라이드'),
+
+(DEFAULT, false, 2, 19500, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000205',
+ '00000000-0000-0000-0000-000000000102',
+ null, '매콤 양념', 'AVAILABLE', '양념치킨'),
+
+(DEFAULT, false, 3, 21000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000206',
+ '00000000-0000-0000-0000-000000000102',
+ null, '달콤 간장', 'SOLD_OUT', '간장치킨'),
+
+-- 사이드
+(DEFAULT, false, 1, 5000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000207',
+ '00000000-0000-0000-0000-000000000103',
+ null, '바삭한 감자튀김', 'SOLD_OUT', '감자튀김'),
+
+(DEFAULT, false, 2, 6000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000208',
+ '00000000-0000-0000-0000-000000000103',
+ null, '치즈볼', 'AVAILABLE', '치즈볼'),
+
+(DEFAULT, false, 3, 7000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000209',
+ '00000000-0000-0000-0000-000000000103',
+ null, '떡볶이', 'AVAILABLE', '국물 떡볶이'),
+
+-- 음료
+(DEFAULT, false, 1, 2000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000210',
+ '00000000-0000-0000-0000-000000000104',
+ null, '콜라', 'AVAILABLE', '콜라'),
+
+(DEFAULT, false, 2, 2000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000211',
+ '00000000-0000-0000-0000-000000000104',
+ null, '사이다', 'AVAILABLE', '사이다'),
+
+(DEFAULT, false, 3, 3000, now(), null, null, null, null,
+ '00000000-0000-0000-0000-000000000212',
+ '00000000-0000-0000-0000-000000000104',
+ null, '제로콜라', 'PREPARING', '콜라 제로');
