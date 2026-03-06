@@ -66,8 +66,7 @@ public enum ErrorCode {
     PAYMENT_ALREADY_DONE("PY003", HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다."),
 
     // pg
-    PAYMENT_GATEWAY_NOT_FOUND("PG001", HttpStatus.INTERNAL_SERVER_ERROR, "결제 게이트웨이 설정이 잘못됐습니다.")
-    ;
+    PAYMENT_GATEWAY_NOT_FOUND("PG001", HttpStatus.INTERNAL_SERVER_ERROR, "결제 게이트웨이 설정이 잘못됐습니다.");
 
     private final String code;
     private final HttpStatus status;

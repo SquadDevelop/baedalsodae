@@ -14,16 +14,15 @@ import com.project.baedalsodae.payment.pg.service.PGClient;
 import com.project.baedalsodae.payment.publisher.PaymentEventPublisher;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.payment.service.PaymentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -74,21 +73,33 @@ public class PaymentServiceImpl implements PaymentService {
 
         // pg 설정
         PGClient pgClient = paymentGateways.get(PGProviderType.WIREPG);
-        if(pgClient == null) {
+        if (pgClient == null) {
             throw new BusinessException(ErrorCode.PAYMENT_GATEWAY_NOT_FOUND);
         }
 
         // payment 생성 & 저장
-        Payment payment = Payment.create(orderId, userId, BigDecimal.valueOf(finalAmount),
-            PaymentMethod.CREDIT_CARD, PaymentStatus.PENDING, null, userId);
+        Payment payment =
+                Payment.create(
+                        orderId,
+                        userId,
+                        BigDecimal.valueOf(finalAmount),
+                        PaymentMethod.CREDIT_CARD,
+                        PaymentStatus.PENDING,
+                        null,
+                        userId);
         paymentRepository.save(payment);
 
         // pg에 결제 요청
-        PGPaymentRequest pgPaymentRequest = new PGPaymentRequest(orderId,userId, PaymentMethod.CREDIT_CARD, BigDecimal.valueOf(finalAmount));
+        PGPaymentRequest pgPaymentRequest =
+                new PGPaymentRequest(
+                        orderId,
+                        userId,
+                        PaymentMethod.CREDIT_CARD,
+                        BigDecimal.valueOf(finalAmount));
         PGPaymentResponse response = pgClient.pay(pgPaymentRequest);
 
         // 결제 결과 따라서 payment update
-        if(response.status() == PaymentStatus.SUCCESS) {
+        if (response.status() == PaymentStatus.SUCCESS) {
             payment.markAsSuccess(response.pgTransactionId());
         } else {
             payment.markAsFailed();
