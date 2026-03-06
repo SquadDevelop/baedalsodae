@@ -6,6 +6,7 @@ import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
 import com.project.baedalsodae.menu.service.MenuItemService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class MenuItemController {
 
     @PutMapping("/{menuItemId}")
     public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItem(
-            @PathVariable UUID menuItemId, @RequestBody MenuItemPutRequestDto request) {
+            @PathVariable UUID menuItemId, @Valid @RequestBody MenuItemPutRequestDto request) {
         MenuItemResponseDto response = menuItemService.updateMenuItem(menuItemId, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_UPDATED, response));
     }

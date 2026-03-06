@@ -26,7 +26,7 @@ public class MenuCategoryController {
 
     @PutMapping("/{menuCategoryId}")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> updateMenuCategory(
-            @PathVariable UUID menuCategoryId, @RequestBody MenuCategoryPutRequestDto request) {
+            @PathVariable UUID menuCategoryId, @Valid @RequestBody MenuCategoryPutRequestDto request) {
         MenuCategoryResponseDto response =
                 menuCategoryService.updateMenuCategory(menuCategoryId, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_UPDATED, response));
@@ -57,7 +57,7 @@ public class MenuCategoryController {
 
     @PostMapping("/{menuCategoryId}/menu-items")
     public ResponseEntity<ApiResponse<MenuItemResponseDto>> createMenuItem(
-            @PathVariable UUID menuCategoryId, @RequestBody MenuItemPostRequestDto request) {
+            @PathVariable UUID menuCategoryId, @Valid @RequestBody MenuItemPostRequestDto request) {
         MenuItemResponseDto response = menuItemService.createMenuItem(menuCategoryId, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_CREATED, response));
     }
