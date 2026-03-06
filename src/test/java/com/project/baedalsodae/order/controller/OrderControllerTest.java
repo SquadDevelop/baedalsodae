@@ -12,10 +12,7 @@ import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
-import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
-import com.project.baedalsodae.order.dto.response.OrderListResponse;
-import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
-import com.project.baedalsodae.order.dto.response.OrderSummaryResponse;
+import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -326,5 +323,141 @@ class OrderControllerTest {
                 .andDo(print())
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_FORBIDDEN.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 요청")
+    void requestOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        OrderActionStatusResponse response = OrderActionStatusResponse.builder()
+                .orderId(orderId)
+                .orderStatus(OrderStatus.ACCEPTED)
+                .build();
+
+        given(orderService.requestOrder(userId, orderId))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/request", orderId)
+                                .header("X-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code")
+                        .value(SuccessCode.ORDER_REQUESTED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 주문 요청 시 존재하지 않는 주문")
+    void requestOrder_fail_orderNotFound() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        given(orderService.requestOrder(userId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/request", orderId)
+                                .header("X-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code")
+                        .value(ErrorCode.ORDER_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 수락")
+    void acceptOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        OrderActionStatusResponse response = OrderActionStatusResponse.builder()
+                .orderId(orderId)
+                .orderStatus(OrderStatus.REJECTED)
+                .build();
+
+        given(orderService.acceptOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/accept", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code")
+                        .value(SuccessCode.ORDER_ACCEPTED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 주문 수락 시 본인 가게 주문 아님")
+    void acceptOrder_fail_storeForbidden() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderService.acceptOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/accept", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code")
+                        .value(ErrorCode.ORDER_STORE_FORBIDDEN.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 거절")
+    void rejectOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+
+        OrderActionStatusResponse response = OrderActionStatusResponse.builder()
+                .orderId(orderId)
+                .orderStatus(OrderStatus.REQUESTED)
+                .build();
+
+        given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/reject", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code")
+                        .value(SuccessCode.ORDER_REJECTED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 주문 거절 시 잘못된 상태")
+    void rejectOrder_fail_invalidStatus() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/reject", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code")
+                        .value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
     }
 }

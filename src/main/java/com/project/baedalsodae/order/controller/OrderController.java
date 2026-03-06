@@ -4,10 +4,7 @@ import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
-import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
-import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
-import com.project.baedalsodae.order.dto.response.OrderListResponse;
-import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
+import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.Valid;
@@ -66,5 +63,45 @@ public class OrderController {
                 orderService.getOrderStatus(userId, userRole, storeId, orderId);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_STATUS, response));
+    }
+
+    @PostMapping("/{orderId}/request")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> requestOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.requestOrder(userId, orderId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.ORDER_REQUESTED, response));
+    }
+
+    @PostMapping("/{orderId}/accept")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> acceptOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.acceptOrder(userId, userRole, storeId, orderId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.ORDER_ACCEPTED, response));
+    }
+
+    @PostMapping("/{orderId}/reject")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> rejectOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.rejectOrder(userId, userRole, storeId, orderId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
     }
 }
