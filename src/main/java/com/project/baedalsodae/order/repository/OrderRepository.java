@@ -14,7 +14,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     @Query(
             """
-
 			    select o from Order o
 			    join fetch o.items oi
 			    where o.id = :orderId

@@ -25,6 +25,9 @@ import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.impl.OrderServiceImpl;
+import com.project.baedalsodae.payment.entity.Payment;
+import com.project.baedalsodae.payment.entity.PaymentStatus;
+import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -53,6 +56,8 @@ public class OrderServiceTest {
 
     @Mock private StoreRepository storeRepository;
 
+    @Mock private PaymentRepository paymentRepository;
+
     @Mock private Cart cart;
 
     @Mock private Store store;
@@ -70,6 +75,8 @@ public class OrderServiceTest {
     @Mock private OrderQueryRepository orderQueryRepository;
 
     @Mock private Order order;
+
+    @Mock private Payment payment;
 
     @Mock private OrderStatusHistory orderStatusHistory;
 
@@ -1060,6 +1067,7 @@ public class OrderServiceTest {
     @DisplayName("실패 - 본인 주문이 아님")
     void requestOrder_fail_notOwner() {
 
+        // given
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
@@ -1068,11 +1076,99 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(UUID.randomUUID());
 
+        // when
         Throwable throwable =
                 catchThrowable(() -> orderService.requestOrder(userId, orderId));
 
+        //then
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("실패 - 주문에 대한 결제가 존재하지 않음")
+    void requestOrder_fail_payment_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+
+        given(paymentRepository.findByOrderId(orderId))
+                .willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+
+        //then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.PAYMENT_NOT_FOUND);
+
+    }
+
+    @Test
+    @DisplayName("실패 - 결제가 완료되지 않은 주문 요청 시도")
+    void requestOrder_fail_payment_not_completed() {
+
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+
+        given(paymentRepository.findByOrderId(orderId))
+                .willReturn(Optional.of(payment));
+
+        given(payment.getStatus()).willReturn(PaymentStatus.PENDING);
+
+         // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+
+        //then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_PAYMENT_NOT_COMPLETED);
+
+    }
+
+    @Test
+    @DisplayName("실패 - CREATED 상태가 아닌 주문 요청 시도")
+    void requestOrder_fail_invalidStatus() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+
+         given(paymentRepository.findByOrderId(orderId))
+                .willReturn(Optional.of(payment));
+
+         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
+
+        given(order.canRequest()).willReturn(false);
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_STATUS);
     }
 }

@@ -11,12 +11,16 @@ import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
+import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.order.util.OrderNoGenerator;
+import com.project.baedalsodae.payment.entity.Payment;
+import com.project.baedalsodae.payment.entity.PaymentStatus;
+import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -37,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final OrderEventPublisher eventPublisher;
     private final OrderQueryRepository orderQueryRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
@@ -209,6 +214,19 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
         }
+
+        Payment payment = paymentRepository.findByOrderId(orderId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        if (payment.getStatus() != PaymentStatus.SUCCESS) {
+            throw new BusinessException(ErrorCode.ORDER_PAYMENT_NOT_COMPLETED);
+        }
+
+        if (!order.canRequest()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+
 
         return null;
     }
