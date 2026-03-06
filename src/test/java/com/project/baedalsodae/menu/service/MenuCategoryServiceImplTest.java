@@ -401,4 +401,83 @@ class MenuCategoryServiceImplTest {
         }
     }
 
+    @Nested
+    @DisplayName("메뉴 카테고리 목록 조회")
+    class GetMenuCategories {
+
+        @Test
+        @DisplayName("성공: 가게에 카테고리가 없으면 빈 목록을 반환한다")
+        void getMenuCategories_success_empty() {
+            // given
+            given(menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId))
+                    .willReturn(List.of());
+
+            // when
+            List<MenuCategoryResponseDto> result = menuCategoryService.getMenuCategories(storeId);
+
+            // then
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("성공: 가게에 속한 카테고리 목록을 orderNo 순으로 반환한다")
+        void getMenuCategories_success() {
+            // given
+            MenuCategory category1 = createMockCategory(UUID.randomUUID(), DEFAULT_CATEGORY_NAME);
+            MenuCategory category2 =
+                    createMockCategory(UUID.randomUUID(), ALTERNATIVE_CATEGORY_NAME);
+            given(category1.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
+            given(category2.getOrderNo()).willReturn(SECOND_ORDER_NUMBER);
+            given(menuCategoryRepository.findAllByStoreIdAndDeletedIsFalse(storeId))
+                    .willReturn(List.of(category1, category2));
+
+            // when
+            List<MenuCategoryResponseDto> result = menuCategoryService.getMenuCategories(storeId);
+
+            // then
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).name()).isEqualTo(DEFAULT_CATEGORY_NAME);
+            assertThat(result.get(1).name()).isEqualTo(ALTERNATIVE_CATEGORY_NAME);
+        }
+    }
+
+    @Nested
+    @DisplayName("메뉴 카테고리 이름 중복 확인")
+    class IsDuplicateMenuCategoryName {
+
+        @Test
+        @DisplayName("중복 이름이 없으면 false를 반환한다")
+        void isDuplicateMenuCategoryName_false() {
+            // given
+            given(
+                            menuCategoryRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                                    storeId, NEW_UNIQUE_CATEGORY_NAME))
+                    .willReturn(false);
+
+            // when
+            boolean result =
+                    menuCategoryService.isDuplicateMenuCategoryName(
+                            storeId, NEW_UNIQUE_CATEGORY_NAME);
+
+            // then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        @DisplayName("중복 이름이 있으면 true를 반환한다")
+        void isDuplicateMenuCategoryName_true() {
+            // given
+            given(
+                            menuCategoryRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                                    storeId, DEFAULT_CATEGORY_NAME))
+                    .willReturn(true);
+
+            // when
+            boolean result =
+                    menuCategoryService.isDuplicateMenuCategoryName(storeId, DEFAULT_CATEGORY_NAME);
+
+            // then
+            assertThat(result).isTrue();
+        }
+    }
 }
