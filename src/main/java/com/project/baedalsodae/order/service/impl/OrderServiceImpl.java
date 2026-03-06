@@ -216,8 +216,10 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
         }
 
-        Payment payment = paymentRepository.findByOrderId(orderId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
+        Payment payment =
+                paymentRepository
+                        .findByOrderId(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
 
         if (payment.getStatus() != PaymentStatus.SUCCESS) {
             throw new BusinessException(ErrorCode.ORDER_PAYMENT_NOT_COMPLETED);
@@ -236,7 +238,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderActionStatusResponse acceptOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderActionStatusResponse acceptOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -247,7 +250,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
 
-        if (!order.canAcceptOrReject()){
+        if (!order.canAcceptOrReject()) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
@@ -262,7 +265,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderActionStatusResponse rejectOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderActionStatusResponse rejectOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -273,7 +277,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
 
-        if (!order.canAcceptOrReject()){
+        if (!order.canAcceptOrReject()) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 

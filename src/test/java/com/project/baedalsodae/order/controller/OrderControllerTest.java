@@ -331,21 +331,18 @@ class OrderControllerTest {
 
         UUID orderId = UUID.randomUUID();
 
-        OrderActionStatusResponse response = OrderActionStatusResponse.builder()
-                .orderId(orderId)
-                .orderStatus(OrderStatus.ACCEPTED)
-                .build();
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.ACCEPTED)
+                        .build();
 
-        given(orderService.requestOrder(userId, orderId))
-                .willReturn(response);
+        given(orderService.requestOrder(userId, orderId)).willReturn(response);
 
-        mockMvc.perform(
-                        post("/orders/{orderId}/request", orderId)
-                                .header("X-User-Id", userId))
+        mockMvc.perform(post("/orders/{orderId}/request", orderId).header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code")
-                        .value(SuccessCode.ORDER_REQUESTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_REQUESTED.getCode()));
     }
 
     @Test
@@ -357,13 +354,10 @@ class OrderControllerTest {
         given(orderService.requestOrder(userId, orderId))
                 .willThrow(new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        mockMvc.perform(
-                        post("/orders/{orderId}/request", orderId)
-                                .header("X-User-Id", userId))
+        mockMvc.perform(post("/orders/{orderId}/request", orderId).header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.code")
-                        .value(ErrorCode.ORDER_NOT_FOUND.getCode()));
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -373,10 +367,11 @@ class OrderControllerTest {
         UUID orderId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        OrderActionStatusResponse response = OrderActionStatusResponse.builder()
-                .orderId(orderId)
-                .orderStatus(OrderStatus.REJECTED)
-                .build();
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.REJECTED)
+                        .build();
 
         given(orderService.acceptOrder(userId, UserRole.OWNER, storeId, orderId))
                 .willReturn(response);
@@ -388,8 +383,7 @@ class OrderControllerTest {
                                 .param("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code")
-                        .value(SuccessCode.ORDER_ACCEPTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_ACCEPTED.getCode()));
     }
 
     @Test
@@ -409,8 +403,7 @@ class OrderControllerTest {
                                 .param("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code")
-                        .value(ErrorCode.ORDER_STORE_FORBIDDEN.getCode()));
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_STORE_FORBIDDEN.getCode()));
     }
 
     @Test
@@ -420,11 +413,11 @@ class OrderControllerTest {
         UUID orderId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-
-        OrderActionStatusResponse response = OrderActionStatusResponse.builder()
-                .orderId(orderId)
-                .orderStatus(OrderStatus.REQUESTED)
-                .build();
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.REQUESTED)
+                        .build();
 
         given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId))
                 .willReturn(response);
@@ -436,8 +429,7 @@ class OrderControllerTest {
                                 .param("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code")
-                        .value(SuccessCode.ORDER_REJECTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_REJECTED.getCode()));
     }
 
     @Test
@@ -457,7 +449,6 @@ class OrderControllerTest {
                                 .param("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code")
-                        .value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
     }
 }

@@ -4,11 +4,10 @@ import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.UUID;
 
 @Getter
 @Builder

@@ -1050,12 +1050,10 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
-        Throwable throwable =
-                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+        Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
 
         // then
         assertThat(throwable)
@@ -1071,16 +1069,14 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(UUID.randomUUID());
 
         // when
-        Throwable throwable =
-                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+        Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
 
-        //then
+        // then
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_FORBIDDEN);
@@ -1094,23 +1090,19 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrderId(orderId))
-                .willReturn(Optional.empty());
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.empty());
 
         // when
-        Throwable throwable =
-                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+        Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
 
-        //then
+        // then
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.PAYMENT_NOT_FOUND);
-
     }
 
     @Test
@@ -1120,26 +1112,21 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrderId(orderId))
-                .willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.PENDING);
 
-         // when
-        Throwable throwable =
-                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+        // when
+        Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
 
-        //then
+        // then
         assertThat(throwable)
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_PAYMENT_NOT_COMPLETED);
-
     }
 
     @Test
@@ -1150,21 +1137,18 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
 
-         given(paymentRepository.findByOrderId(orderId))
-                .willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
-         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
+        given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
 
         given(order.canRequest()).willReturn(false);
 
         // when
-        Throwable throwable =
-                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+        Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
 
         // then
         assertThat(throwable)
@@ -1180,13 +1164,11 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrderId(orderId))
-                .willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
 
@@ -1212,10 +1194,9 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
-		UserRole userRole = UserRole.OWNER;
+        UserRole userRole = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable =
@@ -1227,32 +1208,30 @@ public class OrderServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
     }
 
-	@Test
-	@DisplayName("실패 - 본인 가게 주문이 아님")
-	void acceptOrder_fail_not_store_owner() {
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님")
+    void acceptOrder_fail_not_store_owner() {
 
-		// given
-		UUID userId = UUID.randomUUID();
-		UUID orderId = UUID.randomUUID();
-		UUID storeId1 = UUID.randomUUID();
-		UUID storeId2 = UUID.randomUUID();
-		UserRole userRole = UserRole.OWNER;
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId1 = UUID.randomUUID();
+        UUID storeId2 = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
 
-		given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-				.willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
-		given(order.getStoreId()).willReturn(storeId2);
+        given(order.getStoreId()).willReturn(storeId2);
 
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.acceptOrder(userId, userRole, storeId1, orderId));
 
-		// when
-		Throwable throwable =
-				catchThrowable(() -> orderService.acceptOrder(userId, userRole, storeId1, orderId));
-
-		// then
-		assertThat(throwable)
-				.isInstanceOf(BusinessException.class)
-				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
-	}
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
 
     @Test
     @DisplayName("실패 - REQUESTED 상태가 아닌 주문 수락 시도")
@@ -1260,13 +1239,12 @@ public class OrderServiceTest {
 
         // given
         UUID userId = UUID.randomUUID();
-		UUID orderId = UUID.randomUUID();
-		UUID storeId1 = UUID.randomUUID();
-		UUID storeId2 = UUID.randomUUID();
-		UserRole userRole = UserRole.OWNER;
+        UUID orderId = UUID.randomUUID();
+        UUID storeId1 = UUID.randomUUID();
+        UUID storeId2 = UUID.randomUUID();
+        UserRole userRole = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId1);
 
@@ -1293,8 +1271,7 @@ public class OrderServiceTest {
         UserRole userRole = UserRole.OWNER;
         OrderStatus fromStatus = OrderStatus.REQUESTED;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
 
@@ -1326,12 +1303,11 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole role = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() ->
-                orderService.rejectOrder(userId, role, storeId, orderId));
+        Throwable thrown =
+                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1351,14 +1327,13 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole role = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(otherStoreId);
 
         // when
-        Throwable thrown = catchThrowable(() ->
-                orderService.rejectOrder(userId, role, storeId, orderId));
+        Throwable thrown =
+                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1377,16 +1352,15 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole role = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
 
         given(order.canAcceptOrReject()).willReturn(false);
 
         // when
-        Throwable thrown = catchThrowable(() ->
-                orderService.rejectOrder(userId, role, storeId, orderId));
+        Throwable thrown =
+                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1406,8 +1380,7 @@ public class OrderServiceTest {
         UserRole userRole = UserRole.OWNER;
         OrderStatus fromStatus = OrderStatus.REQUESTED;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
 
@@ -1428,5 +1401,4 @@ public class OrderServiceTest {
 
         assertThat(response).isNotNull();
     }
-
 }

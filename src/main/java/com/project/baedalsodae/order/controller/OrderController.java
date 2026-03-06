@@ -67,14 +67,11 @@ public class OrderController {
 
     @PostMapping("/{orderId}/request")
     public ResponseEntity<ApiResponse<OrderActionStatusResponse>> requestOrder(
-            @RequestHeader("X-User-Id") UUID userId,
-            @PathVariable("orderId") UUID orderId) {
+            @RequestHeader("X-User-Id") UUID userId, @PathVariable("orderId") UUID orderId) {
 
-        OrderActionStatusResponse response =
-                orderService.requestOrder(userId, orderId);
+        OrderActionStatusResponse response = orderService.requestOrder(userId, orderId);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(SuccessCode.ORDER_REQUESTED, response));
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REQUESTED, response));
     }
 
     @PostMapping("/{orderId}/accept")
@@ -87,8 +84,7 @@ public class OrderController {
         OrderActionStatusResponse response =
                 orderService.acceptOrder(userId, userRole, storeId, orderId);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(SuccessCode.ORDER_ACCEPTED, response));
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_ACCEPTED, response));
     }
 
     @PostMapping("/{orderId}/reject")
@@ -101,7 +97,6 @@ public class OrderController {
         OrderActionStatusResponse response =
                 orderService.rejectOrder(userId, userRole, storeId, orderId);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
     }
 }

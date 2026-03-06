@@ -87,7 +87,7 @@ public class Order extends BaseAuditEntity {
     }
 
     public void accept() {
-         this.status = OrderStatus.ACCEPTED;
+        this.status = OrderStatus.ACCEPTED;
     }
 
     public void reject() {
@@ -158,5 +158,4 @@ public class Order extends BaseAuditEntity {
                 finalAmount,
                 OrderStatus.CREATED);
     }
-
 }
