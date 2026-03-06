@@ -184,7 +184,7 @@ public class CartServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store1));
 
-        given(menuItemRepository.findById(menuItemId)).willReturn(Optional.empty());
+        given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable =
@@ -213,7 +213,7 @@ public class CartServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId2)).willReturn(Optional.of(store2));
 
-        given(menuItemRepository.findById(menuItemId2)).willReturn(Optional.of(menuItem2));
+        given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId2)).willReturn(Optional.of(menuItem2));
 
         given(store1.getId()).willReturn(storeId1);
         Cart cart = Cart.create(userId, store1);
@@ -247,7 +247,7 @@ public class CartServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId1)).willReturn(Optional.of(store1));
 
-        given(menuItemRepository.findById(menuItemId1)).willReturn(Optional.of(menuItem1));
+        given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId1)).willReturn(Optional.of(menuItem1));
 
         given(cartRepository.findCartWithItemsByUserId(userId)).willReturn(Optional.empty());
 
@@ -278,7 +278,7 @@ public class CartServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId1)).willReturn(Optional.of(store1));
 
-        given(menuItemRepository.findById(menuItemId2)).willReturn(Optional.of(menuItem2));
+        given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId2)).willReturn(Optional.of(menuItem2));
 
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
@@ -319,7 +319,7 @@ public class CartServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId1)).willReturn(Optional.of(store1));
 
-        given(menuItemRepository.findById(menuItemId1)).willReturn(Optional.of(menuItem1));
+        given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId1)).willReturn(Optional.of(menuItem1));
 
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");

@@ -52,8 +52,7 @@ public class CartServiceImpl implements CartService {
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         MenuItem menuItem =
-                menuItemRepository
-                        .findById(menuItemId)
+                menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
 
         Optional<Cart> optionalCart = cartRepository.findCartWithItemsByUserId(userId);
