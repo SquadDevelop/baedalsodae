@@ -53,7 +53,8 @@ public class OrderServiceImpl implements OrderService {
 
         final UUID storeId = cart.getStore().getId();
         Store store =
-                storeRepository.findByIdAndIsDeletedIsFalse(storeId)
+                storeRepository
+                        .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         int totalAmount = cart.getTotalAmount();
@@ -131,7 +132,8 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderListResponse getOwnerOrders(UUID userId, OrderListRequest request) {
         Store store =
-                storeRepository.findByIdAndIsDeletedIsFalse(request.storeId())
+                storeRepository
+                        .findByIdAndIsDeletedIsFalse(request.storeId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
         if (!store.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);

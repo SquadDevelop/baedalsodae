@@ -40,8 +40,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         statusEq(query),
                         dateRange(query),
                         keywordContains(query),
-                        cursorCondition(query)
-                        )
+                        cursorCondition(query))
                 .orderBy(order.createdAt.desc(), order.id.desc())
                 .limit(query.resolvedSize() + 1)
                 .fetch();
