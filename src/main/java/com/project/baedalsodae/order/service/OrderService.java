@@ -17,4 +17,6 @@ public interface OrderService {
     OrderStatusResponse getOrderStatus(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
     OrderActionStatusResponse requestOrder(UUID userId, UUID orderId);
+
+    OrderActionStatusResponse acceptOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

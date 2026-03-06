@@ -1202,4 +1202,82 @@ public class OrderServiceTest {
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
 
     }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void acceptOrder_fail_order_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+		UserRole userRole = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.acceptOrder(userId, userRole, storeId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
+
+	@Test
+	@DisplayName("실패 - 본인 가게 주문이 아님")
+	void acceptOrder_fail_not_store_owner() {
+
+		// given
+		UUID userId = UUID.randomUUID();
+		UUID orderId = UUID.randomUUID();
+		UUID storeId1 = UUID.randomUUID();
+		UUID storeId2 = UUID.randomUUID();
+		UserRole userRole = UserRole.OWNER;
+
+		given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+				.willReturn(Optional.of(order));
+
+		given(order.getStoreId()).willReturn(storeId2);
+
+
+		// when
+		Throwable throwable =
+				catchThrowable(() -> orderService.acceptOrder(userId, userRole, storeId1, orderId));
+
+		// then
+		assertThat(throwable)
+				.isInstanceOf(BusinessException.class)
+				.hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_STORE_FORBIDDEN);
+	}
+
+    @Test
+    @DisplayName("실패 - REQUESTED 상태가 아닌 주문 수락 시도")
+    void acceptOrder_fail_invalid_status() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+		UUID orderId = UUID.randomUUID();
+		UUID storeId1 = UUID.randomUUID();
+		UUID storeId2 = UUID.randomUUID();
+		UserRole userRole = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId1);
+
+        given(order.canAccept()).willReturn(false);
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.acceptOrder(userId, userRole, storeId1, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_STATUS);
+    }
 }
