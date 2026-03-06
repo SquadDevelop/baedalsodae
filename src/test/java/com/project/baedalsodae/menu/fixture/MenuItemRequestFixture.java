@@ -19,6 +19,9 @@ public class MenuItemRequestFixture {
     return new MenuItemPostRequestBuilder();
   }
 
+  public static MenuItemPostRequestDto createDefaultPostRequest() {
+    return aPostRequest().build();
+  }
   public static class MenuItemPostRequestBuilder {
     private String name = DEFAULT_MENU_ITEM_NAME;
     private String description = DEFAULT_ITEM_DESCRIPTION;
