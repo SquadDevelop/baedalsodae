@@ -34,7 +34,7 @@ public enum ErrorCode {
     // store
     STORE_NOT_FOUND("S001", HttpStatus.NOT_FOUND, "가게가 존재하지 않습니다."),
     STORE_DUPLICATED_BUSINESS_NUMBER("S002", HttpStatus.CONFLICT, "이미 가입된 사업자입니다"),
-    STORE_FORBIDDEN("S002", HttpStatus.FORBIDDEN, "해당 가게에 대한 수정 권한이 없습니다."),
+    STORE_FORBIDDEN("S002", HttpStatus.FORBIDDEN, "해당 가게 권한이 없습니다."),
     STORE_STATUS_CHANGE_FORBIDDEN("S003", HttpStatus.FORBIDDEN, "가게 상태를 변경할 권한이 없습니다."),
 
     // menu-category
