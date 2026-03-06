@@ -321,4 +321,127 @@ class MenuItemServiceImplTest {
       verify(tagMappingService).createTagMappings(item, List.of("치킨"));
     }
   }
+
+  @Nested
+  @DisplayName("메뉴 아이템 부분 수정")
+  class PatchMenuItem {
+
+    private MenuItem item;
+    private MenuCategory category;
+
+    private void givenItemAndCategoryExist() {
+      item = mock(MenuItem.class);
+      category = mock(MenuCategory.class);
+      Store store = mock(Store.class);
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.of(item));
+      given(item.getMenuCategory()).willReturn(category);
+      given(category.getId()).willReturn(menuCategoryId);
+      given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+          .willReturn(Optional.of(category));
+      given(category.getStore()).willReturn(store);
+      given(store.getId()).willReturn(storeId);
+    }
+
+    @Test
+    @DisplayName("실패: 메뉴 아이템이 없으면 예외가 발생한다")
+    void patchMenuItem_fail_notFound() {
+      // given
+      MenuItemPatchRequestDto request = createPatchRequestWithName("새이름");
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.patchMenuItem(menuItemId, request))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패: 변경하려는 이름이 이미 존재하면 예외가 발생한다")
+    void patchMenuItem_fail_duplicateName() {
+      // given
+      MenuItemPatchRequestDto request = createPatchRequestWithName("중복이름");
+      givenItemAndCategoryExist();
+      given(item.getName()).willReturn(DEFAULT_MENU_ITEM_NAME);
+      given(menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, "중복이름"))
+          .willReturn(true);
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.patchMenuItem(menuItemId, request))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+    }
+
+    @Test
+    @DisplayName("성공: null 필드는 변경하지 않는다")
+    void patchMenuItem_success_nullFieldsSkipped() {
+      // given
+      MenuItemPatchRequestDto request = createEmptyPatchRequest();
+      givenItemAndCategoryExist();
+      givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+
+      // when
+      menuItemService.patchMenuItem(menuItemId, request);
+
+      // then
+      verify(item, never()).changeName(any());
+      verify(item, never()).changeDescription(any());
+      verify(item, never()).changePrice(any());
+      verify(item, never()).changeIsPopular(any());
+      verify(item, never()).changeMenuStatus(any());
+      verify(item, never()).changeMenuCategory(any());
+      verifyNoInteractions(tagMappingService);
+    }
+
+    @Test
+    @DisplayName("성공: 태그를 수정하면 기존 태그를 삭제하고 새로 생성한다")
+    void patchMenuItem_success_updateTags() {
+      // given
+      MenuItemPatchRequestDto request = createPatchRequestWithTags(List.of("매운맛", "인기"));
+      givenItemAndCategoryExist();
+      givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+
+      // when
+      menuItemService.patchMenuItem(menuItemId, request);
+
+      // then
+      verify(tagMappingService).deleteAllTagMappingByMenuItemId(menuItemId);
+      verify(tagMappingService).createTagMappings(item, List.of("매운맛", "인기"));
+    }
+
+    @Test
+    @DisplayName("성공: 카테고리를 변경한다")
+    void patchMenuItem_success_changeCategory() {
+      // given
+      MenuItemPatchRequestDto request = createPatchRequestWithCategory(UUID.randomUUID());
+      MenuCategory newCategory = mock(MenuCategory.class);
+      givenItemAndCategoryExist();
+      given(menuCategoryRepository.findByIdAndDeletedIsFalse(request.categoryId()))
+          .willReturn(Optional.of(newCategory));
+      givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+
+      // when
+      menuItemService.patchMenuItem(menuItemId, request);
+
+      // then
+      verify(item).changeMenuCategory(newCategory);
+    }
+
+    @Test
+    @DisplayName("성공: 이름만 변경한다")
+    void patchMenuItem_success_changeName() {
+      // given
+      MenuItemPatchRequestDto request = createPatchRequestWithName("새이름");
+      givenItemAndCategoryExist();
+      given(menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, "새이름"))
+          .willReturn(false);
+      givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+
+      // when
+      menuItemService.patchMenuItem(menuItemId, request);
+
+      // then
+      verify(item).changeName("새이름");
+    }
+  }
+
 }
