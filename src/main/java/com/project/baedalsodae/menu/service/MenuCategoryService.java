@@ -20,4 +20,6 @@ public interface MenuCategoryService {
             UUID menuCategoryId, MenuCategoryPatchRequestDto request);
 
     List<MenuCategoryResponseDto> getMenuCategories(UUID storeId);
+
+    boolean isDuplicateMenuCategoryName(UUID storeId, String name);
 }
