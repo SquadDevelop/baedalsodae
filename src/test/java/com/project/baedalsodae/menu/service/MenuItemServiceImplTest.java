@@ -444,6 +444,61 @@ class MenuItemServiceImplTest {
     }
   }
 
+  @Nested
+  @DisplayName("메뉴 아이템 삭제")
+  class DeleteMenuItem {
+
+    private MenuItem item1;
+    private MenuItem targetItem;
+    private MenuItem item3;
+
+    private void givenItemsForDeletion() {
+      MenuCategory category = mock(MenuCategory.class);
+      given(category.getId()).willReturn(menuCategoryId);
+
+      item1 = mock(MenuItem.class);
+      given(item1.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
+
+      targetItem = mock(MenuItem.class);
+      given(targetItem.getMenuCategory()).willReturn(category);
+      given(targetItem.getOrderNo()).willReturn(SECOND_ORDER_NUMBER);
+
+      item3 = mock(MenuItem.class);
+      given(item3.getOrderNo()).willReturn(THIRD_ORDER_NUMBER);
+
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId))
+          .willReturn(Optional.of(targetItem));
+      given(menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(menuCategoryId))
+          .willReturn(List.of(item1, targetItem, item3));
+    }
+
+    @Test
+    @DisplayName("실패: 메뉴 아이템이 없으면 예외가 발생한다")
+    void deleteMenuItem_fail_notFound() {
+      // given
+      given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> menuItemService.deleteMenuItem(menuItemId))
+          .isInstanceOf(BusinessException.class)
+          .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("성공: 메뉴 아이템을 소프트 삭제하고 뒤의 순서를 앞으로 당긴다")
+    void deleteMenuItem_success() {
+      // given
+      givenItemsForDeletion();
+
+      // when
+      menuItemService.deleteMenuItem(menuItemId);
+
+      // then
+      verify(targetItem).softDelete(null);
+      verify(item3).changeOrderNo(SECOND_ORDER_NUMBER);
+      verify(item1, never()).changeOrderNo(any());
+    }
+  }
 
   @Nested
   @DisplayName("메뉴 아이템 순서 변경")
