@@ -33,10 +33,20 @@ public enum SuccessCode {
     STORE_DELETED("ST204", HttpStatus.OK, "가게 삭제 성공"),
 
     // menu category
-    MENU_CATEGORY_CREATED("MC201", HttpStatus.CREATED, "메뉴 카테고리 생성 성공"),
-    MENU_CATEGORY_UPDATED("MC202", HttpStatus.OK, "메뉴 카테고리 수정 성공"),
-    MENU_CATEGORY_DELETED("MC203", HttpStatus.OK, "메뉴 카테고리 삭제 성공"),
-    MENU_CATEGORY_LIST_FOUND("MC204", HttpStatus.OK, "메뉴 카테고리 목록 조회 성공"),
+    MENU_CATEGORY_CREATED("MC200", HttpStatus.CREATED, "메뉴 카테고리 등록 성공"),
+    MENU_CATEGORY_UPDATED("MC201", HttpStatus.OK, "메뉴 카테고리 수정 성공"),
+    MENU_CATEGORY_DELETED("MC202", HttpStatus.OK, "메뉴 카테고리 삭제 성공"),
+    MENU_CATEGORY_ORDER_UPDATED("MC203", HttpStatus.OK, "메뉴 카테고리 순서 변경 성공"),
+    MENU_CATEGORY_NAME_DUPLICATE_CHECKED("MC204", HttpStatus.OK, "메뉴 카테고리 이름 중복 체크 성공"),
+    MENU_CATEGORY_LIST_FOUND("MC205", HttpStatus.OK, "메뉴 카테고리 목록 조회 성공"),
+
+    // menu item
+    MENU_ITEM_CREATED("MI200", HttpStatus.CREATED, "메뉴 아이템 등록 성공"),
+    MENU_ITEM_UPDATED("MI201", HttpStatus.OK, "메뉴 아이템 수정 성공"),
+    MENU_ITEM_DELETED("MI202", HttpStatus.OK, "메뉴 아이템 삭제 성공"),
+    MENU_ITEM_ORDER_UPDATED("MI203", HttpStatus.OK, "메뉴 아이템 순서 변경 성공"),
+    MENU_ITEM_NAME_DUPLICATE_CHECKED("MI204", HttpStatus.OK, "메뉴 아이템 이름 중복 체크 성공"),
+    MENU_ITEM_LIST_FOUND("MI205", HttpStatus.OK, "메뉴 아이템 목록 조회 성공"),
 
     // payment
     PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),

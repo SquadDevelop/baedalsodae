@@ -56,7 +56,7 @@ public class MenuCategory extends BaseAuditEntity implements Orderable {
     }
 
     @Override
-    public void changeOrderNo(int orderNo) {
+    public void changeOrderNo(Integer orderNo) {
         this.orderNo = orderNo;
     }
 
@@ -64,5 +64,9 @@ public class MenuCategory extends BaseAuditEntity implements Orderable {
     public void softDelete(UUID userId) {
         super.softDelete(userId);
         this.orderNo = null;
+    }
+
+    public boolean hasItem() {
+        return menuItems.stream().anyMatch(item -> !item.isDeleted());
     }
 }
