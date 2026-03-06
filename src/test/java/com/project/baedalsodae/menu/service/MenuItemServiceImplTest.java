@@ -576,4 +576,39 @@ class MenuItemServiceImplTest {
     }
   }
 
+
+  @Nested
+  @DisplayName("메뉴 아이템 이름 중복 확인")
+  class IsDuplicateMenuItemName {
+
+    @Test
+    @DisplayName("중복 이름이 없으면 false를 반환한다")
+    void isDuplicateMenuItemName_false() {
+      // given
+      given(menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, "신메뉴"))
+          .willReturn(false);
+
+      // when
+      boolean result = menuItemService.isDuplicateMenuItemName(storeId, "신메뉴");
+
+      // then
+      assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("중복 이름이 있으면 true를 반환한다")
+    void isDuplicateMenuItemName_true() {
+      // given
+      given(
+              menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(
+                  storeId, DEFAULT_MENU_ITEM_NAME))
+          .willReturn(true);
+
+      // when
+      boolean result = menuItemService.isDuplicateMenuItemName(storeId, DEFAULT_MENU_ITEM_NAME);
+
+      // then
+      assertThat(result).isTrue();
+    }
+  }
 }
