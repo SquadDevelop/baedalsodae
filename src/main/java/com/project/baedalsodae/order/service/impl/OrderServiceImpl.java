@@ -218,7 +218,7 @@ public class OrderServiceImpl implements OrderService {
 
         Payment payment =
                 paymentRepository
-                        .findByOrderId(orderId)
+                        .findByOrder(orderId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
 
         if (payment.getStatus() != PaymentStatus.SUCCESS) {
