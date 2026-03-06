@@ -1,5 +1,6 @@
 package com.project.baedalsodae.auth.security;
 
+import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.entity.UserRole;
 import io.jsonwebtoken.*;
@@ -73,14 +74,13 @@ public class JwtProvider {
 					.parseSignedClaims(inputToken)
 					.getPayload();
 		} catch (SecurityException | MalformedJwtException e) {
-			log.error(ErrorCode.JWT_SIGNATURE_INVALID.getMessage());
+			throw new BusinessException(ErrorCode.JWT_SIGNATURE_INVALID);
 		} catch (ExpiredJwtException e) {
-			log.error(ErrorCode.JWT_EXPIRED.getMessage());
+			throw new BusinessException(ErrorCode.JWT_EXPIRED);
 		} catch (UnsupportedJwtException e) {
-			log.error(ErrorCode.JWT_UNSUPPORTED.getMessage());
+			throw new BusinessException(ErrorCode.JWT_UNSUPPORTED);
 		} catch (IllegalArgumentException e) {
-			log.error(ErrorCode.JWT_INVALID.getMessage());
+			throw new BusinessException(ErrorCode.JWT_INVALID);
 		}
-		return null;
 	}
 }
