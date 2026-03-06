@@ -31,6 +31,8 @@ public enum SuccessCode {
     STORE_UPDATED("ST202", HttpStatus.OK, "가게 정보 수정 성공"),
     STORE_STATUS_UPDATED("ST203", HttpStatus.OK, "가게 영업 상태 변경 성공"),
     STORE_DELETED("ST204", HttpStatus.OK, "가게 삭제 성공"),
+    STORE_DETAIL_FOUND("ST205", HttpStatus.OK, "가게 상세 조회 성공"),
+    STORE_FOUND_FOR_OWNER("ST206", HttpStatus.OK, "가게 조회 성공"),
 
     // menu category
     MENU_CATEGORY_CREATED("MC201", HttpStatus.CREATED, "메뉴 카테고리 생성 성공"),

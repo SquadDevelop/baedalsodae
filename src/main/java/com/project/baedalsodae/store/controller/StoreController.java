@@ -9,7 +9,9 @@ import com.project.baedalsodae.store.dto.request.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
+import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
 import com.project.baedalsodae.store.dto.response.StorePageResponse;
+import com.project.baedalsodae.store.dto.response.StoreResponse;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
@@ -37,6 +39,23 @@ public class StoreController {
         StorePageResponse response =
                 storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_LIST_FOUND, response));
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(
+            @PathVariable("storeId") UUID storeId) {
+        StoreDetailResponse response = storeQueryService.getStoreDetail(storeId);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DETAIL_FOUND, response));
+    }
+
+    @GetMapping("/{storeId}/me")
+    public ResponseEntity<ApiResponse<StoreResponse>> getStoreForOwner(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") String role,
+            @PathVariable("storeId") UUID storeId
+            ) {
+        StoreResponse response = storeQueryService.getStoreForOwner(storeId, userId, role);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_FOUND_FOR_OWNER, response));
     }
 
     @PostMapping
