@@ -11,6 +11,7 @@ import static org.mockito.Mockito.*;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
@@ -229,6 +230,101 @@ class MenuCategoryServiceImplTest {
 
             // then
             verify(category).changeMenuCategoryName(NEW_CATEGORY_NAME);
+        }
+    }
+
+
+    @Nested
+    @DisplayName("메뉴 카테고리 순서 변경")
+    class UpdateMenuCategoryOrder {
+
+        private MenuCategory category;
+
+        private void givenCategoryExistsWithOrder(int orderNo) {
+            category = mock(MenuCategory.class);
+            Store store = mock(Store.class);
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.of(category));
+            given(category.getOrderNo()).willReturn(orderNo);
+            given(category.getId()).willReturn(menuCategoryId);
+            given(category.getName()).willReturn(DEFAULT_CATEGORY_NAME);
+            lenient().when(category.getStore()).thenReturn(store);
+            lenient().when(store.getId()).thenReturn(storeId);
+        }
+
+        @Test
+        @DisplayName("실패: 카테고리가 존재하지 않으면 예외가 발생한다")
+        void updateMenuCategoryOrder_fail_notFound() {
+            // given
+            MenuCategoryPatchRequestDto request = createPatchRequest(THIRD_ORDER_NUMBER);
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.updateMenuCategoryOrder(
+                                            menuCategoryId, request))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: orderNo가 null이면 예외가 발생한다")
+        void updateMenuCategoryOrder_fail_invalidOrder() {
+            // given
+            MenuCategoryPatchRequestDto request = createPatchRequest(THIRD_ORDER_NUMBER);
+            category = mock(MenuCategory.class);
+            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                    .willReturn(Optional.of(category));
+            given(category.getOrderNo()).willReturn(null);
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.updateMenuCategoryOrder(
+                                            menuCategoryId, request))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.INVALID_MENU_CATEGORY_ORDER);
+        }
+
+        @Test
+        @DisplayName("성공: 현재 순서와 동일하면 목록 조회 없이 바로 반환한다")
+        void updateMenuCategoryOrder_success_sameOrder() {
+            // given
+            MenuCategoryPatchRequestDto request = createPatchRequest(SECOND_ORDER_NUMBER);
+            givenCategoryExistsWithOrder(SECOND_ORDER_NUMBER);
+
+            // when
+            menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request);
+
+            // then
+            verify(menuCategoryRepository, never())
+                    .findAllByStoreIdAndDeletedIsFalseWithLock(any());
+        }
+
+        @Test
+        @DisplayName("성공: 1번에서 3번으로 이동 시 사이 순서가 앞으로 당겨진다")
+        void updateMenuCategoryOrder_success_moveDown() {
+            // given
+            MenuCategoryPatchRequestDto request = createPatchRequest(THIRD_ORDER_NUMBER);
+            MenuCategory category2 = mock(MenuCategory.class);
+            MenuCategory category3 = mock(MenuCategory.class);
+            givenCategoryExistsWithOrder(FIRST_ORDER_NUMBER);
+            given(category2.getOrderNo()).willReturn(SECOND_ORDER_NUMBER);
+            given(category3.getOrderNo()).willReturn(THIRD_ORDER_NUMBER);
+            given(menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId))
+                    .willReturn(List.of(category, category2, category3));
+
+            // when
+            menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request);
+
+            // then
+            verify(category).changeOrderNo(THIRD_ORDER_NUMBER);
+            verify(category2).changeOrderNo(FIRST_ORDER_NUMBER);
+            verify(category3).changeOrderNo(SECOND_ORDER_NUMBER);
         }
     }
 
