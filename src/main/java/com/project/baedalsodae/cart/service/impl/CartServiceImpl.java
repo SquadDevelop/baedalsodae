@@ -48,8 +48,7 @@ public class CartServiceImpl implements CartService {
         final UUID menuItemId = request.menuItemId();
 
         Store store =
-                storeRepository
-                        .findById(storeId)
+                storeRepository.findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         MenuItem menuItem =

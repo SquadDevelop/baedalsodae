@@ -157,7 +157,7 @@ public class CartServiceTest {
         UUID menuItemId = UUID.randomUUID();
         AddCartItemRequest addCartItemRequest = new AddCartItemRequest(storeId, menuItemId, 1);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable =
@@ -182,7 +182,7 @@ public class CartServiceTest {
         UUID menuItemId = UUID.randomUUID();
         AddCartItemRequest addCartItemRequest = new AddCartItemRequest(storeId, menuItemId, 1);
 
-        given(storeRepository.findById(storeId)).willReturn(Optional.of(store1));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store1));
 
         given(menuItemRepository.findById(menuItemId)).willReturn(Optional.empty());
 
@@ -211,7 +211,7 @@ public class CartServiceTest {
         UUID menuItemId2 = UUID.randomUUID();
         AddCartItemRequest addCartItemRequest = new AddCartItemRequest(storeId2, menuItemId2, 1);
 
-        given(storeRepository.findById(storeId2)).willReturn(Optional.of(store2));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId2)).willReturn(Optional.of(store2));
 
         given(menuItemRepository.findById(menuItemId2)).willReturn(Optional.of(menuItem2));
 
@@ -245,7 +245,7 @@ public class CartServiceTest {
         UUID menuItemId1 = UUID.randomUUID();
         AddCartItemRequest addCartItemRequest = new AddCartItemRequest(storeId1, menuItemId1, 1);
 
-        given(storeRepository.findById(storeId1)).willReturn(Optional.of(store1));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId1)).willReturn(Optional.of(store1));
 
         given(menuItemRepository.findById(menuItemId1)).willReturn(Optional.of(menuItem1));
 
@@ -276,7 +276,7 @@ public class CartServiceTest {
         UUID menuItemId2 = UUID.randomUUID();
         AddCartItemRequest addCartItemRequest = new AddCartItemRequest(storeId1, menuItemId2, 1);
 
-        given(storeRepository.findById(storeId1)).willReturn(Optional.of(store1));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId1)).willReturn(Optional.of(store1));
 
         given(menuItemRepository.findById(menuItemId2)).willReturn(Optional.of(menuItem2));
 
@@ -317,7 +317,7 @@ public class CartServiceTest {
         UUID menuItemId1 = UUID.randomUUID();
         AddCartItemRequest addCartItemRequest = new AddCartItemRequest(storeId1, menuItemId1, 1);
 
-        given(storeRepository.findById(storeId1)).willReturn(Optional.of(store1));
+        given(storeRepository.findByIdAndIsDeletedIsFalse(storeId1)).willReturn(Optional.of(store1));
 
         given(menuItemRepository.findById(menuItemId1)).willReturn(Optional.of(menuItem1));
 
