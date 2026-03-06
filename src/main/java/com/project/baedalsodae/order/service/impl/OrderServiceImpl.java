@@ -197,4 +197,15 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderStatusResponse.from(order, histories);
     }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse requestOrder(UUID userId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        return null;
+    }
 }

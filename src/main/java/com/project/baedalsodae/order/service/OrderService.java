@@ -2,10 +2,7 @@ package com.project.baedalsodae.order.service;
 
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
-import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
-import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
-import com.project.baedalsodae.order.dto.response.OrderListResponse;
-import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
+import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;
 
@@ -18,4 +15,6 @@ public interface OrderService {
     OrderDetailResponse getOrderDetail(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
     OrderStatusResponse getOrderStatus(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    OrderActionStatusResponse requestOrder(UUID userId, UUID orderId);
 }

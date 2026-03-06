@@ -1034,4 +1034,25 @@ public class OrderServiceTest {
         // then
         assertThat(response).isNotNull();
     }
+
+    @Test
+    @DisplayName("실패 - 주문 요청 시 존재하지 않는 주문")
+    void requestOrder_fail_orderNotFound() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.empty());
+
+        // when
+        Throwable throwable =
+                catchThrowable(() -> orderService.requestOrder(userId, orderId));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
 }
