@@ -1193,7 +1193,7 @@ public class OrderServiceTest {
         given(order.canRequest()).willReturn(true);
 
         // when
-        orderService.requestOrder(userId, orderId);
+        OrderActionStatusResponse response = orderService.requestOrder(userId, orderId);
 
         // then
         then(order).should().request();
@@ -1201,6 +1201,7 @@ public class OrderServiceTest {
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
 
+        assertThat(response).isNotNull();
     }
 
     @Test
