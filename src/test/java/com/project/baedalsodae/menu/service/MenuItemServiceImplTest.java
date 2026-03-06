@@ -62,15 +62,14 @@ class MenuItemServiceImplTest {
         createCategoryAndStoreFixture(menuCategoryRepository, menuCategoryId, storeId);
     }
 
-    private void givenMenuItemFields(MenuItem item, MenuCategory category, int orderNo) {
-        lenient().when(item.getId()).thenReturn(menuItemId);
-        lenient().when(item.getName()).thenReturn(DEFAULT_MENU_ITEM_NAME);
-        lenient().when(item.getDescription()).thenReturn(DEFAULT_ITEM_DESCRIPTION);
-        lenient().when(item.getPrice()).thenReturn(DEFAULT_ITEM_PRICE);
-        lenient().when(item.getOrderNo()).thenReturn(orderNo);
-        lenient().when(item.isPopular()).thenReturn(false);
-        lenient().when(item.getMenuStatus()).thenReturn(MenuStatus.AVAILABLE);
-        lenient().when(item.getMenuCategory()).thenReturn(category);
+    private void givenMenuItemFields(MenuItem item, int orderNo) {
+        given(item.getId()).willReturn(menuItemId);
+        given(item.getName()).willReturn(DEFAULT_MENU_ITEM_NAME);
+        given(item.getDescription()).willReturn(DEFAULT_ITEM_DESCRIPTION);
+        given(item.getPrice()).willReturn(DEFAULT_ITEM_PRICE);
+        given(item.getOrderNo()).willReturn(orderNo);
+        given(item.isPopular()).willReturn(false);
+        given(item.getMenuStatus()).willReturn(MenuStatus.AVAILABLE);
     }
 
     @Nested
@@ -160,6 +159,7 @@ class MenuItemServiceImplTest {
 
             // then
             assertThat(result.orderNo()).isEqualTo(FIRST_ORDER_NUMBER);
+            assertThat(result.categoryId()).isEqualTo(menuCategoryId);
         }
 
         @Test
@@ -182,6 +182,8 @@ class MenuItemServiceImplTest {
             assertThat(result.name()).isEqualTo(DEFAULT_MENU_ITEM_NAME);
             assertThat(result.orderNo()).isEqualTo(EXISTING_MAX_ORDER_NUMBER + 1);
             assertThat(result.menuStatus()).isEqualTo(MenuStatus.AVAILABLE);
+            assertThat(result.categoryId()).isEqualTo(menuCategoryId);
+            assertThat(result.categoryName()).isEqualTo(DEFAULT_CATEGORY_NAME);
             verify(menuItemRepository).save(any(MenuItem.class));
             verify(tagMappingService)
                     .createTagMappings(any(MenuItem.class), eq(List.of("치킨", "바삭")));
@@ -282,9 +284,10 @@ class MenuItemServiceImplTest {
                             .withTagNames(List.of())
                             .build();
             givenItemAndNewCategoryExist(newCategoryId);
+            given(item.getMenuCategory()).willReturn(newCategory);
             given(newCategory.getId()).willReturn(newCategoryId);
             given(newCategory.getName()).willReturn(DEFAULT_CATEGORY_NAME);
-            givenMenuItemFields(item, newCategory, FIRST_ORDER_NUMBER);
+            givenMenuItemFields(item, FIRST_ORDER_NUMBER);
 
             // when
             menuItemService.updateMenuItem(menuItemId, sameNameRequest);
@@ -301,6 +304,7 @@ class MenuItemServiceImplTest {
             UUID newCategoryId = request.categoryId();
             UUID newStoreId = UUID.randomUUID();
             givenItemAndNewCategoryExist(newCategoryId);
+            given(item.getMenuCategory()).willReturn(newCategory);
             given(newCategory.getStore().getId()).willReturn(newStoreId);
             given(
                             menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(
@@ -308,7 +312,7 @@ class MenuItemServiceImplTest {
                     .willReturn(false);
             given(newCategory.getId()).willReturn(newCategoryId);
             given(newCategory.getName()).willReturn(DEFAULT_CATEGORY_NAME);
-            givenMenuItemFields(item, newCategory, FIRST_ORDER_NUMBER);
+            givenMenuItemFields(item, FIRST_ORDER_NUMBER);
 
             // when
             menuItemService.updateMenuItem(menuItemId, request);
@@ -384,7 +388,7 @@ class MenuItemServiceImplTest {
             // given
             MenuItemPatchRequestDto request = createEmptyPatchRequest();
             givenItemAndCategoryExist();
-            givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+            givenMenuItemFields(item, FIRST_ORDER_NUMBER);
 
             // when
             menuItemService.patchMenuItem(menuItemId, request);
@@ -405,7 +409,7 @@ class MenuItemServiceImplTest {
             // given
             MenuItemPatchRequestDto request = createPatchRequestWithTags(List.of("매운맛", "인기"));
             givenItemAndCategoryExist();
-            givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+            givenMenuItemFields(item, FIRST_ORDER_NUMBER);
 
             // when
             menuItemService.patchMenuItem(menuItemId, request);
@@ -424,7 +428,7 @@ class MenuItemServiceImplTest {
             givenItemAndCategoryExist();
             given(menuCategoryRepository.findByIdAndDeletedIsFalse(request.categoryId()))
                     .willReturn(Optional.of(newCategory));
-            givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+            givenMenuItemFields(item, FIRST_ORDER_NUMBER);
 
             // when
             menuItemService.patchMenuItem(menuItemId, request);
@@ -441,7 +445,7 @@ class MenuItemServiceImplTest {
             givenItemAndCategoryExist();
             given(menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, "새이름"))
                     .willReturn(false);
-            givenMenuItemFields(item, category, FIRST_ORDER_NUMBER);
+            givenMenuItemFields(item, FIRST_ORDER_NUMBER);
 
             // when
             menuItemService.patchMenuItem(menuItemId, request);
@@ -521,9 +525,10 @@ class MenuItemServiceImplTest {
             MenuCategory category = mock(MenuCategory.class);
             given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId))
                     .willReturn(Optional.of(item));
-            givenMenuItemFields(item, category, orderNo);
+            given(item.getMenuCategory()).willReturn(category);
             given(category.getId()).willReturn(menuCategoryId);
             given(category.getName()).willReturn(DEFAULT_CATEGORY_NAME);
+            givenMenuItemFields(item, orderNo);
         }
 
         @Test
@@ -650,7 +655,11 @@ class MenuItemServiceImplTest {
             // then
             assertThat(result).hasSize(2);
             assertThat(result.get(0).name()).isEqualTo(DEFAULT_MENU_ITEM_NAME);
+            assertThat(result.get(0).orderNo()).isEqualTo(FIRST_ORDER_NUMBER);
+            assertThat(result.get(0).menuStatus()).isEqualTo(MenuStatus.AVAILABLE);
+            assertThat(result.get(0).categoryId()).isEqualTo(menuCategoryId);
             assertThat(result.get(1).name()).isEqualTo(ALTERNATIVE_MENU_ITEM_NAME);
+            assertThat(result.get(1).orderNo()).isEqualTo(SECOND_ORDER_NUMBER);
         }
     }
 

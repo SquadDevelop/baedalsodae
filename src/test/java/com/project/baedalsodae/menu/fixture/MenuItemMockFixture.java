@@ -15,7 +15,7 @@ public class MenuItemMockFixture {
         throw new AssertionError("Utility class should not be instantiated");
     }
 
-    public static MenuItem createFullyMockedMenuItem(
+    public static MenuItem createMockMenuItem(
             UUID id,
             String name,
             String description,
@@ -34,18 +34,5 @@ public class MenuItemMockFixture {
         lenient().when(item.getMenuStatus()).thenReturn(menuStatus);
         lenient().when(item.getMenuCategory()).thenReturn(category);
         return item;
-    }
-
-    public static MenuItem createMockMenuItem(
-            UUID id,
-            String name,
-            String description,
-            int price,
-            int orderNo,
-            boolean isPopular,
-            MenuStatus menuStatus,
-            MenuCategory category) {
-        return createFullyMockedMenuItem(
-                id, name, description, price, orderNo, isPopular, menuStatus, category);
     }
 }
