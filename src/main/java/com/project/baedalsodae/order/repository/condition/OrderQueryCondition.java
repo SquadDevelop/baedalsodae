@@ -13,6 +13,11 @@ public class OrderQueryCondition {
     private static final QOrder order = QOrder.order;
     private static final QOrderItem orderItem = QOrderItem.orderItem;
 
+
+    public static BooleanExpression isDeletedIsFalse() {
+        return order.isDeleted.isFalse();
+    }
+
     public static BooleanExpression statusEq(OrderListQuery query) {
         return query.status() != null ? order.status.eq(query.status()) : null;
     }

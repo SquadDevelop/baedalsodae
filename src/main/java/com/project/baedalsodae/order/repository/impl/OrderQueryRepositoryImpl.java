@@ -36,11 +36,12 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .from(order)
                 .where(
                         order.userId.eq(query.userId()),
-                        order.isDeleted.isFalse(),
+                        isDeletedIsFalse(),
                         statusEq(query),
                         dateRange(query),
                         keywordContains(query),
-                        cursorCondition(query))
+                        cursorCondition(query)
+                        )
                 .orderBy(order.createdAt.desc(), order.id.desc())
                 .limit(query.resolvedSize() + 1)
                 .fetch();
@@ -62,7 +63,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .from(order)
                 .where(
                         order.storeId.eq(query.storeId()),
-                        order.isDeleted.isFalse(),
+                        isDeletedIsFalse(),
                         statusEq(query),
                         dateRange(query),
                         orderNoEqIgnoreCase(query),
