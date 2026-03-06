@@ -1,6 +1,7 @@
 package com.project.baedalsodae.auth.service;
 
 import com.project.baedalsodae.auth.dto.request.LoginRequest;
+import com.project.baedalsodae.auth.dto.response.LoginResponse;
 import com.project.baedalsodae.auth.security.JwtProvider;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.BusinessException;
@@ -19,7 +20,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
 
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         try {
             Authentication authentication =
                     authenticationManager.authenticate(
@@ -27,12 +28,14 @@ public class AuthService {
                                     request.username(), request.password()));
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            String accessToken =
+                    jwtProvider.createAccessToken(
+                            userDetails.getUserId(),
+                            userDetails.getUsername(),
+                            userDetails.getUserRole(),
+                            userDetails.isDeleted());
 
-            return jwtProvider.createAccessToken(
-                    userDetails.getUserId(),
-                    userDetails.getUsername(),
-                    userDetails.getUserRole(),
-                    userDetails.isDeleted());
+            return LoginResponse.from(accessToken);
         } catch (AuthenticationException e) {
             throw new BusinessException(ErrorCode.LOGIN_FAILED);
         }

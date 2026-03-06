@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.config.AuthConfig;
 import com.project.baedalsodae.auth.dto.request.LoginRequest;
+import com.project.baedalsodae.auth.dto.response.LoginResponse;
 import com.project.baedalsodae.auth.security.JwtProvider;
 import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.BusinessException;
@@ -52,7 +53,8 @@ public class LoginLogoutControllerTest {
     void loginSuccess() throws Exception {
         // given
         LoginRequest request = new LoginRequest("tester123", "Password123!");
-        given(authService.login(any())).willReturn("Bearer mock-token");
+        LoginResponse response = LoginResponse.from("Bearer mock-token");
+        given(authService.login(any())).willReturn(response);
 
         // when & then
         mockMvc.perform(

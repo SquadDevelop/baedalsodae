@@ -2,6 +2,7 @@ package com.project.baedalsodae.auth.controller;
 
 import com.project.baedalsodae.auth.dto.request.LoginRequest;
 import com.project.baedalsodae.auth.dto.request.SignupRequest;
+import com.project.baedalsodae.auth.dto.response.LoginResponse;
 import com.project.baedalsodae.auth.dto.response.SignupResponse;
 import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.ApiResponse;
@@ -42,12 +43,13 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody LoginRequest request) {
-        String accessToken = authService.login(request);
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
 
         return ResponseEntity.ok()
-                .header("Authorization", accessToken)
-                .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS.getMessage()));
+                .header("Authorization", response.getAccessToken())
+                .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS, response));
     }
 
     @PreAuthorize("permitAll()")
