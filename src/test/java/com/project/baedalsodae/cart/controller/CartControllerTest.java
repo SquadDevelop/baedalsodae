@@ -59,7 +59,7 @@ class CartControllerTest {
                         Instant.now());
         given(cartService.getCart(userId)).willReturn(response);
 
-        mockMvc.perform(get("/api/v1/carts").header("X-User-Id", userId))
+        mockMvc.perform(get("/carts").header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.CART_FOUND.getCode()));
@@ -71,7 +71,7 @@ class CartControllerTest {
         given(cartService.getCart(userId))
                 .willThrow(new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-        mockMvc.perform(get("/api/v1/carts").header("X-User-Id", userId))
+        mockMvc.perform(get("/carts").header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -90,7 +90,7 @@ class CartControllerTest {
         given(cartService.addCartItem(userId, request)).willReturn(response);
 
         mockMvc.perform(
-                        post("/api/v1/carts/items")
+                        post("/carts/items")
                                 .header("X-User-Id", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -106,7 +106,7 @@ class CartControllerTest {
                 new AddCartItemRequest(UUID.randomUUID(), UUID.randomUUID(), 0);
 
         mockMvc.perform(
-                        post("/api/v1/carts/items")
+                        post("/carts/items")
                                 .header("X-User-Id", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -121,7 +121,7 @@ class CartControllerTest {
         UpdateCartItemQuantityRequest request = new UpdateCartItemQuantityRequest(3);
 
         mockMvc.perform(
-                        patch("/api/v1/carts/items/{cartItemId}", cartItemId)
+                        patch("/carts/items/{cartItemId}", cartItemId)
                                 .header("X-User-Id", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -137,7 +137,7 @@ class CartControllerTest {
         UUID cartItemId = UUID.randomUUID();
 
         mockMvc.perform(
-                        delete("/api/v1/carts/items/{cartItemId}", cartItemId)
+                        delete("/carts/items/{cartItemId}", cartItemId)
                                 .header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -147,7 +147,7 @@ class CartControllerTest {
     @Test
     @DisplayName("성공 - 장바구니 비우기")
     void clearCart_success() throws Exception {
-        mockMvc.perform(delete("/api/v1/carts").header("X-User-Id", userId))
+        mockMvc.perform(delete("/carts").header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.CART_CLEARED.getCode()));
