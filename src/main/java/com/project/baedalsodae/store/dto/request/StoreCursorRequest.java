@@ -4,20 +4,22 @@ import com.project.baedalsodae.store.entity.enums.SortType;
 import jakarta.validation.constraints.Min;
 import java.time.Instant;
 import java.util.UUID;
-import org.springframework.util.Assert;
 
 public record StoreCursorRequest(
         UUID lastId,
         Instant lastCreatedAt,
         Double lastRating,
         Integer lastReviewCount,
-        @Min(1) Integer size) {
-    public void validate(SortType sortType) {
-        switch (sortType) {
-            case LATEST -> Assert.notNull(lastCreatedAt, "최신순 정렬엔 lastCreatedAt 필요");
-            case RATING -> Assert.notNull(lastRating, "별점순 정렬엔 lastRating 필요");
-            case REVIEW -> Assert.notNull(lastReviewCount, "리뷰순 정렬엔 lastReviewCount 필요");
-        }
+        @Min(1) Integer size
+) {
+    public StoreCursorRequest normalize(SortType sortType) {
+        if (lastId != null) return this; // 첫 페이지 아니면 그대로
+
+        return switch (sortType) {
+            case LATEST -> new StoreCursorRequest(null, Instant.now(), null, null, size);
+            case RATING -> new StoreCursorRequest(null, null, Double.MAX_VALUE, null, size);
+            case REVIEW -> new StoreCursorRequest(null, null, null, Integer.MAX_VALUE, size);
+        };
     }
 
     public int getSize() {
