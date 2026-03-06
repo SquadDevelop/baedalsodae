@@ -121,6 +121,6 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
     @Override
     public void softDelete(UUID userId) {
         super.softDelete(userId);
-        if (orderNo != null) this.orderNo = null;
+        this.orderNo = null;
     }
 }
