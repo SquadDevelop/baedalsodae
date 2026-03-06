@@ -28,4 +28,11 @@ public class OrderActionStatusResponse {
                 .paymentStatus(payment.getStatus())
                 .build();
     }
+
+    public static OrderActionStatusResponse from(Order order) {
+        return OrderActionStatusResponse.builder()
+                .orderId(order.getId())
+                .orderStatus(order.getStatus())
+                .build();
+    }
 }

@@ -86,6 +86,10 @@ public class Order extends BaseAuditEntity {
         return this.status == OrderStatus.REQUESTED;
     }
 
+    public void accept() {
+         this.status = OrderStatus.ACCEPTED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,

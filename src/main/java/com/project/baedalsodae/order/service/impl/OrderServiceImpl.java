@@ -250,7 +250,12 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
+        final OrderStatus fromStatus = order.getStatus();
 
-        return null;
+        order.accept();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+
+        return OrderActionStatusResponse.from(order);
     }
 }
