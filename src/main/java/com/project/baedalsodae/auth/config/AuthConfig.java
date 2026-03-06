@@ -1,8 +1,12 @@
 package com.project.baedalsodae.auth.config;
 
-import com.project.baedalsodae.auth.security.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.JwtAuthorizationFilter;
 import com.project.baedalsodae.auth.security.JwtProvider;
+import com.project.baedalsodae.global.common.ApiResponse;
+import com.project.baedalsodae.global.common.ErrorCode;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -27,21 +31,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class AuthConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final UserDetailsService userDetailsService;
     private final JwtProvider jwtProvider;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
             throws Exception {
         return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider);
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
     }
 
     @Bean
@@ -53,20 +50,47 @@ public class AuthConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.sessionManagement((sessionManagement)
-                -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement(
+                (sessionManagement) ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .requestMatchers(HttpMethod.POST,"/api/v1/auth/login", "/api/v1/auth/signup").permitAll()
-                .anyRequest().permitAll()
-//                .anyRequest().authenticated()
-        );
+        http.authorizeHttpRequests(
+                (authorizeHttpRequests) ->
+                        authorizeHttpRequests
+                                .requestMatchers(
+                                        PathRequest.toStaticResources().atCommonLocations())
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/signup")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/logout")
+                                .authenticated()
+                                .anyRequest()
+                                .permitAll()
+                //                .anyRequest().authenticated()
+                );
 
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling(
+                exceptionHandling ->
+                        exceptionHandling
+                                .authenticationEntryPoint(
+                                        (request, response, authException) ->
+                                                sendErrorResponse(response, ErrorCode.UNAUTHORIZED))
+                                .accessDeniedHandler(
+                                        (request, response, accessDeniedException) ->
+                                                sendErrorResponse(response, ErrorCode.FORBIDDEN)));
+
+        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode)
+            throws IOException {
+        response.setStatus(errorCode.getStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+
+        String json = objectMapper.writeValueAsString(ApiResponse.error(errorCode));
+        response.getWriter().write(json);
     }
 
     @Bean

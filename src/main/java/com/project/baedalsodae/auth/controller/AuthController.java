@@ -1,7 +1,9 @@
 package com.project.baedalsodae.auth.controller;
 
+import com.project.baedalsodae.auth.dto.request.LoginRequest;
 import com.project.baedalsodae.auth.dto.request.SignupRequest;
 import com.project.baedalsodae.auth.dto.response.SignupResponse;
+import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
@@ -21,29 +23,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<SignupResponse>> signup(@Valid @RequestBody SignupRequest request) {
+    public ResponseEntity<ApiResponse<SignupResponse>> signup(
+            @Valid @RequestBody SignupRequest request) {
         UserDetailResponse userDetail = userService.createUser(request.toCreateUserDto());
 
-        SignupResponse response = SignupResponse.from(
-                userDetail.getUserId(),
-                userDetail.getUsername(),
-                userDetail.getNickname()
-        );
+        SignupResponse response =
+                SignupResponse.from(
+                        userDetail.getUserId(), userDetail.getUsername(), userDetail.getNickname());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(SuccessCode.USER_CREATED, response));
     }
 
     @PostMapping("/login")
-    public void login() {
-        // JwtAuthenticationFilter가 요청을 가로채서 처리하므로 이 코드는 실행되지 않습니다.
+    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody LoginRequest request) {
+        String accessToken = authService.login(request);
+
+        return ResponseEntity.ok()
+                .header("Authorization", accessToken)
+                .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS.getMessage()));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<?>> logout() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success("로그아웃되었습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("로그아웃되었습니다."));
     }
 }
