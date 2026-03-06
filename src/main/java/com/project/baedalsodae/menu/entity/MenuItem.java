@@ -114,7 +114,7 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
     }
 
     @Override
-    public void changeOrderNo(int orderNo) {
+    public void changeOrderNo(Integer orderNo) {
         this.orderNo = orderNo;
     }
 

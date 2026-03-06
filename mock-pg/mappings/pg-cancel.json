@@ -1,0 +1,44 @@
+{
+  "mappings": [
+    {
+      "name": "pg-cancel-missing-transaction",
+      "priority": 1,
+      "request": {
+        "method": "POST",
+        "urlPath": "/pg/cancel",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.pgTransactionId",
+              "absent": true
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"success\":false,\"paymentId\":null,\"pgTransactionId\":null,\"amount\":{{jsonPath request.body '$.amount'}},\"status\":\"FAILED\",\"message\":\"취소할 거래 ID가 없습니다\",\"createdAt\":\"{{now format='yyyy-MM-dd HH:mm:ss'}}\"}",
+        "transformers": ["response-template"]
+      }
+    },
+    {
+      "name": "pg-cancel-success",
+      "priority": 10,
+      "request": {
+        "method": "POST",
+        "urlPath": "/pg/cancel"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"success\":true,\"paymentId\":\"{{jsonPath request.body '$.orderId'}}\",\"pgTransactionId\":\"{{jsonPath request.body '$.pgTransactionId'}}\",\"amount\":{{jsonPath request.body '$.amount'}},\"status\":\"CANCELED\",\"message\":\"결제가 성공적으로 취소되었습니다\",\"createdAt\":\"{{now format='yyyy-MM-dd HH:mm:ss'}}\",\"modifiedAt\":\"{{now format='yyyy-MM-dd HH:mm:ss'}}\"}",
+        "transformers": ["response-template"]
+      }
+    }
+  ]
+}

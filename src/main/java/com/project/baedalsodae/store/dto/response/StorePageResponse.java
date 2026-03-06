@@ -1,0 +1,29 @@
+package com.project.baedalsodae.store.dto.response;
+
+import com.project.baedalsodae.store.entity.Store;
+import java.util.List;
+import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
+import org.springframework.data.domain.Slice;
+
+@Getter
+@Builder
+public class StorePageResponse {
+    private UUID storeCategoryId;
+    private String storeCategoryName;
+
+    private boolean hasNext;
+    private int pageSize;
+    private List<StoreSummaryResponse> stores;
+
+    public static StorePageResponse of(UUID categoryId, String categoryName, Slice<Store> slice) {
+        return StorePageResponse.builder()
+                .storeCategoryId(categoryId)
+                .storeCategoryName(categoryName)
+                .hasNext(slice.hasNext())
+                .pageSize(slice.getSize())
+                .stores(slice.getContent().stream().map(StoreSummaryResponse::fromEntity).toList())
+                .build();
+    }
+}

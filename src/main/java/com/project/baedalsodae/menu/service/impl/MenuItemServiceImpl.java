@@ -14,6 +14,7 @@ import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,12 +32,9 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Transactional
     @Override
     public MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request) {
-        MenuCategory category =
-                menuCategoryRepository
-                        .findByIdAndDeletedIsFalse(menuCategoryId)
-                        .orElseThrow(
-                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-        if (existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, request.name())) {
+        MenuCategory category = getMenuCategoryByMenuCategoryId(menuCategoryId);
+        UUID storeId = category.getStore().getId();
+        if (existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
             throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
         }
         int maxOrderNo =
@@ -65,11 +63,13 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
-        MenuCategory category =
-                menuCategoryRepository
-                        .findByIdAndDeletedIsFalse(request.categoryId())
-                        .orElseThrow(
-                                () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+        MenuCategory category = getMenuCategoryByMenuCategoryId(request.categoryId());
+
+        UUID storeId = category.getStore().getId();
+        if (!Objects.equals(item.getName(), request.name())
+                && existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+        }
         item.changeMenuInfo(
                 request.name(),
                 request.description(),
@@ -89,15 +89,20 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
-        if (request.categoryId() != null) {
-            MenuCategory category =
-                    menuCategoryRepository
-                            .findByIdAndDeletedIsFalse(request.categoryId())
-                            .orElseThrow(
-                                    () -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
-            item.changeMenuCategory(category);
+        UUID currentCategoryId = item.getMenuCategory().getId();
+        MenuCategory category = getMenuCategoryByMenuCategoryId(currentCategoryId);
+        UUID storeId = category.getStore().getId();
+        if (request.name() != null) {
+            if (!Objects.equals(item.getName(), request.name())
+                    && existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
+                throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+            }
+            item.changeName(request.name());
         }
-        if (request.name() != null) item.changeName(request.name());
+        if (request.categoryId() != null && !currentCategoryId.equals(request.categoryId())) {
+            MenuCategory newCategory = getMenuCategoryByMenuCategoryId(request.categoryId());
+            item.changeMenuCategory(newCategory);
+        }
         if (request.description() != null) item.changeDescription(request.description());
         if (request.price() != null) item.changePrice(request.price());
         if (request.isPopular() != null) item.changeIsPopular(request.isPopular());
@@ -116,12 +121,18 @@ public class MenuItemServiceImpl implements MenuItemService {
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+        UUID menuCategoryId = item.getMenuCategory().getId();
+
+        List<MenuItem> menuItems =
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(
+                        menuCategoryId);
+        OrderUtil.deleteAndShift(menuItems, item);
         item.softDelete(null); // 토큰 기능 추가 시 수정 필요
     }
 
     @Override
-    public boolean isDuplicateMenuItemName(UUID menuCategoryId, String name) {
-        return existsByNameAndMenuCategoryIdAndDeletedIsFalse(menuCategoryId, name);
+    public boolean isDuplicateMenuItemName(UUID storeId, String name) {
+        return existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
     }
 
     @Transactional
@@ -144,16 +155,29 @@ public class MenuItemServiceImpl implements MenuItemService {
         UUID menuCategoryId = item.getMenuCategory().getId();
 
         List<MenuItem> menuItems =
-                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(
                         menuCategoryId);
 
         OrderUtil.reorder(menuItems, item, from, to);
         return MenuItemResponseDto.fromEntity(item);
     }
 
-    private boolean existsByNameAndMenuCategoryIdAndDeletedIsFalse(
-            UUID menuCategoryId, String name) {
-        return menuItemRepository.existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(
-                menuCategoryId, name);
+    @Override
+    @Transactional(readOnly = true)
+    public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId) {
+        List<MenuItem> menuItems =
+                menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId);
+
+        return menuItems.stream().map(MenuItemResponseDto::fromEntity).toList();
+    }
+
+    private boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name) {
+        return menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
+    }
+
+    private MenuCategory getMenuCategoryByMenuCategoryId(UUID menuCategoryId) {
+        return menuCategoryRepository
+                .findByIdAndDeletedIsFalse(menuCategoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
     }
 }

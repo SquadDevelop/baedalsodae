@@ -19,7 +19,18 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(
-            "SELECT c FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false ORDER "
-                    + "BY c.orderNo ASC")
-    List<MenuCategory> findAllByStoreIdAndDeletedIsFalseForUpdate(UUID storeId);
+            "SELECT c FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false ORDER BY c.orderNo ASC")
+    List<MenuCategory> findAllByStoreIdAndDeletedIsFalseWithLock(UUID storeId);
+
+    @Query(
+            "SELECT MAX(c.orderNo) FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false")
+    Optional<Integer> findMaxOrderNoByStoreIdAndDeletedIsFalse(UUID storeId);
+
+    @Query(
+            "SELECT c FROM MenuCategory c WHERE c.store.id = :storeId AND c.isDeleted = false ORDER BY c.orderNo ASC")
+    List<MenuCategory> findAllByStoreIdAndDeletedIsFalse(UUID storeId);
+
+    @Query(
+            "SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM MenuCategory c WHERE c.store.id = :storeId AND c.name = :name AND c.isDeleted = false")
+    boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name);
 }

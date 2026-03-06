@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.service.impl;
+package com.project.baedalsodae.store.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,6 +16,7 @@ import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.store.service.impl.StoreCommandServiceImpl;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class StoreCommandServiceImplTest {
+class StoreCommandServiceTest {
 
     @Mock private StoreRepository storeRepository;
 
@@ -122,7 +123,7 @@ class StoreCommandServiceImplTest {
             storeCommandService.updateStore(request, storeId, userId);
 
             verify(store)
-                    .updateStore(
+                    .updateInfo(
                             eq(category),
                             eq("BHC치킨"),
                             eq("02-987-6543"),

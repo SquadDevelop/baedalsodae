@@ -3,7 +3,7 @@ package com.project.baedalsodae.store.controller;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.PatchStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
 import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
 import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
 import com.project.baedalsodae.store.service.StoreCategoryService;
@@ -45,10 +45,10 @@ public class StoreCategoryController {
     }
 
     @PatchMapping("/{storeCategoryId}")
-    public ResponseEntity<ApiResponse<Void>> patchStoreCategory(
-            @RequestBody @Valid PatchStoreCategoryRequest request,
+    public ResponseEntity<ApiResponse<Void>> updateStoreCategory(
+            @RequestBody @Valid UpdateStoreCategoryRequest request,
             @PathVariable UUID storeCategoryId) {
-        storeCategoryService.patchStoreCategory(request, storeCategoryId);
+        storeCategoryService.updateStoreCategory(request, storeCategoryId);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_CATEGORY_PATCHED, null));
     }
 

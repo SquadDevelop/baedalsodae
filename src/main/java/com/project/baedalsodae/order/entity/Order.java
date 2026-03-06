@@ -27,6 +27,12 @@ public class Order extends BaseAuditEntity {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "user_nickname_snapshot", nullable = false)
+    private String userNicknameSnapshot;
+
+    @Column(name = "user_phone_snapshot", nullable = false)
+    private String userPhoneSnapshot;
+
     @Column(name = "store_id", nullable = false)
     private UUID storeId;
 
@@ -62,14 +68,16 @@ public class Order extends BaseAuditEntity {
     private int finalAmount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems = new ArrayList<>();
+    private List<OrderItem> items = new ArrayList<>();
 
     public void addOrderItems(List<OrderItem> orderItems) {
-        this.orderItems.addAll(orderItems);
+        this.items.addAll(orderItems);
     }
 
     private Order(
             UUID userId,
+            String userNicknameSnapshot,
+            String userPhoneSnapshot,
             UUID storeId,
             String storeNameSnapshot,
             UUID addressId,
@@ -83,6 +91,8 @@ public class Order extends BaseAuditEntity {
             int finalAmount,
             OrderStatus status) {
         this.userId = userId;
+        this.userNicknameSnapshot = userNicknameSnapshot;
+        this.userPhoneSnapshot = userPhoneSnapshot;
         this.storeId = storeId;
         this.storeNameSnapshot = storeNameSnapshot;
         this.addressId = addressId;
@@ -99,6 +109,8 @@ public class Order extends BaseAuditEntity {
 
     public static Order create(
             UUID userId,
+            String userNicknameSnapshot,
+            String userPhoneSnapshot,
             Store store,
             UUID addressId,
             String deliveryAddressSnapshot,
@@ -111,6 +123,8 @@ public class Order extends BaseAuditEntity {
             int finalAmount) {
         return new Order(
                 userId,
+                userNicknameSnapshot,
+                userPhoneSnapshot,
                 store.getId(),
                 store.getName(),
                 addressId,

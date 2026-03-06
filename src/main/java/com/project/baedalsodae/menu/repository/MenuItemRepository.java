@@ -14,16 +14,23 @@ import org.springframework.stereotype.Repository;
 public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
 
     @Query(
-            "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted ="
-                    + " false")
+            "SELECT m FROM MenuItem m join fetch m.menuCategory WHERE m.id = :id AND m.isDeleted = false")
     Optional<MenuItem> findByIdAndDeletedIsFalse(UUID id);
 
+    @Query(
+            "SELECT MAX(i.orderNo) FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false")
     Optional<Integer> findMaxOrderNoByMenuCategoryId(UUID menuCategoryId);
-
-    boolean existsByMenuCategoryIdAndNameAndIsDeletedIsFalse(UUID menuCategoryId, String name);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(
             "SELECT i FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false ORDER BY i.orderNo ASC")
-    List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalseForUpdate(UUID menuCategoryId);
+    List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(UUID menuCategoryId);
+
+    @Query(
+            "SELECT i FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false ORDER BY i.orderNo ASC")
+    List<MenuItem> findAllByMenuCategoryIdAndIsDeletedIsFalse(UUID menuCategoryId);
+
+    @Query(
+            "SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM MenuItem i WHERE i.menuCategory.store.id = :storeId AND i.name = :name AND i.isDeleted = false")
+    boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name);
 }

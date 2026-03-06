@@ -1,3 +1,5 @@
 package com.project.baedalsodae.menu.dto.requestDto.category;
 
-public record MenuCategoryPutRequestDto(String name) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record MenuCategoryPutRequestDto(@NotBlank String name) {}

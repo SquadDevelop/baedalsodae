@@ -4,24 +4,28 @@ import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
-import com.project.baedalsodae.order.dto.response.CreateOrderResponse;
+import com.project.baedalsodae.order.dto.request.OrderListRequest;
+import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
+import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.order.util.OrderNoGenerator;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserRole;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final OrderEventPublisher eventPublisher;
+    private final OrderQueryRepository orderQueryRepository;
 
     @Override
     @Transactional
@@ -49,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
         final UUID storeId = cart.getStore().getId();
         Store store =
                 storeRepository
-                        .findById(storeId)
+                        .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         int totalAmount = cart.getTotalAmount();
@@ -66,9 +71,15 @@ public class OrderServiceImpl implements OrderService {
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
+        // TODO 인증 도메인 완료 시 넣어줌
+        final String userNickName = "잽닝";
+        final String userPhone = "01011111111";
+
         Order order =
                 Order.create(
                         userId,
+                        userNickName,
+                        userPhone,
                         store,
                         addressId,
                         deliveryAddressSnapshot,
@@ -96,5 +107,97 @@ public class OrderServiceImpl implements OrderService {
         eventPublisher.publishOrderCreated(savedOrder);
 
         return CreateOrderResponse.from(savedOrder);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
+        validateDateRange(request.startDate(), request.endDate());
+        // TODO 인증 도메인 완성 시 AOP로 권한 체크
+        if (UserRole.OWNER.getRole().equals(role)) {
+            return getOwnerOrders(userId, request);
+        }
+        return getCustomerOrders(userId, request);
+    }
+
+    private OrderListResponse getCustomerOrders(UUID userId, OrderListRequest request) {
+        OrderListQuery query = OrderListQuery.forCustomer(userId, request);
+        List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByCustomer(query);
+
+        boolean hasNext = orders.size() > query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
+    }
+
+    private OrderListResponse getOwnerOrders(UUID userId, OrderListRequest request) {
+        Store store =
+                storeRepository
+                        .findByIdAndIsDeletedIsFalse(request.storeId())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+        if (!store.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+        OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
+
+        List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+        boolean hasNext = orders.size() > query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
+    }
+
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_DATE_RANGE);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetail(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+
+        Order order =
+                orderRepository
+                        .findOrderWithItemsById(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
+                && !order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        return OrderDetailResponse.from(order);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderStatusResponse getOrderStatus(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.CUSTOMER.getRole())
+                && !order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        List<OrderStatusHistory> histories =
+                orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId);
+
+        return OrderStatusResponse.from(order, histories);
     }
 }

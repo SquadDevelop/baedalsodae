@@ -4,6 +4,7 @@ import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
 import com.project.baedalsodae.menu.dto.responseDto.item.MenuItemResponseDto;
+import java.util.List;
 import java.util.UUID;
 
 public interface MenuItemService {
@@ -16,7 +17,9 @@ public interface MenuItemService {
 
     void deleteMenuItem(UUID menuItemId);
 
-    boolean isDuplicateMenuItemName(UUID menuCategoryId, String name);
+    boolean isDuplicateMenuItemName(UUID storeId, String name);
 
     MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order);
+
+    List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId);
 }

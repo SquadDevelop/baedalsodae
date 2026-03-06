@@ -11,7 +11,7 @@ public class StoreCategoryResponse {
     private UUID id;
     private String name;
 
-    public static StoreCategoryResponse from(StoreCategory storeCategory) {
+    public static StoreCategoryResponse fromEntity(StoreCategory storeCategory) {
         return StoreCategoryResponse.builder()
                 .id(storeCategory.getId())
                 .name(storeCategory.getName())
