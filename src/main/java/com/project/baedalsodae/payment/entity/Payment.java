@@ -2,11 +2,12 @@ package com.project.baedalsodae.payment.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -103,5 +104,20 @@ public class Payment extends BaseTimeEntity {
             UUID createdBy) {
         return new Payment(
                 order, user, amount, paymentMethod, status, paidAt, createdBy, createdBy);
+    }
+
+    public void markAsSuccess(final String pgTransactionId) {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태는 PENDING이어야 합니다.");
+        }
+        this.status = PaymentStatus.SUCCESS;
+        this.paidAt = LocalDateTime.now();
+    }
+
+    public void markAsFailed() {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태는 PENDING이어야 합니다.");
+        }
+        this.status = PaymentStatus.FAILED;
     }
 }
