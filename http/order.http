@@ -64,18 +64,18 @@ X-User-Role: OWNER
 
 
 ### 주문 요청
-POST http://localhost:8080/orders/{{orderId}}/request
+POST http://localhost:18082/api/v1/orders/{{orderId}}/request
 Content-Type: application/json
 X-User-Id: {{userId}}
 
 ### 주문 수락
-POST http://localhost:8080/orders/{{orderId}}/accept?storeId={{storeId}}
+POST http://localhost:18082/api/v1/orders/{{orderId}}/accept?storeId={{storeId}}
 Content-Type: application/json
 X-User-Id: {{userId}}
 X-User-Role: OWNER
 
 ### 주문 거절
-POST http://localhost:8080/orders/{{orderId}}/reject?storeId={{storeId}}
+POST http://localhost:18082/api/v1/orders/{{orderId}}/reject?storeId={{storeId}}
 Content-Type: application/json
 X-User-Id: {{userId}}
 X-User-Role: OWNER
