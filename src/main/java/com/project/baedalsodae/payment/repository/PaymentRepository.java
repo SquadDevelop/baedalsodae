@@ -22,4 +22,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             ORDER BY p.createdAt DESC
             """)
     List<Payment> findNextPage(Instant cursor, int size);
+
+    boolean existsByOrderId(UUID orderId);
 }

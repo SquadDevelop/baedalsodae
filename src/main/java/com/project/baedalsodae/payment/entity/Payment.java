@@ -41,6 +41,9 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
+    @Column(name = "pg_transaction_id")
+    private String pgTransactionId;
+
     @Column(name = "created_by", nullable = false)
     private UUID createdBy;
 
@@ -104,5 +107,21 @@ public class Payment extends BaseTimeEntity {
             UUID createdBy) {
         return new Payment(
                 order, user, amount, paymentMethod, status, paidAt, createdBy, createdBy);
+    }
+
+    public void markAsSuccess(final String pgTransactionId) {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태는 PENDING이어야 합니다.");
+        }
+        this.status = PaymentStatus.SUCCESS;
+        this.paidAt = LocalDateTime.now();
+        this.pgTransactionId = pgTransactionId;
+    }
+
+    public void markAsFailed() {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태는 PENDING이어야 합니다.");
+        }
+        this.status = PaymentStatus.FAILED;
     }
 }

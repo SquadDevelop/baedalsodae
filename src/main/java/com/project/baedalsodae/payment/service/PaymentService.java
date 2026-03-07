@@ -11,4 +11,6 @@ public interface PaymentService {
     TimeCursorPage<List<PaymentResponse>> getPayments(Instant cursor, int size);
 
     PaymentResponse getPayment(UUID paymentId);
+
+    void processPayment(UUID orderId, UUID userId, int finalAmount);
 }
