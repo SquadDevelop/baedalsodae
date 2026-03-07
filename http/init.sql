@@ -21,9 +21,42 @@ INSERT INTO baedalsodae.p_store (is_deleted, avg_rating, review_count, created_a
                                  business_number, created_by, deleted_by, id, store_category_id, updated_by, user_id,
                                  dong_code, phone, sido_code, sigungu_code, dong_name, name, sido_name, sigungu_name,
                                  description, detail_address, road_address, store_status)
-VALUES (DEFAULT, 0, 0, null, null, null, '1111111111', null, null, '00000000-0000-0000-0000-000000000001',
+VALUES (DEFAULT,  0, 0,null, null, null, '1111111111', null, null, '00000000-0000-0000-0000-000000000001',
         '00000000-0000-0000-0000-000000000001', null, '00000000-0000-0000-0000-000000000001', '1', '01011111111', '2',
         '3', '포일동', '가게1', '경기도', '안양시', null, '오금로', '16', 'OPEN');
+
+
+-- 메뉴 카테고리 추가
+INSERT INTO baedalsodae.p_menu_category (is_deleted, order_no, created_at, deleted_at, updated_at, created_by,
+                                         deleted_by, id, store_id, updated_by, name)
+VALUES (DEFAULT, 1, null, null, null, null, null, '00000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000001', null, '인기 메뉴');
+
+-- 메뉴 추가
+INSERT INTO baedalsodae.p_menu_item (is_deleted, is_popular, order_no, price, created_at, deleted_at, updated_at,
+                                     created_by, deleted_by, id, menu_category_id, updated_by, description, menu_status,
+                                     name)
+VALUES (DEFAULT, true, 1, 18000, null, null, null, null, null, '00000000-0000-0000-0000-000000000003',
+        '00000000-0000-0000-0000-000000000001', null, null, null, '치킨');
+
+-- 결제 정보 생성
+    INSERT INTO baedalsodae.p_payment (amount, payment_method, payment_status, created_at, paid_at, updated_at, created_by, id, order_id, updated_by, user_id) VALUES (36000.00, 0, 'SUCCESS', null, null, null, '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', '5186c2ed-c444-41ff-9bae-a4716791a91c', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010');
+
+--
+-- -- 장바구니 추가
+-- INSERT INTO baedalsodae.p_cart (created_at, updated_at, id, store_id, user_id)
+-- VALUES (null, null, '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
+--         '00000000-0000-0000-0000-000000000001');
+--
+-- -- 장바구니 아이템 추가
+-- INSERT INTO baedalsodae.p_cart_item (quantity, created_at, updated_at, cart_id, id, menu_item_id)
+-- VALUES (1, null, null, '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
+--         '00000000-0000-0000-0000-000000000003');
+
+
+
+
+
 
 
 -- 가게 테이블 수정에 따른 추가 데이터
@@ -83,28 +116,6 @@ VALUES
     ('aaaaaaaa-0000-0000-0000-000000000049', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 2.55, 43, false, '2024-07-09 10:00:00+09', '2024-07-09 10:00:00+09', '1001-01-00049', '1111010400', '02-1234-0049', '11', '11110', '신당동', '매콤한 짜장면', '서울특별시', '중구', '중식 전문점입니다.', '1층', '서울특별시 중구 신당로 49', 'OPEN'),
     ('aaaaaaaa-0000-0000-0000-000000000050', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001', 2.45, 38, false, '2024-07-16 11:30:00+09', '2024-07-16 11:30:00+09', '1001-01-00050', '1111010500', '02-1234-0050', '11', '11110', '황학동', '고소한 깐풍기', '서울특별시', '중구', '중식 전문점입니다.', '2층', '서울특별시 중구 황학로 50', 'OPEN');
 
--- 메뉴 카테고리 추가
-INSERT INTO baedalsodae.p_menu_category (is_deleted, order_no, created_at, deleted_at, updated_at, created_by,
-                                         deleted_by, id, store_id, updated_by, name)
-VALUES (DEFAULT, 1, null, null, null, null, null, '00000000-0000-0000-0000-000000000001',
-        '00000000-0000-0000-0000-000000000001', null, '인기 메뉴');
-
--- 메뉴 추가
-INSERT INTO baedalsodae.p_menu_item (is_deleted, is_popular, order_no, price, created_at, deleted_at, updated_at,
-                                     created_by, deleted_by, id, menu_category_id, updated_by, description, menu_status,
-                                     name)
-VALUES (DEFAULT, true, 1, 18000, null, null, null, null, null, '00000000-0000-0000-0000-000000000003',
-        '00000000-0000-0000-0000-000000000001', null, null, null, '치킨');
---
--- -- 장바구니 추가
--- INSERT INTO baedalsodae.p_cart (created_at, updated_at, id, store_id, user_id)
--- VALUES (null, null, '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
---         '00000000-0000-0000-0000-000000000001');
---
--- -- 장바구니 아이템 추가
--- INSERT INTO baedalsodae.p_cart_item (quantity, created_at, updated_at, cart_id, id, menu_item_id)
--- VALUES (1, null, null, '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001',
---         '00000000-0000-0000-0000-000000000003');
 
 -- 메뉴 카테고리 추가
 INSERT INTO baedalsodae.p_menu_category
@@ -199,3 +210,4 @@ VALUES
  '00000000-0000-0000-0000-000000000212',
  '00000000-0000-0000-0000-000000000104',
  null, '제로콜라', 'PREPARING', '콜라 제로');
+

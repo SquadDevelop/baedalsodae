@@ -74,6 +74,26 @@ public class Order extends BaseAuditEntity {
         this.items.addAll(orderItems);
     }
 
+    public boolean canRequest() {
+        return this.status == OrderStatus.CREATED;
+    }
+
+    public void request() {
+        this.status = OrderStatus.REQUESTED;
+    }
+
+    public boolean canAcceptOrReject() {
+        return this.status == OrderStatus.REQUESTED;
+    }
+
+    public void accept() {
+        this.status = OrderStatus.ACCEPTED;
+    }
+
+    public void reject() {
+        this.status = OrderStatus.REJECTED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,

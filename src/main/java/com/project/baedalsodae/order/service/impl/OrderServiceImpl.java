@@ -11,12 +11,17 @@ import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
+import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.order.service.OrderStatusHistoryService;
 import com.project.baedalsodae.order.util.OrderNoGenerator;
+import com.project.baedalsodae.payment.entity.Payment;
+import com.project.baedalsodae.payment.entity.PaymentStatus;
+import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -31,19 +36,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
+    private final OrderStatusHistoryService orderStatusHistoryService;
     private final CartRepository cartRepository;
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final OrderEventPublisher eventPublisher;
     private final OrderQueryRepository orderQueryRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
     public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
         final UUID cartId = request.cartId();
         final UUID addressId = request.addressId();
-
         Cart cart =
                 cartRepository
                         .findCartWithItemsByIdAndUserId(cartId, userId)
@@ -95,14 +101,10 @@ public class OrderServiceImpl implements OrderService {
                 cart.getItems().stream()
                         .map(cartItem -> OrderItem.create(order, cartItem))
                         .toList();
-
         order.addOrderItems(orderItems);
-
         final Order savedOrder = orderRepository.save(order);
 
-        OrderStatusHistory orderStatusHistory = OrderStatusHistory.create(savedOrder, userId);
-
-        orderStatusHistoryRepository.save(orderStatusHistory);
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
         eventPublisher.publishOrderCreated(savedOrder);
 
@@ -138,9 +140,10 @@ public class OrderServiceImpl implements OrderService {
         if (!store.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
-        OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
 
+        OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
         List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+
         boolean hasNext = orders.size() > query.resolvedSize();
         if (hasNext) orders = orders.subList(0, query.resolvedSize());
 
@@ -199,5 +202,91 @@ public class OrderServiceImpl implements OrderService {
                 orderStatusHistoryRepository.findByOrderIdOrderByCreatedAtAsc(orderId);
 
         return OrderStatusResponse.from(order, histories);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse requestOrder(UUID userId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
+        Payment payment =
+                paymentRepository
+                        .findByOrder(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        if (payment.getStatus() != PaymentStatus.SUCCESS) {
+            throw new BusinessException(ErrorCode.ORDER_PAYMENT_NOT_COMPLETED);
+        }
+
+        if (!order.canRequest()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        order.request();
+
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
+
+        return OrderActionStatusResponse.from(order, payment);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse acceptOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canAcceptOrReject()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.accept();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse rejectOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canAcceptOrReject()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.reject();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+
+        return OrderActionStatusResponse.from(order);
     }
 }
