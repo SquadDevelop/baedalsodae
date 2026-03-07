@@ -9,7 +9,8 @@ import java.util.UUID;
 
 public interface OrderService {
 
-    CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) throws JsonProcessingException;
+    CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request)
+            throws JsonProcessingException;
 
     OrderListResponse getOrders(UUID userId, String role, OrderListRequest request);
 

@@ -4,11 +4,10 @@ import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.payment.entity.Payment;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)

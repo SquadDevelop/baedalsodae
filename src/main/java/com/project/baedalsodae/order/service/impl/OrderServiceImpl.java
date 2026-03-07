@@ -28,13 +28,12 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) throws JsonProcessingException {
+    public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request)
+            throws JsonProcessingException {
         final UUID cartId = request.cartId();
         final UUID addressId = request.addressId();
         Cart cart =
@@ -296,7 +296,5 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateOrderStatus(final UUID orderId, final String payment_completed) {
-
-    }
+    public void updateOrderStatus(final UUID orderId, final String payment_completed) {}
 }
