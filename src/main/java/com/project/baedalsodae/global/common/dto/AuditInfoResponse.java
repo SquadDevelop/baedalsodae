@@ -2,25 +2,28 @@ package com.project.baedalsodae.global.common.dto;
 
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
+
+import static com.project.baedalsodae.global.common.util.TimeUtils.toLocalDateTime;
 
 @Getter
 public class AuditInfoResponse {
     private final UUID createdBy;
-    private final Instant createdAt;
+    private final LocalDateTime createdAt;
     private final UUID updatedBy;
-    private final Instant updatedAt;
+    private final LocalDateTime updatedAt;
     private final UUID deletedBy;
-    private final Instant deletedAt;
+    private final LocalDateTime deletedAt;
 
     private AuditInfoResponse(BaseAuditEntity entity) {
         this.createdBy = entity.getCreatedBy();
-        this.createdAt = entity.getCreatedAt();
+        this.createdAt = toLocalDateTime(entity.getCreatedAt());
         this.updatedBy = entity.getUpdatedBy();
-        this.updatedAt = entity.getUpdatedAt();
+        this.updatedAt = toLocalDateTime(entity.getUpdatedAt());
         this.deletedBy = entity.getDeletedBy();
-        this.deletedAt = entity.getDeletedAt();
+        this.deletedAt = toLocalDateTime(entity.getDeletedAt());
     }
 
     public static AuditInfoResponse fromEntity(BaseAuditEntity entity) {
