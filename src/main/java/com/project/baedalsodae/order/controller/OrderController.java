@@ -106,7 +106,11 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/reviews")
-    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(UUID userId, @PathVariable UUID orderId, @RequestBody ReviewRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_CREATED,reviewService.createReview(userId, orderId, request)));
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
+            UUID userId, @PathVariable UUID orderId, @RequestBody ReviewRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        SuccessCode.REVIEW_CREATED,
+                        reviewService.createReview(userId, orderId, request)));
     }
 }

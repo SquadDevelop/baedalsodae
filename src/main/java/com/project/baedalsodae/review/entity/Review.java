@@ -7,11 +7,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,6 +19,7 @@ public class Review extends BaseAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
     private UUID userId;
     private UUID orderId;
     private int rating;
@@ -53,5 +53,4 @@ public class Review extends BaseAuditEntity {
     public static Review create(UUID userId, UUID orderId, int rating, String content) {
         return new Review(userId, orderId, rating, content);
     }
-
 }
