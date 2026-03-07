@@ -21,7 +21,7 @@ public class EventPublisher {
         if (type == EventType.ORDER_CREATED) {
             final OrderCreatedEvent event = OrderCreatedEvent.from(order);
             eventPublisher.publishEvent(event);
-            eventService.save(Event.fromOrder(order, type, payload));
+            eventService.save(Event.fromOrder(order, EventType.ORDER_CREATED, payload));
         }
         // 다른 이벤트 타입이 추가될 경우 여기에 분기 처리 (예: ORDER_CANCELLED, ORDER_UPDATED 등
     }

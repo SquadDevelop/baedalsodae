@@ -1,32 +1,33 @@
 package com.project.baedalsodae.event.poller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
-import java.util.List;
-import java.util.UUID;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class EventPoller {
 
     private static final int MAX_RETRY = 3;
 
     private final EventRepository eventRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
+    private final Map<EventType, EventDispatcher> dispatcherMap;
+
+    public EventPoller(EventRepository eventRepository, List<EventDispatcher> dispatchers) {
+        this.eventRepository = eventRepository;
+        this.dispatcherMap = dispatchers.stream()
+                .collect(Collectors.toMap(EventDispatcher::getSupportedEventType, Function.identity()));
+    }
 
     @Scheduled(fixedDelay = 1000)
     @Transactional
@@ -51,7 +52,7 @@ public class EventPoller {
                         event.getId(),
                         event.getEventType());
             } catch (Exception e) {
-                event.markFailed(MAX_RETRY); // retryCount < MAX_RETRY → PENDING, 이상이면 FAILED
+                event.markFailed(MAX_RETRY);
                 log.error(
                         "[OutboxPoller] 이벤트 발행 실패 (retryCount={}): id={}, type={}, error={}",
                         event.getRetryCount(),
@@ -62,16 +63,12 @@ public class EventPoller {
         }
     }
 
-    private void dispatch(Event event) throws JsonProcessingException {
-        if (event.getEventType() == EventType.ORDER_CREATED) {
-            JsonNode node = objectMapper.readTree(event.getPayload());
-            UUID orderId = UUID.fromString(node.get("orderId").asText());
-            UUID userId = UUID.fromString(node.get("userId").asText());
-            int finalAmount = node.get("finalAmount").asInt();
-
-            eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
-        } else {
+    private void dispatch(Event event) throws Exception {
+        EventDispatcher dispatcher = dispatcherMap.get(event.getEventType());
+        if (dispatcher == null) {
             log.warn("[OutboxPoller] 처리되지 않은 이벤트 타입: {}", event.getEventType());
+            return;
         }
+        dispatcher.dispatch(event);
     }
 }
