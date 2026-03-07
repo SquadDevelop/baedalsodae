@@ -1,12 +1,15 @@
 package com.project.baedalsodae.event.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
+import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
+import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.payment.entity.Payment;
 import jakarta.persistence.*;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -56,6 +59,10 @@ public class Event extends BaseTimeEntity {
 
     public boolean isExhausted(int maxRetry) {
         return this.retryCount >= maxRetry;
+    }
+
+    public static Event fromOrder(Order order, EventType type) {
+        return new Event(AggregateType.ORDER, order.getId(), type, null);
     }
 
     public static Event create(

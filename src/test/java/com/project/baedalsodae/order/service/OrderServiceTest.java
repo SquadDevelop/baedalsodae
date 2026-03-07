@@ -1182,7 +1182,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-
+        then(eventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1289,7 +1289,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
-
+        then(eventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1399,6 +1399,7 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
 
+        then(eventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();
     }
 }

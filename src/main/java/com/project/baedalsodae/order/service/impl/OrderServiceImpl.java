@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-    private final OrderEventPublisher eventPublisher;
+    private final OrderEventPublisher orderEventPublisher;
     private final OrderQueryRepository orderQueryRepository;
     private final PaymentRepository paymentRepository;
 
@@ -106,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
-        eventPublisher.publishOrderCreated(savedOrder);
+        orderEventPublisher.publishOrderCreated(savedOrder);
 
         return CreateOrderResponse.from(savedOrder);
     }
@@ -233,6 +233,8 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
+        orderEventPublisher.publishOrderRequested(order);
+
         return OrderActionStatusResponse.from(order, payment);
     }
 
@@ -260,6 +262,8 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
 
+        orderEventPublisher.publishOrderAccepted(order);
+
         return OrderActionStatusResponse.from(order);
     }
 
@@ -286,6 +290,8 @@ public class OrderServiceImpl implements OrderService {
         order.reject();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+
+        orderEventPublisher.publishOrderRejected(order);
 
         return OrderActionStatusResponse.from(order);
     }
