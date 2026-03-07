@@ -1,5 +1,6 @@
 package com.project.baedalsodae.store.controller;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -96,8 +98,10 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PostMapping("/{storeId}/menu-categories")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(
-            @PathVariable UUID storeId, @RequestBody @Valid MenuCategoryPostRequestDto request) {
         MenuCategoryResponseDto response = menuCategoryService.createMenuCategory(storeId, request);
+            @PathVariable UUID storeId,
+            @RequestBody @Valid MenuCategoryPostRequestDto request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_CREATED, response));
     }
 
