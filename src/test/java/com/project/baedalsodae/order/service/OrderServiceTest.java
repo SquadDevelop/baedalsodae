@@ -1418,7 +1418,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.cookedOrder(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1444,7 +1444,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.cookedOrder(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1471,7 +1471,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.cookedOrder(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1503,7 +1503,7 @@ public class OrderServiceTest {
 
         // when
         OrderActionStatusResponse response =
-                orderService.cookedOrder(userId, role, storeId, orderId);
+                orderService.completeCookingOrder(userId, role, storeId, orderId);
 
         // then
         then(order).should().canCompleteCooking();

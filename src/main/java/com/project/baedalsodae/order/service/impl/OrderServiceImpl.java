@@ -298,7 +298,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderActionStatusResponse cookedOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
