@@ -1,7 +1,11 @@
 package com.project.baedalsodae.order.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
@@ -12,7 +16,6 @@ import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
@@ -25,12 +28,13 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,13 +45,14 @@ public class OrderServiceImpl implements OrderService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-    private final OrderEventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
     private final OrderQueryRepository orderQueryRepository;
     private final PaymentRepository paymentRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
-    public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
+    public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) throws JsonProcessingException {
         final UUID cartId = request.cartId();
         final UUID addressId = request.addressId();
         Cart cart =
@@ -105,8 +110,8 @@ public class OrderServiceImpl implements OrderService {
         final Order savedOrder = orderRepository.save(order);
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
-
-        eventPublisher.publishOrderCreated(savedOrder);
+        String payload = objectMapper.writeValueAsString(request);
+        eventPublisher.publishOrderEvent(savedOrder, EventType.ORDER_CREATED, payload);
 
         return CreateOrderResponse.from(savedOrder);
     }
@@ -288,5 +293,10 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
 
         return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    public void updateOrderStatus(final UUID orderId, final String payment_completed) {
+
     }
 }

@@ -1,5 +1,6 @@
 package com.project.baedalsodae.order.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.*;
@@ -8,7 +9,7 @@ import java.util.UUID;
 
 public interface OrderService {
 
-    CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request);
+    CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) throws JsonProcessingException;
 
     OrderListResponse getOrders(UUID userId, String role, OrderListRequest request);
 
@@ -23,4 +24,6 @@ public interface OrderService {
 
     OrderActionStatusResponse rejectOrder(
             UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    void updateOrderStatus(UUID orderId, String payment_completed);
 }

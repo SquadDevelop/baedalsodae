@@ -1,10 +1,8 @@
 package com.project.baedalsodae.payment.listener;
 
-import static org.mockito.BDDMockito.then;
-
+import com.project.baedalsodae.event.listener.PaymentEventListener;
 import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
 import com.project.baedalsodae.payment.service.PaymentService;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
+import static org.mockito.BDDMockito.then;
+
 @ExtendWith(MockitoExtension.class)
 class PaymentListenerTest {
 
-    @InjectMocks private PaymentListener paymentListener;
+    @InjectMocks private PaymentEventListener paymentListener;
 
     @Mock private PaymentService paymentService;
 
