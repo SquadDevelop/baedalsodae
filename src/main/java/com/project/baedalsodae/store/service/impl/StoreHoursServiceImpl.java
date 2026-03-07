@@ -58,6 +58,15 @@ public class StoreHoursServiceImpl implements StoreHoursService {
         return storeHoursList;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public StoreHoursResponse.StoreHoursInfo getStoreHours(UUID storeId) {
+        checkIfStoreIdValid(storeId);
+        List<StoreHours> storeHoursList = storeHoursRepository.findAllByStoreId(storeId);
+        List<StoreHoursResponse.StoreHourDto> storeHourDtos =
+                StoreHoursResponse.StoreHourDto.fromEntityList(storeHoursList);
+        return new StoreHoursResponse.StoreHoursInfo(storeId, storeHourDtos);
+    }
     private void validateDayCount(List<StoreHoursRequest> request) {
         long distinctDayCount =
                 request.stream().map(StoreHoursRequest::getDayOfWeek).distinct().count();
@@ -70,5 +79,11 @@ public class StoreHoursServiceImpl implements StoreHoursService {
         return storeRepository
                 .findByIdAndIsDeletedIsFalse(storeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+    }
+
+    private void checkIfStoreIdValid(UUID storeId) {
+        if (!storeRepository.existsByIdAndIsDeletedIsFalse(storeId)) {
+            throw new BusinessException(ErrorCode.STORE_NOT_FOUND);
+        }
     }
 }

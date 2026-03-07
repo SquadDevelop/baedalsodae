@@ -11,4 +11,6 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
     Boolean existsByBusinessNumber(String businessNumber);
 
     Optional<Store> findByIdAndIsDeletedIsFalse(UUID id);
+
+    boolean existsByIdAndIsDeletedIsFalse(UUID id);
 }

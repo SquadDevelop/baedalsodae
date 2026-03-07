@@ -105,6 +105,16 @@ public class StoreController {
         storeHoursService.createStoreHours(storeId, userDetails, request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_CREATED, null));
     }
+
+    @GetMapping("/{storeId}/hours")
+    public ResponseEntity<ApiResponse<StoreHoursResponse.StoreHoursInfo>> getStoreHours(
+            @PathVariable UUID storeId) {
+        StoreHoursResponse.StoreHoursInfo response = storeHoursService.getStoreHours(storeId);
+        if (response.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_NOT_SET, null));
+        }
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_FOUND, response));
+    }
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PostMapping("/{storeId}/menu-categories")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(

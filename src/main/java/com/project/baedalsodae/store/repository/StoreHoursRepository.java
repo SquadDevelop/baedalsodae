@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StoreHoursRepository extends JpaRepository<StoreHours, UUID> {
 
+    List<StoreHours> findAllByStoreId(UUID storeId);
     boolean existsByStoreId(UUID storeId);

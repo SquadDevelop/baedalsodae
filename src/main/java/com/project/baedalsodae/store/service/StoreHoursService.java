@@ -10,3 +10,5 @@ public interface StoreHoursService {
 
     void createStoreHours(
             UUID storeId, UserDetailsImpl userDetails, List<StoreHoursRequest> request);
+
+    StoreHoursResponse.StoreHoursInfo getStoreHours(UUID storeId);
