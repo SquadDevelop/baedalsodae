@@ -96,7 +96,7 @@ public class OrderController {
             @RequestHeader("X-User-Id") UUID userId,
             @RequestHeader("X-User-Role") UserRole userRole,
             @RequestParam(name = "storeId", required = false) UUID storeId,
-            @RequestParam(name = "reason") String reason,
+            @RequestParam(name = "reason", required = false) String reason,
             @PathVariable("orderId") UUID orderId) {
 
         OrderActionStatusResponse response =
