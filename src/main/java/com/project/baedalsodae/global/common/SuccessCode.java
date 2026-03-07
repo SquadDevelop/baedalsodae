@@ -37,6 +37,15 @@ public enum SuccessCode {
     STORE_DETAIL_FOUND("ST205", HttpStatus.OK, "가게 상세 조회 성공"),
     STORE_FOUND_FOR_OWNER("ST206", HttpStatus.OK, "가게 조회 성공"),
 
+    // user+auth
+    USER_FOUND("UR200", HttpStatus.OK, "회원 정보 조회 성공"),
+    USER_CREATED("UR201", HttpStatus.CREATED, "회원가입 성공"),
+    USER_UPDATED("UR202", HttpStatus.OK, "회원 정보 수정 성공"),
+    USER_DELETED("UR203", HttpStatus.OK, "회원 탈퇴 성공"),
+
+    LOGIN_SUCCESS("AU200", HttpStatus.OK, "로그인 성공"),
+    LOGOUT_SUCCESS("AU201", HttpStatus.OK, "로그아웃 성공"),
+
     // menu category
     MENU_CATEGORY_CREATED("MC200", HttpStatus.CREATED, "메뉴 카테고리 등록 성공"),
     MENU_CATEGORY_UPDATED("MC201", HttpStatus.OK, "메뉴 카테고리 수정 성공"),

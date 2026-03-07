@@ -3,9 +3,10 @@ package com.project.baedalsodae.user.service.impl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
-import com.project.baedalsodae.user.dto.request.UserRequestDto;
-import com.project.baedalsodae.user.dto.response.UserResponseDto.Delete;
-import com.project.baedalsodae.user.dto.response.UserResponseDto.Detail;
+import com.project.baedalsodae.user.dto.request.CreateUserRequest;
+import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
+import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Detail createUser(UserRequestDto.Create createRequest) {
+    public UserDetailResponse createUser(CreateUserRequest createRequest) {
         String encodedPassword = passwordEncoder.encode(createRequest.getPassword());
 
         User newUser =
@@ -47,20 +48,20 @@ public class UserServiceImpl implements UserService {
                         createRequest.getDescription());
         userAddressService.createAddress(savedUser.getId(), addressRequest);
 
-        return Detail.from(savedUser);
+        return UserDetailResponse.from(savedUser);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Detail getUser(UUID userId) {
+    public UserDetailResponse getUser(UUID userId) {
         User user = findByUserId(userId);
 
-        return Detail.from(user);
+        return UserDetailResponse.from(user);
     }
 
     @Transactional
     @Override
-    public Detail updateUser(UUID userId, UserRequestDto.Update updateRequest) {
+    public UserDetailResponse updateUser(UUID userId, UpdateUserRequest updateRequest) {
         User user = findByUserId(userId);
 
         String encodedPassword = user.getPassword();
@@ -78,18 +79,18 @@ public class UserServiceImpl implements UserService {
             userAddressService.updateAddressList(userId, updateRequest.getAddresses());
         }
 
-        return Detail.from(user);
+        return UserDetailResponse.from(user);
     }
 
     @Transactional
     @Override
-    public Delete deleteUser(UUID userId) {
+    public UserDeleteResponse deleteUser(UUID userId) {
         User user = findByUserId(userId);
 
         userAddressService.deleteAllAddressesByUserId(userId);
         user.softDelete(userId);
 
-        return Delete.from(user);
+        return UserDeleteResponse.from(user);
     }
 
     private User findByUserId(UUID userId) {

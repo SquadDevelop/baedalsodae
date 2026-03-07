@@ -10,8 +10,13 @@ public enum ErrorCode {
     // common
     INTERNAL_SERVER_ERROR("Z001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 못한 오류가 발생했습니다"),
     INVALID_REQUEST("Z002", HttpStatus.BAD_REQUEST, "요청값이 잘못됐습니다"),
-    UNAUTHORIZED("Z003", HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
-    FORBIDDEN("Z004", HttpStatus.FORBIDDEN, "권한이 없니다."),
+    UNAUTHORIZED("Z003", HttpStatus.UNAUTHORIZED, "요청을 인가할 수 없습니다."),
+    FORBIDDEN("Z004", HttpStatus.FORBIDDEN, "권한이 없습니다."),
+    JWT_SIGNATURE_INVALID("Z005", HttpStatus.UNAUTHORIZED, "유효하지 않은 서명입니다."),
+    JWT_INVALID("Z006", HttpStatus.UNAUTHORIZED, "유효하지 않은 JWT 토큰입니다."),
+    JWT_EXPIRED("Z007", HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다."),
+    JWT_UNSUPPORTED("Z008", HttpStatus.UNAUTHORIZED, "지원하지 않는 JWT 토큰입니다."),
+    LOGIN_FAILED("Z009", HttpStatus.UNAUTHORIZED, "로그인 요청 처리에 실패했습니다."),
 
     // database
     DATABASE_UNAVAILABLE("DA001", HttpStatus.SERVICE_UNAVAILABLE, "데이터베이스 연결이 불가능합니다"),
@@ -27,6 +32,7 @@ public enum ErrorCode {
     USER_ADDRESS_NOT_FOUND("U006", HttpStatus.NOT_FOUND, "해당 회원의 주소지를 찾을 수 없습니다."),
     USER_ADDRESS_CANNOT_DELETE("U007", HttpStatus.BAD_REQUEST, "회원 주소를 더 이상 삭제할 수 없습니다."),
     USER_ADDRESS_DUPLICATED("U008", HttpStatus.BAD_REQUEST, "중복된 회원주소가 존재합니다."),
+    USER_ROLE_NOT_FOUND("U009", HttpStatus.NOT_FOUND, "해당하는 회원 권한을 찾을 수 없습니다."),
 
     // store-category
     STORE_CATEGORY_NOT_FOUND("SC001", HttpStatus.NOT_FOUND, "가게 카테고리가 존재하지 않습니다"),
