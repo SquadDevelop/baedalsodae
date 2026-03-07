@@ -229,9 +229,11 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
+        final OrderStatus fromStatus = order.getStatus();
+
         order.request();
 
-        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
         orderEventPublisher.publishOrderRequested(order);
 
@@ -382,6 +384,76 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         orderEventPublisher.publishOrderDelivered(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse cancelRequestOrder(
+            UUID userId,
+            UserRole userRole,
+            UUID storeId,
+            UUID orderId
+    ) {
+
+        Order order = orderRepository
+                .findByIdAndIsDeletedFalse(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getStatus() == OrderStatus.CANCEL_REQUESTED) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        if (order.getStatus() == OrderStatus.CANCELED) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        if (userRole == UserRole.CUSTOMER) {
+            return cancelRequestByCustomer(userId, order);
+        }
+
+        if (userRole == UserRole.OWNER) {
+            return cancelRequestByOwner(userId, storeId, order);
+        }
+
+        throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+    }
+
+    private OrderActionStatusResponse cancelRequestByCustomer(UUID userId, Order order) {
+
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+
+        if (!order.canCancelRequestByCustomer()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancelRequested();
+
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    private OrderActionStatusResponse cancelRequestByOwner(UUID userId, UUID storeId, Order order) {
+
+        if (!order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canCancelRequestByOwner()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancelRequested();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         return OrderActionStatusResponse.from(order);
     }

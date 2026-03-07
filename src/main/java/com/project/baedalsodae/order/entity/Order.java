@@ -1,5 +1,7 @@
 package com.project.baedalsodae.order.entity;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.store.entity.Store;
@@ -116,6 +118,19 @@ public class Order extends BaseAuditEntity {
 
     public void completeDelivery() {
         this.status = OrderStatus.DELIVERED;
+    }
+
+    public boolean canCancelRequestByCustomer() {
+        return this.status == OrderStatus.REQUESTED
+                || this.status == OrderStatus.ACCEPTED;
+    }
+
+    public boolean canCancelRequestByOwner() {
+        return this.status == OrderStatus.ACCEPTED;
+    }
+
+    public void cancelRequested() {
+        this.status = OrderStatus.CANCEL_REQUESTED;
     }
 
     private Order(
