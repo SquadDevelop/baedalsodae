@@ -1767,6 +1767,45 @@ public class OrderServiceTest {
                 .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
     }
 
+    @DisplayName("주문 취소 요청 실패 - 이미 취소 대기 상태인 주문")
+    @Test
+    void cancelRequestOrder_fail_order_already_cancel_request() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getStatus()).willReturn(OrderStatus.CANCEL_REQUESTED);
+
+        // when & then
+        assertThatThrownBy(() ->
+                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
+        ).isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 이미 취소된 주문")
+    @Test
+    void cancelRequestOrder_fail_order_already_cancel_end() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+        given(order.getStatus()).willReturn(OrderStatus.CANCELED);
+
+        // when & then
+        assertThatThrownBy(() ->
+                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
+        ).isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
     @DisplayName("주문 취소 요청 실패 - 본인 주문이 아님 (고객)")
     @Test
     void cancelRequestOrder_fail_not_my_order_customer() {
