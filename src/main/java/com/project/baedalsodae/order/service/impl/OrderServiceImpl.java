@@ -298,7 +298,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderActionStatusResponse cookedOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -319,7 +319,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order,null);
 
-        orderEventPublisher.publishOrderCookingCompleted(order);
+        orderEventPublisher.publishOrderCooked(order);
 
         return OrderActionStatusResponse.from(order);
     }
