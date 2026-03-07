@@ -47,6 +47,7 @@ public enum ErrorCode {
     STORE_HOURS_ALREADY_EXISTS("SH001", HttpStatus.CONFLICT, "이미 영업시간이 등록되어 있습니다."),
     STORE_HOURS_INVALID_DAY_COUNT(
             "SH002", HttpStatus.BAD_REQUEST, "7일치 영업시간 정보가 필요합니다. 요일이 중복되거나 누락되지 않았는지 확인해주세요."),
+    STORE_HOURS_NOT_FOUND("SH003", HttpStatus.NOT_FOUND, "영업시간 정보가 없습니다."),
 
     // menu-category
     MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),

@@ -33,15 +33,16 @@ public class StoreHoursServiceImpl implements StoreHoursService {
         validateDayCount(requests);
         Store store = getStoreByStoreId(storeId);
         StoreOwnershipValidator.verifyStoreOwnership(store, userDetails, ErrorCode.STORE_FORBIDDEN);
+
         if (storeHoursRepository.existsByStoreId(storeId)) {
             throw new BusinessException(ErrorCode.STORE_HOURS_ALREADY_EXISTS);
         }
+
         List<StoreHours> storeHoursList = getStoreHoursList(requests, store);
         storeHoursRepository.saveAll(storeHoursList);
     }
 
-    private static List<StoreHours> getStoreHoursList(
-            List<StoreHoursRequest> requests, Store store) {
+    private List<StoreHours> getStoreHoursList(List<StoreHoursRequest> requests, Store store) {
         List<StoreHours> storeHoursList = new ArrayList<>();
         for (StoreHoursRequest request : requests) {
             StoreHours storeHours =
@@ -67,11 +68,32 @@ public class StoreHoursServiceImpl implements StoreHoursService {
                 StoreHoursResponse.StoreHourDto.fromEntityList(storeHoursList);
         return new StoreHoursResponse.StoreHoursInfo(storeId, storeHourDtos);
     }
+
+    @Transactional
+    @Override
+    public void updateStoreHours(
+            UUID storeId, UserDetailsImpl userDetails, List<StoreHoursRequest> requests) {
+        validateDayCount(requests);
+        Store store = getStoreByStoreId(storeId);
+        StoreOwnershipValidator.verifyStoreOwnership(store, userDetails, ErrorCode.STORE_FORBIDDEN);
+        if (!storeHoursRepository.existsByStoreId(storeId)) {
+            throw new BusinessException(ErrorCode.STORE_HOURS_NOT_FOUND);
+        }
+        storeHoursRepository.deleteAllByStoreId(storeId);
+        storeHoursRepository.saveAll(getStoreHoursList(requests, store));
+
+    }
+
     @Transactional
     @Override
     public void deleteStoreHours(UUID storeId, UserDetailsImpl userDetails) {
         Store store = getStoreByStoreId(storeId);
         StoreOwnershipValidator.verifyStoreOwnership(store, userDetails, ErrorCode.STORE_FORBIDDEN);
+        bulkDeleteStoreHours(storeId);
+    }
+
+    @Override
+    public void bulkDeleteStoreHours(UUID storeId) {
         storeHoursRepository.deleteAllByStoreId(storeId);
 
         entityManager.flush();
@@ -79,6 +101,14 @@ public class StoreHoursServiceImpl implements StoreHoursService {
     }
 
     private void validateDayCount(List<StoreHoursRequest> request) {
+        if (request == null || request.isEmpty()) {
+            throw new BusinessException(ErrorCode.STORE_HOURS_INVALID_DAY_COUNT);
+        }
+
+        if (request.size() != 7) {
+            throw new BusinessException(ErrorCode.STORE_HOURS_INVALID_DAY_COUNT);
+        }
+
         long distinctDayCount =
                 request.stream().map(StoreHoursRequest::getDayOfWeek).distinct().count();
         if (distinctDayCount != 7) {

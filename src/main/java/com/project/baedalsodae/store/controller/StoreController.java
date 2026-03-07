@@ -117,6 +117,16 @@ public class StoreController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
+    @PatchMapping("/{storeId}/hours")
+    public ResponseEntity<ApiResponse<Void>> updateStoreHours(
+            @PathVariable UUID storeId,
+            @RequestBody @Valid List<StoreHoursRequest> request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        storeHoursService.updateStoreHours(storeId, userDetails, request);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_UPDATED, null));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @DeleteMapping("/{storeId}/hours")
     public ResponseEntity<ApiResponse<Void>> deleteStoreHours(
             @PathVariable UUID storeId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
