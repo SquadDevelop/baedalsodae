@@ -295,4 +295,24 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderActionStatusResponse.from(order);
     }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse completeCooking(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canCompleteCooking()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        return null;
+    }
 }

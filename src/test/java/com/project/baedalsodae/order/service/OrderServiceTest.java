@@ -1402,4 +1402,81 @@ public class OrderServiceTest {
         then(eventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();
     }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void completeCooking_fail_orderNotFound() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.empty());
+
+        // when
+        Throwable thrown =
+                catchThrowable(() -> orderService.completeCooking(userId, role, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님")
+    void completeCooking_fail_storeForbidden() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(UUID.randomUUID());
+
+        // when
+        Throwable thrown =
+                catchThrowable(() -> orderService.completeCooking(userId, role, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("실패 - ACCEPTED 상태가 아닌 조리 완료 시도")
+    void completeCooking_fail_invalidStatus() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canCompleteCooking()).willReturn(false);
+
+        // when
+        Throwable thrown =
+                catchThrowable(() -> orderService.completeCooking(userId, role, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.ORDER_INVALID_STATUS);
+    }
 }
