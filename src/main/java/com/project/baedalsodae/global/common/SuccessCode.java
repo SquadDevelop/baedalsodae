@@ -67,7 +67,15 @@ public enum SuccessCode {
 
     // payment
     PAYMENT_HISTORY_FOUND("PY200", HttpStatus.OK, "결제 내역 조회 성공"),
-    PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공");
+    PAYMENT_DETAIL_FOUND("PY201", HttpStatus.OK, "결제 상세 조회 성공"),
+
+    // review
+    REVIEW_LIST_FOUND("RV200", HttpStatus.OK, "리뷰 목록 조회 성공"),
+    REVIEW_DETAIL_FOUND("RV201", HttpStatus.OK, "리뷰 상세 조회 성공"),
+    REVIEW_CREATED("RV202", HttpStatus.CREATED, "리뷰 작성 성공"),
+    REVIEW_UPDATED("RV203", HttpStatus.OK, "리뷰 수정 성공"),
+    REVIEW_DELETED("RV204", HttpStatus.OK, "리뷰 삭제 성공"),
+    ;
 
     private final String code;
     private final HttpStatus status;

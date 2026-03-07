@@ -1,19 +1,49 @@
 package com.project.baedalsodae.order.publisher;
 
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
+import com.project.baedalsodae.event.entity.Event;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.service.EventService;
 import com.project.baedalsodae.order.entity.Order;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class OrderEventPublisher {
-
-    private final ApplicationEventPublisher eventPublisher;
+    private final EventService eventService;
 
     public void publishOrderCreated(Order order) {
-        final OrderCreatedEvent event = OrderCreatedEvent.from(order);
-        eventPublisher.publishEvent(event);
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_CREATED);
+        eventService.save(newEvent);
+    }
+
+    public void publishOrderRequested(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
+
+    public void publishOrderAccepted(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
+
+    public void publishOrderRejected(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
+
+    public void publishOrderCooked(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
+
+    public void publishOrderDelivering(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
+
+    public void publishOrderDelivered(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
     }
 }

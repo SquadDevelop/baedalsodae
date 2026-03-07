@@ -1,5 +1,7 @@
 package com.project.baedalsodae.payment.service.impl;
 
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.TimeCursorPage;
@@ -11,7 +13,6 @@ import com.project.baedalsodae.payment.pg.dto.PGPaymentRequest;
 import com.project.baedalsodae.payment.pg.dto.PGPaymentResponse;
 import com.project.baedalsodae.payment.pg.enums.PGProviderType;
 import com.project.baedalsodae.payment.pg.service.PGClient;
-import com.project.baedalsodae.payment.publisher.PaymentEventPublisher;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.payment.service.PaymentService;
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PaymentServiceImpl implements PaymentService {
     private final Map<PGProviderType, PGClient> paymentGateways;
-    private final PaymentEventPublisher eventPublisher;
+    private final EventPublisher eventPublisher;
     private final PaymentRepository paymentRepository;
 
     @Override
@@ -106,6 +107,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // 주문 도메인에서 결제 결과에 따른 주문 상태 변경 이벤트 발행
-        eventPublisher.publishPaymentResult(payment);
+        eventPublisher.publishPaymentEvent(payment, EventType.PAYMENT_CREATED);
     }
 }

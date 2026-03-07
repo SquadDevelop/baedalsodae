@@ -72,7 +72,7 @@ public class OrderServiceTest {
 
     @Mock private MenuItem menuItem2;
 
-    @Mock private OrderEventPublisher eventPublisher;
+    @Mock private OrderEventPublisher orderEventPublisher;
 
     @Mock private OrderQueryRepository orderQueryRepository;
 
@@ -280,7 +280,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(eventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -353,7 +353,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(eventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -1182,7 +1182,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-
+        then(orderEventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1288,8 +1288,9 @@ public class OrderServiceTest {
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
-
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
+        then(orderEventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1307,7 +1308,8 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
+                catchThrowable(
+                        () -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1333,7 +1335,8 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
+                catchThrowable(
+                        () -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1360,7 +1363,8 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
+                catchThrowable(
+                        () -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1390,14 +1394,354 @@ public class OrderServiceTest {
 
         // when
         OrderActionStatusResponse response =
-                orderService.rejectOrder(userId, userRole, storeId, orderId);
+                orderService.rejectOrder(userId, userRole, storeId, orderId, null);
 
         // then
         then(order).should().reject();
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
+
+        then(orderEventPublisher).should().publishOrderRejected(any(Order.class));
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void completeCooking_fail_orderNotFound() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () -> orderService.completeCookingOrder(userId, role, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("실패 - 본인 가게 주문이 아님")
+    void completeCooking_fail_storeForbidden() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(UUID.randomUUID());
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () -> orderService.completeCookingOrder(userId, role, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.ORDER_STORE_FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("실패 - ACCEPTED 상태가 아닌 조리 완료 시도")
+    void completeCooking_fail_invalidStatus() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canCompleteCooking()).willReturn(false);
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () -> orderService.completeCookingOrder(userId, role, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.ORDER_INVALID_STATUS);
+    }
+
+    @Test
+    @DisplayName("성공 - 조리 완료 시 상태 변경 및 상태 이력 생성")
+    void completeCooking_success() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        OrderStatus fromStatus = OrderStatus.ACCEPTED;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+
+        given(order.canCompleteCooking()).willReturn(true);
+
+        given(order.getStatus()).willReturn(OrderStatus.ACCEPTED);
+
+        // when
+        OrderActionStatusResponse response =
+                orderService.completeCookingOrder(userId, role, storeId, orderId);
+
+        // then
+        then(order).should().canCompleteCooking();
+
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
+
+        then(orderEventPublisher).should().publishOrderCooked(any(Order.class));
+
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void startDelivery_fail_order_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.startDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("실패 - 다른 가게 주문 접근")
+    void startDelivery_fail_store_forbidden() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID otherStoreId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(otherStoreId);
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.startDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
+    }
+
+    @Test
+    @DisplayName("실패 - COOKED 상태가 아닌 배달 시작 시도")
+    void startDelivery_fail_invalid_status() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canStartDelivery()).willReturn(false);
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.startDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
+    @Test
+    @DisplayName("성공 - 배달 시작 시 상태 변경 및 상태 이력 생성")
+    void startDelivery_success() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        OrderStatus fromStatus = OrderStatus.COOKED;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canStartDelivery()).willReturn(true);
+        given(order.getStatus()).willReturn(fromStatus);
+
+        // when
+        OrderActionStatusResponse response =
+                orderService.startDeliveryOrder(userId, UserRole.OWNER, storeId, orderId);
+
+        // then
+        then(order).should().startDelivery();
+
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
+
+        then(orderEventPublisher).should().publishOrderDelivering(any(Order.class));
+
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 주문")
+    void completeDelivery_fail_order_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.completeDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("실패 - 다른 가게 주문 접근")
+    void completeDelivery_fail_store_forbidden() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID otherStoreId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(otherStoreId);
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.completeDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
+    }
+
+    @Test
+    @DisplayName("실패 - DELIVERING 상태가 아닌 배달 완료 시도")
+    void completeDelivery_fail_invalid_status() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canCompleteDelivery()).willReturn(false);
+
+        // when
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.completeDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
+    @Test
+    @DisplayName("성공 - 배달 완료 시 상태 변경 및 상태 이력 생성")
+    void completeDelivery_success() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        OrderStatus fromStatus = OrderStatus.DELIVERING;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canCompleteDelivery()).willReturn(true);
+        given(order.getStatus()).willReturn(fromStatus);
+
+        // when
+        OrderActionStatusResponse response =
+                orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId);
+
+        // then
+        then(order).should().completeDelivery();
+
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
+
+        then(orderEventPublisher).should().publishOrderDelivered(any(Order.class));
 
         assertThat(response).isNotNull();
     }

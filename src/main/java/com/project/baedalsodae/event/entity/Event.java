@@ -1,6 +1,7 @@
 package com.project.baedalsodae.event.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
+import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.payment.entity.Payment;
 import jakarta.persistence.*;
 import java.time.Instant;
@@ -42,6 +43,10 @@ public class Event extends BaseTimeEntity {
         return new Event(AggregateType.PAYMENT, payment.getId(), type, null);
     }
 
+    public static Event fromOrder(final Order order, final EventType type, String payload) {
+        return new Event(AggregateType.ORDER, order.getId(), type, payload);
+    }
+
     public void markPublished() {
         this.status = EventStatus.PUBLISHED;
         this.publishedAt = Instant.now();
@@ -56,6 +61,10 @@ public class Event extends BaseTimeEntity {
 
     public boolean isExhausted(int maxRetry) {
         return this.retryCount >= maxRetry;
+    }
+
+    public static Event fromOrder(Order order, EventType type) {
+        return new Event(AggregateType.ORDER, order.getId(), type, null);
     }
 
     public static Event create(

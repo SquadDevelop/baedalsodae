@@ -1,9 +1,26 @@
-ALTER DATABASE baedalsodae SET search_path TO baedalsodae, public;
+-- Role이 없을 때만 생성 (DO 블록 안에서는 CREATE ROLE만)
+DO
+$$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles
+      WHERE rolname = 'baedalsodae_admin'
+   ) THEN
+      CREATE ROLE baedalsodae_admin LOGIN PASSWORD 'p@ssw0rd';
+   END IF;
+END
+$$;
 
-CREATE SCHEMA IF NOT EXISTS baedalsodae AUTHORIZATION postgres;
-GRANT ALL ON SCHEMA baedalsodae TO postgres;
-GRANT ALL ON ALL TABLES IN SCHEMA baedalsodae TO postgres;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA baedalsodae TO postgres;
+-- GRANT/ALTER는 DO 블록 밖에서 실행 (멱등성 보장)
+ALTER USER baedalsodae_admin CREATEDB;
+GRANT ALL PRIVILEGES ON DATABASE baedalsodae TO baedalsodae_admin;
+
+ALTER DATABASE baedalsodae SET search_path TO baedalsodae_admin, public;
+
+CREATE SCHEMA IF NOT EXISTS baedalsodae AUTHORIZATION baedalsodae_admin;
+GRANT ALL ON SCHEMA baedalsodae TO baedalsodae_admin;
+GRANT ALL ON ALL TABLES IN SCHEMA baedalsodae TO baedalsodae_admin;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA baedalsodae TO baedalsodae_admin;
 
 SET search_path TO baedalsodae;
 

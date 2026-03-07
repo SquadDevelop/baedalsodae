@@ -22,5 +22,14 @@ public interface OrderService {
             UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
     OrderActionStatusResponse rejectOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
+
+    OrderActionStatusResponse completeCookingOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    OrderActionStatusResponse startDeliveryOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    OrderActionStatusResponse completeDeliveryOrder(
             UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

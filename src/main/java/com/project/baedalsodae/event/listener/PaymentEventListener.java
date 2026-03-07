@@ -1,6 +1,6 @@
-package com.project.baedalsodae.payment.listener;
+package com.project.baedalsodae.event.listener;
 
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
+import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentListener {
+public class PaymentEventListener {
 
     private final PaymentService paymentService;
 

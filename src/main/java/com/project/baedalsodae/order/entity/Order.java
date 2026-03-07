@@ -94,6 +94,30 @@ public class Order extends BaseAuditEntity {
         this.status = OrderStatus.REJECTED;
     }
 
+    public boolean canCompleteCooking() {
+        return this.status == OrderStatus.ACCEPTED;
+    }
+
+    public void completeCooking() {
+        this.status = OrderStatus.COOKED;
+    }
+
+    public boolean canStartDelivery() {
+        return this.status == OrderStatus.COOKED;
+    }
+
+    public void startDelivery() {
+        this.status = OrderStatus.DELIVERING;
+    }
+
+    public boolean canCompleteDelivery() {
+        return this.status == OrderStatus.DELIVERING;
+    }
+
+    public void completeDelivery() {
+        this.status = OrderStatus.DELIVERED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,

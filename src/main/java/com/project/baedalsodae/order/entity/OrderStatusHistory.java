@@ -60,7 +60,12 @@ public class OrderStatusHistory extends BaseTimeEntity {
     }
 
     public static OrderStatusHistory createForOwner(
-            Order order, OrderStatus fromStatus, UUID userId) {
+            Order order, OrderStatus fromStatus, UUID userId, String reason) {
+        String why = "";
+        why = order.getStatus().equals(OrderStatus.CANCELED) ? "주문 취소" : "";
+        why = order.getStatus().equals(OrderStatus.REJECTED) ? "주문 거절" : "";
+        if (reason == null) reason = "가게 사정으로 인하여 " + why + " 되었습니다.";
+
         return new OrderStatusHistory(
                 order.getId(), fromStatus, order.getStatus(), ActorType.OWNER, userId);
     }

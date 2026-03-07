@@ -28,9 +28,9 @@ public class OrderStatusHistoryServiceImpl implements OrderStatusHistoryService 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
     public void createForOwnerOrderStatusHistory(
-            UUID userId, OrderStatus fromStatus, Order savedOrder) {
+            UUID userId, OrderStatus fromStatus, Order savedOrder, String reason) {
         OrderStatusHistory orderStatusHistory =
-                OrderStatusHistory.createForOwner(savedOrder, fromStatus, userId);
+                OrderStatusHistory.createForOwner(savedOrder, fromStatus, userId, reason);
         orderStatusHistoryRepository.save(orderStatusHistory);
     }
 }

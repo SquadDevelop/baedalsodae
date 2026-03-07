@@ -18,8 +18,8 @@ public record PaymentResponse(
     public static PaymentResponse from(Payment payment) {
         return new PaymentResponse(
                 payment.getId(),
-                payment.getOrder(),
-                payment.getUser(),
+                payment.getOrderId(),
+                payment.getUserId(),
                 payment.getAmount(),
                 payment.getPaymentMethod(),
                 payment.getStatus(),

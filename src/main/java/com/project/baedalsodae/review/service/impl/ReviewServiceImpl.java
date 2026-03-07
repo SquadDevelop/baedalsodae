@@ -1,0 +1,91 @@
+package com.project.baedalsodae.review.service.impl;
+
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.TimeCursorPage;
+import com.project.baedalsodae.review.dto.request.ReviewRequest;
+import com.project.baedalsodae.review.dto.response.ReviewResponse;
+import com.project.baedalsodae.review.entity.Review;
+import com.project.baedalsodae.review.repository.ReviewRepository;
+import com.project.baedalsodae.review.service.ReviewService;
+import com.project.baedalsodae.user.service.UserService;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+public class ReviewServiceImpl implements ReviewService {
+    private final ReviewRepository reviewRepository;
+    private final UserService userService;
+
+    @Override
+    public TimeCursorPage<List<ReviewResponse>> getReviewsByUser(
+            final UUID userId, final Instant cursor, final int size) {
+        userService.getUser(userId);
+        List<Review> foundReviews =
+                reviewRepository.findNextPageWithUserId(userId, cursor, size + 1);
+        boolean hasNext = foundReviews.size() > size;
+
+        List<Review> reviews = hasNext ? foundReviews.subList(0, size) : foundReviews;
+
+        LocalDateTime nextCursor =
+                hasNext ? LocalDateTime.from(reviews.get(reviews.size() - 1).getCreatedAt()) : null;
+
+        List<ReviewResponse> content = reviews.stream().map(ReviewResponse::from).toList();
+        if (hasNext) {
+            content = content.subList(0, content.size() - 1);
+        }
+        return TimeCursorPage.of(content, hasNext, nextCursor);
+    }
+
+    @Override
+    public ReviewResponse getReviewDetail(final UUID userId, final UUID reviewId) {
+        Review foundReview =
+                reviewRepository
+                        .findByIdAndUserId(userId, reviewId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+        return ReviewResponse.from(foundReview);
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponse createReview(
+            final UUID userId, final UUID orderId, final ReviewRequest request) {
+        Review savedReview =
+                reviewRepository.save(
+                        Review.create(userId, orderId, request.rating(), request.comment()));
+        return ReviewResponse.from(savedReview);
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponse updateReview(
+            final UUID userId, final UUID reviewId, final ReviewRequest request) {
+        Review foundReview =
+                reviewRepository
+                        .findByIdAndUserId(userId, reviewId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+        if (foundReview.getUserId() != userId) {
+            throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
+        }
+        foundReview.update(request.rating(), request.comment());
+        return ReviewResponse.from(foundReview);
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponse deleteReview(final UUID userId, final UUID reviewId) {
+        Review foundReview =
+                reviewRepository
+                        .findByIdAndUserId(userId, reviewId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
+        if (foundReview.getUserId() != userId) {
+            throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
+        }
+        foundReview.softDelete(userId);
+        return ReviewResponse.from(foundReview);
+    }
+}

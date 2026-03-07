@@ -6,6 +6,9 @@ import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.review.dto.request.ReviewRequest;
+import com.project.baedalsodae.review.dto.response.ReviewResponse;
+import com.project.baedalsodae.review.service.ReviewService;
 import com.project.baedalsodae.user.entity.UserRole;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
+    private final ReviewService reviewService;
 
     // TODO: 인증 도메인 완성 후 userId 교체
     @PostMapping
@@ -92,11 +96,21 @@ public class OrderController {
             @RequestHeader("X-User-Id") UUID userId,
             @RequestHeader("X-User-Role") UserRole userRole,
             @RequestParam(name = "storeId", required = false) UUID storeId,
+            @RequestParam(name = "reason") String reason,
             @PathVariable("orderId") UUID orderId) {
 
         OrderActionStatusResponse response =
-                orderService.rejectOrder(userId, userRole, storeId, orderId);
+                orderService.rejectOrder(userId, userRole, storeId, orderId, reason);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
+    }
+
+    @PostMapping("/{orderId}/reviews")
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
+            UUID userId, @PathVariable UUID orderId, @RequestBody ReviewRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        SuccessCode.REVIEW_CREATED,
+                        reviewService.createReview(userId, orderId, request)));
     }
 }

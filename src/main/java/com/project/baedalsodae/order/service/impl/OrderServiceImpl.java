@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-    private final OrderEventPublisher eventPublisher;
+    private final OrderEventPublisher orderEventPublisher;
     private final OrderQueryRepository orderQueryRepository;
     private final PaymentRepository paymentRepository;
 
@@ -106,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
-        eventPublisher.publishOrderCreated(savedOrder);
+        orderEventPublisher.publishOrderCreated(savedOrder);
 
         return CreateOrderResponse.from(savedOrder);
     }
@@ -233,6 +233,8 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
+        orderEventPublisher.publishOrderRequested(order);
+
         return OrderActionStatusResponse.from(order, payment);
     }
 
@@ -258,7 +260,9 @@ public class OrderServiceImpl implements OrderService {
 
         order.accept();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        orderEventPublisher.publishOrderAccepted(order);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -266,7 +270,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderActionStatusResponse rejectOrder(
-            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -285,7 +289,99 @@ public class OrderServiceImpl implements OrderService {
 
         order.reject();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(
+                userId, fromStatus, order, reason);
+
+        orderEventPublisher.publishOrderRejected(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse completeCookingOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canCompleteCooking()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.completeCooking();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        orderEventPublisher.publishOrderCooked(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse startDeliveryOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canStartDelivery()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.startDelivery();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        orderEventPublisher.publishOrderDelivering(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse completeDeliveryOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (userRole.getRole().equals(UserRole.OWNER.getRole())
+                && !order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canCompleteDelivery()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.completeDelivery();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        orderEventPublisher.publishOrderDelivered(order);
 
         return OrderActionStatusResponse.from(order);
     }
