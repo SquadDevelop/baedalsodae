@@ -190,4 +190,78 @@ class StoreHoursServiceImplTest {
             assertThat(result.getStoreHours()).hasSize(7);
         }
     }
+
+    @Nested
+    @DisplayName("영업시간 수정")
+    class UpdateStoreHours {
+
+        @Test
+        @DisplayName("실패: 7일 미만으로 요청하면 예외가 발생한다")
+        void updateStoreHours_fail_insufficientDays() {
+            assertThatThrownBy(
+                            () ->
+                                    storeHoursService.updateStoreHours(
+                                            storeId,
+                                            managerUserDetails,
+                                            createRequestsWithInsufficientDays()))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.STORE_HOURS_INVALID_DAY_COUNT);
+        }
+
+        @Test
+        @DisplayName("실패: 가게가 존재하지 않으면 예외가 발생한다")
+        void updateStoreHours_fail_storeNotFound() {
+            given(storeRepository.findByIdAndIsDeletedIsFalse(storeId))
+                    .willReturn(Optional.empty());
+
+            assertThatThrownBy(
+                            () ->
+                                    storeHoursService.updateStoreHours(
+                                            storeId, managerUserDetails, createDefaultRequests()))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
+        void updateStoreHours_fail_forbidden() {
+            Store store = createMockStoreWithRepository(storeRepository, storeId);
+            given(store.getUserId()).willReturn(UUID.randomUUID());
+
+            assertThatThrownBy(
+                            () ->
+                                    storeHoursService.updateStoreHours(
+                                            storeId, ownerUserDetails, createDefaultRequests()))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_FORBIDDEN);
+        }
+
+        @Test
+        @DisplayName("실패: 등록된 영업시간이 없으면 예외가 발생한다")
+        void updateStoreHours_fail_notFound() {
+            createMockStoreWithRepository(storeRepository, storeId);
+            given(storeHoursRepository.existsByStoreId(storeId)).willReturn(false);
+
+            assertThatThrownBy(
+                            () ->
+                                    storeHoursService.updateStoreHours(
+                                            storeId, managerUserDetails, createDefaultRequests()))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_HOURS_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("성공: 기존 영업시간을 삭제하고 새로운 7일치를 저장한다")
+        void updateStoreHours_success() {
+            createMockStoreWithRepository(storeRepository, storeId);
+            given(storeHoursRepository.existsByStoreId(storeId)).willReturn(true);
+
+            storeHoursService.updateStoreHours(
+                    storeId, managerUserDetails, createDefaultRequests());
+
+            verify(storeHoursRepository).deleteAllByStoreId(storeId);
+            verify(storeHoursRepository).saveAll(argThat(list -> ((List<?>) list).size() == 7));
+        }
+    }
 }
