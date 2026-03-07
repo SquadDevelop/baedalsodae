@@ -56,7 +56,7 @@ class PaymentEventPublisherTest {
         UUID orderId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
         given(payment.getId()).willReturn(paymentId);
-          given(payment.getOrderId()).willReturn(orderId);
+        given(payment.getOrderId()).willReturn(orderId);
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
         given(payment.getPgTransactionId()).willReturn("pg-txn-001");
 

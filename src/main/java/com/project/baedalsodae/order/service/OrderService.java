@@ -18,13 +18,18 @@ public interface OrderService {
 
     OrderActionStatusResponse requestOrder(UUID userId, UUID orderId);
 
-    OrderActionStatusResponse acceptOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+    OrderActionStatusResponse acceptOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
-    OrderActionStatusResponse rejectOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
+    OrderActionStatusResponse rejectOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
 
-    OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+    OrderActionStatusResponse completeCookingOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
-    OrderActionStatusResponse startDeliveryOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+    OrderActionStatusResponse startDeliveryOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
-    OrderActionStatusResponse completeDeliveryOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+    OrderActionStatusResponse completeDeliveryOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

@@ -289,7 +289,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.reject();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, reason);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(
+                userId, fromStatus, order, reason);
 
         orderEventPublisher.publishOrderRejected(order);
 
@@ -298,7 +299,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderActionStatusResponse completeCookingOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -317,7 +319,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.completeCooking();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order,null);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         orderEventPublisher.publishOrderCooked(order);
 
@@ -347,8 +349,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.startDelivery();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(
-                userId, fromStatus, order, null);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         orderEventPublisher.publishOrderDelivering(order);
 
@@ -378,8 +379,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.completeDelivery();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(
-                userId, fromStatus, order, null);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         orderEventPublisher.publishOrderDelivered(order);
 

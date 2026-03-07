@@ -1288,7 +1288,8 @@ public class OrderServiceTest {
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
         then(orderEventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
@@ -1307,7 +1308,8 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId, null));
+                catchThrowable(
+                        () -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1333,7 +1335,8 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId, null));
+                catchThrowable(
+                        () -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1360,7 +1363,8 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId, null));
+                catchThrowable(
+                        () -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1397,7 +1401,8 @@ public class OrderServiceTest {
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
 
         then(orderEventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();
@@ -1413,12 +1418,12 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole role = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
+                catchThrowable(
+                        () -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1437,14 +1442,14 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole role = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(UUID.randomUUID());
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
+                catchThrowable(
+                        () -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1463,15 +1468,15 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UserRole role = UserRole.OWNER;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
         given(order.canCompleteCooking()).willReturn(false);
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
+                catchThrowable(
+                        () -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1492,8 +1497,7 @@ public class OrderServiceTest {
 
         OrderStatus fromStatus = OrderStatus.ACCEPTED;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
 
@@ -1510,11 +1514,10 @@ public class OrderServiceTest {
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher)
-                .should()
-                .publishOrderCooked(any(Order.class));
+        then(orderEventPublisher).should().publishOrderCooked(any(Order.class));
 
         assertThat(response).isNotNull();
     }
@@ -1528,20 +1531,20 @@ public class OrderServiceTest {
         UUID storeId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() ->
-                orderService.startDeliveryOrder(userId, UserRole.OWNER, storeId, orderId)
-        );
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.startDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
 
         // then
         assertThat(thrown)
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
     }
-
 
     @Test
     @DisplayName("실패 - 다른 가게 주문 접근")
@@ -1553,22 +1556,22 @@ public class OrderServiceTest {
         UUID otherStoreId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(otherStoreId);
 
         // when
-        Throwable thrown = catchThrowable(() ->
-                orderService.startDeliveryOrder(userId, UserRole.OWNER, storeId, orderId)
-        );
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.startDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
 
         // then
         assertThat(thrown)
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
     }
-
 
     @Test
     @DisplayName("실패 - COOKED 상태가 아닌 배달 시작 시도")
@@ -1579,23 +1582,23 @@ public class OrderServiceTest {
         UUID storeId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
         given(order.canStartDelivery()).willReturn(false);
 
         // when
-        Throwable thrown = catchThrowable(() ->
-                orderService.startDeliveryOrder(userId, UserRole.OWNER, storeId, orderId)
-        );
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.startDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
 
         // then
         assertThat(thrown)
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
-
 
     @Test
     @DisplayName("성공 - 배달 시작 시 상태 변경 및 상태 이력 생성")
@@ -1608,8 +1611,7 @@ public class OrderServiceTest {
 
         OrderStatus fromStatus = OrderStatus.COOKED;
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
         given(order.canStartDelivery()).willReturn(true);
@@ -1624,11 +1626,10 @@ public class OrderServiceTest {
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher)
-                .should()
-                .publishOrderDelivering(any(Order.class));
+        then(orderEventPublisher).should().publishOrderDelivering(any(Order.class));
 
         assertThat(response).isNotNull();
     }
@@ -1645,10 +1646,16 @@ public class OrderServiceTest {
         given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() -> orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId));
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.completeDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
 
         // then
-        assertThat(thrown).isInstanceOf(BusinessException.class).hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -1666,12 +1673,17 @@ public class OrderServiceTest {
         given(order.getStoreId()).willReturn(otherStoreId);
 
         // when
-        Throwable thrown = catchThrowable(() -> orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId));
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.completeDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
 
         // then
-        assertThat(thrown).isInstanceOf(BusinessException.class).hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
     }
-
 
     @Test
     @DisplayName("실패 - DELIVERING 상태가 아닌 배달 완료 시도")
@@ -1688,12 +1700,17 @@ public class OrderServiceTest {
         given(order.canCompleteDelivery()).willReturn(false);
 
         // when
-        Throwable thrown = catchThrowable(() -> orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId));
+        Throwable thrown =
+                catchThrowable(
+                        () ->
+                                orderService.completeDeliveryOrder(
+                                        userId, UserRole.OWNER, storeId, orderId));
 
         // then
-        assertThat(thrown).isInstanceOf(BusinessException.class).hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
-
 
     @Test
     @DisplayName("성공 - 배달 완료 시 상태 변경 및 상태 이력 생성")
@@ -1713,12 +1730,16 @@ public class OrderServiceTest {
         given(order.getStatus()).willReturn(fromStatus);
 
         // when
-        OrderActionStatusResponse response = orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId);
+        OrderActionStatusResponse response =
+                orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId);
 
         // then
         then(order).should().completeDelivery();
 
-        then(orderStatusHistoryService).should().createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
 
         then(orderEventPublisher).should().publishOrderDelivered(any(Order.class));
 

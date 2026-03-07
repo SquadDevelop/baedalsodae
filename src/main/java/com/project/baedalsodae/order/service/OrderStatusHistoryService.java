@@ -8,5 +8,6 @@ import java.util.UUID;
 public interface OrderStatusHistoryService {
     void createForCustomerOrderStatusHistory(UUID userId, Order savedOrder);
 
-    void createForOwnerOrderStatusHistory(UUID userId, OrderStatus fromStatus, Order savedOrder, String reason);
+    void createForOwnerOrderStatusHistory(
+            UUID userId, OrderStatus fromStatus, Order savedOrder, String reason);
 }

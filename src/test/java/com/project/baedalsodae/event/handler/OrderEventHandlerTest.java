@@ -4,11 +4,11 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.then;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.entity.AggregateType;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
-import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

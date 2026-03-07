@@ -14,6 +14,6 @@ public class OrderEventListener {
     @EventListener
     public void handlePaymentCreated(PaymentCreatedEvent event) {
         // TODO: 결제 완료 후 주문 상태 업데이트 로직 구현
-//        orderService.updateOrderStatus(event.orderId(), "PAYMENT_COMPLETED");
+        //        orderService.updateOrderStatus(event.orderId(), "PAYMENT_COMPLETED");
     }
 }

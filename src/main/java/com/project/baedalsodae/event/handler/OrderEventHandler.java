@@ -1,11 +1,11 @@
 package com.project.baedalsodae.event.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.entity.AggregateType;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
-import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
