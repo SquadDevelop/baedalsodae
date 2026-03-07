@@ -15,6 +15,8 @@ import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import java.util.UUID;
+
+import com.project.baedalsodae.store.service.StoreHoursService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreCommandServiceImpl implements StoreCommandService {
     private final StoreRepository storeRepository;
     private final StoreCategoryRepository storeCategoryRepository;
+    private final StoreHoursService storeHoursService;
 
     @Override
     @Transactional
@@ -68,6 +71,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     public void deleteStore(UUID storeId, UUID userId) {
         Store store = getStore(storeId);
         validateStoreOwner(store.getUserId(), userId);
+        storeHoursService.bulkDeleteStoreHours(storeId);
 
         store.softDelete(userId);
     }

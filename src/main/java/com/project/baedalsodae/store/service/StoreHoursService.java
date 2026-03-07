@@ -17,4 +17,6 @@ public interface StoreHoursService {
             UUID storeId, UserDetailsImpl userDetails, List<StoreHoursRequest> request);
 
     void deleteStoreHours(UUID storeId, UserDetailsImpl userDetails);
+
+    void bulkDeleteStoreHours(UUID storeId);
 }
