@@ -22,5 +22,5 @@ public interface OrderService {
 
     OrderActionStatusResponse rejectOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
 
-    OrderActionStatusResponse completeCooking(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+    OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

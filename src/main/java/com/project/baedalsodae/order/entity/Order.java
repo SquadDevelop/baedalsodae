@@ -98,6 +98,10 @@ public class Order extends BaseAuditEntity {
         return this.status == OrderStatus.ACCEPTED;
     }
 
+    public void completeCooking() {
+        this.status = OrderStatus.COOKED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,

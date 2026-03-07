@@ -298,7 +298,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderActionStatusResponse completeCooking(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+    public OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -313,6 +313,14 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
-        return null;
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.completeCooking();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order,null);
+
+        orderEventPublisher.publishOrderCookingCompleted(order);
+
+        return OrderActionStatusResponse.from(order);
     }
 }

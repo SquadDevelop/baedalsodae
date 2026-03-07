@@ -72,7 +72,7 @@ public class OrderServiceTest {
 
     @Mock private MenuItem menuItem2;
 
-    @Mock private OrderEventPublisher eventPublisher;
+    @Mock private OrderEventPublisher orderEventPublisher;
 
     @Mock private OrderQueryRepository orderQueryRepository;
 
@@ -280,7 +280,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(eventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -353,7 +353,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(eventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -1182,7 +1182,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(eventPublisher).should().publishOrderRequested(any(Order.class));
+        then(orderEventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1289,7 +1289,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
-        then(eventPublisher).should().publishOrderAccepted(any(Order.class));
+        then(orderEventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1399,7 +1399,7 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(eventPublisher).should().publishOrderRejected(any(Order.class));
+        then(orderEventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1418,7 +1418,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.completeCooking(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1444,7 +1444,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.completeCooking(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
@@ -1471,12 +1471,51 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.completeCooking(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.completeCookingOrder(userId, role, storeId, orderId));
 
         // then
         assertThat(thrown)
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.ORDER_INVALID_STATUS);
+    }
+
+    @Test
+    @DisplayName("성공 - 조리 완료 시 상태 변경 및 상태 이력 생성")
+    void completeCooking_success() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+        UserRole role = UserRole.OWNER;
+
+        OrderStatus fromStatus = OrderStatus.ACCEPTED;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+
+        given(order.canCompleteCooking()).willReturn(true);
+
+        given(order.getStatus()).willReturn(OrderStatus.ACCEPTED);
+
+        // when
+        OrderActionStatusResponse response =
+                orderService.completeCookingOrder(userId, role, storeId, orderId);
+
+        // then
+        then(order).should().canCompleteCooking();
+
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
+
+        then(orderEventPublisher)
+                .should()
+                .publishOrderCookingCompleted(any(Order.class));
+
+        assertThat(response).isNotNull();
     }
 }
