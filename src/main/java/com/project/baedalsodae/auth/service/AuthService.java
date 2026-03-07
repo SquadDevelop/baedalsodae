@@ -58,7 +58,8 @@ public class AuthService {
             throw new BusinessException(ErrorCode.JWT_INVALID);
         }
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
+        UserDetailsImpl userDetails =
+                (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
 
         return issue(userDetails);
     }
@@ -71,7 +72,9 @@ public class AuthService {
         String newAccessToken = jwtProvider.createAccessToken(userDetails);
         String newRefreshToken = jwtProvider.createRefreshToken(userDetails.getUsername());
         tokenRedisUtil.saveRefreshToken(
-                userDetails.getUsername(), newRefreshToken, jwtProvider.getRemainingTime(newRefreshToken));
+                userDetails.getUsername(),
+                newRefreshToken,
+                jwtProvider.getRemainingTime(newRefreshToken));
 
         return LoginResponse.from(newAccessToken, newRefreshToken);
     }

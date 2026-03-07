@@ -89,7 +89,7 @@ public class LoginLogoutControllerTest {
     @DisplayName("성공 - 유효한 리프레시 토큰으로 재발급 요청 시 200 OK를 반환한다")
     void reissueSuccess() throws Exception {
         // given
-        com.project.baedalsodae.auth.dto.request.ReissueRequest request = 
+        com.project.baedalsodae.auth.dto.request.ReissueRequest request =
                 new com.project.baedalsodae.auth.dto.request.ReissueRequest("valid-refresh-token");
         LoginResponse response = LoginResponse.from("Bearer new-access-token", "new-refresh-token");
         given(authService.reissue(any())).willReturn(response);
@@ -108,7 +108,7 @@ public class LoginLogoutControllerTest {
     @DisplayName("실패 - 리프레시 토큰이 비어있으면 400 Bad Request를 반환한다")
     void reissueFailEmptyToken() throws Exception {
         // given
-        com.project.baedalsodae.auth.dto.request.ReissueRequest request = 
+        com.project.baedalsodae.auth.dto.request.ReissueRequest request =
                 new com.project.baedalsodae.auth.dto.request.ReissueRequest("");
 
         // when & then

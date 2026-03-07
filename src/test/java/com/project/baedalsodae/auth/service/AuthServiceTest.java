@@ -61,7 +61,8 @@ public class AuthServiceTest {
             UUID userId = UUID.randomUUID();
 
             Authentication mockAuthentication = mock(Authentication.class);
-            UserDetailsImpl mockUserDetails = UserDetailsImpl.from(userId, username, null, UserRole.CUSTOMER, false);
+            UserDetailsImpl mockUserDetails =
+                    UserDetailsImpl.from(userId, username, null, UserRole.CUSTOMER, false);
 
             given(authenticationManager.authenticate(any())).willReturn(mockAuthentication);
             given(mockAuthentication.getPrincipal()).willReturn(mockUserDetails);
@@ -77,7 +78,8 @@ public class AuthServiceTest {
             assertThat(response.getRefreshToken()).isEqualTo("refresh-token");
 
             // 핵심 검증: Redis 저장 메서드가 호출되었는지 확인
-            verify(tokenRedisUtil, times(1)).saveRefreshToken(eq(username), eq("refresh-token"), anyLong());
+            verify(tokenRedisUtil, times(1))
+                    .saveRefreshToken(eq(username), eq("refresh-token"), anyLong());
         }
 
         @Test
@@ -85,7 +87,8 @@ public class AuthServiceTest {
         void login_Fail_BadCredentials() {
             // given
             LoginRequest request = new LoginRequest("tester123", "wrong-password");
-            given(authenticationManager.authenticate(any())).willThrow(new BadCredentialsException("Invalid password"));
+            given(authenticationManager.authenticate(any()))
+                    .willThrow(new BadCredentialsException("Invalid password"));
 
             // when & then
             assertThatThrownBy(() -> authService.login(request))
@@ -135,7 +138,9 @@ public class AuthServiceTest {
             String username = "tester123";
 
             Claims mockClaims = mock(Claims.class);
-            UserDetailsImpl mockUserDetails = UserDetailsImpl.from(UUID.randomUUID(), username, null, UserRole.CUSTOMER, false);
+            UserDetailsImpl mockUserDetails =
+                    UserDetailsImpl.from(
+                            UUID.randomUUID(), username, null, UserRole.CUSTOMER, false);
 
             given(jwtProvider.getClaims(oldRefreshToken)).willReturn(mockClaims);
             given(mockClaims.getSubject()).willReturn(username);
@@ -154,7 +159,8 @@ public class AuthServiceTest {
             assertThat(response.getAccessToken()).isEqualTo("Bearer new-access-token");
             assertThat(response.getRefreshToken()).isEqualTo("new-refresh-token");
 
-            verify(tokenRedisUtil, times(1)).saveRefreshToken(eq(username), eq("new-refresh-token"), anyLong());
+            verify(tokenRedisUtil, times(1))
+                    .saveRefreshToken(eq(username), eq("new-refresh-token"), anyLong());
         }
 
         @Test
@@ -185,7 +191,9 @@ public class AuthServiceTest {
             String refreshToken = "valid-token";
             String username = "tester123";
             Claims mockClaims = mock(Claims.class);
-            UserDetailsImpl disabledUser = UserDetailsImpl.from(UUID.randomUUID(), username, null, UserRole.CUSTOMER, true);
+            UserDetailsImpl disabledUser =
+                    UserDetailsImpl.from(
+                            UUID.randomUUID(), username, null, UserRole.CUSTOMER, true);
 
             given(jwtProvider.getClaims(refreshToken)).willReturn(mockClaims);
             given(mockClaims.getSubject()).willReturn(username);

@@ -15,12 +15,13 @@ public class TokenRedisUtil {
     private final StringRedisTemplate redisTemplate;
 
     public void saveRefreshToken(String username, String refreshToken, long expirationMillis) {
-        redisTemplate.opsForValue().set(
-                REFRESH_TOKEN_PREFIX + username,
-                refreshToken,
-                expirationMillis,
-                TimeUnit.MILLISECONDS
-        );
+        redisTemplate
+                .opsForValue()
+                .set(
+                        REFRESH_TOKEN_PREFIX + username,
+                        refreshToken,
+                        expirationMillis,
+                        TimeUnit.MILLISECONDS);
     }
 
     public String getRefreshToken(String username) {
@@ -36,12 +37,13 @@ public class TokenRedisUtil {
     }
 
     public void saveBlacklist(String accessToken, long expirationMillis) {
-        redisTemplate.opsForValue().set(
-                BLACKLIST_PREFIX + accessToken,
-                "logout",
-                expirationMillis,
-                TimeUnit.MILLISECONDS
-        );
+        redisTemplate
+                .opsForValue()
+                .set(
+                        BLACKLIST_PREFIX + accessToken,
+                        "logout",
+                        expirationMillis,
+                        TimeUnit.MILLISECONDS);
     }
 
     public boolean isBlacklisted(String accessToken) {
