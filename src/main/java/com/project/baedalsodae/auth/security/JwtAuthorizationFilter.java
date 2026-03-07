@@ -1,6 +1,7 @@
 package com.project.baedalsodae.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
@@ -27,6 +28,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
+    private final TokenRedisUtil tokenRedisUtil;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -39,11 +41,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String resolvedAccessToken = jwtProvider.resolveToken(request);
+        String resolvedAccessToken = jwtProvider.resolveToken(request.getHeader("Authorization"));
 
         if (StringUtils.hasText(resolvedAccessToken)) {
+            if (tokenRedisUtil.isBlacklisted(resolvedAccessToken)) {
+                sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
+                return;
+            }
+
             try {
                 Claims claims = jwtProvider.getClaims(resolvedAccessToken);
+
+                if (!jwtProvider.isAccessToken(claims)) {
+                    sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
+                    return;
+                }
+
                 setAuthentication(claims);
             } catch (BusinessException e) {
                 sendErrorResponse(response, e.getErrorCode());
