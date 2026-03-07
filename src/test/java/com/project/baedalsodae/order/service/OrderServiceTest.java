@@ -1288,7 +1288,7 @@ public class OrderServiceTest {
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
+                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
         then(eventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
@@ -1307,7 +1307,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1333,7 +1333,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1360,7 +1360,7 @@ public class OrderServiceTest {
 
         // when
         Throwable thrown =
-                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId));
+                catchThrowable(() -> orderService.rejectOrder(userId, role, storeId, orderId, null));
 
         // then
         assertThat(thrown)
@@ -1390,14 +1390,14 @@ public class OrderServiceTest {
 
         // when
         OrderActionStatusResponse response =
-                orderService.rejectOrder(userId, userRole, storeId, orderId);
+                orderService.rejectOrder(userId, userRole, storeId, orderId, null);
 
         // then
         then(order).should().reject();
 
         then(orderStatusHistoryService)
                 .should()
-                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class));
+                .createForOwnerOrderStatusHistory(eq(userId), eq(fromStatus), any(Order.class), isNull());
 
         then(eventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();

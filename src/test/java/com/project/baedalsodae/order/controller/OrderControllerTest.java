@@ -419,7 +419,7 @@ class OrderControllerTest {
                         .orderStatus(OrderStatus.REQUESTED)
                         .build();
 
-        given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId))
+        given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId, null))
                 .willReturn(response);
 
         mockMvc.perform(
@@ -439,7 +439,7 @@ class OrderControllerTest {
         UUID orderId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId))
+        given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId, null))
                 .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
 
         mockMvc.perform(

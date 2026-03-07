@@ -20,7 +20,7 @@ public interface OrderService {
 
     OrderActionStatusResponse acceptOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
-    OrderActionStatusResponse rejectOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+    OrderActionStatusResponse rejectOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
 
     OrderActionStatusResponse completeCooking(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

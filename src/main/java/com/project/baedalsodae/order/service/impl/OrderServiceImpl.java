@@ -260,7 +260,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.accept();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         orderEventPublisher.publishOrderAccepted(order);
 
@@ -270,7 +270,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderActionStatusResponse rejectOrder(
-            UUID userId, UserRole userRole, UUID storeId, UUID orderId) {
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason) {
         Order order =
                 orderRepository
                         .findByIdAndIsDeletedFalse(orderId)
@@ -289,7 +289,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.reject();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, reason);
 
         orderEventPublisher.publishOrderRejected(order);
 

@@ -92,10 +92,11 @@ public class OrderController {
             @RequestHeader("X-User-Id") UUID userId,
             @RequestHeader("X-User-Role") UserRole userRole,
             @RequestParam(name = "storeId", required = false) UUID storeId,
+            @RequestParam(name = "reason") String reason,
             @PathVariable("orderId") UUID orderId) {
 
         OrderActionStatusResponse response =
-                orderService.rejectOrder(userId, userRole, storeId, orderId);
+                orderService.rejectOrder(userId, userRole, storeId, orderId, reason);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
     }
