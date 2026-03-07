@@ -25,4 +25,6 @@ public interface OrderService {
     OrderActionStatusResponse completeCookingOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 
     OrderActionStatusResponse startDeliveryOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    OrderActionStatusResponse completeDeliveryOrder(UUID userId, UserRole userRole, UUID storeId, UUID orderId);
 }

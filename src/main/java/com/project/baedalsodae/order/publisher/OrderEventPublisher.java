@@ -42,4 +42,8 @@ public class OrderEventPublisher {
         eventService.save(newEvent);
     }
 
+    public void publishOrderDelivered(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
 }
