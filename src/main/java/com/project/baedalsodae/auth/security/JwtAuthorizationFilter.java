@@ -44,15 +44,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String resolvedAccessToken = jwtProvider.resolveToken(request.getHeader("Authorization"));
 
         if (StringUtils.hasText(resolvedAccessToken)) {
-            if (tokenRedisUtil.isBlacklisted(resolvedAccessToken)) {
-                sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
-                return;
-            }
-
             try {
                 Claims claims = jwtProvider.getClaims(resolvedAccessToken);
 
-                if (!jwtProvider.isAccessToken(claims)) {
+                if (tokenRedisUtil.isBlacklisted(resolvedAccessToken)) {
                     sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
                     return;
                 }
