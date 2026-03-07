@@ -43,6 +43,11 @@ public enum ErrorCode {
     STORE_FORBIDDEN("S003", HttpStatus.FORBIDDEN, "해당 가게 권한이 없습니다."),
     STORE_STATUS_CHANGE_FORBIDDEN("S004", HttpStatus.FORBIDDEN, "가게 상태를 변경할 권한이 없습니다."),
 
+    // store-hours
+    STORE_HOURS_ALREADY_EXISTS("SH001", HttpStatus.CONFLICT, "이미 영업시간이 등록되어 있습니다."),
+    STORE_HOURS_INVALID_DAY_COUNT(
+            "SH002", HttpStatus.BAD_REQUEST, "7일치 영업시간 정보가 필요합니다. 요일이 중복되거나 누락되지 않았는지 확인해주세요."),
+
     // menu-category
     MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),
     INVALID_MENU_CATEGORY_ORDER("MC002", HttpStatus.BAD_REQUEST, "메뉴 카테고리 순서가 잘못됐습니다."),

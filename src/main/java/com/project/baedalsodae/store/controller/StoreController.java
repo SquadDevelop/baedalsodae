@@ -8,13 +8,16 @@ import com.project.baedalsodae.menu.service.MenuCategoryService;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.store.dto.request.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
+import com.project.baedalsodae.store.dto.request.StoreHoursRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
+import com.project.baedalsodae.store.dto.response.StoreHoursResponse;
 import com.project.baedalsodae.store.dto.response.StorePageResponse;
 import com.project.baedalsodae.store.dto.response.StoreResponse;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.service.StoreCommandService;
+import com.project.baedalsodae.store.service.StoreHoursService;
 import com.project.baedalsodae.store.service.StoreQueryService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class StoreController {
     private final StoreCommandService storeCommandService;
     private final StoreQueryService storeQueryService;
+    private final StoreHoursService storeHoursService;
     private final MenuCategoryService menuCategoryService;
     private final MenuItemService menuItemService;
 
@@ -92,6 +96,16 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DELETED, null));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
+    @PostMapping("/{storeId}/hours")
+    public ResponseEntity<ApiResponse<Void>> createStoreHours(
+            @PathVariable UUID storeId,
+            @RequestBody @Valid List<StoreHoursRequest> request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        storeHoursService.createStoreHours(storeId, userDetails, request);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_CREATED, null));
+    }
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PostMapping("/{storeId}/menu-categories")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(
             @PathVariable UUID storeId, @RequestBody @Valid MenuCategoryPostRequestDto request) {
