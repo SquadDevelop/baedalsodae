@@ -1,4 +1,3 @@
-
 package com.project.baedalsodae.menu.dto.responseDto.item;
 
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
