@@ -25,6 +25,8 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -425,6 +427,9 @@ public class OrderServiceImpl implements OrderService {
         }
         if (!order.canCancelRequestByCustomer()) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+        if(order.getCreatedAt().plusSeconds(300).isAfter(Instant.now())){
+            throw new BusinessException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
         final OrderStatus fromStatus = order.getStatus();

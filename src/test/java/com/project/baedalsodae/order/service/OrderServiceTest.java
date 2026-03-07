@@ -1869,6 +1869,29 @@ public class OrderServiceTest {
                 .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
 
+    @DisplayName("주문 취소 요청 실패 - 주문 생성 후 5분 이후 취소 시도 (고객)")
+    @Test
+    void cancelRequestOrder_fail_invalid_Order_createdAt_five_minute() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
+                .willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+        given(order.canCancelRequestByCustomer()).willReturn(true);
+        given(order.getCreatedAt()).willReturn(Instant.now());
+
+        // when & then
+        assertThatThrownBy(() ->
+                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
+        ).isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_CANCEL_NOT_ALLOWED.getMessage());
+    }
+
     @DisplayName("주문 취소 요청 성공 - REQUESTED 상태 고객 취소")
     @Test
     void cancelRequestOrder_success_customer_requested() {
