@@ -1,4 +1,4 @@
-package com.project.baedalsodae.order.dto.event;
+package com.project.baedalsodae.event.dto;
 
 import com.project.baedalsodae.order.entity.Order;
 

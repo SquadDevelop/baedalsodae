@@ -1,7 +1,6 @@
 package com.project.baedalsodae.event.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.payment.entity.Payment;
 import jakarta.persistence.*;

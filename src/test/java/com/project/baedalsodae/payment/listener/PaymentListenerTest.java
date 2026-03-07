@@ -2,7 +2,7 @@ package com.project.baedalsodae.payment.listener;
 
 import static org.mockito.BDDMockito.then;
 
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
+import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.payment.service.PaymentService;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;

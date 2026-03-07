@@ -3,11 +3,8 @@ package com.project.baedalsodae.order.publisher;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.service.EventService;
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
-import com.project.baedalsodae.order.dto.event.OrderRequestedEvent;
 import com.project.baedalsodae.order.entity.Order;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 @Component

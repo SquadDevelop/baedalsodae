@@ -12,7 +12,7 @@ import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
-import com.project.baedalsodae.order.dto.event.OrderCreatedEvent;
+import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
