@@ -18,7 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,7 +26,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -46,8 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(resolvedAccessToken)) {
             try {
                 Claims claims = jwtProvider.getClaims(resolvedAccessToken);
-                String username = claims.getSubject();
-                setAuthentication(username);
+                setAuthentication(claims);
             } catch (BusinessException e) {
                 sendErrorResponse(response, e.getErrorCode());
                 return;
@@ -60,16 +57,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthentication(String username) {
+    private void setAuthentication(Claims claims) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(username);
+        Authentication authentication = createAuthentication(claims);
 
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
     }
 
-    private Authentication createAuthentication(String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    private Authentication createAuthentication(Claims claims) {
+        UserDetails userDetails = UserDetailsImpl.from(claims);
         return new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
     }
