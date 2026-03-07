@@ -8,7 +8,6 @@ import com.project.baedalsodae.store.dto.request.StoreHoursRequest;
 import com.project.baedalsodae.store.dto.response.StoreHoursResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreHours;
-import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import com.project.baedalsodae.store.repository.StoreHoursRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.service.StoreHoursService;
@@ -81,7 +80,6 @@ public class StoreHoursServiceImpl implements StoreHoursService {
         }
         storeHoursRepository.deleteAllByStoreId(storeId);
         storeHoursRepository.saveAll(getStoreHoursList(requests, store));
-
     }
 
     @Transactional

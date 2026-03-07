@@ -1,5 +1,6 @@
 package com.project.baedalsodae.store.controller;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
@@ -24,10 +25,14 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/stores")
 public class StoreController {
     private final StoreCommandService storeCommandService;

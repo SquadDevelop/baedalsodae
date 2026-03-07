@@ -14,9 +14,8 @@ import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.service.StoreCommandService;
-import java.util.UUID;
-
 import com.project.baedalsodae.store.service.StoreHoursService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
