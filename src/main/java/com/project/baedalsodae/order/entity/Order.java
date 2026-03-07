@@ -133,6 +133,14 @@ public class Order extends BaseAuditEntity {
         this.status = OrderStatus.CANCEL_REQUESTED;
     }
 
+    public boolean canCompleteCancel() {
+        return this.status == OrderStatus.CANCEL_REQUESTED;
+    }
+
+    public void cancel() {
+        this.status = OrderStatus.CANCELED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,

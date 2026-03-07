@@ -428,7 +428,8 @@ public class OrderServiceImpl implements OrderService {
         if (!order.canCancelRequestByCustomer()) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
-        if(order.getCreatedAt().plusSeconds(300).isAfter(Instant.now())){
+
+        if (order.getCreatedAt().plusSeconds(300).isBefore(Instant.now())) {
             throw new BusinessException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
@@ -439,6 +440,29 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
         orderEventPublisher.publishOrderCancelRequested(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse completeCancelOrder(UUID userId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.canCompleteCancel()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancel();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        orderEventPublisher.publishOrderCanceled(order);
 
         return OrderActionStatusResponse.from(order);
     }

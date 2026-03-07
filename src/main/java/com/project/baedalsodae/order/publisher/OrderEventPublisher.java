@@ -51,4 +51,9 @@ public class OrderEventPublisher {
         Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
         eventService.save(newEvent);
     }
+
+    public void publishOrderCanceled(Order order) {
+        Event newEvent = Event.fromOrder(order, EventType.ORDER_UPDATED);
+        eventService.save(newEvent);
+    }
 }
