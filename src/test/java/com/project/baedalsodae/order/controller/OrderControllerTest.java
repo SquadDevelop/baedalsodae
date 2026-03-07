@@ -15,6 +15,7 @@ import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.review.service.ReviewService;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -40,6 +41,8 @@ class OrderControllerTest {
     @Autowired private ObjectMapper objectMapper;
 
     @MockitoBean private OrderService orderService;
+
+    @MockitoBean private ReviewService reviewService;
 
     private UUID userId;
 
