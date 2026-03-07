@@ -4,15 +4,14 @@ import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -25,8 +24,12 @@ public class EventPoller {
 
     public EventPoller(EventRepository eventRepository, List<EventDispatcher> dispatchers) {
         this.eventRepository = eventRepository;
-        this.dispatcherMap = dispatchers.stream()
-                .collect(Collectors.toMap(EventDispatcher::getSupportedEventType, Function.identity()));
+        this.dispatcherMap =
+                dispatchers.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        EventDispatcher::getSupportedEventType,
+                                        Function.identity()));
     }
 
     @Scheduled(fixedDelay = 1000)

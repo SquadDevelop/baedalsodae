@@ -30,10 +30,12 @@ public class PaymentCreatedDispatcher implements EventDispatcher {
         UUID orderId = UUID.fromString(node.get("orderId").asText());
         UUID paymentId = UUID.fromString(node.get("paymentId").asText());
         PaymentStatus status = PaymentStatus.valueOf(node.get("status").asText());
-        String pgTransactionId = node.has("pgTransactionId") && !node.get("pgTransactionId").isNull()
-                ? node.get("pgTransactionId").asText()
-                : null;
+        String pgTransactionId =
+                node.has("pgTransactionId") && !node.get("pgTransactionId").isNull()
+                        ? node.get("pgTransactionId").asText()
+                        : null;
 
-        eventPublisher.publishEvent(new PaymentCreatedEvent(orderId, paymentId, status, pgTransactionId));
+        eventPublisher.publishEvent(
+                new PaymentCreatedEvent(orderId, paymentId, status, pgTransactionId));
     }
 }
