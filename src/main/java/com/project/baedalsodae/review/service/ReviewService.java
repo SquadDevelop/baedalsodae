@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ReviewService {
         TimeCursorPage<List<ReviewResponse>> getReviewsByUser(UUID userId, Instant cursor, int size);
         ReviewResponse getReviewDetail(UUID userId, UUID reviewId);
-        ReviewResponse createReview(UUID userId, ReviewRequest request);
+        ReviewResponse createReview(UUID userId, UUID orderId, ReviewRequest request);
         ReviewResponse updateReview(UUID userId, UUID reviewId, ReviewRequest request);
         ReviewResponse deleteReview(UUID userId,UUID reviewId);
 

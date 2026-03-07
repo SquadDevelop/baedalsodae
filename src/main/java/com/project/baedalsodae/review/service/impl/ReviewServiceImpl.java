@@ -1,5 +1,7 @@
 package com.project.baedalsodae.review.service.impl;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.TimeCursorPage;
 import com.project.baedalsodae.review.dto.request.ReviewRequest;
 import com.project.baedalsodae.review.dto.response.ReviewResponse;
@@ -8,6 +10,7 @@ import com.project.baedalsodae.review.repository.ReviewRepository;
 import com.project.baedalsodae.review.service.ReviewService;
 import com.project.baedalsodae.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -42,21 +45,42 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewResponse getReviewDetail(final UUID userId, final UUID reviewId) {
-        return null;
+        Review foundReview = reviewRepository.findByIdAndUserId(userId, reviewId).orElseThrow(
+            () -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND)
+        );
+        return ReviewResponse.from(foundReview);
     }
 
     @Override
-    public ReviewResponse createReview(final UUID userId, final ReviewRequest request) {
-        return null;
+    @Transactional
+    public ReviewResponse createReview(final UUID userId, final UUID orderId, final ReviewRequest request) {
+        Review savedReview = reviewRepository.save(Review.create(userId, orderId, request.rating(), request.comment()));
+        return ReviewResponse.from(savedReview);
     }
 
     @Override
+    @Transactional
     public ReviewResponse updateReview(final UUID userId, final UUID reviewId, final ReviewRequest request) {
-        return null;
+        Review foundReview = reviewRepository.findByIdAndUserId(userId, reviewId).orElseThrow(
+            () -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND)
+        );
+        if(foundReview.getUserId()!=userId){
+            throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
+        }
+        foundReview.update(request.rating(), request.comment());
+        return ReviewResponse.from(foundReview);
     }
 
     @Override
+    @Transactional
     public ReviewResponse deleteReview(final UUID userId, final UUID reviewId) {
-        return null;
+        Review foundReview = reviewRepository.findByIdAndUserId(userId, reviewId).orElseThrow(
+            () -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND)
+        );
+        if(foundReview.getUserId()!=userId){
+            throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
+        }
+        foundReview.softDelete(userId);
+        return ReviewResponse.from(foundReview);
     }
 }

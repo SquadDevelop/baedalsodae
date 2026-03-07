@@ -44,6 +44,12 @@ public class Review extends BaseAuditEntity {
         }
     }
 
+    public void update(int rating, String content) {
+        validate(rating, content);
+        this.rating = rating;
+        this.content = content;
+    }
+
     public static Review create(UUID userId, UUID orderId, int rating, String content) {
         return new Review(userId, orderId, rating, content);
     }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -21,4 +22,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
         ORDER BY r.createdAt DESC
         """)
     List<Review> findNextPageWithUserId(UUID userId, Instant cursor, int size);
+
+    Optional<Review> findByIdAndUserId(UUID userId, UUID reviewId);
 }

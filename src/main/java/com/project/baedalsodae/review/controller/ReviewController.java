@@ -30,11 +30,6 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_DETAIL_FOUND, reviewService.getReviewDetail(userId, reviewId)));
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(UUID userId, @RequestBody ReviewRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_CREATED,reviewService.createReview(userId, request)));
-    }
-
     @PutMapping("/{reviewId}")
     public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(UUID userId, @PathVariable UUID reviewId, @RequestBody ReviewRequest request) {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_UPDATED, reviewService.updateReview(userId, reviewId, request)));
