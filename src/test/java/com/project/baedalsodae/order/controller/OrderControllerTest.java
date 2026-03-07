@@ -649,9 +649,7 @@ class OrderControllerTest {
 
         given(orderService.completeCancelOrder(userId, orderId)).willReturn(response);
 
-        mockMvc.perform(
-                        post("/orders/{orderId}/cancel", orderId)
-                                .header("X-User-Id", userId))
+        mockMvc.perform(post("/orders/{orderId}/cancel", orderId).header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCELED.getCode()));
@@ -666,9 +664,7 @@ class OrderControllerTest {
         given(orderService.completeCancelOrder(userId, orderId))
                 .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
 
-        mockMvc.perform(
-                        post("/orders/{orderId}/cancel", orderId)
-                                .header("X-User-Id", userId))
+        mockMvc.perform(post("/orders/{orderId}/cancel", orderId).header("X-User-Id", userId))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));

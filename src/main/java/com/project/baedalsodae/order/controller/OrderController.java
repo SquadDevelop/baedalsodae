@@ -115,7 +115,8 @@ public class OrderController {
         OrderActionStatusResponse response =
                 orderService.completeCookingOrder(userId, userRole, storeId, orderId);
 
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_COOKING_COMPLETED, response));
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.ORDER_COOKING_COMPLETED, response));
     }
 
     @PostMapping("/{orderId}/delivering")
@@ -160,8 +161,7 @@ public class OrderController {
 
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<ApiResponse<OrderActionStatusResponse>> completeCancelOrder(
-            @RequestHeader("X-User-Id") UUID userId,
-            @PathVariable("orderId") UUID orderId) {
+            @RequestHeader("X-User-Id") UUID userId, @PathVariable("orderId") UUID orderId) {
 
         OrderActionStatusResponse response = orderService.completeCancelOrder(userId, orderId);
 

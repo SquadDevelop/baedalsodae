@@ -1,7 +1,6 @@
 package com.project.baedalsodae.event.dto;
 
 import com.project.baedalsodae.order.entity.Order;
-
 import java.util.UUID;
 
 public record OrderDeliveringEvent(UUID orderId, UUID userId, int finalAmount) {

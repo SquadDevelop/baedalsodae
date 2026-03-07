@@ -1184,7 +1184,8 @@ public class OrderServiceTest {
         then(order).should().request();
         then(orderStatusHistoryService)
                 .should()
-                .createForCustomerOrderStatusHistory(eq(userId), eq(OrderStatus.CREATED), any(Order.class));
+                .createForCustomerOrderStatusHistory(
+                        eq(userId), eq(OrderStatus.CREATED), any(Order.class));
         then(orderEventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
@@ -1757,13 +1758,14 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.empty());
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
     }
 
@@ -1775,15 +1777,16 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStatus()).willReturn(OrderStatus.CANCEL_REQUESTED);
 
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
 
@@ -1795,14 +1798,15 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
         given(order.getStatus()).willReturn(OrderStatus.CANCELED);
 
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
 
@@ -1814,15 +1818,16 @@ public class OrderServiceTest {
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(UUID.randomUUID());
 
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_FORBIDDEN.getMessage());
     }
 
@@ -1835,15 +1840,16 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(UUID.randomUUID());
 
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.OWNER, storeId, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.OWNER, storeId, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
     }
 
@@ -1856,16 +1862,17 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
         given(order.canCancelRequestByCustomer()).willReturn(false);
 
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
 
@@ -1878,18 +1885,18 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
         given(order.canCancelRequestByCustomer()).willReturn(true);
         given(order.getCreatedAt()).willReturn(Instant.now().minusSeconds(301));
 
-
         // when & then
-        assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
-        ).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_CANCEL_NOT_ALLOWED.getMessage());
     }
 
@@ -1902,9 +1909,7 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
         given(order.getStatus()).willReturn(OrderStatus.REQUESTED);
@@ -1929,8 +1934,7 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
         given(order.canCancelRequestByCustomer()).willReturn(true);
@@ -1952,8 +1956,7 @@ public class OrderServiceTest {
         UUID userId = UUID.randomUUID();
         UUID storeId = UUID.randomUUID();
 
-        given(orderRepository.findByIdAndIsDeletedFalse(orderId))
-                .willReturn(Optional.of(order));
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getStoreId()).willReturn(storeId);
         given(order.canCancelRequestByOwner()).willReturn(true);

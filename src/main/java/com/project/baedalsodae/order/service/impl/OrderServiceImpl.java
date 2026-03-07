@@ -25,7 +25,6 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -393,16 +392,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderActionStatusResponse cancelRequestOrder(
-            UUID userId,
-            UserRole userRole,
-            UUID storeId,
-            UUID orderId,
-            String reason
-    ) {
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason) {
 
-        Order order = orderRepository
-                .findByIdAndIsDeletedFalse(orderId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         if (order.getStatus() == OrderStatus.CANCEL_REQUESTED) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
@@ -414,7 +409,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (userRole == UserRole.CUSTOMER) {
             return cancelRequestByCustomer(userId, order);
-        } else if(userRole == UserRole.OWNER) {
+        } else if (userRole == UserRole.OWNER) {
             return cancelRequestByOwner(userId, storeId, order, reason);
         }
 
@@ -467,7 +462,8 @@ public class OrderServiceImpl implements OrderService {
         return OrderActionStatusResponse.from(order);
     }
 
-    private OrderActionStatusResponse cancelRequestByOwner(UUID userId, UUID storeId, Order order, String reason) {
+    private OrderActionStatusResponse cancelRequestByOwner(
+            UUID userId, UUID storeId, Order order, String reason) {
         if (!order.getStoreId().equals(storeId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
@@ -480,7 +476,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.cancelRequested();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, reason);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(
+                userId, fromStatus, order, reason);
 
         orderEventPublisher.publishOrderCancelRequested(order);
 
