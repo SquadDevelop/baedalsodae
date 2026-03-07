@@ -10,6 +10,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://baedalsodae-postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      ENCRYPTION_AES_KEY: ${ENCRYPTION_AES_KEY}
       SPRING_PROFILES_ACTIVE: local
     volumes:
       - ./logs:/app/logs  # Optional: for persistent logs
@@ -29,13 +30,14 @@ services:
     env_file:
       - .env
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
+      - ./script:/docker-entrypoint-initdb.d
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d baedalsodae" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 30s
     restart: unless-stopped
 
   mock-pg:

@@ -4,8 +4,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.project.baedalsodae.event.dto.PaymentCreatedEvent;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.event.service.EventService;
-import com.project.baedalsodae.payment.dto.event.PaymentResultEvent;
 import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
 import java.util.UUID;
@@ -20,7 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 @ExtendWith(MockitoExtension.class)
 class PaymentEventPublisherTest {
 
-    @InjectMocks private PaymentEventPublisher paymentEventPublisher;
+    @InjectMocks private EventPublisher paymentEventPublisher;
 
     @Mock private ApplicationEventPublisher eventPublisher;
 
@@ -36,15 +38,15 @@ class PaymentEventPublisherTest {
         UUID orderId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
         given(payment.getId()).willReturn(paymentId);
-        given(payment.getOrder()).willReturn(orderId);
+        given(payment.getOrderId()).willReturn(orderId);
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
         given(payment.getPgTransactionId()).willReturn("pg-txn-001");
 
         // when
-        paymentEventPublisher.publishPaymentResult(payment);
+        paymentEventPublisher.publishPaymentEvent(payment, EventType.PAYMENT_CREATED);
 
         // then
-        then(eventPublisher).should().publishEvent(any(PaymentResultEvent.class));
+        then(eventPublisher).should().publishEvent(any(PaymentCreatedEvent.class));
     }
 
     @Test
@@ -54,12 +56,12 @@ class PaymentEventPublisherTest {
         UUID orderId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
         given(payment.getId()).willReturn(paymentId);
-        given(payment.getOrder()).willReturn(orderId);
+          given(payment.getOrderId()).willReturn(orderId);
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
         given(payment.getPgTransactionId()).willReturn("pg-txn-001");
 
         // when
-        paymentEventPublisher.publishPaymentResult(payment);
+        paymentEventPublisher.publishPaymentEvent(payment, EventType.PAYMENT_CREATED);
 
         // then
         then(eventService).should().save(any());
@@ -73,12 +75,12 @@ class PaymentEventPublisherTest {
         UUID orderId = UUID.randomUUID();
         UUID paymentId = UUID.randomUUID();
         given(payment.getId()).willReturn(paymentId);
-        given(payment.getOrder()).willReturn(orderId);
+        given(payment.getOrderId()).willReturn(orderId);
         given(payment.getStatus()).willReturn(PaymentStatus.PENDING);
         given(payment.getPgTransactionId()).willReturn(null);
 
         // when
-        paymentEventPublisher.publishPaymentResult(payment);
+        paymentEventPublisher.publishPaymentEvent(payment, EventType.PAYMENT_CREATED);
 
         // then
         then(eventPublisher).should().publishEvent(any(Object.class));

@@ -44,6 +44,10 @@ public class Event extends BaseTimeEntity {
         return new Event(AggregateType.PAYMENT, payment.getId(), type, null);
     }
 
+    public static Event fromOrder(final Order order, final EventType type, String payload) {
+        return new Event(AggregateType.ORDER, order.getId(), type, payload);
+    }
+
     public void markPublished() {
         this.status = EventStatus.PUBLISHED;
         this.publishedAt = Instant.now();

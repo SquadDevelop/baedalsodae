@@ -21,12 +21,12 @@ public class Payment extends BaseTimeEntity {
     //    @ManyToOne(fetch = FetchType.LAZY)
     //    @JoinColumn(name = "order_id", nullable = false)
     @Column(name = "order_id", nullable = false)
-    private UUID order;
+    private UUID orderId;
 
     //    @ManyToOne(fetch = FetchType.LAZY)
     //    @JoinColumn(name = "user_id", nullable = false)
     @Column(name = "user_id", nullable = false)
-    private UUID user;
+    private UUID userId;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
@@ -51,17 +51,17 @@ public class Payment extends BaseTimeEntity {
     private UUID updatedBy;
 
     public Payment(
-            UUID order,
-            UUID user,
+            UUID orderId,
+            UUID userId,
             BigDecimal amount,
             PaymentMethod paymentMethod,
             PaymentStatus status,
             LocalDateTime paidAt,
             UUID createdBy,
             UUID updatedBy) {
-        validate(order, user, amount, paymentMethod, status, paidAt);
-        this.order = order;
-        this.user = user;
+        validate(orderId, userId, amount, paymentMethod, status, paidAt);
+        this.orderId = orderId;
+        this.userId = userId;
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.status = status;
@@ -71,16 +71,16 @@ public class Payment extends BaseTimeEntity {
     }
 
     private void validate(
-            UUID order,
-            UUID user,
+            UUID orderId,
+            UUID userId,
             BigDecimal amount,
             PaymentMethod paymentMethod,
             PaymentStatus status,
             LocalDateTime paidAt) {
-        if (order == null) {
+        if (orderId == null) {
             throw new IllegalArgumentException("주문 ID는 null일 수 없습니다.");
         }
-        if (user == null) {
+        if (userId == null) {
             throw new IllegalArgumentException("사용자 ID는 null일 수 없습니다.");
         }
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -98,15 +98,15 @@ public class Payment extends BaseTimeEntity {
     }
 
     public static Payment create(
-            UUID order,
-            UUID user,
+            UUID orderId,
+            UUID userId,
             BigDecimal amount,
             PaymentMethod paymentMethod,
             PaymentStatus status,
             LocalDateTime paidAt,
             UUID createdBy) {
         return new Payment(
-                order, user, amount, paymentMethod, status, paidAt, createdBy, createdBy);
+                orderId, userId, amount, paymentMethod, status, paidAt, createdBy, createdBy);
     }
 
     public void markAsSuccess(final String pgTransactionId) {

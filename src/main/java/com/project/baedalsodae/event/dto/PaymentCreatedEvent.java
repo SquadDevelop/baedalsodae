@@ -1,14 +1,14 @@
-package com.project.baedalsodae.payment.dto.event;
+package com.project.baedalsodae.event.dto;
 
 import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
 import java.util.UUID;
 
-public record PaymentResultEvent(
+public record PaymentCreatedEvent(
         UUID orderId, UUID paymentId, PaymentStatus status, String pgTransactionId) {
-    public static PaymentResultEvent from(final Payment payment) {
-        return new PaymentResultEvent(
-                payment.getOrder(),
+    public static PaymentCreatedEvent from(final Payment payment) {
+        return new PaymentCreatedEvent(
+                payment.getOrderId(),
                 payment.getId(),
                 payment.getStatus(),
                 payment.getPgTransactionId());
