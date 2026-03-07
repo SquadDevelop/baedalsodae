@@ -1,8 +1,8 @@
 package com.project.baedalsodae.store.entity;
 
+import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import jakarta.persistence.*;
-import java.time.DayOfWeek;
-import java.time.Instant;
+import java.time.LocalTime;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -17,7 +17,6 @@ import org.hibernate.annotations.ColumnDefault;
         })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StoreHours {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,22 +31,63 @@ public class StoreHours {
     private Store store;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "day_of_week", length = 3)
+    @Column(name = "day_of_week", length = 3, nullable = false)
     private DayOfWeek dayOfWeek;
 
     @Column(name = "open_time")
-    private Instant openTime;
+    private LocalTime openTime;
 
     @Column(name = "close_time")
-    private Instant closeTime;
+    private LocalTime closeTime;
 
     @Column(name = "break_start")
-    private Instant breakStart;
+    private LocalTime breakStart;
 
     @Column(name = "break_end")
-    private Instant breakEnd;
+    private LocalTime breakEnd;
 
     @Column(name = "is_open", nullable = false)
     @ColumnDefault("true")
     private boolean isOpen = true;
+
+    private StoreHours(
+            Store store,
+            DayOfWeek dayOfWeek,
+            LocalTime openTime,
+            LocalTime closeTime,
+            LocalTime breakStart,
+            LocalTime breakEnd,
+            boolean isOpen) {
+        this.store = store;
+        this.dayOfWeek = dayOfWeek;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.breakStart = breakStart;
+        this.breakEnd = breakEnd;
+        this.isOpen = isOpen;
+    }
+
+    public static StoreHours createStoreHours(
+            Store store,
+            DayOfWeek dayOfWeek,
+            LocalTime openTime,
+            LocalTime closeTime,
+            LocalTime breakStart,
+            LocalTime breakEnd,
+            boolean isOpen) {
+        return new StoreHours(store, dayOfWeek, openTime, closeTime, breakStart, breakEnd, isOpen);
+    }
+
+    public void update(
+            LocalTime openTime,
+            LocalTime closeTime,
+            LocalTime breakStart,
+            LocalTime breakEnd,
+            boolean isOpen) {
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.breakStart = breakStart;
+        this.breakEnd = breakEnd;
+        this.isOpen = isOpen;
+    }
 }
