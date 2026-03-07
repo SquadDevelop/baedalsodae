@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -18,28 +20,28 @@ import java.util.UUID;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<TimeCursorPage<ReviewResponse>>> getReviews() {
-            return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_LIST_FOUND, reviewService.getReviews()));
+    @GetMapping()
+    public ResponseEntity<ApiResponse<TimeCursorPage<List<ReviewResponse>>>> getReviews(UUID userId, @RequestParam(required = false) Instant cursor, @RequestParam(defaultValue = "10") int size) {
+            return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_LIST_FOUND, reviewService.getReviewsByUser(userId, cursor, size)));
     }
 
     @GetMapping("/{reviewId}")
-    public ResponseEntity<ApiResponse<ReviewResponse>> getReviewDetail(@PathVariable UUID reviewId) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_DETAIL_FOUND, reviewService.getReviewDetail(reviewId)));
+    public ResponseEntity<ApiResponse<ReviewResponse>> getReviewDetail(UUID userId, @PathVariable UUID reviewId) {
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_DETAIL_FOUND, reviewService.getReviewDetail(userId, reviewId)));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(@RequestBody ReviewRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_CREATED,reviewService.createReview(request)));
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(UUID userId, @RequestBody ReviewRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_CREATED,reviewService.createReview(userId, request)));
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(@PathVariable UUID reviewId, @RequestBody ReviewRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_UPDATED, reviewService.updateReview(reviewId, request)));
+    public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(UUID userId, @PathVariable UUID reviewId, @RequestBody ReviewRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_UPDATED, reviewService.updateReview(userId, reviewId, request)));
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<ApiResponse<ReviewResponse>> deleteReview(@PathVariable UUID reviewId) {
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_DELETED, reviewService.deleteReview(reviewId)));
+    public ResponseEntity<ApiResponse<ReviewResponse>> deleteReview(UUID userId, @PathVariable UUID reviewId) {
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.REVIEW_DELETED, reviewService.deleteReview(userId, reviewId)));
     }
 }
