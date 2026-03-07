@@ -176,11 +176,31 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId) {
-        List<MenuItem> menuItems =
+    public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId, UserDetailsImpl userDetails) {
+        List<MenuItem> allItems =
                 menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId);
 
-        return menuItems.stream().map(MenuItemResponseDto::fromEntity).toList();
+        List<MenuItem> items = new ArrayList<>();
+        List<UUID> itemIds = new ArrayList<>();
+        for (MenuItem item : allItems) {
+            if (isVisibleTo(item, userDetails)) {
+                items.add(item);
+                itemIds.add(item.getId());
+            }
+        }
+        if (items.isEmpty()) return List.of();
+        Map<UUID, List<String>> tagMap = tagMappingService.getTagNamesByMenuItemIds(itemIds);
+        List<MenuItemResponseDto> responseDto = new ArrayList<>();
+        for (MenuItem item : items) {
+            List<String> tagNames = tagMap.getOrDefault(item.getId(), List.of());
+            responseDto.add(MenuItemResponseDto.fromEntity(item, tagNames));
+        }
+        return responseDto;
+    }
+
+    private boolean isVisibleTo(MenuItem item, UserDetailsImpl userDetails) {
+        if (item.getMenuStatus().isPubliclyVisible()) return true;
+        return userDetails != null && userDetails.getUserRole() != UserRole.CUSTOMER;
     }
 
     private boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name) {

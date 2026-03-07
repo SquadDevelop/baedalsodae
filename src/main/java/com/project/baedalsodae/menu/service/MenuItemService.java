@@ -26,5 +26,5 @@ public interface MenuItemService {
     MenuItemResponseDto updateMenuItemOrder(
             UUID menuItemId, Integer order, UserDetailsImpl userDetails);
 
-    List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId);
+    List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId, UserDetailsImpl userDetails);
 }
