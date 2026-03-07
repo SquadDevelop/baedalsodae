@@ -23,6 +23,11 @@ public enum SuccessCode {
     ORDER_REQUESTED("OR205", HttpStatus.OK, "주문 요청 성공"),
     ORDER_ACCEPTED("OR206", HttpStatus.OK, "주문 수락 성공"),
     ORDER_REJECTED("OR207", HttpStatus.OK, "주문 거절 성공"),
+    ORDER_COOKING_COMPLETED("OR208", HttpStatus.OK, "조리 완료 성공"),
+    ORDER_DELIVERING("OR209", HttpStatus.OK, "배달 시작 성공"),
+    ORDER_DELIVERED("OR210", HttpStatus.OK, "배달 완료 성공"),
+    ORDER_CANCEL_REQUESTED("OR211", HttpStatus.OK, "주문 취소 요청 성공"),
+    ORDER_CANCELED("OR212", HttpStatus.OK, "주문 취소 성공"),
 
     // store category
     STORE_CATEGORY_LIST_FOUND("SC200", HttpStatus.OK, "가게 카테고리 목록 조회 성공"),

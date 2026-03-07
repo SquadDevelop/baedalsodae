@@ -454,4 +454,223 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
     }
+
+    @Test
+    @DisplayName("성공 - 조리 완료")
+    void completeCookingOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.COOKED)
+                        .build();
+
+        given(orderService.completeCookingOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/cooked", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_COOKING_COMPLETED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 조리 완료 시 잘못된 상태")
+    void completeCookingOrder_fail_invalidStatus() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderService.completeCookingOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/cooked", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 배달 시작")
+    void startDeliveryOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.DELIVERING)
+                        .build();
+
+        given(orderService.startDeliveryOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/delivering", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DELIVERING.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 배달 시작 시 잘못된 상태")
+    void startDeliveryOrder_fail_invalidStatus() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderService.startDeliveryOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/delivering", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 배달 완료")
+    void completeDeliveryOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.DELIVERED)
+                        .build();
+
+        given(orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/delivered", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DELIVERED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 배달 완료 시 잘못된 상태")
+    void completeDeliveryOrder_fail_invalidStatus() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderService.completeDeliveryOrder(userId, UserRole.OWNER, storeId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/delivered", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "OWNER")
+                                .param("storeId", storeId.toString()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 취소 요청")
+    void cancelRequestOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.CANCEL_REQUESTED)
+                        .build();
+
+        given(orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null))
+                .willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/cancel-request", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "CUSTOMER"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCEL_REQUESTED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 주문 취소 요청 시 본인 주문 아님")
+    void cancelRequestOrder_fail_forbidden() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        given(orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null))
+                .willThrow(new BusinessException(ErrorCode.ORDER_FORBIDDEN));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/cancel-request", orderId)
+                                .header("X-User-Id", userId)
+                                .header("X-User-Role", "CUSTOMER"))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_FORBIDDEN.getCode()));
+    }
+
+    @Test
+    @DisplayName("성공 - 주문 취소")
+    void completeCancelOrder_success() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        OrderActionStatusResponse response =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.CANCELED)
+                        .build();
+
+        given(orderService.completeCancelOrder(userId, orderId)).willReturn(response);
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/cancel", orderId)
+                                .header("X-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCELED.getCode()));
+    }
+
+    @Test
+    @DisplayName("실패 - 주문 취소 시 CANCEL_REQUESTED 상태가 아님")
+    void completeCancelOrder_fail_invalidStatus() throws Exception {
+
+        UUID orderId = UUID.randomUUID();
+
+        given(orderService.completeCancelOrder(userId, orderId))
+                .willThrow(new BusinessException(ErrorCode.ORDER_INVALID_STATUS));
+
+        mockMvc.perform(
+                        post("/orders/{orderId}/cancel", orderId)
+                                .header("X-User-Id", userId))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(ErrorCode.ORDER_INVALID_STATUS.getCode()));
+    }
 }
