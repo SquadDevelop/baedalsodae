@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPatchRequestDto;
@@ -43,11 +44,17 @@ class MenuCategoryServiceImplTest {
 
     private UUID storeId;
     private UUID menuCategoryId;
+    private UUID ownerId;
+    private UserDetailsImpl managerUserDetails;
+    private UserDetailsImpl ownerUserDetails;
 
     @BeforeEach
     void setUp() {
         storeId = UUID.randomUUID();
         menuCategoryId = UUID.randomUUID();
+        ownerId = UUID.randomUUID();
+        managerUserDetails = createManagerUserDetails();
+        ownerUserDetails = createOwnerUserDetails(ownerId);
     }
 
     @Nested
@@ -64,9 +71,29 @@ class MenuCategoryServiceImplTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> menuCategoryService.createMenuCategory(storeId, request))
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.createMenuCategory(
+                                            storeId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
+        void createMenuCategory_fail_forbidden() {
+            // given
+            Store store = createMockStoreWithRepository(storeRepository, storeId);
+            given(store.getUserId()).willReturn(UUID.randomUUID());
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.createMenuCategory(
+                                            storeId, request, ownerUserDetails))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         }
 
         @Test
@@ -80,7 +107,10 @@ class MenuCategoryServiceImplTest {
                     .willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> menuCategoryService.createMenuCategory(storeId, request))
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.createMenuCategory(
+                                            storeId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
@@ -101,7 +131,10 @@ class MenuCategoryServiceImplTest {
                     .willThrow(new DataIntegrityViolationException("order conflict"));
 
             // when & then
-            assertThatThrownBy(() -> menuCategoryService.createMenuCategory(storeId, request))
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.createMenuCategory(
+                                            storeId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_ORDER_CONFLICT);
@@ -123,7 +156,7 @@ class MenuCategoryServiceImplTest {
 
             // when
             MenuCategoryResponseDto result =
-                    menuCategoryService.createMenuCategory(storeId, request);
+                    menuCategoryService.createMenuCategory(storeId, request, managerUserDetails);
 
             // then
             assertThat(result.orderNo()).isEqualTo(FIRST_ORDER_NUMBER);
@@ -146,7 +179,7 @@ class MenuCategoryServiceImplTest {
 
             // when
             MenuCategoryResponseDto result =
-                    menuCategoryService.createMenuCategory(storeId, request);
+                    menuCategoryService.createMenuCategory(storeId, request, managerUserDetails);
 
             // then
             assertThat(result.name()).isEqualTo(DEFAULT_CATEGORY_NAME);
@@ -168,10 +201,29 @@ class MenuCategoryServiceImplTest {
 
             // when & then
             assertThatThrownBy(
-                            () -> menuCategoryService.updateMenuCategory(menuCategoryId, request))
+                            () ->
+                                    menuCategoryService.updateMenuCategory(
+                                            menuCategoryId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
+        void updateMenuCategory_fail_forbidden() {
+            // given
+            MenuCategoryPutRequestDto request = createDefaultPutRequest();
+            createMockCategoryWithUnrelatedStore(menuCategoryRepository, menuCategoryId);
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.updateMenuCategory(
+                                            menuCategoryId, request, ownerUserDetails))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         }
 
         @Test
@@ -187,7 +239,9 @@ class MenuCategoryServiceImplTest {
 
             // when & then
             assertThatThrownBy(
-                            () -> menuCategoryService.updateMenuCategory(menuCategoryId, request))
+                            () ->
+                                    menuCategoryService.updateMenuCategory(
+                                            menuCategoryId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
@@ -204,7 +258,7 @@ class MenuCategoryServiceImplTest {
             given(category.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
 
             // when
-            menuCategoryService.updateMenuCategory(menuCategoryId, request);
+            menuCategoryService.updateMenuCategory(menuCategoryId, request, managerUserDetails);
 
             // then
             verify(menuCategoryRepository, never())
@@ -226,7 +280,7 @@ class MenuCategoryServiceImplTest {
             given(category.getOrderNo()).willReturn(FIRST_ORDER_NUMBER);
 
             // when
-            menuCategoryService.updateMenuCategory(menuCategoryId, request);
+            menuCategoryService.updateMenuCategory(menuCategoryId, request, managerUserDetails);
 
             // then
             verify(category).changeMenuCategoryName(NEW_CATEGORY_NAME);
@@ -269,10 +323,29 @@ class MenuCategoryServiceImplTest {
                     .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(menuCategoryId))
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.deleteMenuCategory(
+                                            menuCategoryId, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
+        void deleteMenuCategory_fail_forbidden() {
+            // given
+            createMockCategoryWithUnrelatedStore(menuCategoryRepository, menuCategoryId);
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.deleteMenuCategory(
+                                            menuCategoryId, ownerUserDetails))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         }
 
         @Test
@@ -280,12 +353,17 @@ class MenuCategoryServiceImplTest {
         void deleteMenuCategory_fail_hasItems() {
             // given
             MenuCategory category = mock(MenuCategory.class);
+            Store store = mock(Store.class);
             given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
                     .willReturn(Optional.of(category));
+            given(category.getStore()).willReturn(store);
             given(category.hasItem()).willReturn(true);
 
             // when & then
-            assertThatThrownBy(() -> menuCategoryService.deleteMenuCategory(menuCategoryId))
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.deleteMenuCategory(
+                                            menuCategoryId, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_HAS_ITEMS);
@@ -298,10 +376,10 @@ class MenuCategoryServiceImplTest {
             givenCategoriesForDeletion();
 
             // when
-            menuCategoryService.deleteMenuCategory(menuCategoryId);
+            menuCategoryService.deleteMenuCategory(menuCategoryId, managerUserDetails);
 
             // then
-            verify(targetCategory).softDelete(null);
+            verify(targetCategory).softDelete(managerUserDetails.getUserId());
             verify(category3).changeOrderNo(SECOND_ORDER_NUMBER);
             verify(category1, never()).changeOrderNo(any());
         }
@@ -321,8 +399,7 @@ class MenuCategoryServiceImplTest {
             given(category.getOrderNo()).willReturn(orderNo);
             given(category.getId()).willReturn(menuCategoryId);
             given(category.getName()).willReturn(DEFAULT_CATEGORY_NAME);
-            lenient().when(category.getStore()).thenReturn(store);
-            lenient().when(store.getId()).thenReturn(storeId);
+            given(category.getStore()).willReturn(store);
         }
 
         @Test
@@ -337,10 +414,27 @@ class MenuCategoryServiceImplTest {
             assertThatThrownBy(
                             () ->
                                     menuCategoryService.updateMenuCategoryOrder(
-                                            menuCategoryId, request))
+                                            menuCategoryId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
+        void updateMenuCategoryOrder_fail_forbidden() {
+            // given
+            MenuCategoryPatchRequestDto request = createPatchRequest(THIRD_ORDER_NUMBER);
+            createMockCategoryWithUnrelatedStore(menuCategoryRepository, menuCategoryId);
+
+            // when & then
+            assertThatThrownBy(
+                            () ->
+                                    menuCategoryService.updateMenuCategoryOrder(
+                                            menuCategoryId, request, ownerUserDetails))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         }
 
         @Test
@@ -349,15 +443,17 @@ class MenuCategoryServiceImplTest {
             // given
             MenuCategoryPatchRequestDto request = createPatchRequest(THIRD_ORDER_NUMBER);
             category = mock(MenuCategory.class);
+            Store store = mock(Store.class);
             given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
                     .willReturn(Optional.of(category));
+            given(category.getStore()).willReturn(store);
             given(category.getOrderNo()).willReturn(null);
 
             // when & then
             assertThatThrownBy(
                             () ->
                                     menuCategoryService.updateMenuCategoryOrder(
-                                            menuCategoryId, request))
+                                            menuCategoryId, request, managerUserDetails))
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.INVALID_MENU_CATEGORY_ORDER);
@@ -371,7 +467,8 @@ class MenuCategoryServiceImplTest {
             givenCategoryExistsWithOrder(SECOND_ORDER_NUMBER);
 
             // when
-            menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request);
+            menuCategoryService.updateMenuCategoryOrder(
+                    menuCategoryId, request, managerUserDetails);
 
             // then
             verify(menuCategoryRepository, never())
@@ -386,13 +483,15 @@ class MenuCategoryServiceImplTest {
             MenuCategory category2 = mock(MenuCategory.class);
             MenuCategory category3 = mock(MenuCategory.class);
             givenCategoryExistsWithOrder(FIRST_ORDER_NUMBER);
+            given(category.getStore().getId()).willReturn(storeId);
             given(category2.getOrderNo()).willReturn(SECOND_ORDER_NUMBER);
             given(category3.getOrderNo()).willReturn(THIRD_ORDER_NUMBER);
             given(menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId))
                     .willReturn(List.of(category, category2, category3));
 
             // when
-            menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request);
+            menuCategoryService.updateMenuCategoryOrder(
+                    menuCategoryId, request, managerUserDetails);
 
             // then
             verify(category).changeOrderNo(THIRD_ORDER_NUMBER);
