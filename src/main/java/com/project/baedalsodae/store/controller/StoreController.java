@@ -115,6 +115,15 @@ public class StoreController {
         }
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_FOUND, response));
     }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
+    @DeleteMapping("/{storeId}/hours")
+    public ResponseEntity<ApiResponse<Void>> deleteStoreHours(
+            @PathVariable UUID storeId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        storeHoursService.deleteStoreHours(storeId, userDetails);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_HOURS_DELETED, null));
+    }
+
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PostMapping("/{storeId}/menu-categories")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(

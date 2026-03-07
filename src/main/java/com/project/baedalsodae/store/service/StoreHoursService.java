@@ -12,3 +12,5 @@ public interface StoreHoursService {
             UUID storeId, UserDetailsImpl userDetails, List<StoreHoursRequest> request);
 
     StoreHoursResponse.StoreHoursInfo getStoreHours(UUID storeId);
+    void deleteStoreHours(UUID storeId, UserDetailsImpl userDetails);
+}

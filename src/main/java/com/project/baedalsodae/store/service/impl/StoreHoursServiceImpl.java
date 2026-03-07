@@ -8,13 +8,12 @@ import com.project.baedalsodae.store.dto.request.StoreHoursRequest;
 import com.project.baedalsodae.store.dto.response.StoreHoursResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreHours;
+import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import com.project.baedalsodae.store.repository.StoreHoursRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.service.StoreHoursService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import jakarta.persistence.EntityManager;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,7 @@ public class StoreHoursServiceImpl implements StoreHoursService {
 
     private final StoreHoursRepository storeHoursRepository;
     private final StoreRepository storeRepository;
+    private final EntityManager entityManager;
 
     @Transactional
     @Override
@@ -67,6 +67,17 @@ public class StoreHoursServiceImpl implements StoreHoursService {
                 StoreHoursResponse.StoreHourDto.fromEntityList(storeHoursList);
         return new StoreHoursResponse.StoreHoursInfo(storeId, storeHourDtos);
     }
+    @Transactional
+    @Override
+    public void deleteStoreHours(UUID storeId, UserDetailsImpl userDetails) {
+        Store store = getStoreByStoreId(storeId);
+        StoreOwnershipValidator.verifyStoreOwnership(store, userDetails, ErrorCode.STORE_FORBIDDEN);
+        storeHoursRepository.deleteAllByStoreId(storeId);
+
+        entityManager.flush();
+        entityManager.clear();
+    }
+
     private void validateDayCount(List<StoreHoursRequest> request) {
         long distinctDayCount =
                 request.stream().map(StoreHoursRequest::getDayOfWeek).distinct().count();
