@@ -150,4 +150,44 @@ class StoreHoursServiceImplTest {
             verify(storeHoursRepository).saveAll(argThat(list -> ((List<?>) list).size() == 7));
         }
     }
+
+    @Nested
+    @DisplayName("영업시간 조회")
+    class GetStoreHours {
+
+        @Test
+        @DisplayName("실패: 가게가 존재하지 않으면 예외가 발생한다")
+        void getStoreHours_fail_storeNotFound() {
+            given(storeRepository.existsByIdAndIsDeletedIsFalse(storeId)).willReturn(false);
+
+            assertThatThrownBy(() -> storeHoursService.getStoreHours(storeId))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("성공: 등록된 영업시간이 없으면 빈 목록을 반환한다")
+        void getStoreHours_success_empty() {
+            given(storeRepository.existsByIdAndIsDeletedIsFalse(storeId)).willReturn(true);
+            given(storeHoursRepository.findAllByStoreId(storeId)).willReturn(List.of());
+
+            StoreHoursResponse.StoreHoursInfo result = storeHoursService.getStoreHours(storeId);
+
+            assertThat(result.isEmpty()).isTrue();
+            assertThat(result.getStoreHours()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("성공: 등록된 7일치 영업시간을 반환한다")
+        void getStoreHours_success() {
+            List<StoreHours> mockHoursList = createMockStoreHoursList();
+            given(storeRepository.existsByIdAndIsDeletedIsFalse(storeId)).willReturn(true);
+            given(storeHoursRepository.findAllByStoreId(storeId)).willReturn(mockHoursList);
+
+            StoreHoursResponse.StoreHoursInfo result = storeHoursService.getStoreHours(storeId);
+
+            assertThat(result.getStoreId()).isEqualTo(storeId);
+            assertThat(result.getStoreHours()).hasSize(7);
+        }
+    }
 }
