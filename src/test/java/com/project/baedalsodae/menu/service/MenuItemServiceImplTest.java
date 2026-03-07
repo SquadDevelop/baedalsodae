@@ -40,7 +40,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 @ExtendWith(MockitoExtension.class)
 class MenuItemServiceImplTest {
 
-    public static final String ERROR_CODE = "errorCode";
     @Mock private MenuItemRepository menuItemRepository;
     @Mock private MenuCategoryRepository menuCategoryRepository;
     @Mock private TagMappingService tagMappingService;
@@ -102,7 +101,8 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.createMenuItem(menuCategoryId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
         }
 
         @Test
@@ -118,7 +118,8 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.createMenuItem(menuCategoryId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
         }
 
         @Test
@@ -138,7 +139,8 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.createMenuItem(menuCategoryId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_ORDER_CONFLICT);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_ITEM_ORDER_CONFLICT);
         }
 
         @Test
@@ -227,7 +229,7 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.updateMenuItem(menuItemId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.MENU_ITEM_NOT_FOUND);
         }
 
         @Test
@@ -245,7 +247,8 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.updateMenuItem(menuItemId, testRequest))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_CATEGORY_NOT_FOUND);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.MENU_CATEGORY_NOT_FOUND);
         }
 
         @Test
@@ -265,7 +268,8 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.updateMenuItem(menuItemId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
         }
 
         @Test
@@ -363,7 +367,7 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.patchMenuItem(menuItemId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.MENU_ITEM_NOT_FOUND);
         }
 
         @Test
@@ -379,7 +383,8 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.patchMenuItem(menuItemId, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
         }
 
         @Test
@@ -495,7 +500,7 @@ class MenuItemServiceImplTest {
             // when & then
             assertThatThrownBy(() -> menuItemService.deleteMenuItem(menuItemId))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.MENU_ITEM_NOT_FOUND);
         }
 
         @Test
@@ -544,7 +549,7 @@ class MenuItemServiceImplTest {
                                     menuItemService.updateMenuItemOrder(
                                             menuItemId, THIRD_ORDER_NUMBER))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.MENU_ITEM_NOT_FOUND);
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.MENU_ITEM_NOT_FOUND);
         }
 
         @Test
@@ -562,7 +567,8 @@ class MenuItemServiceImplTest {
                                     menuItemService.updateMenuItemOrder(
                                             menuItemId, THIRD_ORDER_NUMBER))
                     .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(ERROR_CODE, ErrorCode.INVALID_MENU_ITEM_ORDER);
+                    .hasFieldOrPropertyWithValue(
+                            ERROR_CODE_FIELD, ErrorCode.INVALID_MENU_ITEM_ORDER);
         }
 
         @Test
