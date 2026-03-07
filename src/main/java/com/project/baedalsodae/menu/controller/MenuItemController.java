@@ -30,6 +30,8 @@ public class MenuItemController {
             @PathVariable UUID menuItemId,
             @Valid @RequestBody MenuItemPutRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        MenuItemResponseDto response =
+                menuItemService.updateMenuItem(menuItemId, request, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_UPDATED, response));
     }
 
@@ -39,6 +41,8 @@ public class MenuItemController {
             @PathVariable UUID menuItemId,
             @Valid @RequestBody MenuItemPatchRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        MenuItemResponseDto response =
+                menuItemService.patchMenuItem(menuItemId, request, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_UPDATED, response));
     }
 
@@ -48,6 +52,8 @@ public class MenuItemController {
             @PathVariable UUID menuItemId,
             @RequestParam @Validated @Positive Integer order,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        MenuItemResponseDto response =
+                menuItemService.updateMenuItemOrder(menuItemId, order, userDetails);
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessCode.MENU_ITEM_ORDER_UPDATED, response));
     }
@@ -56,6 +62,7 @@ public class MenuItemController {
     @DeleteMapping("/{menuItemId}")
     public ResponseEntity<ApiResponse<Void>> deleteMenuItem(
             @PathVariable UUID menuItemId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        menuItemService.deleteMenuItem(menuItemId, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_DELETED, null));
     }
 }

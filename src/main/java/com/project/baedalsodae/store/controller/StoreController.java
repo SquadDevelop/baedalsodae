@@ -98,10 +98,11 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PostMapping("/{storeId}/menu-categories")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(
-        MenuCategoryResponseDto response = menuCategoryService.createMenuCategory(storeId, request);
             @PathVariable UUID storeId,
             @RequestBody @Valid MenuCategoryPostRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        MenuCategoryResponseDto response =
+                menuCategoryService.createMenuCategory(storeId, request, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_CREATED, response));
     }
 
