@@ -11,8 +11,9 @@ import static org.mockito.Mockito.verify;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
-import com.project.baedalsodae.user.dto.request.UserRequestDto;
-import com.project.baedalsodae.user.dto.response.UserResponseDto;
+import com.project.baedalsodae.user.dto.request.CreateUserRequest;
+import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.repository.UserRepository;
@@ -44,14 +45,14 @@ class UserServiceTest {
     @Test
     @DisplayName("성공 - 회원가입 시 비밀번호 암호화 및 주소 등록")
     void createUser_Success() {
-        UserRequestDto.Create request = createCreateRequest();
+        CreateUserRequest request = createCreateRequest();
         String encodedPassword = "encodedPassword2";
         User savedUser = createTestUser(UUID.randomUUID(), request.getUsername(), encodedPassword);
 
         given(passwordEncoder.encode(request.getPassword())).willReturn(encodedPassword);
         given(userRepository.save(any(User.class))).willReturn(savedUser);
 
-        UserResponseDto.Detail result = userService.createUser(request);
+        UserDetailResponse result = userService.createUser(request);
 
         assertThat(result.getUserId()).isNotNull();
         assertThat(result.getUsername()).isEqualTo(request.getUsername());
@@ -65,7 +66,7 @@ class UserServiceTest {
     @Test
     @DisplayName("실패 - 이미 존재하는 아이디로 가입 시도 시 예외 발생")
     void createUser_Failed() {
-        UserRequestDto.Create request = createCreateRequest();
+        CreateUserRequest request = createCreateRequest();
         given(userRepository.save(any(User.class)))
                 .willThrow(
                         new DataIntegrityViolationException(
@@ -83,7 +84,7 @@ class UserServiceTest {
         given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
                 .willReturn(Optional.of(user));
 
-        UserResponseDto.Detail result = userService.getUser(userId);
+        UserDetailResponse result = userService.getUser(userId);
 
         assertThat(result.getUserId()).isEqualTo(userId);
         assertThat(result.getUsername()).isEqualTo("tester");
@@ -107,7 +108,7 @@ class UserServiceTest {
     void updateUser_Success() {
         UUID userId = UUID.randomUUID();
         User user = createTestUser(userId, "tester", "oldPassword123");
-        UserRequestDto.Update updateRequest = createUpdateRequest("newPassword123");
+        UpdateUserRequest updateRequest = createUpdateRequest("newPassword123");
         String newEncodedPassword = "newEncodedPassword";
 
         given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
@@ -149,8 +150,8 @@ class UserServiceTest {
                 .isInstanceOf(BusinessException.class);
     }
 
-    private UserRequestDto.Create createCreateRequest() {
-        return UserRequestDto.Create.builder()
+    private CreateUserRequest createCreateRequest() {
+        return CreateUserRequest.builder()
                 .username("tester")
                 .phone("010-1234-5678")
                 .email("tester@example.com")
@@ -179,8 +180,8 @@ class UserServiceTest {
         return user;
     }
 
-    private UserRequestDto.Update createUpdateRequest(String newPassword) {
-        return UserRequestDto.Update.builder()
+    private UpdateUserRequest createUpdateRequest(String newPassword) {
+        return UpdateUserRequest.builder()
                 .password(newPassword)
                 .phone("010-1111-1111")
                 .email("tester01@example.com")

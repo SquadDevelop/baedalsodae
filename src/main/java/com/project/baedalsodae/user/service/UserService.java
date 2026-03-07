@@ -1,16 +1,18 @@
 package com.project.baedalsodae.user.service;
 
-import com.project.baedalsodae.user.dto.request.UserRequestDto;
-import com.project.baedalsodae.user.dto.response.UserResponseDto;
+import com.project.baedalsodae.user.dto.request.CreateUserRequest;
+import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
+import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import java.util.UUID;
 
 public interface UserService {
 
-    UserResponseDto.Detail createUser(UserRequestDto.Create createRequest);
+    UserDetailResponse createUser(CreateUserRequest createRequest);
 
-    UserResponseDto.Detail getUser(UUID userId);
+    UserDetailResponse getUser(UUID userId);
 
-    UserResponseDto.Detail updateUser(UUID userId, UserRequestDto.Update updateRequest);
+    UserDetailResponse updateUser(UUID userId, UpdateUserRequest updateRequest);
 
-    UserResponseDto.Delete deleteUser(UUID userId);
+    UserDeleteResponse deleteUser(UUID userId);
 }
