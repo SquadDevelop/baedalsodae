@@ -264,4 +264,42 @@ class StoreHoursServiceImplTest {
             verify(storeHoursRepository).saveAll(argThat(list -> ((List<?>) list).size() == 7));
         }
     }
+
+    @Nested
+    @DisplayName("영업시간 삭제")
+    class DeleteStoreHours {
+
+        @Test
+        @DisplayName("실패: 가게가 존재하지 않으면 예외가 발생한다")
+        void deleteStoreHours_fail_storeNotFound() {
+            given(storeRepository.findByIdAndIsDeletedIsFalse(storeId))
+                    .willReturn(Optional.empty());
+
+            assertThatThrownBy(
+                            () -> storeHoursService.deleteStoreHours(storeId, managerUserDetails))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
+        void deleteStoreHours_fail_forbidden() {
+            Store store = createMockStoreWithRepository(storeRepository, storeId);
+            given(store.getUserId()).willReturn(UUID.randomUUID());
+
+            assertThatThrownBy(() -> storeHoursService.deleteStoreHours(storeId, ownerUserDetails))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue(ERROR_CODE_FIELD, ErrorCode.STORE_FORBIDDEN);
+        }
+
+        @Test
+        @DisplayName("성공: 가게의 모든 영업시간을 삭제한다")
+        void deleteStoreHours_success() {
+            createMockStoreWithRepository(storeRepository, storeId);
+
+            storeHoursService.deleteStoreHours(storeId, managerUserDetails);
+
+            verify(storeHoursRepository).deleteAllByStoreId(storeId);
+        }
+    }
 }
