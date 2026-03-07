@@ -1,12 +1,11 @@
 package com.project.baedalsodae.global.common.dto;
 
+import static com.project.baedalsodae.global.common.util.TimeUtils.toLocalDateTime;
+
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
-
-import static com.project.baedalsodae.global.common.util.TimeUtils.toLocalDateTime;
 
 @Getter
 public class AuditInfoResponse {
