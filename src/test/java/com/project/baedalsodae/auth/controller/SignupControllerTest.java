@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.dto.request.SignupRequest;
 import com.project.baedalsodae.auth.security.JwtProvider;
+import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
@@ -42,6 +43,8 @@ public class SignupControllerTest {
     @MockitoBean private JwtProvider jwtProvider;
 
     @MockitoBean private UserDetailsService userDetailsService;
+
+    @MockitoBean private TokenRedisUtil tokenRedisUtil;
 
     private final String BASE_URL = "/auth";
 
