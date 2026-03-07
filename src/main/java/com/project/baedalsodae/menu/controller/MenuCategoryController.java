@@ -34,7 +34,7 @@ public class MenuCategoryController {
             @Valid @RequestBody MenuCategoryPutRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         MenuCategoryResponseDto response =
-                menuCategoryService.updateMenuCategory(menuCategoryId, request);
+                menuCategoryService.updateMenuCategory(menuCategoryId, request, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_UPDATED, response));
     }
 
@@ -45,17 +45,17 @@ public class MenuCategoryController {
             @Valid @RequestBody MenuCategoryPatchRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         MenuCategoryResponseDto response =
-                menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request);
+                menuCategoryService.updateMenuCategoryOrder(menuCategoryId, request, userDetails);
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessCode.MENU_CATEGORY_ORDER_UPDATED, response));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @DeleteMapping("/{menuCategoryId}")
-        menuCategoryService.deleteMenuCategory(menuCategoryId);
     public ResponseEntity<ApiResponse<Void>> deleteMenuCategory(
             @PathVariable UUID menuCategoryId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        menuCategoryService.deleteMenuCategory(menuCategoryId, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_DELETED, null));
     }
 
@@ -63,6 +63,8 @@ public class MenuCategoryController {
     public ResponseEntity<ApiResponse<List<MenuItemResponseDto>>> getMenuItem(
             @PathVariable UUID menuCategoryId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<MenuItemResponseDto> response =
+                menuItemService.getMenuItem(menuCategoryId, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_LIST_FOUND, response));
     }
 
@@ -72,6 +74,8 @@ public class MenuCategoryController {
             @PathVariable UUID menuCategoryId,
             @Valid @RequestBody MenuItemPostRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        MenuItemResponseDto response =
+                menuItemService.createMenuItem(menuCategoryId, request, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_CREATED, response));
     }
 }
