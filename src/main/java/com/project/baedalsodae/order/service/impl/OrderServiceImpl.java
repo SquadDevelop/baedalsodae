@@ -394,7 +394,8 @@ public class OrderServiceImpl implements OrderService {
             UUID userId,
             UserRole userRole,
             UUID storeId,
-            UUID orderId
+            UUID orderId,
+            String reason
     ) {
 
         Order order = orderRepository
@@ -411,21 +412,17 @@ public class OrderServiceImpl implements OrderService {
 
         if (userRole == UserRole.CUSTOMER) {
             return cancelRequestByCustomer(userId, order);
-        }
-
-        if (userRole == UserRole.OWNER) {
-            return cancelRequestByOwner(userId, storeId, order);
+        } else if(userRole == UserRole.OWNER) {
+            return cancelRequestByOwner(userId, storeId, order, reason);
         }
 
         throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
     }
 
     private OrderActionStatusResponse cancelRequestByCustomer(UUID userId, Order order) {
-
         if (!order.getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
         }
-
         if (!order.canCancelRequestByCustomer()) {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
@@ -436,11 +433,12 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
+        orderEventPublisher.publishOrderCancelRequested(order);
+
         return OrderActionStatusResponse.from(order);
     }
 
-    private OrderActionStatusResponse cancelRequestByOwner(UUID userId, UUID storeId, Order order) {
-
+    private OrderActionStatusResponse cancelRequestByOwner(UUID userId, UUID storeId, Order order, String reason) {
         if (!order.getStoreId().equals(storeId)) {
             throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
         }
@@ -453,7 +451,9 @@ public class OrderServiceImpl implements OrderService {
 
         order.cancelRequested();
 
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, reason);
+
+        orderEventPublisher.publishOrderCancelRequested(order);
 
         return OrderActionStatusResponse.from(order);
     }

@@ -1762,7 +1762,7 @@ public class OrderServiceTest {
 
         // when & then
         assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId)
+                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
         ).isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
     }
@@ -1782,7 +1782,7 @@ public class OrderServiceTest {
 
         // when & then
         assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId)
+                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
         ).isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_FORBIDDEN.getMessage());
     }
@@ -1803,7 +1803,7 @@ public class OrderServiceTest {
 
         // when & then
         assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.OWNER, storeId, orderId)
+                orderService.cancelRequestOrder(userId, UserRole.OWNER, storeId, orderId, null)
         ).isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
     }
@@ -1825,7 +1825,7 @@ public class OrderServiceTest {
 
         // when & then
         assertThatThrownBy(() ->
-                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId)
+                orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null)
         ).isInstanceOf(BusinessException.class)
                 .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
     }
@@ -1848,7 +1848,7 @@ public class OrderServiceTest {
         given(order.canCancelRequestByCustomer()).willReturn(true);
 
         // when
-        orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId);
+        orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null);
 
         // then
         verify(order).cancelRequested();
@@ -1872,7 +1872,7 @@ public class OrderServiceTest {
         given(order.canCancelRequestByCustomer()).willReturn(true);
 
         // when
-        orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId);
+        orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null);
 
         // then
         verify(order).cancelRequested();
@@ -1895,7 +1895,7 @@ public class OrderServiceTest {
         given(order.getStatus()).willReturn(OrderStatus.ACCEPTED);
 
         // when
-        orderService.cancelRequestOrder(userId, UserRole.OWNER, storeId, orderId);
+        orderService.cancelRequestOrder(userId, UserRole.OWNER, storeId, orderId, null);
 
         // then
         verify(order).cancelRequested();
