@@ -102,6 +102,14 @@ public class Order extends BaseAuditEntity {
         this.status = OrderStatus.COOKED;
     }
 
+    public boolean canStartDelivery() {
+        return this.status == OrderStatus.COOKED;
+    }
+
+    public void startDelivery() {
+        this.status = OrderStatus.DELIVERING;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,
