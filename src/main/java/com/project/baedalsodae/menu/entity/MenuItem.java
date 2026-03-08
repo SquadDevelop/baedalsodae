@@ -7,6 +7,7 @@ import com.project.baedalsodae.menu.common.Orderable;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
 import com.project.baedalsodae.tag.entity.TagMapping;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,8 +41,8 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
     @Column(name = "order_no")
     private Integer orderNo;
 
-    @Column(name = "price", nullable = false)
-    private int price;
+    @Column(name = "price", nullable = false, precision = 15, scale = 2)
+    private BigDecimal price;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -60,7 +61,7 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
     public static MenuItem createMenuItem(
             String name,
             String description,
-            int price,
+            BigDecimal price,
             boolean popular,
             int orderNo,
             MenuStatus menuStatus,
@@ -79,7 +80,7 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
     public void changeMenuInfo(
             String name,
             String description,
-            int price,
+            BigDecimal price,
             MenuStatus menuStatus,
             MenuCategory menuCategory,
             boolean popular) {
@@ -99,7 +100,7 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
         this.description = description;
     }
 
-    public void changePrice(Integer price) {
+    public void changePrice(BigDecimal price) {
         this.price = price;
     }
 

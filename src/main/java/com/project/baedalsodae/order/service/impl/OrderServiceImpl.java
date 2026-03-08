@@ -25,6 +25,7 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -64,14 +65,16 @@ public class OrderServiceImpl implements OrderService {
                         .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-        int totalAmount = cart.getTotalAmount();
-        if (totalAmount <= 0) throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
+        BigDecimal totalAmount = cart.getTotalAmount();
+        if (totalAmount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
 
         // 할인 쿠폰 도메인, 배달 도메인이 없음
-        final int deliveryFee = 0;
-        final int discountAmount = 0;
-        final int finalAmount = totalAmount - discountAmount + deliveryFee;
-        if (finalAmount < 0) throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
+        final BigDecimal deliveryFee = BigDecimal.ZERO;
+        final BigDecimal discountAmount = BigDecimal.ZERO;
+        final BigDecimal finalAmount = totalAmount.subtract(discountAmount).add(deliveryFee);
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+            throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
 
         // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
         String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";

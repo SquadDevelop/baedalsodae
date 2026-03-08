@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.then;
 import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.listener.PaymentEventListener;
 import com.project.baedalsodae.payment.service.PaymentService;
+import java.math.BigDecimal;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class PaymentListenerTest {
         // given
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        int finalAmount = 18000;
+        BigDecimal finalAmount = BigDecimal.valueOf(18000);
         OrderCreatedEvent event = new OrderCreatedEvent(orderId, userId, finalAmount);
 
         // when
@@ -42,7 +43,7 @@ class PaymentListenerTest {
         // given
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        int finalAmount = 32000;
+        BigDecimal finalAmount = BigDecimal.valueOf(32000);
         OrderCreatedEvent event = new OrderCreatedEvent(orderId, userId, finalAmount);
 
         // when

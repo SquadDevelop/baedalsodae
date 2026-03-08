@@ -33,6 +33,7 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
@@ -212,7 +213,7 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(cart.getTotalAmount()).willReturn(0);
+        given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
         // when
         Throwable throwable = catchThrowable(() -> orderService.createOrder(userId, request));
@@ -258,12 +259,12 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(cart.getTotalAmount()).willReturn(18000);
+        given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -317,18 +318,18 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(cart.getTotalAmount()).willReturn(26000);
+        given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
 
         given(cartItem2.getMenuItem()).willReturn(menuItem2);
         given(menuItem2.getId()).willReturn(menuItemId2);
         given(menuItem2.getName()).willReturn("짜장면");
-        given(menuItem2.getPrice()).willReturn(8000);
+        given(menuItem2.getPrice()).willReturn(BigDecimal.valueOf(8000));
         given(cartItem2.getQuantity()).willReturn(1);
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -351,7 +352,10 @@ public class OrderServiceTest {
                         argThat(
                                 order ->
                                         order.getItems().size() == 2
-                                                && order.getTotalAmount() == 26000));
+                                                && order.getTotalAmount()
+                                                                .compareTo(
+                                                                        BigDecimal.valueOf(26000))
+                                                        == 0));
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));

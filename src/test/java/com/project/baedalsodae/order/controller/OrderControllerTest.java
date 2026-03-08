@@ -17,6 +17,7 @@ import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.review.service.ReviewService;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -127,7 +128,7 @@ class OrderControllerTest {
                         .orderNo("ORD-001")
                         .status(OrderStatus.CREATED)
                         .storeNameSnapshot("테스트 가게")
-                        .finalAmount(20000)
+                        .finalAmount(BigDecimal.valueOf(20000))
                         .createdAt(LocalDateTime.now())
                         .createdAtCursor(Instant.now())
                         .build();
@@ -185,7 +186,7 @@ class OrderControllerTest {
                         .orderNo("ORD-002")
                         .status(OrderStatus.CREATED)
                         .storeNameSnapshot("사장 가게")
-                        .finalAmount(15000)
+                        .finalAmount(BigDecimal.valueOf(15000))
                         .createdAt(LocalDateTime.now())
                         .createdAtCursor(Instant.now())
                         .build();

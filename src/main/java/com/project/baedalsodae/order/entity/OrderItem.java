@@ -3,6 +3,7 @@ package com.project.baedalsodae.order.entity;
 import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,14 +33,18 @@ public class OrderItem extends BaseTimeEntity {
     @Column(name = "name_snapshot")
     private String nameSnapshot;
 
-    @Column(name = "price_snapshot")
-    private int priceSnapshot;
+    @Column(name = "price_snapshot", precision = 15, scale = 2)
+    private BigDecimal priceSnapshot;
 
     @Column(name = "quantity")
     private int quantity;
 
     private OrderItem(
-            Order order, UUID menuItemId, String nameSnapshot, int priceSnapshot, int quantity) {
+            Order order,
+            UUID menuItemId,
+            String nameSnapshot,
+            BigDecimal priceSnapshot,
+            int quantity) {
         this.order = order;
         this.menuItemId = menuItemId;
         this.nameSnapshot = nameSnapshot;

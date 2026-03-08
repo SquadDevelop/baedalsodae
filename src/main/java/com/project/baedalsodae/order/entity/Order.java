@@ -4,6 +4,7 @@ import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -55,17 +56,17 @@ public class Order extends BaseAuditEntity {
     @Column(name = "delivery_address_snapshot", columnDefinition = "TEXT")
     private String deliveryAddressSnapshot;
 
-    @Column(name = "total_amount")
-    private int totalAmount;
+    @Column(name = "total_amount", precision = 15, scale = 2)
+    private BigDecimal totalAmount;
 
-    @Column(name = "delivery_fee")
-    private int deliveryFee;
+    @Column(name = "delivery_fee", precision = 15, scale = 2)
+    private BigDecimal deliveryFee;
 
-    @Column(name = "discount_amount")
-    private int discountAmount;
+    @Column(name = "discount_amount", precision = 15, scale = 2)
+    private BigDecimal discountAmount;
 
-    @Column(name = "final_amount")
-    private int finalAmount;
+    @Column(name = "final_amount", precision = 15, scale = 2)
+    private BigDecimal finalAmount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
@@ -149,10 +150,10 @@ public class Order extends BaseAuditEntity {
             String orderNo,
             String storeRequestNote,
             String deliveryRequestNote,
-            int totalAmount,
-            int deliveryFee,
-            int discountAmount,
-            int finalAmount,
+            BigDecimal totalAmount,
+            BigDecimal deliveryFee,
+            BigDecimal discountAmount,
+            BigDecimal finalAmount,
             OrderStatus status) {
         this.userId = userId;
         this.userNicknameSnapshot = userNicknameSnapshot;
@@ -181,10 +182,10 @@ public class Order extends BaseAuditEntity {
             String orderNo,
             String storeRequestNote,
             String deliveryRequestNote,
-            int totalAmount,
-            int deliveryFee,
-            int discountAmount,
-            int finalAmount) {
+            BigDecimal totalAmount,
+            BigDecimal deliveryFee,
+            BigDecimal discountAmount,
+            BigDecimal finalAmount) {
         return new Order(
                 userId,
                 userNicknameSnapshot,

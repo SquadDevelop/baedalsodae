@@ -3,6 +3,7 @@ package com.project.baedalsodae.menu.dto.responseDto.item;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryResponseDto;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ public record MenuItemResponseDto(
         UUID id,
         String name,
         String description,
-        int price,
+        BigDecimal price,
         int orderNo,
         boolean isPopular,
         MenuStatus menuStatus,
