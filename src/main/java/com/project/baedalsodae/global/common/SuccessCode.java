@@ -40,6 +40,13 @@ public enum SuccessCode {
     STORE_DETAIL_FOUND("ST205", HttpStatus.OK, "가게 상세 조회 성공"),
     STORE_FOUND_FOR_OWNER("ST206", HttpStatus.OK, "가게 조회 성공"),
 
+    // store-hours
+    STORE_HOURS_FOUND("SH200", HttpStatus.OK, "영업시간 조회 성공"),
+    STORE_HOURS_CREATED("SH201", HttpStatus.CREATED, "영업시간 등록 성공"),
+    STORE_HOURS_UPDATED("SH202", HttpStatus.OK, "영업시간 수정 성공"),
+    STORE_HOURS_DELETED("SH203", HttpStatus.OK, "영업시간 삭제 성공"),
+    STORE_HOURS_NOT_SET("SH204", HttpStatus.OK, "설정된 영업시간이 없습니다."),
+
     // user+auth
     USER_FOUND("UR200", HttpStatus.OK, "회원 정보 조회 성공"),
     USER_CREATED("UR201", HttpStatus.CREATED, "회원가입 성공"),

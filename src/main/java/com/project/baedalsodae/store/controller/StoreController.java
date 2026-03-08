@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -92,6 +93,7 @@ public class StoreController {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DELETED, null));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PostMapping("/{storeId}/menu-categories")
     public ResponseEntity<ApiResponse<MenuCategoryResponseDto>> createMenuCategory(
             @PathVariable UUID storeId, @RequestBody @Valid MenuCategoryPostRequestDto request) {
