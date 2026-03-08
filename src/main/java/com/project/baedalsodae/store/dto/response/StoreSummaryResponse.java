@@ -1,7 +1,11 @@
 package com.project.baedalsodae.store.dto.response;
 
 import com.project.baedalsodae.store.entity.Store;
+
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,5 +26,9 @@ public class StoreSummaryResponse {
                 .avgRating(store.getAvgRating())
                 .storeStatus(store.getStoreStatus().name())
                 .build();
+    }
+
+    public static List<StoreSummaryResponse> fromList(List<Store> stores) {
+        return stores.stream().map(StoreSummaryResponse::fromEntity).collect(Collectors.toList());
     }
 }
