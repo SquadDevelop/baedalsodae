@@ -106,7 +106,11 @@ public class AdminUserControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserDetailResponse> mockPage = new PageImpl<>(List.of(), pageable, 0);
 
-        given(userService.getUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class)))
+        given(
+                        userService.getUsers(
+                                eq(UserRole.MANAGER),
+                                any(UserSearchRequest.class),
+                                any(Pageable.class)))
                 .willReturn(mockPage);
 
         // when & then

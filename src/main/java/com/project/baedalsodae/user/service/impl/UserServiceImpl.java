@@ -13,7 +13,6 @@ import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import com.project.baedalsodae.user.service.UserService;
-
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -104,15 +103,18 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDetailResponse> getUsers(UserRole role, UserSearchRequest request, Pageable pageable) {
+    public Page<UserDetailResponse> getUsers(
+            UserRole role, UserSearchRequest request, Pageable pageable) {
         int pageSize = pageable.getPageSize();
         if (!ALLOWED_PAGE_SIZE.contains(pageSize)) {
             pageSize = 10;
         }
 
-        Pageable validatedPageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+        Pageable validatedPageable =
+                PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
 
-        return userRepository.searchUsers(role, request, validatedPageable)
+        return userRepository
+                .searchUsers(role, request, validatedPageable)
                 .map(UserDetailResponse::from);
     }
 
