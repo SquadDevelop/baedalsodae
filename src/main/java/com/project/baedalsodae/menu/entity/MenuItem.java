@@ -1,5 +1,7 @@
 package com.project.baedalsodae.menu.entity;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.menu.common.Orderable;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
@@ -111,6 +113,11 @@ public class MenuItem extends BaseAuditEntity implements Orderable {
 
     public void changeMenuCategory(MenuCategory category) {
         this.menuCategory = category;
+    }
+
+    public int getValidOrderNo() {
+        if (orderNo == null) throw new BusinessException(ErrorCode.INVALID_MENU_ITEM_ORDER);
+        return orderNo;
     }
 
     @Override

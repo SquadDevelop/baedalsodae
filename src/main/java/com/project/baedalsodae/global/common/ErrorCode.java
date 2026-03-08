@@ -56,12 +56,14 @@ public enum ErrorCode {
     MENU_CATEGORY_ORDER_CONFLICT("MC004", HttpStatus.CONFLICT, "메뉴 카테고리 순서가 충돌했습니다. 다시 시도해주세요."),
     MENU_CATEGORY_HAS_ITEMS(
             "MC005", HttpStatus.BAD_REQUEST, "메뉴 카테고리에 메뉴 아이템이 존재합니다. 먼저 메뉴 아이템을 삭제해주세요."),
+    MENU_CATEGORY_FORBIDDEN("MC006", HttpStatus.FORBIDDEN, "해당 메뉴 카테고리에 대한 권한이 없습니다."),
 
     // menuItem
     MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 없습니다"),
     INVALID_MENU_ITEM_ORDER("MI002", HttpStatus.BAD_REQUEST, "메뉴 순서가 유효하지 않습니다"),
     DUPLICATE_MENU_ITEM_NAME("MI003", HttpStatus.CONFLICT, "같은 카테고리에 같은 이름의 메뉴 아이템이 존재합니다"),
     MENU_ITEM_ORDER_CONFLICT("MI004", HttpStatus.CONFLICT, "메뉴 아이템 순서가 충돌했습니다. 다시 시도해주세요."),
+    MENU_ITEM_FORBIDDEN("MI005", HttpStatus.FORBIDDEN, "해당 메뉴 아이템에 대한 권한이 없습니다."),
 
     // cart
     CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND, "장바구니가 없습니다."),

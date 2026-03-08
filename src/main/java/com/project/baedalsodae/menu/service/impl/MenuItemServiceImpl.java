@@ -1,8 +1,10 @@
 package com.project.baedalsodae.menu.service.impl;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.common.OrderUtil;
+import com.project.baedalsodae.menu.common.StoreOwnershipValidator;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
@@ -13,9 +15,8 @@ import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.tag.service.TagMappingService;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import com.project.baedalsodae.user.entity.UserRole;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,11 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Transactional
     @Override
-    public MenuItemResponseDto createMenuItem(UUID menuCategoryId, MenuItemPostRequestDto request) {
+    public MenuItemResponseDto createMenuItem(
+            UUID menuCategoryId, MenuItemPostRequestDto request, UserDetailsImpl userDetails) {
         MenuCategory category = getMenuCategoryByMenuCategoryId(menuCategoryId);
+        StoreOwnershipValidator.verifyStoreOwnership(
+                category.getStore(), userDetails, ErrorCode.MENU_ITEM_FORBIDDEN);
         UUID storeId = category.getStore().getId();
         if (existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
             throw new BusinessException(ErrorCode.DUPLICATE_MENU_ITEM_NAME);
@@ -58,11 +62,14 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Transactional
     @Override
-    public MenuItemResponseDto updateMenuItem(UUID menuItemId, MenuItemPutRequestDto request) {
+    public MenuItemResponseDto updateMenuItem(
+            UUID menuItemId, MenuItemPutRequestDto request, UserDetailsImpl userDetails) {
         MenuItem item =
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+        StoreOwnershipValidator.verifyStoreOwnership(
+                item.getMenuCategory().getStore(), userDetails, ErrorCode.MENU_ITEM_FORBIDDEN);
         MenuCategory category = getMenuCategoryByMenuCategoryId(request.categoryId());
 
         UUID storeId = category.getStore().getId();
@@ -84,11 +91,14 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Transactional
     @Override
-    public MenuItemResponseDto patchMenuItem(UUID menuItemId, MenuItemPatchRequestDto request) {
+    public MenuItemResponseDto patchMenuItem(
+            UUID menuItemId, MenuItemPatchRequestDto request, UserDetailsImpl userDetails) {
         MenuItem item =
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+        StoreOwnershipValidator.verifyStoreOwnership(
+                item.getMenuCategory().getStore(), userDetails, ErrorCode.MENU_ITEM_FORBIDDEN);
         UUID currentCategoryId = item.getMenuCategory().getId();
         MenuCategory category = getMenuCategoryByMenuCategoryId(currentCategoryId);
         UUID storeId = category.getStore().getId();
@@ -116,18 +126,20 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Transactional
     @Override
-    public void deleteMenuItem(UUID menuItemId) {
+    public void deleteMenuItem(UUID menuItemId, UserDetailsImpl userDetails) {
         MenuItem item =
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
+        StoreOwnershipValidator.verifyStoreOwnership(
+                item.getMenuCategory().getStore(), userDetails, ErrorCode.MENU_ITEM_FORBIDDEN);
         UUID menuCategoryId = item.getMenuCategory().getId();
 
         List<MenuItem> menuItems =
                 menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalseWithLock(
                         menuCategoryId);
         OrderUtil.deleteAndShift(menuItems, item);
-        item.softDelete(null); // 토큰 기능 추가 시 수정 필요
+        item.softDelete(userDetails.getUserId());
     }
 
     @Override
@@ -137,15 +149,15 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Transactional
     @Override
-    public MenuItemResponseDto updateMenuItemOrder(UUID menuItemId, Integer order) {
+    public MenuItemResponseDto updateMenuItemOrder(
+            UUID menuItemId, Integer order, UserDetailsImpl userDetails) {
         MenuItem item =
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MENU_ITEM_NOT_FOUND));
-        Integer from = item.getOrderNo();
-        if (from == null) {
-            throw new BusinessException(ErrorCode.INVALID_MENU_ITEM_ORDER);
-        }
+        StoreOwnershipValidator.verifyStoreOwnership(
+                item.getMenuCategory().getStore(), userDetails, ErrorCode.MENU_ITEM_FORBIDDEN);
+        int from = item.getValidOrderNo();
         int to = order;
 
         if (from == to) {
@@ -164,11 +176,31 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId) {
-        List<MenuItem> menuItems =
+    public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId, UserDetailsImpl userDetails) {
+        List<MenuItem> allItems =
                 menuItemRepository.findAllByMenuCategoryIdAndIsDeletedIsFalse(menuCategoryId);
 
-        return menuItems.stream().map(MenuItemResponseDto::fromEntity).toList();
+        List<MenuItem> items = new ArrayList<>();
+        List<UUID> itemIds = new ArrayList<>();
+        for (MenuItem item : allItems) {
+            if (isVisibleTo(item, userDetails)) {
+                items.add(item);
+                itemIds.add(item.getId());
+            }
+        }
+        if (items.isEmpty()) return List.of();
+        Map<UUID, List<String>> tagMap = tagMappingService.getTagNamesByMenuItemIds(itemIds);
+        List<MenuItemResponseDto> responseDto = new ArrayList<>();
+        for (MenuItem item : items) {
+            List<String> tagNames = tagMap.getOrDefault(item.getId(), List.of());
+            responseDto.add(MenuItemResponseDto.fromEntity(item, tagNames));
+        }
+        return responseDto;
+    }
+
+    private boolean isVisibleTo(MenuItem item, UserDetailsImpl userDetails) {
+        if (item.getMenuStatus().isPubliclyVisible()) return true;
+        return userDetails != null && userDetails.getUserRole() != UserRole.CUSTOMER;
     }
 
     private boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name) {
