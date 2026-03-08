@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
-    Optional<Payment> findByOrder(UUID order);
+    Optional<Payment> findByOrderId(UUID order);
 
     @Query(
             """

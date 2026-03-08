@@ -1100,7 +1100,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.empty());
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
@@ -1122,7 +1122,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.PENDING);
 
@@ -1147,7 +1147,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
 
@@ -1175,7 +1175,7 @@ public class OrderServiceTest {
         given(order.getUserId()).willReturn(userId);
         given(order.getStatus()).willReturn(OrderStatus.CREATED);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
 
