@@ -13,7 +13,7 @@ import com.project.baedalsodae.menu.repository.custom.MenuCategoryCustomReposito
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
 import com.project.baedalsodae.store.dto.response.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.StoreResponse;
+import com.project.baedalsodae.store.dto.response.OwnerStoreResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.SortType;
@@ -24,6 +24,8 @@ import com.project.baedalsodae.store.service.impl.StoreQueryServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.project.baedalsodae.user.entity.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -108,10 +110,10 @@ class StoreQueryServiceTest {
         void getStoreForOwner_success() {
             // given
             given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
-            String role = "OWNER";
+            UserRole role = UserRole.OWNER;
 
             // when
-            StoreResponse response = storeQueryService.getStoreForOwner(storeId, userId, role);
+            OwnerStoreResponse response = storeQueryService.getOwnerStore(storeId, userId, role);
 
             // then
             assertThat(response).isNotNull();
@@ -124,13 +126,13 @@ class StoreQueryServiceTest {
             // given
             given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
             UUID otherUserId = UUID.randomUUID();
-            String role = "OWNER";
+            UserRole role = UserRole.OWNER;
 
             // when & then
             BusinessException exception =
                     assertThrows(
                             BusinessException.class,
-                            () -> storeQueryService.getStoreForOwner(storeId, otherUserId, role));
+                            () -> storeQueryService.getOwnerStore(storeId, otherUserId, role));
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.STORE_FORBIDDEN);
         }
 
@@ -139,13 +141,13 @@ class StoreQueryServiceTest {
         void getStoreForOwner_fail_forbiddenRole() {
             // given
             given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
-            String role = "ADMIN";
+            UserRole role = UserRole.MANAGER;
 
             // when & then
             BusinessException exception =
                     assertThrows(
                             BusinessException.class,
-                            () -> storeQueryService.getStoreForOwner(storeId, userId, role));
+                            () -> storeQueryService.getOwnerStore(storeId, userId, role));
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.STORE_FORBIDDEN);
         }
     }
@@ -171,12 +173,12 @@ class StoreQueryServiceTest {
 
             // when
             StorePageResponse response =
-                    storeQueryService.getStorePage(storeCategoryId, cursorRequest, sortType);
+                    storeQueryService.getStorePage(storeCategoryId, cursorRequest);
 
             // then
             assertThat(response).isNotNull();
             assertThat(response.getStoreCategoryId()).isEqualTo(storeCategoryId);
-            verify(cursorRequest).normalize(sortType);
+            verify(cursorRequest).initCursor(sortType);
             verify(storeCustomRepository)
                     .findStoresByCursor(eq(storeCategoryId), any(), eq(sortType));
         }
