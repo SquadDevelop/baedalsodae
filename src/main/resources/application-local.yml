@@ -12,7 +12,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        default_schema: baedalsodae
+        default_schema: ${POSTGRES_DEFAULT_SCHEMA}
         format_sql: true
         jdbc.time_zone: Asia/Seoul
   sql:
@@ -42,4 +42,4 @@ logging:
     org.apache.catalina: DEBUG
 
 server:
-  port: 18082
+  port: ${API_SERVER_PORT}

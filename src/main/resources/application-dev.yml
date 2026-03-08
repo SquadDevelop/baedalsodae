@@ -12,7 +12,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        default_schema: baedalsodae
+        default_schema: ${POSTGRES_DEFAULT_SCHEMA}
         format_sql: true
         jdbc.time_zone: Asia/Seoul
   sql:
