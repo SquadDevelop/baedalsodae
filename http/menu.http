@@ -1,0 +1,104 @@
+### ===== 메뉴 카테고리 =====
+
+### 메뉴 카테고리 생성
+POST http://localhost:18082/api/v1/stores/{{storeId}}/menu-categories
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+{
+  "name": "추천 메뉴"
+}
+
+### 메뉴 카테고리 목록 조회
+GET http://localhost:18082/api/v1/stores/{{storeId}}/menu-categories
+
+### 메뉴 카테고리 이름 중복 확인
+GET http://localhost:18082/api/v1/stores/{{storeId}}/menu-categories/duplicate-check?name=추천 메뉴
+
+### 메뉴 카테고리 수정
+PUT http://localhost:18082/api/v1/menu-categories/{{menuCategoryId}}
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+{
+  "name": "인기 메뉴"
+}
+
+### 메뉴 카테고리 순서 변경
+PATCH http://localhost:18082/api/v1/menu-categories/{{menuCategoryId}}/orders
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+{
+  "orderNo": 2
+}
+
+### 메뉴 카테고리 삭제
+DELETE http://localhost:18082/api/v1/menu-categories/{{menuCategoryId}}
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+
+
+### ===== 메뉴 아이템 =====
+
+### 메뉴 아이템 생성
+POST http://localhost:18082/api/v1/menu-categories/{{menuCategoryId}}/menu-items
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+{
+  "name": "후라이드 치킨",
+  "description": "바삭한 후라이드 치킨입니다",
+  "price": 18000,
+  "isPopular": true,
+  "menuStatus": "AVAILABLE",
+  "tagNames": ["치킨", "바삭"]
+}
+
+### 메뉴 아이템 목록 조회
+GET http://localhost:18082/api/v1/menu-categories/{{menuCategoryId}}/menu-items
+X-User-Id: {{userId}}
+
+### 메뉴 아이템 이름 중복 확인
+GET http://localhost:18082/api/v1/stores/{{storeId}}/menu-items/duplicate-check?name=후라이드 치킨
+
+### 메뉴 아이템 전체 수정 (PUT)
+PUT http://localhost:18082/api/v1/menu-items/{{menuItemId}}
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+{
+  "name": "양념 치킨",
+  "description": "매콤달콤 양념 치킨입니다",
+  "price": 19000,
+  "isPopular": false,
+  "categoryId": "{{menuCategoryId}}",
+  "menuStatus": "AVAILABLE",
+  "tagNames": ["치킨", "양념"]
+}
+
+### 메뉴 아이템 부분 수정 (PATCH)
+PATCH http://localhost:18082/api/v1/menu-items/{{menuItemId}}
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+{
+  "price": 20000,
+  "menuStatus": "SOLD_OUT"
+}
+
+### 메뉴 아이템 순서 변경
+PATCH http://localhost:18082/api/v1/menu-items/{{menuItemId}}/orders?order=3
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+
+### 메뉴 아이템 삭제
+DELETE http://localhost:18082/api/v1/menu-items/{{menuItemId}}
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
