@@ -13,6 +13,8 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -34,6 +36,11 @@ public class AuthConfig {
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
     private final TokenRedisUtil tokenRedisUtil;
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix().role("MASTER").implies("MANAGER").build();
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -64,10 +71,10 @@ public class AuthConfig {
                                 .permitAll()
                                 .requestMatchers("/users/me")
                                 .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                                .requestMatchers("/admins/**")
+                                .hasAuthority("ROLE_MANAGER")
                                 .anyRequest()
-                                .permitAll()
-                //                                .anyRequest().authenticated()
-                );
+                                .permitAll());
 
         http.exceptionHandling(
                 exceptionHandling ->
