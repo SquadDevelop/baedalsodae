@@ -32,3 +32,8 @@ encryption:
 pg:
   url: http://localhost:8089
 
+logging:
+  level:
+    org.springframework.boot.diagnostics: DEBUG
+    org.springframework.boot.web.embedded.tomcat: DEBUG
+    org.apache.catalina: DEBUG

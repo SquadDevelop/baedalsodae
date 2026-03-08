@@ -6,7 +6,7 @@ spring:
     password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     defer-datasource-initialization: false
     show-sql: true
     open-in-view: false
@@ -18,7 +18,22 @@ spring:
   sql:
     init:
       mode: never
+  data:
+    redis:
+      url: ${REDIS_URL}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+JWT_SECRET: test-secret-key
+JWT_EXPIRATION: 100000
 
 encryption:
   aes:
     key: ${ENCRYPTION_AES_KEY}
+
+logging:
+  level:
+    org.springframework.boot.diagnostics: ERROR
+    org.springframework.boot.web.embedded.tomcat: ERROR
+    org.apache.catalina: ERROR
