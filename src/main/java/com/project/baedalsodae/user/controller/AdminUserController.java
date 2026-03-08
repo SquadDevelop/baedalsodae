@@ -4,7 +4,9 @@ import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
+import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
 import com.project.baedalsodae.user.dto.response.AdminUserDetailResponse;
+import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.service.UserService;
@@ -58,12 +60,30 @@ public class AdminUserController {
         return ApiResponse.success(SuccessCode.USER_FOUND, AdminUserDetailResponse.from(response));
     }
 
-    @GetMapping("/me")
+    @GetMapping("/managers/me")
     @PreAuthorize("hasAuthority('ROLE_MANAGER')")
     public ApiResponse<AdminUserDetailResponse> getAdminDetail(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         UserDetailResponse response = userService.getUser(userDetails.getUserId());
 
         return ApiResponse.success(SuccessCode.USER_FOUND, AdminUserDetailResponse.from(response));
+    }
+
+    @PutMapping("/managers/{managerId}")
+    @PreAuthorize("hasAuthority('ROLE_MASTER')")
+    public ApiResponse<AdminUserDetailResponse> updateManager(
+            @PathVariable("managerId") UUID userId,
+            @RequestBody @Valid UpdateUserRequest updateRequest) {
+        UserDetailResponse response = userService.updateUser(userId, updateRequest);
+
+        return ApiResponse.success(
+                SuccessCode.USER_UPDATED, AdminUserDetailResponse.from(response));
+    }
+
+    @DeleteMapping("/managers/{managerId}")
+    @PreAuthorize("hasAuthority('ROLE_MASTER')")
+    public ApiResponse<UserDeleteResponse> deleteManager(@PathVariable("managerId") UUID userId) {
+        UserDeleteResponse response = userService.deleteUser(userId);
+        return ApiResponse.success(SuccessCode.USER_DELETED, response);
     }
 }
