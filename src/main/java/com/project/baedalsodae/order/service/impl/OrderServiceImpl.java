@@ -25,12 +25,13 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -384,5 +385,10 @@ public class OrderServiceImpl implements OrderService {
         orderEventPublisher.publishOrderDelivered(order);
 
         return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    public Order findById(final UUID orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
     }
 }
