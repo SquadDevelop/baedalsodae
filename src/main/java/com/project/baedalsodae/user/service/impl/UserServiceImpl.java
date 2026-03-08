@@ -8,11 +8,15 @@ import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
 import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
+import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import com.project.baedalsodae.user.service.UserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +95,23 @@ public class UserServiceImpl implements UserService {
         user.softDelete(userId);
 
         return UserDeleteResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<UserDetailResponse> getUsers(UserRole role, String username, Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        if (pageSize != 10 && pageSize != 30 && pageSize != 50) {
+            pageSize = 10;
+        }
+
+        Pageable validatedPageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+
+        Page<User> usersPage = (username != null && !username.isBlank())
+                ? userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(role, username, validatedPageable)
+                : userRepository.findAllByRoleAndIsDeletedFalse(role, validatedPageable);
+
+        return usersPage.map(UserDetailResponse::from);
     }
 
     private User findByUserId(UUID userId) {
