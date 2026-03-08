@@ -14,7 +14,8 @@ public class StorePageResponse {
     private String storeCategoryName;
 
     private boolean hasNext;
-    private int pageSize;
+    private int storeCount;
+    private UUID lastCursorId;
     private List<StoreSummaryResponse> stores;
 
     public static StorePageResponse of(UUID categoryId, String categoryName, Slice<Store> slice) {
@@ -22,8 +23,17 @@ public class StorePageResponse {
                 .storeCategoryId(categoryId)
                 .storeCategoryName(categoryName)
                 .hasNext(slice.hasNext())
-                .pageSize(slice.getSize())
-                .stores(slice.getContent().stream().map(StoreSummaryResponse::fromEntity).toList())
+                .storeCount(slice.getNumberOfElements())
+                .lastCursorId(getLastCursorId(slice))
+                .stores(StoreSummaryResponse.fromList(slice.getContent()))
                 .build();
+    }
+
+    private static UUID getLastCursorId(Slice<Store> slice) {
+        List<Store> content = slice.getContent();
+
+        if (content.isEmpty()) return null;
+
+        return content.get(content.size() - 1).getId();
     }
 }
