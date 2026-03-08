@@ -75,7 +75,52 @@ X-User-Id: {{userId}}
 X-User-Role: OWNER
 
 ### 주문 거절
-POST http://localhost:18082/api/v1/orders/{{orderId}}/reject?storeId={{storeId}}
+POST http://localhost:18082/api/v1/orders/{{orderId}}/reject?storeId={{storeId}}&reason=재료소진
 Content-Type: application/json
 X-User-Id: {{userId}}
 X-User-Role: OWNER
+
+### 조리 완료
+POST http://localhost:18082/api/v1/orders/{{orderId}}/cooked?storeId={{storeId}}
+Content-Type: application/json
+X-User-Id: {{userId}}
+X-User-Role: OWNER
+
+### 배달 시작
+POST http://localhost:18082/api/v1/orders/{{orderId}}/delivering?storeId={{storeId}}
+Content-Type: application/json
+X-User-Id: {{userId}}
+X-User-Role: OWNER
+
+### 배달 완료
+POST http://localhost:18082/api/v1/orders/{{orderId}}/delivered?storeId={{storeId}}
+Content-Type: application/json
+X-User-Id: {{userId}}
+X-User-Role: OWNER
+
+### 주문 취소 대기 (CUSTOMER)
+POST http://localhost:18082/api/v1/orders/{{orderId}}/cancel-request?reason=단순변심
+Content-Type: application/json
+X-User-Id: {{userId}}
+X-User-Role: CUSTOMER
+
+### 주문 취소 대기 (OWNER)
+POST http://localhost:18082/api/v1/orders/{{orderId}}/cancel-request?storeId={{storeId}}&reason=재료소진
+Content-Type: application/json
+X-User-Id: {{userId}}
+X-User-Role: OWNER
+
+### 주문 취소
+POST http://localhost:18082/api/v1/orders/{{orderId}}/cancel
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+### 리뷰 생성
+POST http://localhost:18082/api/v1/orders/{{orderId}}/reviews
+Content-Type: application/json
+X-User-Id: {{userId}}
+
+{
+  "rating": 5,
+  "content": "맛있어요!"
+}

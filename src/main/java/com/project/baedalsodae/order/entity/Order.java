@@ -118,6 +118,26 @@ public class Order extends BaseAuditEntity {
         this.status = OrderStatus.DELIVERED;
     }
 
+    public boolean canCancelRequestByCustomer() {
+        return this.status == OrderStatus.REQUESTED || this.status == OrderStatus.ACCEPTED;
+    }
+
+    public boolean canCancelRequestByOwner() {
+        return this.status == OrderStatus.ACCEPTED;
+    }
+
+    public void cancelRequested() {
+        this.status = OrderStatus.CANCEL_REQUESTED;
+    }
+
+    public boolean canCompleteCancel() {
+        return this.status == OrderStatus.CANCEL_REQUESTED;
+    }
+
+    public void cancel() {
+        this.status = OrderStatus.CANCELED;
+    }
+
     private Order(
             UUID userId,
             String userNicknameSnapshot,

@@ -32,4 +32,9 @@ public interface OrderService {
 
     OrderActionStatusResponse completeDeliveryOrder(
             UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    OrderActionStatusResponse cancelRequestOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
+
+    OrderActionStatusResponse completeCancelOrder(UUID userId, UUID orderId);
 }
