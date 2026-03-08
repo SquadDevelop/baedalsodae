@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
-@Service
 public interface ReviewService {
     TimeCursorPage<List<ReviewResponse>> getReviewsByUser(UUID userId, Instant cursor, int size);
 
