@@ -56,7 +56,7 @@ public class AdminUserControllerTest {
 
     @MockitoBean private TokenRedisUtil tokenRedisUtil;
 
-    private final String BASE_URL = "/admin";
+    private final String BASE_URL = "/admins";
 
     @Test
     @DisplayName("성공 - MASTER 권한으로 관리자 계정 생성 시도")
