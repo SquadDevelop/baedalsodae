@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: false
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: ${POSTGRES_DEFAULT_SCHEMA}
+        format_sql: true
+        jdbc.time_zone: Asia/Seoul
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      url: ${REDIS_URL}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+JWT_SECRET: ${JWT_SECRET}
+JWT_EXPIRATION: ${JWT_EXPIRATION}
+JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+
+encryption:
+  aes:
+    key: ${ENCRYPTION_AES_KEY}
+
+logging:
+  level:
+    org.springframework.boot.diagnostics: ERROR
+    org.springframework.boot.web.embedded.tomcat: ERROR
+    org.apache.catalina: ERROR
