@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to HAProxy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HAPROXY_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            if [ ! -d "baedalsodae" ]; then
+              git clone https://github.com/SquadDevelop/baedalsodae.git
+            fi
+
+            cd baedalsodae
+            git pull origin prod
+
+            docker stop api-server-1 || true
+            docker stop api-server-2 || true
+            docker rm api-server-1 || true
+            docker rm api-server-2 || true
+
+            docker build -t baedalsodae .
+
+            docker run -d \
+              --name api-server-1 \
+              -p 8081:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e API_SERVER_PORT=${{ secrets.API_SERVER_PORT }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e POSTGRES_DB_URL=${{ secrets.POSTGRES_DB_URL }} \
+              -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
+              -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+              baedalsodae
+
+            docker run -d \
+              --name api-server-2 \
+              -p 8082:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e API_SERVER_PORT=${{ secrets.API_SERVER_PORT }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e POSTGRES_DB_URL=${{ secrets.POSTGRES_DB_URL }} \
+              -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+              -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
+              -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+              baedalsodae
+
+            docker ps
