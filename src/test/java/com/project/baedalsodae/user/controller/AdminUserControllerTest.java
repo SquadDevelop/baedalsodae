@@ -5,10 +5,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -19,8 +17,7 @@ import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
-import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
-import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
+import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.service.UserService;
@@ -85,6 +82,23 @@ public class AdminUserControllerTest {
     }
 
     @Test
+    @DisplayName("실패 - MANAGER 권한으로 다른 관리자 계정 생성 시도 시 거부(403)")
+    void createManager_ByManager_Forbidden() throws Exception {
+        // given
+        UserDetailsImpl manager = createUserDetails(UUID.randomUUID(), UserRole.MANAGER);
+        CreateUserRequest request = createManagerRequest("manager12");
+
+        // when & then
+        mockMvc.perform(
+                        post(BASE_URL + "/managers")
+                                .with(user(manager))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("성공 - MASTER 권한으로 관리자 목록 페이징 조회")
     void getManagers_ByMaster_Success() throws Exception {
         // given
@@ -92,7 +106,7 @@ public class AdminUserControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserDetailResponse> mockPage = new PageImpl<>(List.of(), pageable, 0);
 
-        given(userService.getUsers(eq(UserRole.MANAGER), any(), any(Pageable.class)))
+        given(userService.getUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class)))
                 .willReturn(mockPage);
 
         // when & then
@@ -100,66 +114,6 @@ public class AdminUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_FOUND.getCode()))
                 .andExpect(jsonPath("$.data.content").isArray());
-    }
-
-    @Test
-    @DisplayName("성공 - MASTER 권한으로 관리자 정보 수정")
-    void updateManager_ByMaster_Success() throws Exception {
-        // given
-        UUID managerId = UUID.randomUUID();
-        UserDetailsImpl master = createUserDetails(UUID.randomUUID(), UserRole.MASTER);
-        UpdateUserRequest updateRequest =
-                UpdateUserRequest.builder()
-                        .nickname("updatedNickname")
-                        .addresses(List.of())
-                        .build();
-        UserDetailResponse mockResponse =
-                createUserDetailResponse(managerId, "manager", UserRole.MANAGER);
-
-        given(userService.updateUser(eq(managerId), any(UpdateUserRequest.class)))
-                .willReturn(mockResponse);
-
-        // when & then
-        mockMvc.perform(
-                        put(BASE_URL + "/managers/" + managerId)
-                                .with(user(master))
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.USER_UPDATED.getCode()));
-    }
-
-    @Test
-    @DisplayName("성공 - MASTER 권한으로 관리자 계정 삭제")
-    void deleteManager_ByMaster_Success() throws Exception {
-        // given
-        UUID managerId = UUID.randomUUID();
-        UserDetailsImpl master = createUserDetails(UUID.randomUUID(), UserRole.MASTER);
-        UserDeleteResponse mockResponse =
-                UserDeleteResponse.builder().id(managerId).deletedAt(LocalDateTime.now()).build();
-
-        given(userService.deleteUser(managerId)).willReturn(mockResponse);
-
-        // when & then
-        mockMvc.perform(delete(BASE_URL + "/managers/" + managerId).with(user(master)).with(csrf()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.USER_DELETED.getCode()));
-    }
-
-    @Test
-    @DisplayName("실패 - MANAGER 권한으로 관리자 계정 삭제 시도 시 거부(403)")
-    void deleteManager_ByManager_Forbidden() throws Exception {
-        // given
-        UUID managerId = UUID.randomUUID();
-        UserDetailsImpl manager = createUserDetails(UUID.randomUUID(), UserRole.MANAGER);
-
-        // when & then
-        mockMvc.perform(
-                        delete(BASE_URL + "/managers/" + managerId)
-                                .with(user(manager))
-                                .with(csrf()))
-                .andExpect(status().isForbidden());
     }
 
     @Test

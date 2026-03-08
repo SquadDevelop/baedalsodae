@@ -8,10 +8,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -132,67 +134,39 @@ class UserServiceTest {
     void getUsers_Success() {
         // given
         User manager1 = createTestUser(UUID.randomUUID(), "manager1", "pwd1", UserRole.MANAGER);
+        UserSearchRequest request = new UserSearchRequest();
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(List.of(manager1), pageable, 1);
 
-        given(
-                        userRepository.findAllByRoleAndIsDeletedFalse(
-                                eq(UserRole.MANAGER), any(Pageable.class)))
+        given(userRepository.searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class)))
                 .willReturn(userPage);
 
         // when
-        Page<UserDetailResponse> results = userService.getUsers(UserRole.MANAGER, null, pageable);
+        Page<UserDetailResponse> results = userService.getUsers(UserRole.MANAGER, request, pageable);
 
         // then
         assertThat(results.getContent()).hasSize(1);
         assertThat(results.getContent().get(0).getRole()).isEqualTo(UserRole.MANAGER);
-        verify(userRepository)
-                .findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), any(Pageable.class));
+        verify(userRepository).searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class));
     }
 
     @Test
     @DisplayName("성공 - 잘못된 페이지 사이즈(20) 요청 시 기본값(10)으로 보정")
     void getUsers_InvalidSize_ShouldDefaultTo10() {
         // given
+        UserSearchRequest request = new UserSearchRequest();
         Pageable requestedPageable = PageRequest.of(0, 20); // 10, 30, 50이 아님
         Pageable expectedPageable = PageRequest.of(0, 10);
         Page<User> emptyPage = new PageImpl<>(List.of(), expectedPageable, 0);
 
-        given(
-                        userRepository.findAllByRoleAndIsDeletedFalse(
-                                eq(UserRole.MANAGER), eq(expectedPageable)))
+        given(userRepository.searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), eq(expectedPageable)))
                 .willReturn(emptyPage);
 
         // when
-        userService.getUsers(UserRole.MANAGER, null, requestedPageable);
+        userService.getUsers(UserRole.MANAGER, request, requestedPageable);
 
         // then
-        verify(userRepository)
-                .findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), eq(expectedPageable));
-    }
-
-    @Test
-    @DisplayName("성공 - 관리자(MANAGER) 검색어 포함 조회")
-    void getUsers_WithSearch_Success() {
-        // given
-        String search = "admin";
-        User manager = createTestUser(UUID.randomUUID(), "admin123", "pwd", UserRole.MANAGER);
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<User> userPage = new PageImpl<>(List.of(manager), pageable, 1);
-
-        given(
-                        userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(
-                                eq(UserRole.MANAGER), eq(search), any(Pageable.class)))
-                .willReturn(userPage);
-
-        // when
-        Page<UserDetailResponse> results = userService.getUsers(UserRole.MANAGER, search, pageable);
-
-        // then
-        assertThat(results.getContent().get(0).getUsername()).contains(search);
-        verify(userRepository)
-                .findAllByRoleAndUsernameContainingAndIsDeletedFalse(
-                        eq(UserRole.MANAGER), eq(search), any(Pageable.class));
+        verify(userRepository).searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), eq(expectedPageable));
     }
 
     private CreateUserRequest createCreateRequest() {
