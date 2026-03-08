@@ -41,8 +41,6 @@ public class AuthConfig {
     public RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.withDefaultRolePrefix()
                 .role("MASTER").implies("MANAGER")
-                .role("MANAGER").implies("CUSTOMER")
-                .role("MANAGER").implies("OWNER")
                 .build();
     }
 
