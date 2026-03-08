@@ -14,6 +14,8 @@ import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.SuccessCode;
+
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -53,7 +55,7 @@ class CartControllerTest {
                         UUID.randomUUID(),
                         1,
                         1,
-                        18000,
+                        BigDecimal.valueOf(18000),
                         List.of(),
                         Instant.now(),
                         Instant.now());
@@ -86,7 +88,7 @@ class CartControllerTest {
                 new AddCartItemRequest(UUID.randomUUID(), UUID.randomUUID(), 1);
         CartResponse response =
                 new CartResponse(
-                        cartId, storeId, 1, 1, 18000, List.of(), Instant.now(), Instant.now());
+                        cartId, storeId, 1, 1, BigDecimal.valueOf(18000), List.of(), Instant.now(), Instant.now());
         given(cartService.addCartItem(userId, request)).willReturn(response);
 
         mockMvc.perform(

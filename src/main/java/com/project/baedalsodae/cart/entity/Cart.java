@@ -3,6 +3,7 @@ package com.project.baedalsodae.cart.entity;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.store.entity.Store;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,8 +47,10 @@ public class Cart extends BaseTimeEntity {
         return items.stream().mapToInt(CartItem::getQuantity).sum();
     }
 
-    public int getTotalAmount() {
-        return items.stream().mapToInt(CartItem::getLineAmount).sum();
+    public BigDecimal getTotalAmount() {
+        return items.stream()
+                .map(CartItem::getLineAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void addItem(CartItem item) {

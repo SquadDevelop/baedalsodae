@@ -3,6 +3,7 @@ package com.project.baedalsodae.cart.entity;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,8 +43,8 @@ public class CartItem extends BaseTimeEntity {
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    public int getLineAmount() {
-        return menuItem.getPrice() * quantity;
+    public BigDecimal getLineAmount() {
+        return menuItem.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 
     public boolean isSameMenuItem(UUID menuItemId) {

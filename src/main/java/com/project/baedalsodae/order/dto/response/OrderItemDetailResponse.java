@@ -1,6 +1,7 @@
 package com.project.baedalsodae.order.dto.response;
 
 import com.project.baedalsodae.order.entity.OrderItem;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,13 +16,13 @@ public class OrderItemDetailResponse {
     private UUID menuItemId;
 
     private String menuItemName;
-    private int menuItemPrice;
+    private BigDecimal menuItemPrice;
     private int quantity;
 
-    private int lineAmount;
+    private BigDecimal lineAmount;
 
     public static OrderItemDetailResponse from(OrderItem orderItem) {
-        int unitPrice = orderItem.getPriceSnapshot();
+        BigDecimal unitPrice = orderItem.getPriceSnapshot();
         int quantity = orderItem.getQuantity();
 
         return OrderItemDetailResponse.builder()
@@ -30,7 +31,7 @@ public class OrderItemDetailResponse {
                 .menuItemName(orderItem.getNameSnapshot())
                 .menuItemPrice(unitPrice)
                 .quantity(quantity)
-                .lineAmount(unitPrice * quantity)
+                .lineAmount(unitPrice.multiply(BigDecimal.valueOf(quantity)))
                 .build();
     }
 }

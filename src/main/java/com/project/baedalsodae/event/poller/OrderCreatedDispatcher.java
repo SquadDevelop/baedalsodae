@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventType;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,7 +29,7 @@ public class OrderCreatedDispatcher implements EventDispatcher {
         JsonNode node = objectMapper.readTree(event.getPayload());
         UUID orderId = UUID.fromString(node.get("orderId").asText());
         UUID userId = UUID.fromString(node.get("userId").asText());
-        int finalAmount = node.get("finalAmount").asInt();
+        BigDecimal finalAmount = node.get("finalAmount").decimalValue();
 
         eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
     }

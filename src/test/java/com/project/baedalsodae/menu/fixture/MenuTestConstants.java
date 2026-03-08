@@ -2,6 +2,7 @@ package com.project.baedalsodae.menu.fixture;
 
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public final class MenuTestConstants {
@@ -45,10 +46,10 @@ public final class MenuTestConstants {
     // MENU ITEM
     public static final String DEFAULT_MENU_ITEM_NAME = "후라이드치킨";
     public static final String DEFAULT_ITEM_DESCRIPTION = "바삭한 후라이드";
-    public static final int DEFAULT_ITEM_PRICE = 18000;
+    public static final BigDecimal DEFAULT_ITEM_PRICE = BigDecimal.valueOf(18000);
     public static final String ALTERNATIVE_MENU_ITEM_NAME = "양념치킨";
     public static final String ALTERNATIVE_ITEM_DESCRIPTION = "달콤한 양념";
-    public static final int ALTERNATIVE_ITEM_PRICE = 19000;
+    public static final BigDecimal ALTERNATIVE_ITEM_PRICE = BigDecimal.valueOf(19000);
 
     // MENU CATEGORY
     public static final String DEFAULT_CATEGORY_NAME = "치킨류";

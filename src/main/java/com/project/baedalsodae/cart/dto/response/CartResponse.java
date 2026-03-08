@@ -1,6 +1,7 @@
 package com.project.baedalsodae.cart.dto.response;
 
 import com.project.baedalsodae.cart.entity.Cart;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public record CartResponse(
         UUID storeId,
         int totalItemCount,
         int totalQuantity,
-        int totalAmount,
+        BigDecimal totalAmount,
         List<CartItemResponse> items,
         Instant createdAt,
         Instant updatedAt) {
@@ -31,6 +32,6 @@ public record CartResponse(
     }
 
     public static CartResponse empty() {
-        return new CartResponse(null, null, 0, 0, 0, new ArrayList<>(), null, null);
+        return new CartResponse(null, null, 0, 0, BigDecimal.ZERO, new ArrayList<>(), null, null);
     }
 }

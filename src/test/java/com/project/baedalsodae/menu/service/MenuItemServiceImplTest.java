@@ -27,6 +27,7 @@ import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.impl.MenuItemServiceImpl;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.tag.service.TagMappingService;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -341,7 +342,7 @@ class MenuItemServiceImplTest {
                     aPutRequest()
                             .withName(DEFAULT_MENU_ITEM_NAME)
                             .withDescription("새로운 설명")
-                            .withPrice(20000)
+                            .withPrice(BigDecimal.valueOf(20000))
                             .withIsPopular(false)
                             .withCategoryId(newCategoryId)
                             .withMenuStatus(MenuStatus.SOLD_OUT)

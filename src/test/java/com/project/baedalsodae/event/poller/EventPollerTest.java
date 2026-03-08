@@ -13,6 +13,7 @@ import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +60,7 @@ class EventPollerTest {
         // given
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        int finalAmount = 18000;
+        BigDecimal finalAmount = BigDecimal.valueOf(18000);
 
         String payload =
                 objectMapper.writeValueAsString(

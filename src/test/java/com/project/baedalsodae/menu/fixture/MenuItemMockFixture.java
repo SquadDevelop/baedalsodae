@@ -10,6 +10,7 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.store.entity.Store;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class MenuItemMockFixture {
             UUID id,
             String name,
             String description,
-            int price,
+            BigDecimal price,
             int orderNo,
             boolean isPopular,
             MenuStatus menuStatus,

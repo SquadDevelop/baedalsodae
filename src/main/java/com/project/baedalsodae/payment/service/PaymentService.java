@@ -2,6 +2,7 @@ package com.project.baedalsodae.payment.service;
 
 import com.project.baedalsodae.global.common.TimeCursorPage;
 import com.project.baedalsodae.payment.dto.response.PaymentResponse;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -12,5 +13,5 @@ public interface PaymentService {
 
     PaymentResponse getPayment(UUID paymentId);
 
-    void processPayment(UUID orderId, UUID userId, int finalAmount);
+    void processPayment(UUID orderId, UUID userId, BigDecimal finalAmount);
 }
