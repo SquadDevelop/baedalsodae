@@ -352,7 +352,10 @@ public class OrderServiceTest {
                         argThat(
                                 order ->
                                         order.getItems().size() == 2
-                                                && order.getTotalAmount().compareTo(BigDecimal.valueOf(26000)) == 0));
+                                                && order.getTotalAmount()
+                                                                .compareTo(
+                                                                        BigDecimal.valueOf(26000))
+                                                        == 0));
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));

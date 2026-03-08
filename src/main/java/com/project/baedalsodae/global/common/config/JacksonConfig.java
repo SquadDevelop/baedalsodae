@@ -11,10 +11,9 @@ public class JacksonConfig {
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
-        return builder -> builder
-                .featuresToEnable(
+        return builder ->
+                builder.featuresToEnable(
                         DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS,
-                        JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN
-                );
+                        JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN);
     }
 }

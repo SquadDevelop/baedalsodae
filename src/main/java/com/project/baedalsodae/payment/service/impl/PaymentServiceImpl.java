@@ -65,7 +65,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public void processPayment(final UUID orderId, final UUID userId, final BigDecimal finalAmount) {
+    public void processPayment(
+            final UUID orderId, final UUID userId, final BigDecimal finalAmount) {
 
         // 이미 결제가 생성된 주문 정보인지 확인
         if (paymentRepository.existsByOrderId(orderId)) {
@@ -92,11 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         // pg에 결제 요청
         PGPaymentRequest pgPaymentRequest =
-                new PGPaymentRequest(
-                        orderId,
-                        userId,
-                        PaymentMethod.CREDIT_CARD,
-                        finalAmount);
+                new PGPaymentRequest(orderId, userId, PaymentMethod.CREDIT_CARD, finalAmount);
         PGPaymentResponse response = pgClient.pay(pgPaymentRequest);
 
         // 결제 결과 따라서 payment update

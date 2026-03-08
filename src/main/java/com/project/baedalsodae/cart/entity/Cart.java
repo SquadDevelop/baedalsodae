@@ -48,9 +48,7 @@ public class Cart extends BaseTimeEntity {
     }
 
     public BigDecimal getTotalAmount() {
-        return items.stream()
-                .map(CartItem::getLineAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return items.stream().map(CartItem::getLineAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void addItem(CartItem item) {

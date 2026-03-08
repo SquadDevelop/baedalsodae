@@ -16,7 +16,8 @@ public class OrderEventHandler {
     private final EventRepository eventRepository;
     private final ObjectMapper objectMapper;
 
-    public void handleOrderCreated(OrderCreatedEvent orderCreatedEvent) throws JsonProcessingException {
+    public void handleOrderCreated(OrderCreatedEvent orderCreatedEvent)
+            throws JsonProcessingException {
         Event orderEvent =
                 Event.create(
                         AggregateType.ORDER,

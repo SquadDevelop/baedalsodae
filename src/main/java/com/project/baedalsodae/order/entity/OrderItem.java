@@ -40,7 +40,11 @@ public class OrderItem extends BaseTimeEntity {
     private int quantity;
 
     private OrderItem(
-            Order order, UUID menuItemId, String nameSnapshot, BigDecimal priceSnapshot, int quantity) {
+            Order order,
+            UUID menuItemId,
+            String nameSnapshot,
+            BigDecimal priceSnapshot,
+            int quantity) {
         this.order = order;
         this.menuItemId = menuItemId;
         this.nameSnapshot = nameSnapshot;
