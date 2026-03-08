@@ -39,9 +39,7 @@ public class AuthConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.withDefaultRolePrefix()
-                .role("MASTER").implies("MANAGER")
-                .build();
+        return RoleHierarchyImpl.withDefaultRolePrefix().role("MASTER").implies("MANAGER").build();
     }
 
     @Bean
@@ -73,10 +71,10 @@ public class AuthConfig {
                                 .permitAll()
                                 .requestMatchers("/users/me")
                                 .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
-                                .requestMatchers("/admin/**").hasAnyAuthority("ROLE_MANAGER")
+                                .requestMatchers("/admin/**")
+                                .hasAnyAuthority("ROLE_MANAGER")
                                 .anyRequest()
-                                .permitAll()
-                );
+                                .permitAll());
 
         http.exceptionHandling(
                 exceptionHandling ->

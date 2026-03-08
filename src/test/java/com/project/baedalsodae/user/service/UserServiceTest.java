@@ -135,7 +135,9 @@ class UserServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(List.of(manager1), pageable, 1);
 
-        given(userRepository.findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), any(Pageable.class)))
+        given(
+                        userRepository.findAllByRoleAndIsDeletedFalse(
+                                eq(UserRole.MANAGER), any(Pageable.class)))
                 .willReturn(userPage);
 
         // when
@@ -144,7 +146,8 @@ class UserServiceTest {
         // then
         assertThat(results.getContent()).hasSize(1);
         assertThat(results.getContent().get(0).getRole()).isEqualTo(UserRole.MANAGER);
-        verify(userRepository).findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), any(Pageable.class));
+        verify(userRepository)
+                .findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), any(Pageable.class));
     }
 
     @Test
@@ -155,14 +158,17 @@ class UserServiceTest {
         Pageable expectedPageable = PageRequest.of(0, 10);
         Page<User> emptyPage = new PageImpl<>(List.of(), expectedPageable, 0);
 
-        given(userRepository.findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), eq(expectedPageable)))
+        given(
+                        userRepository.findAllByRoleAndIsDeletedFalse(
+                                eq(UserRole.MANAGER), eq(expectedPageable)))
                 .willReturn(emptyPage);
 
         // when
         userService.getUsers(UserRole.MANAGER, null, requestedPageable);
 
         // then
-        verify(userRepository).findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), eq(expectedPageable));
+        verify(userRepository)
+                .findAllByRoleAndIsDeletedFalse(eq(UserRole.MANAGER), eq(expectedPageable));
     }
 
     @Test
@@ -174,7 +180,9 @@ class UserServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(List.of(manager), pageable, 1);
 
-        given(userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(eq(UserRole.MANAGER), eq(search), any(Pageable.class)))
+        given(
+                        userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(
+                                eq(UserRole.MANAGER), eq(search), any(Pageable.class)))
                 .willReturn(userPage);
 
         // when
@@ -182,7 +190,9 @@ class UserServiceTest {
 
         // then
         assertThat(results.getContent().get(0).getUsername()).contains(search);
-        verify(userRepository).findAllByRoleAndUsernameContainingAndIsDeletedFalse(eq(UserRole.MANAGER), eq(search), any(Pageable.class));
+        verify(userRepository)
+                .findAllByRoleAndUsernameContainingAndIsDeletedFalse(
+                        eq(UserRole.MANAGER), eq(search), any(Pageable.class));
     }
 
     private CreateUserRequest createCreateRequest() {

@@ -105,11 +105,14 @@ public class UserServiceImpl implements UserService {
             pageSize = 10;
         }
 
-        Pageable validatedPageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+        Pageable validatedPageable =
+                PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
 
-        Page<User> usersPage = (username != null && !username.isBlank())
-                ? userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(role, username, validatedPageable)
-                : userRepository.findAllByRoleAndIsDeletedFalse(role, validatedPageable);
+        Page<User> usersPage =
+                (username != null && !username.isBlank())
+                        ? userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(
+                                role, username, validatedPageable)
+                        : userRepository.findAllByRoleAndIsDeletedFalse(role, validatedPageable);
 
         return usersPage.map(UserDetailResponse::from);
     }

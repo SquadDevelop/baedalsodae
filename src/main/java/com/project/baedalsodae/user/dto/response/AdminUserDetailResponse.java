@@ -32,9 +32,10 @@ public class AdminUserDetailResponse {
     private UUID updatedBy;
 
     public static AdminUserDetailResponse from(UserDetailResponse detailResponse) {
-        UserAddressResponse singleAddress = (detailResponse.getAddresses() != null && !detailResponse.getAddresses().isEmpty())
-                ? detailResponse.getAddresses().get(0)
-                : null;
+        UserAddressResponse singleAddress =
+                (detailResponse.getAddresses() != null && !detailResponse.getAddresses().isEmpty())
+                        ? detailResponse.getAddresses().get(0)
+                        : null;
 
         return AdminUserDetailResponse.builder()
                 .userId(detailResponse.getUserId())

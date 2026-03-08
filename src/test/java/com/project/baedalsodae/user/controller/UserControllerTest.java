@@ -62,13 +62,13 @@ public class UserControllerTest {
         // given
         UUID userId = UUID.randomUUID();
         UserDetailsImpl customer = createUserDetails(userId, UserRole.CUSTOMER);
-        UserDetailResponse mockResponse = createUserDetailResponse(userId, "customer", UserRole.CUSTOMER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(userId, "customer", UserRole.CUSTOMER);
 
         given(userService.getUser(userId)).willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/me")
-                        .with(user(customer)))
+        mockMvc.perform(get(BASE_URL + "/me").with(user(customer)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_FOUND.getCode()));
     }
@@ -80,16 +80,19 @@ public class UserControllerTest {
         UUID userId = UUID.randomUUID();
         UserDetailsImpl customer = createUserDetails(userId, UserRole.CUSTOMER);
         UpdateUserRequest updateRequest = createUpdateUserRequest();
-        UserDetailResponse mockResponse = createUserDetailResponse(userId, "customer", UserRole.CUSTOMER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(userId, "customer", UserRole.CUSTOMER);
 
-        given(userService.updateUser(eq(userId), any(UpdateUserRequest.class))).willReturn(mockResponse);
+        given(userService.updateUser(eq(userId), any(UpdateUserRequest.class)))
+                .willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(put(BASE_URL + "/me")
-                        .with(user(customer))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
+        mockMvc.perform(
+                        put(BASE_URL + "/me")
+                                .with(user(customer))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_UPDATED.getCode()));
     }
@@ -105,9 +108,7 @@ public class UserControllerTest {
         given(userService.deleteUser(userId)).willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(delete(BASE_URL + "/me")
-                        .with(user(customer))
-                        .with(csrf()))
+        mockMvc.perform(delete(BASE_URL + "/me").with(user(customer)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_DELETED.getCode()));
     }
@@ -117,7 +118,8 @@ public class UserControllerTest {
         return UserDetailsImpl.from(userId, "testUser", "password", role, false);
     }
 
-    private UserDetailResponse createUserDetailResponse(UUID userId, String username, UserRole role) {
+    private UserDetailResponse createUserDetailResponse(
+            UUID userId, String username, UserRole role) {
         return UserDetailResponse.builder()
                 .userId(userId)
                 .username(username)
@@ -137,9 +139,6 @@ public class UserControllerTest {
     }
 
     private UserDeleteResponse createUserDeleteResponse(UUID userId) {
-        return UserDeleteResponse.builder()
-                .id(userId)
-                .deletedAt(LocalDateTime.now())
-                .build();
+        return UserDeleteResponse.builder().id(userId).deletedAt(LocalDateTime.now()).build();
     }
 }

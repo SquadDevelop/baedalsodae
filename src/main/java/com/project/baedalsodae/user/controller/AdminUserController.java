@@ -31,16 +31,19 @@ public class AdminUserController {
     public ApiResponse<AdminUserDetailResponse> createManager(
             @RequestBody @Valid CreateUserRequest createRequest) {
         UserDetailResponse response = userService.createUser(createRequest);
-        return ApiResponse.success(SuccessCode.USER_CREATED, AdminUserDetailResponse.from(response));
+        return ApiResponse.success(
+                SuccessCode.USER_CREATED, AdminUserDetailResponse.from(response));
     }
 
     @GetMapping("/managers")
     @PreAuthorize("hasAuthority('ROLE_MASTER')")
     public ApiResponse<Page<AdminUserDetailResponse>> getManagers(
             @RequestParam(name = "username", required = false) String username,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        
-        Page<UserDetailResponse> managers = userService.getUsers(UserRole.MANAGER, username, pageable);
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                    Pageable pageable) {
+
+        Page<UserDetailResponse> managers =
+                userService.getUsers(UserRole.MANAGER, username, pageable);
         Page<AdminUserDetailResponse> response = managers.map(AdminUserDetailResponse::from);
 
         return ApiResponse.success(SuccessCode.USER_FOUND, response);
@@ -48,7 +51,8 @@ public class AdminUserController {
 
     @GetMapping("/managers/{managerId}")
     @PreAuthorize("hasAuthority('ROLE_MASTER')")
-    public ApiResponse<AdminUserDetailResponse> getManagerDetail(@PathVariable("managerId") UUID userId) {
+    public ApiResponse<AdminUserDetailResponse> getManagerDetail(
+            @PathVariable("managerId") UUID userId) {
         UserDetailResponse response = userService.getUser(userId);
 
         return ApiResponse.success(SuccessCode.USER_FOUND, AdminUserDetailResponse.from(response));

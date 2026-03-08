@@ -2,14 +2,13 @@ package com.project.baedalsodae.user.repository;
 
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.Optional;
-import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
@@ -25,5 +24,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Page<User> findAllByRoleAndIsDeletedFalse(UserRole role, Pageable pageable);
 
     // 검색 조건을 위한 메서드 추가 (예: username 검색)
-    Page<User> findAllByRoleAndUsernameContainingAndIsDeletedFalse(UserRole role, String username, Pageable pageable);
+    Page<User> findAllByRoleAndUsernameContainingAndIsDeletedFalse(
+            UserRole role, String username, Pageable pageable);
 }

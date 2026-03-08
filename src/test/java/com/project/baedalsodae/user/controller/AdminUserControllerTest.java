@@ -64,16 +64,18 @@ public class AdminUserControllerTest {
         // given
         UserDetailsImpl master = createUserDetails(UUID.randomUUID(), UserRole.MASTER);
         CreateUserRequest request = createManagerRequest("manager12");
-        UserDetailResponse mockResponse = createUserDetailResponse(UUID.randomUUID(), "manager12", UserRole.MANAGER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(UUID.randomUUID(), "manager12", UserRole.MANAGER);
 
         given(userService.createUser(any())).willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(post(BASE_URL + "/managers")
-                        .with(user(master))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        post(BASE_URL + "/managers")
+                                .with(user(master))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_CREATED.getCode()));
     }
@@ -86,11 +88,12 @@ public class AdminUserControllerTest {
         CreateUserRequest request = createManagerRequest("manager12");
 
         // when & then
-        mockMvc.perform(post(BASE_URL + "/managers")
-                        .with(user(manager))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        post(BASE_URL + "/managers")
+                                .with(user(manager))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 
@@ -102,11 +105,11 @@ public class AdminUserControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserDetailResponse> mockPage = new PageImpl<>(List.of(), pageable, 0);
 
-        given(userService.getUsers(eq(UserRole.MANAGER), any(), any(Pageable.class))).willReturn(mockPage);
+        given(userService.getUsers(eq(UserRole.MANAGER), any(), any(Pageable.class)))
+                .willReturn(mockPage);
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/managers")
-                        .with(user(master)))
+        mockMvc.perform(get(BASE_URL + "/managers").with(user(master)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_FOUND.getCode()))
                 .andExpect(jsonPath("$.data.content").isArray());
@@ -118,13 +121,13 @@ public class AdminUserControllerTest {
         // given
         UUID userId = UUID.randomUUID();
         UserDetailsImpl userDetails = createUserDetails(userId, UserRole.MANAGER);
-        UserDetailResponse mockResponse = createUserDetailResponse(userId, "admin", UserRole.MANAGER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(userId, "admin", UserRole.MANAGER);
 
         given(userService.getUser(userId)).willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/me")
-                        .with(user(userDetails)))
+        mockMvc.perform(get(BASE_URL + "/me").with(user(userDetails)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_FOUND.getCode()));
     }
@@ -146,7 +149,8 @@ public class AdminUserControllerTest {
                 .build();
     }
 
-    private UserDetailResponse createUserDetailResponse(UUID userId, String username, UserRole role) {
+    private UserDetailResponse createUserDetailResponse(
+            UUID userId, String username, UserRole role) {
         return UserDetailResponse.builder()
                 .userId(userId)
                 .username(username)
