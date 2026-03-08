@@ -108,20 +108,24 @@ public class AdminUserControllerTest {
         // given
         UUID managerId = UUID.randomUUID();
         UserDetailsImpl master = createUserDetails(UUID.randomUUID(), UserRole.MASTER);
-        UpdateUserRequest updateRequest = UpdateUserRequest.builder()
-                .nickname("updatedNickname")
-                .addresses(List.of())
-                .build();
-        UserDetailResponse mockResponse = createUserDetailResponse(managerId, "manager", UserRole.MANAGER);
+        UpdateUserRequest updateRequest =
+                UpdateUserRequest.builder()
+                        .nickname("updatedNickname")
+                        .addresses(List.of())
+                        .build();
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(managerId, "manager", UserRole.MANAGER);
 
-        given(userService.updateUser(eq(managerId), any(UpdateUserRequest.class))).willReturn(mockResponse);
+        given(userService.updateUser(eq(managerId), any(UpdateUserRequest.class)))
+                .willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(put(BASE_URL + "/managers/" + managerId)
-                        .with(user(master))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
+        mockMvc.perform(
+                        put(BASE_URL + "/managers/" + managerId)
+                                .with(user(master))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_UPDATED.getCode()));
     }
@@ -132,17 +136,13 @@ public class AdminUserControllerTest {
         // given
         UUID managerId = UUID.randomUUID();
         UserDetailsImpl master = createUserDetails(UUID.randomUUID(), UserRole.MASTER);
-        UserDeleteResponse mockResponse = UserDeleteResponse.builder()
-                .id(managerId)
-                .deletedAt(LocalDateTime.now())
-                .build();
+        UserDeleteResponse mockResponse =
+                UserDeleteResponse.builder().id(managerId).deletedAt(LocalDateTime.now()).build();
 
         given(userService.deleteUser(managerId)).willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(delete(BASE_URL + "/managers/" + managerId)
-                        .with(user(master))
-                        .with(csrf()))
+        mockMvc.perform(delete(BASE_URL + "/managers/" + managerId).with(user(master)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_DELETED.getCode()));
     }
@@ -155,9 +155,10 @@ public class AdminUserControllerTest {
         UserDetailsImpl manager = createUserDetails(UUID.randomUUID(), UserRole.MANAGER);
 
         // when & then
-        mockMvc.perform(delete(BASE_URL + "/managers/" + managerId)
-                        .with(user(manager))
-                        .with(csrf()))
+        mockMvc.perform(
+                        delete(BASE_URL + "/managers/" + managerId)
+                                .with(user(manager))
+                                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
