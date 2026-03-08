@@ -17,6 +17,7 @@ public enum ErrorCode {
     JWT_EXPIRED("Z007", HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다."),
     JWT_UNSUPPORTED("Z008", HttpStatus.UNAUTHORIZED, "지원하지 않는 JWT 토큰입니다."),
     LOGIN_FAILED("Z009", HttpStatus.UNAUTHORIZED, "로그인 요청 처리에 실패했습니다."),
+    SORT_UNSUPPORTED("Z010", HttpStatus.UNAUTHORIZED, "지원하지 않는 정렬입니다."),
 
     // database
     DATABASE_UNAVAILABLE("DA001", HttpStatus.SERVICE_UNAVAILABLE, "데이터베이스 연결이 불가능합니다"),
