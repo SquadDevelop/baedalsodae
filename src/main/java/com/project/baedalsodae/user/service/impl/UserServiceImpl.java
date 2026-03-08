@@ -5,6 +5,7 @@ import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
@@ -12,6 +13,8 @@ import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import com.project.baedalsodae.user.service.UserService;
+
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private static final List<Integer> ALLOWED_PAGE_SIZE = List.of(10, 30, 50);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -99,22 +104,16 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDetailResponse> getUsers(UserRole role, String username, Pageable pageable) {
+    public Page<UserDetailResponse> getUsers(UserRole role, UserSearchRequest request, Pageable pageable) {
         int pageSize = pageable.getPageSize();
-        if (pageSize != 10 && pageSize != 30 && pageSize != 50) {
+        if (!ALLOWED_PAGE_SIZE.contains(pageSize)) {
             pageSize = 10;
         }
 
-        Pageable validatedPageable =
-                PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+        Pageable validatedPageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
 
-        Page<User> usersPage =
-                (username != null && !username.isBlank())
-                        ? userRepository.findAllByRoleAndUsernameContainingAndIsDeletedFalse(
-                                role, username, validatedPageable)
-                        : userRepository.findAllByRoleAndIsDeletedFalse(role, validatedPageable);
-
-        return usersPage.map(UserDetailResponse::from);
+        return userRepository.searchUsers(role, request, validatedPageable)
+                .map(UserDetailResponse::from);
     }
 
     private User findByUserId(UUID userId) {

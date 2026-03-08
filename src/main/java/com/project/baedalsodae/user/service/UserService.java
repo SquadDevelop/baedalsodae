@@ -2,6 +2,7 @@ package com.project.baedalsodae.user.service;
 
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -19,5 +20,5 @@ public interface UserService {
 
     UserDeleteResponse deleteUser(UUID userId);
 
-    Page<UserDetailResponse> getUsers(UserRole role, String username, Pageable pageable);
+    Page<UserDetailResponse> getUsers(UserRole role, UserSearchRequest request, Pageable pageable);
 }
