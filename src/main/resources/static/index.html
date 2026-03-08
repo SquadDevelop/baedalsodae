@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>배달소대 - 가게 등록 테스트</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h2>🥔 가게 등록 테스트</h2>
+    <form id="storeForm">
+        <div class="input-group">
+            <label>X-User-Id (테스트용 UUID)</label>
+            <input type="text" id="userId" placeholder="예: 550e8400-e29b-41d4-a716-446655440000">
+        </div>
+
+        <hr>
+
+        <input type="text" id="storeName" placeholder="가게 이름" required>
+        <input type="text" id="storeCategoryId" placeholder="카테고리 UUID" required>
+        <input type="text" id="businessNumber" placeholder="사업자 번호 (000-00-00000)" required>
+        <input type="text" id="storePhone" placeholder="전화번호 (02-000-0000)" required>
+
+        <div class="address-section">
+            <div class="row">
+                <input type="text" id="postcode" placeholder="우편번호" readonly>
+                <button type="button" onclick="searchAddress()">주소 검색</button>
+            </div>
+            <input type="text" id="roadAddress" placeholder="도로명주소" readonly required>
+            <input type="text" id="detailAddress" placeholder="상세주소">
+        </div>
+
+        <textarea id="description" placeholder="가게 설명 (선택)"></textarea>
+
+        <div class="codes">
+            <input type="hidden" id="sidoCode">
+            <input type="hidden" id="sidoName">
+            <input type="hidden" id="sigunguCode">
+            <input type="hidden" id="sigunguName">
+            <input type="hidden" id="dongCode">
+            <input type="hidden" id="dongName">
+        </div>
+
+        <button type="submit" class="submit-btn">가게 등록하기</button>
+    </form>
+</div>
+
+<script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
