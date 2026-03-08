@@ -17,6 +17,7 @@ import com.project.baedalsodae.store.entity.StoreHours;
 import com.project.baedalsodae.store.repository.StoreHoursRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.service.impl.StoreHoursServiceImpl;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +35,7 @@ class StoreHoursServiceImplTest {
 
     @Mock private StoreHoursRepository storeHoursRepository;
     @Mock private StoreRepository storeRepository;
+    @Mock private EntityManager entityManager;
 
     @InjectMocks private StoreHoursServiceImpl storeHoursService;
 

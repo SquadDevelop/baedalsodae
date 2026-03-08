@@ -37,6 +37,8 @@ class StoreCommandServiceTest {
 
     @Mock private StoreCategoryRepository storeCategoryRepository;
 
+    @Mock private StoreHoursService storeHoursService;
+
     @InjectMocks private StoreCommandServiceImpl storeCommandService;
 
     private UUID userId;

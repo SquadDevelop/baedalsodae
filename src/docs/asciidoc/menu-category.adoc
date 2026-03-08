@@ -1,0 +1,120 @@
+= 메뉴 카테고리 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[menu-category-update]]
+== 메뉴 카테고리 이름 수정
+
+`PUT /menu-categories/{menuCategoryId}`
+
+권한: `OWNER`, `MANAGER`
+
+=== Path Parameters
+include::{snippets}/menu-category/update/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/menu-category/update/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-category/update/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-category/update/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-category/update/http-response.adoc[]
+
+---
+
+[[menu-category-update-order]]
+== 메뉴 카테고리 순서 변경
+
+`PATCH /menu-categories/{menuCategoryId}/orders`
+
+권한: `OWNER`, `MANAGER`
+
+=== Path Parameters
+include::{snippets}/menu-category/update-order/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/menu-category/update-order/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-category/update-order/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-category/update-order/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-category/update-order/http-response.adoc[]
+
+---
+
+[[menu-category-delete]]
+== 메뉴 카테고리 삭제
+
+`DELETE /menu-categories/{menuCategoryId}`
+
+권한: `OWNER`, `MANAGER`
+
+=== Path Parameters
+include::{snippets}/menu-category/delete/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-category/delete/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-category/delete/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-category/delete/http-response.adoc[]
+
+---
+
+[[menu-category-get-menu-items]]
+== 카테고리별 메뉴 아이템 목록 조회
+
+`GET /menu-categories/{menuCategoryId}/menu-items`
+
+권한: 인증 불필요 (비공개 메뉴는 권한에 따라 필터링됨)
+
+=== Path Parameters
+include::{snippets}/menu-category/get-menu-items/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-category/get-menu-items/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-category/get-menu-items/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-category/get-menu-items/http-response.adoc[]
+
+---
+
+[[menu-category-create-menu-item]]
+== 메뉴 아이템 생성
+
+`POST /menu-categories/{menuCategoryId}/menu-items`
+
+권한: `OWNER`, `MANAGER`
+
+=== Path Parameters
+include::{snippets}/menu-category/create-menu-item/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/menu-category/create-menu-item/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-category/create-menu-item/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-category/create-menu-item/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-category/create-menu-item/http-response.adoc[]

@@ -1,0 +1,103 @@
+= 메뉴 아이템 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[menu-item-update]]
+== 메뉴 아이템 전체 수정 (PUT)
+
+`PUT /menu-items/{menuItemId}`
+
+권한: `OWNER`, `MANAGER`
+
+모든 필드를 교체합니다. 카테고리 이동이 가능합니다.
+
+=== Path Parameters
+include::{snippets}/menu-item/update/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/menu-item/update/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-item/update/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-item/update/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-item/update/http-response.adoc[]
+
+---
+
+[[menu-item-patch]]
+== 메뉴 아이템 부분 수정 (PATCH)
+
+`PATCH /menu-items/{menuItemId}`
+
+권한: `OWNER`, `MANAGER`
+
+전달된 필드만 변경합니다. 전달하지 않은 필드는 기존 값을 유지합니다.
+
+=== Path Parameters
+include::{snippets}/menu-item/patch/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/menu-item/patch/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-item/patch/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-item/patch/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-item/patch/http-response.adoc[]
+
+---
+
+[[menu-item-update-order]]
+== 메뉴 아이템 순서 변경
+
+`PATCH /menu-items/{menuItemId}/orders?order={order}`
+
+권한: `OWNER`, `MANAGER`
+
+=== Path Parameters
+include::{snippets}/menu-item/update-order/path-parameters.adoc[]
+
+=== Query Parameters
+include::{snippets}/menu-item/update-order/query-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-item/update-order/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-item/update-order/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-item/update-order/http-response.adoc[]
+
+---
+
+[[menu-item-delete]]
+== 메뉴 아이템 삭제
+
+`DELETE /menu-items/{menuItemId}`
+
+권한: `OWNER`, `MANAGER`
+
+=== Path Parameters
+include::{snippets}/menu-item/delete/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/menu-item/delete/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/menu-item/delete/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/menu-item/delete/http-response.adoc[]
