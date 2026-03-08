@@ -1,6 +1,7 @@
 package com.project.baedalsodae.auth.controller;
 
 import com.project.baedalsodae.auth.dto.request.LoginRequest;
+import com.project.baedalsodae.auth.dto.request.ReissueRequest;
 import com.project.baedalsodae.auth.dto.request.SignupRequest;
 import com.project.baedalsodae.auth.dto.response.LoginResponse;
 import com.project.baedalsodae.auth.dto.response.SignupResponse;
@@ -9,6 +10,7 @@ import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
 
     private final UserService userService;
     private final AuthService authService;
@@ -48,14 +52,25 @@ public class AuthController {
         LoginResponse response = authService.login(request);
 
         return ResponseEntity.ok()
-                .header("Authorization", response.getAccessToken())
+                .header(AUTHORIZATION_HEADER, response.getAccessToken())
                 .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS, response));
     }
 
     @PreAuthorize("permitAll()")
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<LoginResponse>> reissue(
+            @Valid @RequestBody ReissueRequest request) {
+        LoginResponse response = authService.reissue(request.refreshToken());
+
+        return ResponseEntity.ok()
+                .header(AUTHORIZATION_HEADER, response.getAccessToken())
+                .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS, response));
+    }
+
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout() {
-        return ResponseEntity.status(HttpStatus.OK)
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        authService.logout(request.getHeader(AUTHORIZATION_HEADER));
+        return ResponseEntity.ok()
                 .body(ApiResponse.success(SuccessCode.LOGOUT_SUCCESS.getMessage()));
     }
 }

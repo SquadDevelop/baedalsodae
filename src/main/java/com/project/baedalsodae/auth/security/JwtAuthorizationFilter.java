@@ -1,6 +1,7 @@
 package com.project.baedalsodae.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
@@ -18,7 +19,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,8 +27,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
+    private final TokenRedisUtil tokenRedisUtil;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -41,13 +41,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String resolvedAccessToken = jwtProvider.resolveToken(request);
+        String resolvedAccessToken = jwtProvider.resolveToken(request.getHeader("Authorization"));
 
         if (StringUtils.hasText(resolvedAccessToken)) {
             try {
                 Claims claims = jwtProvider.getClaims(resolvedAccessToken);
-                String username = claims.getSubject();
-                setAuthentication(username);
+
+                if (tokenRedisUtil.isBlacklisted(resolvedAccessToken)) {
+                    sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
+                    return;
+                }
+
+                setAuthentication(claims);
             } catch (BusinessException e) {
                 sendErrorResponse(response, e.getErrorCode());
                 return;
@@ -60,16 +65,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthentication(String username) {
+    private void setAuthentication(Claims claims) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(username);
+        Authentication authentication = createAuthentication(claims);
 
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
     }
 
-    private Authentication createAuthentication(String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    private Authentication createAuthentication(Claims claims) {
+        UserDetails userDetails = UserDetailsImpl.from(claims);
         return new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
     }

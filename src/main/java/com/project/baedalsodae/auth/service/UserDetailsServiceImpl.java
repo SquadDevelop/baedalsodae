@@ -26,6 +26,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                                         new UsernameNotFoundException(
                                                 ErrorCode.USER_NOT_FOUND.getMessage()));
 
-        return UserDetailsImpl.from(user);
+        return UserDetailsImpl.from(
+                user.getId(),
+                user.getUsername(),
+                user.getPassword(),
+                user.getRole(),
+                user.isDeleted());
     }
 }

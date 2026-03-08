@@ -1,6 +1,5 @@
 package com.project.baedalsodae.auth.security;
 
-import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import java.util.ArrayList;
@@ -24,13 +23,14 @@ public class UserDetailsImpl implements UserDetails {
 
     @Getter private final boolean isDeleted;
 
-    public static UserDetailsImpl from(User user) {
+    public static UserDetailsImpl from(
+            UUID userId, String username, String password, UserRole userRole, boolean isDeleted) {
         return UserDetailsImpl.builder()
-                .userId(user.getId())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .userRole(user.getRole())
-                .isDeleted(user.isDeleted())
+                .userId(userId)
+                .username(username)
+                .password(password)
+                .userRole(userRole)
+                .isDeleted(isDeleted)
                 .build();
     }
 

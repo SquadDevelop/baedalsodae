@@ -12,6 +12,7 @@ import com.project.baedalsodae.auth.config.AuthConfig;
 import com.project.baedalsodae.auth.dto.request.LoginRequest;
 import com.project.baedalsodae.auth.dto.response.LoginResponse;
 import com.project.baedalsodae.auth.security.JwtProvider;
+import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
@@ -45,6 +46,8 @@ public class LoginLogoutControllerTest {
 
     @MockitoBean private UserDetailsService userDetailsService;
 
+    @MockitoBean private TokenRedisUtil tokenRedisUtil;
+
     private final String CONTEXT_PATH = "/api/v1";
     private final String BASE_URL = CONTEXT_PATH + "/auth";
 
@@ -53,7 +56,7 @@ public class LoginLogoutControllerTest {
     void loginSuccess() throws Exception {
         // given
         LoginRequest request = new LoginRequest("tester123", "Password123!");
-        LoginResponse response = LoginResponse.from("Bearer mock-token");
+        LoginResponse response = LoginResponse.from("Bearer mock-token", "mock-refresh-token");
         given(authService.login(any())).willReturn(response);
 
         // when & then
@@ -83,10 +86,53 @@ public class LoginLogoutControllerTest {
     }
 
     @Test
+    @DisplayName("성공 - 유효한 리프레시 토큰으로 재발급 요청 시 200 OK를 반환한다")
+    void reissueSuccess() throws Exception {
+        // given
+        com.project.baedalsodae.auth.dto.request.ReissueRequest request =
+                new com.project.baedalsodae.auth.dto.request.ReissueRequest("valid-refresh-token");
+        LoginResponse response = LoginResponse.from("Bearer new-access-token", "new-refresh-token");
+        given(authService.reissue(any())).willReturn(response);
+
+        // when & then
+        mockMvc.perform(
+                        post(BASE_URL + "/reissue")
+                                .contextPath(CONTEXT_PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Authorization", "Bearer new-access-token"));
+    }
+
+    @Test
+    @DisplayName("실패 - 리프레시 토큰이 비어있으면 400 Bad Request를 반환한다")
+    void reissueFailEmptyToken() throws Exception {
+        // given
+        com.project.baedalsodae.auth.dto.request.ReissueRequest request =
+                new com.project.baedalsodae.auth.dto.request.ReissueRequest("");
+
+        // when & then
+        mockMvc.perform(
+                        post(BASE_URL + "/reissue")
+                                .contextPath(CONTEXT_PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("성공 - 인증된 사용자는 로그아웃할 수 있다")
     @WithMockUser(authorities = "ROLE_CUSTOMER")
     void logoutSuccess() throws Exception {
-        mockMvc.perform(post(BASE_URL + "/logout").contextPath(CONTEXT_PATH).with(csrf()))
+        // given
+        given(jwtProvider.resolveToken(any())).willReturn("mock-token");
+
+        // when & then
+        mockMvc.perform(
+                        post(BASE_URL + "/logout")
+                                .contextPath(CONTEXT_PATH)
+                                .header("Authorization", "Bearer mock-token")
+                                .with(csrf()))
                 .andExpect(status().isOk());
     }
 }

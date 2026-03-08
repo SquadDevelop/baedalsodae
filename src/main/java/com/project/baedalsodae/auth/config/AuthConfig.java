@@ -3,6 +3,7 @@ package com.project.baedalsodae.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.JwtAuthorizationFilter;
 import com.project.baedalsodae.auth.security.JwtProvider;
+import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.ErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,9 +31,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class AuthConfig {
 
-    private final UserDetailsService userDetailsService;
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
+    private final TokenRedisUtil tokenRedisUtil;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -43,7 +43,7 @@ public class AuthConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtProvider, userDetailsService, objectMapper);
+        return new JwtAuthorizationFilter(jwtProvider, objectMapper, tokenRedisUtil);
     }
 
     @Bean
