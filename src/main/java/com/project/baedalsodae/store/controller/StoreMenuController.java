@@ -8,13 +8,12 @@ import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryRespons
 import com.project.baedalsodae.menu.service.MenuCategoryService;
 import com.project.baedalsodae.menu.service.MenuItemService;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +27,8 @@ public class StoreMenuController {
             @PathVariable UUID storeId,
             @RequestBody @Valid MenuCategoryPostRequestDto request,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        MenuCategoryResponseDto response = menuCategoryService.createMenuCategory(storeId, request, userDetails);
+        MenuCategoryResponseDto response =
+                menuCategoryService.createMenuCategory(storeId, request, userDetails);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_CATEGORY_CREATED, response));
     }
 

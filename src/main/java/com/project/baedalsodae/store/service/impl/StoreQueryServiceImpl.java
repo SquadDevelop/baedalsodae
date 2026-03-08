@@ -30,8 +30,7 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final MenuCategoryCustomRepository menuCategoryCustomRepository;
 
     @Override
-    public StorePageResponse getStorePage(
-            UUID storeCategoryId, StoreCursorRequest cursorRequest) {
+    public StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest) {
         SortType sortType = cursorRequest.sortType();
         validateSortType(sortType);
         StoreCursorRequest initializedCursor = cursorRequest.initCursor(sortType);
@@ -39,7 +38,8 @@ public class StoreQueryServiceImpl implements StoreQueryService {
         StoreCategory storeCategory = getStoreCategory(storeCategoryId);
 
         Slice<Store> storeSlice =
-                storeCustomRepository.findStoresByCursor(storeCategoryId, initializedCursor, sortType);
+                storeCustomRepository.findStoresByCursor(
+                        storeCategoryId, initializedCursor, sortType);
 
         return StorePageResponse.of(storeCategory.getId(), storeCategory.getName(), storeSlice);
     }
@@ -48,7 +48,8 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     public StoreSearchPageResponse getStoreByKeyword(
             String keyword, Pageable pageable, SortType sortType) {
         validateSortType(sortType);
-        List<Store> content = storeCustomRepository.searchStoreByKeyword(keyword, pageable, sortType);
+        List<Store> content =
+                storeCustomRepository.searchStoreByKeyword(keyword, pageable, sortType);
 
         boolean hasNext = content.size() > pageable.getPageSize();
         if (hasNext) content.remove(content.size() - 1);

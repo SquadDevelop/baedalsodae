@@ -7,9 +7,9 @@ import com.project.baedalsodae.store.dto.request.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
+import com.project.baedalsodae.store.dto.response.OwnerStoreResponse;
 import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
 import com.project.baedalsodae.store.dto.response.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.OwnerStoreResponse;
 import com.project.baedalsodae.store.dto.response.StoreSearchPageResponse;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.service.StoreCommandService;
@@ -33,23 +33,19 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<StorePageResponse>> getStorePageByStoreCategory(
-            @RequestParam UUID storeCategoryId,
-            @ModelAttribute StoreCursorRequest cursorRequest) {
-        StorePageResponse response =
-                storeQueryService.getStorePage(storeCategoryId, cursorRequest);
+            @RequestParam UUID storeCategoryId, @ModelAttribute StoreCursorRequest cursorRequest) {
+        StorePageResponse response = storeQueryService.getStorePage(storeCategoryId, cursorRequest);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_LIST_FOUND, response));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
     @GetMapping("/keywords")
     public ResponseEntity<ApiResponse<StoreSearchPageResponse>> getStorePageByKeyword(
-            @RequestParam String keyword,
-            @RequestParam SortType sortType,
-            Pageable pageable
-    ) {
+            @RequestParam String keyword, @RequestParam SortType sortType, Pageable pageable) {
         StoreSearchPageResponse response =
                 storeQueryService.getStoreByKeyword(keyword, pageable, sortType);
-        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_LIST_FOUND_BY_KEYWORD, response));
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.STORE_LIST_FOUND_BY_KEYWORD, response));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
@@ -66,7 +62,8 @@ public class StoreController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable("storeId") UUID storeId) {
         OwnerStoreResponse response =
-                storeQueryService.getOwnerStore(storeId, userDetails.getUserId(), userDetails.getUserRole());
+                storeQueryService.getOwnerStore(
+                        storeId, userDetails.getUserId(), userDetails.getUserRole());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_FOUND_FOR_OWNER, response));
     }
 
@@ -95,7 +92,8 @@ public class StoreController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody @Valid UpdateStoreStatusRequest request,
             @PathVariable UUID storeId) {
-        storeCommandService.updateStoreOpened(storeId, request.getStatus(), userDetails.getUserId());
+        storeCommandService.updateStoreOpened(
+                storeId, request.getStatus(), userDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_STATUS_UPDATED, null));
     }
 
@@ -106,5 +104,4 @@ public class StoreController {
         storeCommandService.deleteStore(storeId, userDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DELETED, null));
     }
-
 }

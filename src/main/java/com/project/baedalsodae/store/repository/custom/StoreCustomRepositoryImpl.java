@@ -56,34 +56,40 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         return queryFactory
                 .selectDistinct(store)
                 .from(store)
-                .join(store.storeCategory, storeCategory).fetchJoin()
-                .leftJoin(menuCategory).on(menuCategory.store.id.eq(store.id))
-                .leftJoin(menuItem).on(menuItem.menuCategory.id.eq(menuCategory.id))
+                .join(store.storeCategory, storeCategory)
+                .fetchJoin()
+                .leftJoin(menuCategory)
+                .on(menuCategory.store.id.eq(store.id))
+                .leftJoin(menuItem)
+                .on(menuItem.menuCategory.id.eq(menuCategory.id))
                 .where(keywordCondition(keyword))
                 .orderBy(orderSpecifier(sortType), store.id.desc())
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize()+1)
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
     }
 
     @Override
     public Long countStoresByKeyword(String keyword) {
         return Optional.ofNullable(
-                    queryFactory
-                            .select(store.countDistinct())
-                            .from(store)
-                            .join(store.storeCategory, storeCategory)
-                            .leftJoin(menuCategory).on(menuCategory.store.id.eq(store.id))
-                            .leftJoin(menuItem).on(menuItem.menuCategory.id.eq(menuCategory.id))
-                            .where(keywordCondition(keyword))
-                            .fetchOne()
-            ).orElse(0L);
+                        queryFactory
+                                .select(store.countDistinct())
+                                .from(store)
+                                .join(store.storeCategory, storeCategory)
+                                .leftJoin(menuCategory)
+                                .on(menuCategory.store.id.eq(store.id))
+                                .leftJoin(menuItem)
+                                .on(menuItem.menuCategory.id.eq(menuCategory.id))
+                                .where(keywordCondition(keyword))
+                                .fetchOne())
+                .orElse(0L);
     }
 
     private BooleanExpression keywordCondition(String keyword) {
         String likeKeyword = "%" + keyword + "%";
 
-        return store.name.like(likeKeyword)
+        return store.name
+                .like(likeKeyword)
                 .or(store.storeCategory.name.like(likeKeyword))
                 .or(menuCategory.name.like(likeKeyword))
                 .or(menuItem.name.like(likeKeyword));

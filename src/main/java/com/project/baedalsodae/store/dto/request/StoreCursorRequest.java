@@ -18,15 +18,11 @@ public record StoreCursorRequest(
         SortType type = sortType == null ? SortType.LATEST : sortType;
 
         return switch (type) {
-            case LATEST -> new StoreCursorRequest(
-                    null, type, Instant.now(), null, null, getSize()
-            );
-            case RATING -> new StoreCursorRequest(
-                    null, type, null, Double.MAX_VALUE, null, getSize()
-            );
-            case REVIEW -> new StoreCursorRequest(
-                    null, type, null, null, Integer.MAX_VALUE, getSize()
-            );
+            case LATEST -> new StoreCursorRequest(null, type, Instant.now(), null, null, getSize());
+            case RATING ->
+                    new StoreCursorRequest(null, type, null, Double.MAX_VALUE, null, getSize());
+            case REVIEW ->
+                    new StoreCursorRequest(null, type, null, null, Integer.MAX_VALUE, getSize());
         };
     }
 
