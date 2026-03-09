@@ -58,7 +58,7 @@ jobs:
           host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
-          envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
+          envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,SPRING_DATA_REDIS_URL,SPRING_DATA_REDIS_HOST,SPRING_DATA_REDIS_PORT,SPRING_DATA_REDIS_PASSWORD
           script: |
             echo "=== SCP images to API-1 ==="
             ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 "mkdir -p ~/baedalsodae"
@@ -90,10 +90,10 @@ jobs:
                 -e POSTGRES_PORT=$POSTGRES_PORT \
                 -e POSTGRES_USER=$POSTGRES_USER \
                 -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
-                -e REDIS_URL=$REDIS_URL \
-                -e REDIS_HOST=$REDIS_HOST \
-                -e REDIS_PORT=$REDIS_PORT \
-                -e REDIS_PASSWORD=$REDIS_PASSWORD \
+                -e SPRING_DATA_REDIS_URL=SPRING_DATA_REDIS_URL \
+                -e SPRING_DATA_REDIS_HOST=SPRING_DATA_REDIS_HOST \
+                -e SPRING_DATA_REDIS_PORT=SPRING_DATA_REDIS_PORT \
+                -e SPRING_DATA_REDIS_PASSWORD=SPRING_DATA_REDIS_PASSWORD \
                 baedalsodae:latest && \
               rm -f baedalsodae.tar.gz mock-pg.tar.gz && \
               docker image prune -f && \
@@ -110,10 +110,10 @@ jobs:
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_DEFAULT_SCHEMA: ${{ secrets.POSTGRES_DEFAULT_SCHEMA }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          SPRING_DATA_REDIS_URL: ${{ secrets.SPRING_DATA_REDIS_URL }}
+          SPRING_DATA_REDIS_HOST: ${{ secrets.SPRING_DATA_REDIS_HOST }}
+          SPRING_DATA_REDIS_PORT: ${{ secrets.SPRING_DATA_REDIS_PORT }}
+          SPRING_DATA_REDIS_PASSWORD: ${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
 
       - name: Health Check API-1
         uses: appleboy/ssh-action@v1.0.3
@@ -142,7 +142,7 @@ jobs:
           host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
-          envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
+          envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,SPRING_DATA_REDIS_URL,SPRING_DATA_REDIS_HOST,SPRING_DATA_REDIS_PORT,SPRING_DATA_REDIS_PASSWORD
           script: |
             echo "=== SCP images to API-2 ==="
             ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.179 "mkdir -p ~/baedalsodae"
@@ -174,10 +174,10 @@ jobs:
                 -e POSTGRES_PORT=$POSTGRES_PORT \
                 -e POSTGRES_USER=$POSTGRES_USER \
                 -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
-                -e REDIS_URL=$REDIS_URL \
-                -e REDIS_HOST=$REDIS_HOST \
-                -e REDIS_PORT=$REDIS_PORT \
-                -e REDIS_PASSWORD=$REDIS_PASSWORD \
+                -e SPRING_DATA_REDIS_URL=SPRING_DATA_REDIS_URL \
+                -e SPRING_DATA_REDIS_HOST=SPRING_DATA_REDIS_HOST \
+                -e SPRING_DATA_REDIS_PORT=SPRING_DATA_REDIS_PORT \
+                -e SPRING_DATA_REDIS_PASSWORD=SPRING_DATA_REDIS_PASSWORD \
                 baedalsodae:latest && \
               rm -f baedalsodae.tar.gz mock-pg.tar.gz && \
               docker image prune -f && \
@@ -194,7 +194,7 @@ jobs:
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_DEFAULT_SCHEMA: ${{ secrets.POSTGRES_DEFAULT_SCHEMA }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          SPRING_DATA_REDIS_URL: ${{ secrets.SPRING_DATA_REDIS_URL }}
+          SPRING_DATA_REDIS_HOST: ${{ secrets.SPRING_DATA_REDIS_HOST }}
+          SPRING_DATA_REDIS_PORT: ${{ secrets.SPRING_DATA_REDIS_PORT }}
+          SPRING_DATA_REDIS_PASSWORD: ${{ secrets.SPRING_DATA_REDIS_PASSWORD }}
