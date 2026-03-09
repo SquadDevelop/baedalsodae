@@ -1,10 +1,10 @@
 package com.project.baedalsodae.store.service;
 
-import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
-import com.project.baedalsodae.store.dto.response.OwnerStoreResponse;
-import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
-import com.project.baedalsodae.store.dto.response.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.StoreSearchPageResponse;
+import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
+import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
+import com.project.baedalsodae.store.dto.response.store.StoreDetailResponse;
+import com.project.baedalsodae.store.dto.response.store.StorePageResponse;
+import com.project.baedalsodae.store.dto.response.store.StoreSearchPageResponse;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;

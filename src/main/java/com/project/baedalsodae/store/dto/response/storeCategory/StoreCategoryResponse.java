@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.dto.response;
+package com.project.baedalsodae.store.dto.response.storeCategory;
 
 import com.project.baedalsodae.store.entity.StoreCategory;
 import java.util.UUID;

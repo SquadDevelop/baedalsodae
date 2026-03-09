@@ -74,6 +74,10 @@ tasks.withType(JavaCompile).configureEach {
     options.getGeneratedSourceOutputDirectory().set(file(generated))
 }
 
+tasks.named('compileJava') {
+    dependsOn 'spotlessJava'
+}
+
 sourceSets {
     main.java.srcDirs += [generated]
 }

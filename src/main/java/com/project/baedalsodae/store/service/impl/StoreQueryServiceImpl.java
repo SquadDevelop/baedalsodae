@@ -4,8 +4,8 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryItemsResponse;
 import com.project.baedalsodae.menu.repository.custom.MenuCategoryCustomRepository;
-import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
-import com.project.baedalsodae.store.dto.response.*;
+import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
+import com.project.baedalsodae.store.dto.response.store.*;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.SortType;
@@ -94,7 +94,7 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     }
 
     private void validateStoreOwner(UUID storeOwnerId, UUID userId, UserRole role) {
-        if (!userId.equals(storeOwnerId) || !role.getRole().equals(UserRole.OWNER.name())) {
+        if (!userId.equals(storeOwnerId) || !role.getRole().equals(UserRole.OWNER.getRole())) {
             throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
         }
     }

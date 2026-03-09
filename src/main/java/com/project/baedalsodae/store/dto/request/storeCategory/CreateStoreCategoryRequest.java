@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.dto.request;
+package com.project.baedalsodae.store.dto.request.storeCategory;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

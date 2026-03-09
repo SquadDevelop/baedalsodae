@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.store.dto.response.StoreHoursResponse;
+import com.project.baedalsodae.store.dto.response.store.StoreHoursResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreHours;
 import com.project.baedalsodae.store.repository.StoreHoursRepository;

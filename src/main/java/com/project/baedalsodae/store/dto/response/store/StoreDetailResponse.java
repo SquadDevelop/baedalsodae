@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.dto.response;
+package com.project.baedalsodae.store.dto.response.store;
 
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryItemsResponse;
 import java.util.List;

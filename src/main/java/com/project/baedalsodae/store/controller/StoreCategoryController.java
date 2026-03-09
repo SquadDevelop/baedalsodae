@@ -2,10 +2,10 @@ package com.project.baedalsodae.store.controller;
 
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
-import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
+import com.project.baedalsodae.store.dto.request.storeCategory.CreateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.storeCategory.UpdateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryDetailResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryListResponse;
 import com.project.baedalsodae.store.service.StoreCategoryService;
 import jakarta.validation.Valid;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.dto.response;
+package com.project.baedalsodae.store.dto.response.storeCategory;
 
 import java.util.List;
 import lombok.*;
