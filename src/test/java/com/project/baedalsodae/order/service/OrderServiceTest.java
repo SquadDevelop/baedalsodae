@@ -8,11 +8,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
@@ -32,7 +34,9 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -78,6 +82,12 @@ public class OrderServiceTest {
     @Mock private OrderEventPublisher orderEventPublisher;
 
     @Mock private OrderQueryRepository orderQueryRepository;
+
+    @Mock private AllowedRegionService allowedRegionService;
+
+    @Mock private UserAddressService userAddressService;
+
+    @Mock private UserAddress userAddress;
 
     @Mock private Order order;
 
@@ -213,6 +223,11 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
+        given(store.getAddress())
+                .willReturn(
+                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+        given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
+
         given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
         // when
@@ -258,6 +273,15 @@ public class OrderServiceTest {
         given(cart.hasNoItems()).willReturn(false);
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+
+        given(store.getAddress())
+                .willReturn(
+                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+        given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
+        given(userAddress.getAddress())
+                .willReturn(
+                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
@@ -317,6 +341,15 @@ public class OrderServiceTest {
         given(cart.hasNoItems()).willReturn(false);
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+
+        given(store.getAddress())
+                .willReturn(
+                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+        given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
+        given(userAddress.getAddress())
+                .willReturn(
+                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
 
