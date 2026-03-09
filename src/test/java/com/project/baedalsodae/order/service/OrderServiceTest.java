@@ -311,7 +311,9 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -396,7 +398,9 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -1559,7 +1563,9 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1671,7 +1677,9 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -2072,7 +2080,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-
 
         assertThat(response).isNotNull();
     }

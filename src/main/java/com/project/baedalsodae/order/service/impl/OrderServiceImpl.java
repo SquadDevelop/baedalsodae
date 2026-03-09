@@ -3,6 +3,8 @@ package com.project.baedalsodae.order.service.impl;
 import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
@@ -12,8 +14,6 @@ import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
-import com.project.baedalsodae.event.entity.EventType;
-import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
@@ -512,5 +512,4 @@ public class OrderServiceImpl implements OrderService {
 
         return order.getStatus() == OrderStatus.DELIVERED;
     }
-
 }

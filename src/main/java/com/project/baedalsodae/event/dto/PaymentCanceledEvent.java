@@ -2,7 +2,6 @@ package com.project.baedalsodae.event.dto;
 
 import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
-
 import java.util.UUID;
 
 public record PaymentCanceledEvent(
