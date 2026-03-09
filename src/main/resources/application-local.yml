@@ -25,6 +25,8 @@ spring:
       password:
       ssl:
         enabled: true
+      repositories:
+        enabled: false
 
 JWT_SECRET: ${JWT_SECRET}
 JWT_EXPIRATION: ${JWT_EXPIRATION}
