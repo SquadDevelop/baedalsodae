@@ -240,6 +240,33 @@ public class AdminUserControllerTest {
     }
 
     @Test
+    @DisplayName("실패 - 존재하지 않는 관리자 상세 정보 조회")
+    void getManagerDetail_Fail_NotFound() throws Exception {
+        // given
+        UserDetailsImpl master = createUserDetails(MASTER_ID, UserRole.MASTER);
+        UUID invalidManagerId = UUID.randomUUID();
+
+        given(userService.getUser(invalidManagerId))
+                .willThrow(new com.project.baedalsodae.global.common.BusinessException(com.project.baedalsodae.global.common.ErrorCode.USER_NOT_FOUND));
+
+        // when & then
+        mockMvc.perform(get(BASE_URL + "/managers/{managerId}", invalidManagerId).with(user(master)))
+                .andExpect(status().isNotFound())
+                .andDo(
+                        document(
+                                "admin-user/get-manager-detail-fail-notfound",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(parameterWithName("managerId").description("조회할 관리자 UUID")),
+                                responseFields(
+                                        fieldWithPath("code").description("에러 코드"),
+                                        fieldWithPath("message").description("에러 메시지"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("timestamp").description("에러 발생 시각"),
+                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+    }
+
+    @Test
     @DisplayName("성공 - MANAGER 권한으로 본인 정보 조회")
     void getAdminDetail_ByManager_Success() throws Exception {
         // given

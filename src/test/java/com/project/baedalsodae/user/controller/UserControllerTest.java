@@ -157,6 +157,36 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("실패 - 이미 사용 중인 닉네임으로 수정 시도")
+    void updateMe_Fail_DuplicatedNickname() throws Exception {
+        // given
+        UserDetailsImpl customer = createUserDetails(USER_ID, UserRole.CUSTOMER);
+        UpdateUserRequest updateRequest = createUpdateUserRequest();
+
+        given(userService.updateUser(eq(USER_ID), any(UpdateUserRequest.class)))
+                .willThrow(new com.project.baedalsodae.global.common.BusinessException(com.project.baedalsodae.global.common.ErrorCode.USER_DUPLICATED_NICKNAME));
+
+        // when & then
+        mockMvc.perform(
+                        put(BASE_URL + "/me")
+                                .with(user(customer))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isConflict())
+                .andDo(
+                        document(
+                                "user/update-me-fail-nickname",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                responseFields(
+                                        fieldWithPath("code").description("에러 코드"),
+                                        fieldWithPath("message").description("에러 메시지"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("timestamp").description("에러 발생 시각"),
+                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+    }
+
+    @Test
     @DisplayName("성공 - 회원 탈퇴 (소프트 딜리트)")
     void deleteMe_Success() throws Exception {
         // given

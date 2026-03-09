@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -310,6 +311,32 @@ public class UserAddressControllerTest {
                                         fieldWithPath("data")
                                                 .description("응답 데이터 (null)")
                                                 .optional())));
+    }
+
+    @Test
+    @DisplayName("실패 - 마지막 남은 주소 삭제 시도")
+    void deleteAddress_Fail_LastAddress() throws Exception {
+        // given
+        UserDetailsImpl user = createUserDetails(USER_ID, UserRole.CUSTOMER);
+
+        doThrow(new com.project.baedalsodae.global.common.BusinessException(com.project.baedalsodae.global.common.ErrorCode.USER_ADDRESS_CANNOT_DELETE))
+                .when(userAddressService).deleteAddress(USER_ID, ADDRESS_ID);
+
+        // when & then
+        mockMvc.perform(delete(BASE_URL + "/{addressId}", ADDRESS_ID).with(user(user)))
+                .andExpect(status().isBadRequest())
+                .andDo(
+                        document(
+                                "user-address/delete-fail-last",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(parameterWithName("addressId").description("삭제할 주소 UUID")),
+                                responseFields(
+                                        fieldWithPath("code").description("에러 코드"),
+                                        fieldWithPath("message").description("에러 메시지"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("timestamp").description("에러 발생 시각"),
+                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
     }
 
     @Test
