@@ -190,9 +190,18 @@ class UserServiceTest {
                 .name("테스터")
                 .nickname("테스터A")
                 .role(UserRole.CUSTOMER)
-                .roadAddress("서울시 강남구 역삼동")
-                .detailAddress("101호")
-                .description("직장")
+                .address(
+                        CreateUserAddressRequest.builder()
+                                .roadAddress("서울시 강남구 역삼동")
+                                .detailAddress("101호")
+                                .sidoCode("11")
+                                .sidoName("서울")
+                                .sigunguCode("110")
+                                .sigunguName("강남구")
+                                .dongCode("11010")
+                                .dongName("역삼동")
+                                .description("직장")
+                                .build())
                 .build();
     }
 

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -102,12 +101,21 @@ public class User extends BaseAuditEntity {
         if (address.getUser() != this) {
             address.changeUser(this);
         }
+        if (this.userMainAddressId == null && address.getId() != null) {
+            this.userMainAddressId = address.getId();
+        }
     }
 
-    public void addAddresses(List<UserAddress> addresses) {
-        addresses.forEach(this::addAddress);
-        if (this.userMainAddressId == null) {
-            this.changeMainAddress(this.userAddresses.get(0).getId());
+    public void removeAddress(UserAddress address) {
+        this.userAddresses.remove(address);
+
+        if (address.getId() != null && address.getId().equals(this.userMainAddressId)) {
+            this.userMainAddressId =
+                    this.userAddresses.stream()
+                            .map(UserAddress::getId)
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(null);
         }
     }
 
@@ -117,43 +125,53 @@ public class User extends BaseAuditEntity {
                         .map(UserAddress::getId)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
+
+        boolean mainAddressWillBeRemoved =
+                this.userMainAddressId != null && !newIds.contains(this.userMainAddressId);
+
         this.userAddresses.removeIf(
                 existing -> existing.getId() != null && !newIds.contains(existing.getId()));
 
-        Map<UserAddress, UserAddress> existingMap =
-                this.userAddresses.stream().collect(Collectors.toMap(a -> a, a -> a));
+        Map<UUID, UserAddress> existingMap =
+                this.userAddresses.stream().collect(Collectors.toMap(UserAddress::getId, a -> a));
 
         newAddresses.forEach(
                 newAddr -> {
-                    Optional.ofNullable(existingMap.get(newAddr))
-                            .ifPresentOrElse(
-                                    existing ->
-                                            existing.update(
-                                                    newAddr.getRoadAddress(),
-                                                    newAddr.getDetailAddress(),
-                                                    newAddr.getDescription()),
-                                    () -> this.addAddress(newAddr));
+                    if (newAddr.getId() != null && existingMap.containsKey(newAddr.getId())) {
+                        UserAddress existing = existingMap.get(newAddr.getId());
+                        existing.update(
+                                existing.getId(), newAddr.getAddress(), newAddr.getDescription());
+                    } else {
+                        this.addAddress(newAddr);
+                    }
                 });
 
-        if (this.userMainAddressId != null && this.getMainAddress() == null) {
+        if (mainAddressWillBeRemoved
+                || (this.userMainAddressId == null && !this.userAddresses.isEmpty())) {
             this.userMainAddressId =
-                    this.userAddresses.isEmpty() ? null : this.userAddresses.get(0).getId();
-        } else if (!this.userAddresses.isEmpty()) {
-            this.userMainAddressId = this.userAddresses.get(0).getId();
+                    this.userAddresses.stream()
+                            .map(UserAddress::getId)
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(null);
         }
     }
 
     public UserAddress getMainAddress() {
+        if (this.userMainAddressId == null) return null;
         return this.userAddresses.stream()
-                .filter(
-                        userAddress ->
-                                this.userMainAddressId != null
-                                        && this.userMainAddressId.equals(userAddress.getId()))
+                .filter(addr -> this.userMainAddressId.equals(addr.getId()))
                 .findAny()
                 .orElse(null);
     }
 
     public void changeMainAddress(UUID userMainAddressId) {
-        this.userMainAddressId = userMainAddressId;
+        boolean exists =
+                this.userAddresses.stream()
+                        .anyMatch(addr -> addr.getId().equals(userMainAddressId));
+
+        if (exists || userMainAddressId == null) {
+            this.userMainAddressId = userMainAddressId;
+        }
     }
 }
