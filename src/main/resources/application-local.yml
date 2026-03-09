@@ -44,3 +44,9 @@ logging:
 
 server:
   port: ${API_SERVER_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

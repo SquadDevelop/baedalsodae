@@ -41,3 +41,9 @@ logging:
     org.springframework.boot.diagnostics: ERROR
     org.springframework.boot.web.embedded.tomcat: ERROR
     org.apache.catalina: ERROR
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
