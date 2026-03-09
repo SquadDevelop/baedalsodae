@@ -11,14 +11,13 @@ import com.project.baedalsodae.review.repository.ReviewRepository;
 import com.project.baedalsodae.review.service.ReviewService;
 import com.project.baedalsodae.store.service.StoreReviewService;
 import com.project.baedalsodae.user.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +82,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
         double oldRating = foundReview.getRating();
         foundReview.update(request.rating(), request.comment());
-        storeReviewService.calculateReviewUpdated(reviewId, foundReview.getOrderId(),oldRating, request.rating());
+        storeReviewService.calculateReviewUpdated(
+                reviewId, foundReview.getOrderId(), oldRating, request.rating());
         return ReviewResponse.from(foundReview);
     }
 
@@ -98,7 +98,8 @@ public class ReviewServiceImpl implements ReviewService {
             throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
         }
         foundReview.softDelete(userId);
-        storeReviewService.calculateReviewDeleted(reviewId, foundReview.getOrderId(), foundReview.getRating());
+        storeReviewService.calculateReviewDeleted(
+                reviewId, foundReview.getOrderId(), foundReview.getRating());
         return ReviewResponse.from(foundReview);
     }
 }

@@ -23,8 +23,10 @@ public class RecommendationController {
             @RequestBody VoiceRecommendationRequest request) {
         log.info("[Voice Recommendation] Input Text: {}", request.transcribedText());
         VoiceRecommendationResponse response = recommendationService.recommendMenuItems(request);
-        log.info("[Voice Recommendation] Response AI Message: '{}', Recommended Menu Count: {}", 
-                response.aiMessage(), response.recommendedMenus() != null ? response.recommendedMenus().size() : 0);
+        log.info(
+                "[Voice Recommendation] Response AI Message: '{}', Recommended Menu Count: {}",
+                response.aiMessage(),
+                response.recommendedMenus() != null ? response.recommendedMenus().size() : 0);
         return ResponseEntity.ok(response);
     }
 

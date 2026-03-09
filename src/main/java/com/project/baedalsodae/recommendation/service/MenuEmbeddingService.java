@@ -2,16 +2,15 @@ package com.project.baedalsodae.recommendation.service;
 
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,9 +50,10 @@ public class MenuEmbeddingService {
     private Document createDocument(MenuItem menuItem) {
         String storeName = menuItem.getMenuCategory().getStore().getName();
         String categoryName = menuItem.getMenuCategory().getName();
-        String tags = menuItem.getTagMappings().stream()
-                .map(mapping -> mapping.getTag().getName())
-                .collect(Collectors.joining(", "));
+        String tags =
+                menuItem.getTagMappings().stream()
+                        .map(mapping -> mapping.getTag().getName())
+                        .collect(Collectors.joining(", "));
 
         String content =
                 String.format(

@@ -4,12 +4,11 @@ import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(
@@ -84,7 +83,7 @@ public class Store extends BaseAuditEntity {
         totalRating -= oldRating;
         this.reviewCount -= 1;
         this.avgRating = totalRating / this.reviewCount;
-     }
+    }
 
     public void updateInfo(
             StoreCategory storeCategory,

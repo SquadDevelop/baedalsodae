@@ -17,12 +17,11 @@ import com.project.baedalsodae.menu.service.MenuItemService;
 import com.project.baedalsodae.recommendation.service.MenuEmbeddingService;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
