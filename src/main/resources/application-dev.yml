@@ -27,6 +27,10 @@ spring:
         enabled: true
       repositories:
         enabled: false
+      lettuce:
+        pool:
+          max-active: 8
+        shutdown-timeout: 100ms
 
 JWT_SECRET: ${JWT_SECRET}
 JWT_EXPIRATION: ${JWT_EXPIRATION}
