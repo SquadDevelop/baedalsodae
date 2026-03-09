@@ -298,8 +298,7 @@ public class OrderServiceTest {
 
         given(user.getNickname()).willReturn("잽닝이");
         given(user.getPhone()).willReturn("01011112222");
-        given(userRepository.findByUserIdAndIsDeletedFalse(userId))
-        .willReturn(Optional.of(user));
+        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
 
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
@@ -367,8 +366,7 @@ public class OrderServiceTest {
 
         given(user.getNickname()).willReturn("잽닝이");
         given(user.getPhone()).willReturn("01011112222");
-        given(userRepository.findByUserIdAndIsDeletedFalse(userId))
-        .willReturn(Optional.of(user));
+        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);

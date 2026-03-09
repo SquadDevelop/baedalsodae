@@ -98,9 +98,10 @@ public class OrderServiceImpl implements OrderService {
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
-        final User user = userRepository
-                .findByUserIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        final User user =
+                userRepository
+                        .findByUserIdAndIsDeletedFalse(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         final String userNickName = user.getNickname();
         final String userPhone = user.getPhone();

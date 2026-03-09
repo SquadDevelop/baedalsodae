@@ -211,5 +211,4 @@ public class UserAddressServiceImpl implements UserAddressService {
                 .findMainAddressByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_ADDRESS_NOT_FOUND));
     }
-
 }
