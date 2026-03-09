@@ -34,7 +34,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;
 -- PostgreSQL database dump
 --
 
-restrict 6D8KnLjnaPopOmaUATkQdb6N7rjahzKKwhh4rH2el97xucJxgar3XXWGnTbKKbf
+\restrict 6D8KnLjnaPopOmaUATkQdb6N7rjahzKKwhh4rH2el97xucJxgar3XXWGnTbKKbf
 
 -- Dumped from database version 17.9 (Debian 17.9-1.pgdg12+1)
 -- Dumped by pg_dump version 17.9 (Debian 17.9-1.pgdg12+1)
