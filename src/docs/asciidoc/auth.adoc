@@ -1,0 +1,117 @@
+= 인증 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[auth-signup]]
+== 회원가입
+
+`POST /auth/signup`
+
+서비스를 이용하기 위한 신규 회원 가입을 진행합니다.
+
+=== Request Fields
+include::{snippets}/auth/signup/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/auth/signup/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/auth/signup/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/auth/signup/http-response.adoc[]
+
+==== 회원가입 실패 (아이디 중복)
+===== HTTP Response Example
+include::{snippets}/auth/signup-fail-username/http-response.adoc[]
+
+==== 회원가입 실패 (이메일 중복)
+===== HTTP Response Example
+include::{snippets}/auth/signup-fail-email/http-response.adoc[]
+
+---
+
+[[auth-login]]
+== 로그인
+
+`POST /auth/login`
+
+아이디와 비밀번호로 로그인하고 토큰을 발급받습니다.
+
+=== Request Fields
+include::{snippets}/auth/login/request-fields.adoc[]
+
+=== Response Headers
+include::{snippets}/auth/login/response-headers.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/auth/login/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/auth/login/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/auth/login/http-response.adoc[]
+
+==== 로그인 실패 (비밀번호 불일치)
+===== HTTP Response Example
+include::{snippets}/auth/login-fail/http-response.adoc[]
+
+---
+
+[[auth-reissue]]
+== 토큰 재발급
+
+`POST /auth/reissue`
+
+Refresh Token을 사용하여 만료된 Access Token을 재발급받습니다.
+
+=== Request Fields
+include::{snippets}/auth/reissue/request-fields.adoc[]
+
+=== Response Headers
+include::{snippets}/auth/reissue/response-headers.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/auth/reissue/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/auth/reissue/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/auth/reissue/http-response.adoc[]
+
+==== 토큰 재발급 실패 (만료된 토큰)
+===== HTTP Response Example
+include::{snippets}/auth/reissue-fail-expired/http-response.adoc[]
+
+==== 토큰 재발급 실패 (유효하지 않은 토큰)
+===== HTTP Response Example
+include::{snippets}/auth/reissue-fail-invalid/http-response.adoc[]
+
+---
+
+[[auth-logout]]
+== 로그아웃
+
+`POST /auth/logout`
+
+현재 로그인된 세션을 종료하고 토큰을 무효화합니다.
+
+=== HTTP Request Example
+include::{snippets}/auth/logout/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/auth/logout/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/auth/logout/http-response.adoc[]
+
+==== 로그아웃 실패 (인증되지 않은 요청)
+===== HTTP Response Example
+include::{snippets}/auth/logout-fail-unauthorized/http-response.adoc[]
