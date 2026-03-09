@@ -1,5 +1,7 @@
 package com.project.baedalsodae.allowedRegion.service.impl;
 
+import com.project.baedalsodae.allowedRegion.dto.AllowedRegionCursorRequest;
+import com.project.baedalsodae.allowedRegion.dto.AllowedRegionPageResponse;
 import com.project.baedalsodae.allowedRegion.dto.AllowedRegionRequestDto;
 import com.project.baedalsodae.allowedRegion.dto.AllowedRegionResponseDto;
 import com.project.baedalsodae.allowedRegion.entity.AllowedRegion;
@@ -63,5 +65,13 @@ public class AllowedRegionServiceImpl implements AllowedRegionService {
         if (activation) allowedRegion.activate();
         else allowedRegion.deactivate();
         return AllowedRegionResponseDto.fromEntity(allowedRegion);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AllowedRegionPageResponse getAllowedRegions(AllowedRegionCursorRequest cursorRequest) {
+        AllowedRegionCursorRequest cursor = cursorRequest.initCursor(cursorRequest.sortType());
+        return AllowedRegionPageResponse.of(
+                allowedRegionRepository.findAllowedRegionsByCursor(cursor));
     }
 }

@@ -20,6 +20,14 @@ public class AllowedRegionController {
 
     private final AllowedRegionService allowedRegionService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER')")
+    @GetMapping
+    public ResponseEntity<ApiResponse<AllowedRegionPageResponse>> getAllowedRegions(
+            @ModelAttribute AllowedRegionCursorRequest cursorRequest) {
+        AllowedRegionPageResponse response = allowedRegionService.getAllowedRegions(cursorRequest);
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.ALLOWED_REGION_LIST_FOUND, response));
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER')")
     @PostMapping
