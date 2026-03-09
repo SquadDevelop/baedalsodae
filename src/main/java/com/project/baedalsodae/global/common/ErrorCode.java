@@ -10,7 +10,7 @@ public enum ErrorCode {
     // common
     INTERNAL_SERVER_ERROR("Z001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 못한 오류가 발생했습니다"),
     INVALID_REQUEST("Z002", HttpStatus.BAD_REQUEST, "요청값이 잘못됐습니다"),
-    UNAUTHORIZED("Z003", HttpStatus.UNAUTHORIZED, "요청을 인가할 수 없습니다."),
+    UNAUTHORIZED("Z003", HttpStatus.UNAUTHORIZED, "인증 처리에 실패한 요청입니다."),
     FORBIDDEN("Z004", HttpStatus.FORBIDDEN, "권한이 없습니다."),
     JWT_SIGNATURE_INVALID("Z005", HttpStatus.UNAUTHORIZED, "유효하지 않은 서명입니다."),
     JWT_INVALID("Z006", HttpStatus.UNAUTHORIZED, "유효하지 않은 JWT 토큰입니다."),
