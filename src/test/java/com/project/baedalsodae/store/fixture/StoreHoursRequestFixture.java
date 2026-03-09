@@ -2,7 +2,9 @@ package com.project.baedalsodae.store.fixture;
 
 import static com.project.baedalsodae.store.fixture.StoreHoursTestConstants.*;
 
-import com.project.baedalsodae.store.dto.request.store.StoreHoursRequest;
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.store.dto.request.StoreHoursRequest;
 import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.List;
 public class StoreHoursRequestFixture {
 
     private StoreHoursRequestFixture() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static List<StoreHoursRequest> createDefaultRequests() {
