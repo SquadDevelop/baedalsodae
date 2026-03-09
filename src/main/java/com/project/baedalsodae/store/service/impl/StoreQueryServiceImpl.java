@@ -1,5 +1,6 @@
 package com.project.baedalsodae.store.service.impl;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryItemsResponse;
@@ -13,7 +14,9 @@ import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
 import com.project.baedalsodae.store.service.StoreQueryService;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.service.UserAddressService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,8 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final StoreCustomRepository storeCustomRepository;
     private final StoreCategoryRepository storeCategoryRepository;
     private final MenuCategoryCustomRepository menuCategoryCustomRepository;
+    private final AllowedRegionService allowedRegionService;
+    private final UserAddressService userAddressService;
 
     @Override
     public StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest) {
@@ -63,14 +68,20 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     }
 
     @Override
-    public StoreDetailResponse getStoreDetail(UUID storeId) {
+    public StoreDetailResponse getStoreDetail(UUID storeId, UUID userId) {
         Store store = getStore(storeId);
 
+        String sigunguCode = store.getAddress().getSigunguCode();
+        boolean isAllowedRegion = allowedRegionService.isAllowedByCode(sigunguCode);
         List<MenuCategoryItemsResponse> storeMenuCategoryItemsList =
                 menuCategoryCustomRepository.getStoreCategoryItems(storeId);
+        UserAddress userAddress = userAddressService.getMainUserAddress(userId);
+        boolean isDeliverable = allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode());
 
         return StoreDetailResponse.of(
-                StoreSummaryResponse.fromEntity(store), storeMenuCategoryItemsList);
+                StoreSummaryResponse.fromEntity(store),
+                storeMenuCategoryItemsList,
+                isAllowedRegion,isDeliverable);
     }
 
     @Override
