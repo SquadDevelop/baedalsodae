@@ -29,6 +29,7 @@ jobs:
             --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
             -t baedalsodae:latest \
             --load .
+          rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           docker save baedalsodae:latest | gzip > baedalsodae.tar.gz
 
