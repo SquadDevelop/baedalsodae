@@ -96,7 +96,7 @@ class StoreQueryServiceTest {
                     .willReturn(mockMenuList);
 
             // when
-            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId);
+            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
 
             // then
             assertThat(response).isNotNull();

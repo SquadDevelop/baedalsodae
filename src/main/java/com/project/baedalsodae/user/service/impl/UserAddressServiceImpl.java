@@ -204,4 +204,11 @@ public class UserAddressServiceImpl implements UserAddressService {
         user.changeMainAddress(null);
         user.getUserAddresses().clear();
     }
+
+    @Override
+    public UserAddress getMainUserAddress(UUID userId) {
+        return userAddressRepository
+                .findMainAddressByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_ADDRESS_NOT_FOUND));
+    }
 }

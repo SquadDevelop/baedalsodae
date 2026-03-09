@@ -10,13 +10,19 @@ import lombok.Getter;
 public class StoreDetailResponse {
     private StoreSummaryResponse store;
     private List<MenuCategoryItemsResponse> storeMenuCategoryItems;
+    private boolean isAllowedRegion;
+    private boolean isDeliverableToUser;
 
     public static StoreDetailResponse of(
             StoreSummaryResponse store,
-            List<MenuCategoryItemsResponse> storeMenuCategoryItemsList) {
+            List<MenuCategoryItemsResponse> storeMenuCategoryItemsList,
+            boolean isAllowedRegion,
+            boolean isDeliverableToUser) {
         return StoreDetailResponse.builder()
                 .store(store)
                 .storeMenuCategoryItems(storeMenuCategoryItemsList)
+                .isAllowedRegion(isAllowedRegion)
+                .isDeliverableToUser(isDeliverableToUser)
                 .build();
     }
 }

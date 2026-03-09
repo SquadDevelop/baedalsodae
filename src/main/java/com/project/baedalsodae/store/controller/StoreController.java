@@ -51,8 +51,10 @@ public class StoreController {
     @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
     @GetMapping("/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable("storeId") UUID storeId) {
-        StoreDetailResponse response = storeQueryService.getStoreDetail(storeId);
+        StoreDetailResponse response =
+                storeQueryService.getStoreDetail(storeId, userDetails.getUserId());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DETAIL_FOUND, response));
     }
 
