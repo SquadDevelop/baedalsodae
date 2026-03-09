@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.config.AuthConfig;
 import com.project.baedalsodae.auth.security.JwtProvider;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
@@ -57,13 +56,15 @@ public class AdminOrderControllerTest {
         UserDetailsImpl admin = createUserDetails(adminId, UserRole.MANAGER);
         OrderListResponse mockResponse = OrderListResponse.empty();
 
-        given(orderService.getOrders(eq(adminId), eq(UserRole.MANAGER.getRole()), any(OrderListRequest.class)))
+        given(
+                        orderService.getOrders(
+                                eq(adminId),
+                                eq(UserRole.MANAGER.getRole()),
+                                any(OrderListRequest.class)))
                 .willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(get(BASE_URL)
-                        .with(user(admin))
-                        .param("size", "10"))
+        mockMvc.perform(get(BASE_URL).with(user(admin)).param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_LIST.getCode()));
     }
@@ -81,8 +82,7 @@ public class AdminOrderControllerTest {
                 .willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/" + orderId)
-                        .with(user(admin)))
+        mockMvc.perform(get(BASE_URL + "/" + orderId).with(user(admin)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DETAIL.getCode()));
     }
@@ -100,8 +100,7 @@ public class AdminOrderControllerTest {
                 .willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/" + orderId + "/status-history")
-                        .with(user(admin)))
+        mockMvc.perform(get(BASE_URL + "/" + orderId + "/status-history").with(user(admin)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_STATUS.getCode()));
     }
@@ -113,9 +112,7 @@ public class AdminOrderControllerTest {
         UserDetailsImpl customer = createUserDetails(UUID.randomUUID(), UserRole.CUSTOMER);
 
         // when & then
-        mockMvc.perform(get(BASE_URL)
-                        .with(user(customer))
-                        .with(csrf()))
+        mockMvc.perform(get(BASE_URL).with(user(customer)).with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
