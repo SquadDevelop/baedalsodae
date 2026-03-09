@@ -97,7 +97,7 @@ class StoreControllerTest {
                         .storeCategoryId(CATEGORY_ID)
                         .storeCategoryName("한식")
                         .hasNext(false)
-                        .storeCount(1)
+                        .storeCount(BigDecimal.valueOf(1))
                         .lastCursorId(STORE_ID)
                         .stores(List.of(storeSummary()))
                         .build();
