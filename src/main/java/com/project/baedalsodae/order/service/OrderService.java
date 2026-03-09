@@ -37,4 +37,6 @@ public interface OrderService {
             UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
 
     OrderActionStatusResponse completeCancelOrder(UUID userId, UUID orderId);
+
+    boolean isOrderDelivered(UUID orderId);
 }

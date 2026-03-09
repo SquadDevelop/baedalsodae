@@ -97,7 +97,8 @@ public enum ErrorCode {
     REVIEW_CONTENT_EMPTY("RV002", HttpStatus.BAD_REQUEST, "리뷰 내용은 비어있을 수 없습니다."),
     REVIEW_NOT_FOUND("RV003", HttpStatus.NOT_FOUND, "리뷰가 없습니다."),
     REVIEW_UNAUTHORIZED("RV004", HttpStatus.UNAUTHORIZED, "이 리뷰에 대한 권한이 없습니다."),
-    ;
+    REVIEW_BEFORE_DELIVERY_NOT_ALLOWED(
+            "RV005", HttpStatus.BAD_REQUEST, "배송 완료 전에는 리뷰를 작성할 수 없습니다.");
     private final String code;
     private final HttpStatus status;
     private final String message;
