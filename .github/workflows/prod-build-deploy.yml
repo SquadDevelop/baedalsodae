@@ -55,6 +55,7 @@ jobs:
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
             echo "=== SCP image to API-1 ==="
+            ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 "mkdir -p ~/baedalsodae"
             scp -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no \
               ~/baedalsodae/baedalsodae.tar.gz ec2-user@10.0.1.187:~/baedalsodae/
 
@@ -134,6 +135,7 @@ jobs:
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
             echo "=== SCP image to API-2 ==="
+            ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.179 "mkdir -p ~/baedalsodae"
             scp -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no \
               ~/baedalsodae/baedalsodae.tar.gz ec2-user@10.0.1.179:~/baedalsodae/
 
