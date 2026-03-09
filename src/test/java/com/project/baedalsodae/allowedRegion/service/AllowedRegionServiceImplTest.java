@@ -1,10 +1,14 @@
 package com.project.baedalsodae.allowedRegion.service;
 
+import static com.project.baedalsodae.allowedRegion.service.fixture.AllowedRegionFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
-import com.project.baedalsodae.allowedRegion.entity.AllowedRegion;
+import com.project.baedalsodae.allowedRegion.dto.AllowedRegionPageResponse;
 import com.project.baedalsodae.allowedRegion.repository.AllowedRegionRepository;
 import com.project.baedalsodae.allowedRegion.service.impl.AllowedRegionServiceImpl;
 import java.util.Optional;
@@ -23,11 +27,6 @@ class AllowedRegionServiceImplTest {
 
     @InjectMocks private AllowedRegionServiceImpl allowedRegionService;
 
-    private static final String SIDO_CODE = "11";
-    private static final String SIDO_NAME = "서울특별시";
-    private static final String SIGUNGU_CODE = "11010";
-    private static final String SIGUNGU_NAME = "종로구";
-
     @Nested
     @DisplayName("isAllowedByCode")
     class IsAllowedByCode {
@@ -35,10 +34,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하고 활성화 상태이면 true를 반환한다")
         void returnsTrueWhenActiveRegionExists() {
-            AllowedRegion region =
-                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
             given(allowedRegionRepository.findBySigunguCodeAndIsDeletedIsFalse(SIGUNGU_CODE))
-                    .willReturn(Optional.of(region));
+                    .willReturn(Optional.of(createActiveRegion()));
 
             boolean result = allowedRegionService.isAllowedByCode(SIGUNGU_CODE);
 
@@ -48,11 +45,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하지만 비활성화 상태이면 false를 반환한다")
         void returnsFalseWhenInactiveRegionExists() {
-            AllowedRegion region =
-                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
-            region.deactivate();
             given(allowedRegionRepository.findBySigunguCodeAndIsDeletedIsFalse(SIGUNGU_CODE))
-                    .willReturn(Optional.of(region));
+                    .willReturn(Optional.of(createInactiveRegion()));
 
             boolean result = allowedRegionService.isAllowedByCode(SIGUNGU_CODE);
 
@@ -78,10 +72,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하고 활성화 상태이면 true를 반환한다")
         void returnsTrueWhenActiveRegionExists() {
-            AllowedRegion region =
-                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
             given(allowedRegionRepository.findBySigunguNameAndIsDeletedIsFalse(SIGUNGU_NAME))
-                    .willReturn(Optional.of(region));
+                    .willReturn(Optional.of(createActiveRegion()));
 
             boolean result = allowedRegionService.isAllowedByName(SIGUNGU_NAME);
 
@@ -91,11 +83,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하지만 비활성화 상태이면 false를 반환한다")
         void returnsFalseWhenInactiveRegionExists() {
-            AllowedRegion region =
-                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
-            region.deactivate();
             given(allowedRegionRepository.findBySigunguNameAndIsDeletedIsFalse(SIGUNGU_NAME))
-                    .willReturn(Optional.of(region));
+                    .willReturn(Optional.of(createInactiveRegion()));
 
             boolean result = allowedRegionService.isAllowedByName(SIGUNGU_NAME);
 
@@ -111,6 +100,85 @@ class AllowedRegionServiceImplTest {
             boolean result = allowedRegionService.isAllowedByName(SIGUNGU_NAME);
 
             assertFalse(result);
+        }
+    }
+
+    @Nested
+    @DisplayName("getAllowedRegions")
+    class GetAllowedRegions {
+
+        @Test
+        @DisplayName("지역 목록을 반환한다")
+        void returnsRegionList() {
+            given(allowedRegionRepository.findAllowedRegionsByCursor(any()))
+                    .willReturn(createSingleRegionSlice());
+
+            AllowedRegionPageResponse response =
+                    allowedRegionService.getAllowedRegions(createDefaultCursorRequest());
+
+            assertThat(response.getAllowedRegions()).hasSize(1);
+            verify(allowedRegionRepository).findAllowedRegionsByCursor(any());
+        }
+
+        @Test
+        @DisplayName("결과가 비어있으면 빈 목록과 hasNext=false를 반환한다")
+        void returnsEmptyResponseWhenNoRegions() {
+            given(allowedRegionRepository.findAllowedRegionsByCursor(any()))
+                    .willReturn(createEmptySlice());
+
+            AllowedRegionPageResponse response =
+                    allowedRegionService.getAllowedRegions(createDefaultCursorRequest());
+
+            assertThat(response.getAllowedRegions()).isEmpty();
+            assertThat(response.isHasNext()).isFalse();
+            assertThat(response.getAllowedRegionCount()).isZero();
+        }
+
+        @Test
+        @DisplayName("다음 페이지가 있으면 hasNext=true를 반환한다")
+        void returnsHasNextTrueWhenMorePagesExist() {
+            given(allowedRegionRepository.findAllowedRegionsByCursor(any()))
+                    .willReturn(createSliceWithHasNext());
+
+            AllowedRegionPageResponse response =
+                    allowedRegionService.getAllowedRegions(createDefaultCursorRequest());
+
+            assertThat(response.isHasNext()).isTrue();
+        }
+
+        @Test
+        @DisplayName("SIDO_NAME 정렬 요청으로 조회된다")
+        void callsRepositoryWithSidoNameSortRequest() {
+            given(allowedRegionRepository.findAllowedRegionsByCursor(any()))
+                    .willReturn(createSingleRegionSlice());
+
+            AllowedRegionPageResponse response =
+                    allowedRegionService.getAllowedRegions(createCursorRequestWithSidoName());
+
+            assertThat(response.getAllowedRegions()).hasSize(1);
+            verify(allowedRegionRepository).findAllowedRegionsByCursor(any());
+        }
+
+        @Test
+        @DisplayName("sidoCode 필터 요청으로 조회된다")
+        void callsRepositoryWithSidoCodeFilterRequest() {
+            given(allowedRegionRepository.findAllowedRegionsByCursor(any()))
+                    .willReturn(createEmptySlice());
+
+            allowedRegionService.getAllowedRegions(createCursorRequestWithSidoCode());
+
+            verify(allowedRegionRepository).findAllowedRegionsByCursor(any());
+        }
+
+        @Test
+        @DisplayName("activeFilter 요청으로 조회된다")
+        void callsRepositoryWithActiveFilterRequest() {
+            given(allowedRegionRepository.findAllowedRegionsByCursor(any()))
+                    .willReturn(createEmptySlice());
+
+            allowedRegionService.getAllowedRegions(createCursorRequestWithActiveFilter());
+
+            verify(allowedRegionRepository).findAllowedRegionsByCursor(any());
         }
     }
 }
