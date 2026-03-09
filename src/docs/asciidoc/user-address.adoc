@@ -140,6 +140,10 @@ include::{snippets}/user-address/delete/response-fields.adoc[]
 === HTTP Response Example
 include::{snippets}/user-address/delete/http-response.adoc[]
 
+==== 특정 주소 삭제 실패 (마지막 남은 주소)
+===== HTTP Response Example
+include::{snippets}/user-address/delete-fail-last/http-response.adoc[]
+
 ---
 
 [[user-address-change-main]]

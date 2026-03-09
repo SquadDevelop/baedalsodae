@@ -93,3 +93,7 @@ include::{snippets}/admin-user/get-manager-detail/response-fields.adoc[]
 
 === HTTP Response Example
 include::{snippets}/admin-user/get-manager-detail/http-response.adoc[]
+
+==== 관리자 상세 조회 실패 (존재하지 않는 관리자)
+===== HTTP Response Example
+include::{snippets}/admin-user/get-manager-detail-fail-notfound/http-response.adoc[]

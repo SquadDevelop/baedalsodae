@@ -48,6 +48,10 @@ include::{snippets}/user/update-me/response-fields.adoc[]
 === HTTP Response Example
 include::{snippets}/user/update-me/http-response.adoc[]
 
+==== 내 정보 수정 실패 (닉네임 중복)
+===== HTTP Response Example
+include::{snippets}/user/update-me-fail-nickname/http-response.adoc[]
+
 ---
 
 [[user-delete-me]]
