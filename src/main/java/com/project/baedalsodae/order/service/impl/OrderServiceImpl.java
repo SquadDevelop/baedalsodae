@@ -26,8 +26,10 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -46,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final EventPublisher eventPublisher;
     private final OrderQueryRepository orderQueryRepository;
@@ -95,9 +98,12 @@ public class OrderServiceImpl implements OrderService {
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
-        // TODO 인증 도메인 완료 시 넣어줌
-        final String userNickName = "잽닝";
-        final String userPhone = "01011111111";
+        final User user = userRepository
+                .findByUserIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        final String userNickName = user.getNickname();
+        final String userPhone = user.getPhone();
 
         Order order =
                 Order.create(
