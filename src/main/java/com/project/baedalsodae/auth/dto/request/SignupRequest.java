@@ -1,9 +1,12 @@
 package com.project.baedalsodae.auth.dto.request;
 
+import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.entity.UserRole;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record SignupRequest(
@@ -23,10 +26,9 @@ public record SignupRequest(
                 String password,
         @NotBlank String name,
         @NotBlank String nickname,
-        UserRole role,
-        String roadAddress,
-        String detailAddress,
-        String description) {
+        @NotNull UserRole role,
+        @Valid @NotNull(message = "주소 정보는 필수입니다")
+        CreateUserAddressRequest address) {
     public CreateUserRequest toCreateUserDto() {
         return CreateUserRequest.builder()
                 .username(this.username)
@@ -36,9 +38,7 @@ public record SignupRequest(
                 .name(this.name)
                 .nickname(this.nickname)
                 .role(this.role)
-                .roadAddress(this.roadAddress)
-                .detailAddress(this.detailAddress)
-                .description(this.description)
+                .address(this.address)
                 .build();
     }
 }
