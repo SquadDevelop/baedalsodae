@@ -16,6 +16,7 @@ import com.project.baedalsodae.auth.security.JwtProvider;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.SuccessCode;
+import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
@@ -106,11 +107,7 @@ public class AdminUserControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserDetailResponse> mockPage = new PageImpl<>(List.of(), pageable, 0);
 
-        given(
-                        userService.getUsers(
-                                eq(UserRole.MANAGER),
-                                any(UserSearchRequest.class),
-                                any(Pageable.class)))
+        given(userService.getUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class)))
                 .willReturn(mockPage);
 
         // when & then
@@ -151,6 +148,16 @@ public class AdminUserControllerTest {
                 .name("관리자")
                 .nickname("어드민")
                 .role(UserRole.MANAGER)
+                .address(CreateUserAddressRequest.builder()
+                        .roadAddress("도로명")
+                        .detailAddress("상세주소")
+                        .sidoCode("11")
+                        .sidoName("서울")
+                        .sigunguCode("110")
+                        .sigunguName("강남구")
+                        .dongCode("11010")
+                        .dongName("역삼동")
+                        .build())
                 .build();
     }
 

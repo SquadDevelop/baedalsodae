@@ -12,6 +12,7 @@ import com.project.baedalsodae.auth.security.JwtProvider;
 import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.SuccessCode;
+import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.service.UserService;
@@ -52,6 +53,9 @@ public class SignupControllerTest {
     @DisplayName("성공 - 회원가입 서비스 호출 및 응답 검증")
     void signupSuccess() throws Exception {
         // given
+        CreateUserAddressRequest addressRequest = CreateUserAddressRequest.from(
+                "11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세주소", "집"
+        );
         SignupRequest request =
                 new SignupRequest(
                         "tester123",
@@ -61,9 +65,8 @@ public class SignupControllerTest {
                         "테스터",
                         "닉네임",
                         UserRole.CUSTOMER,
-                        "도로명",
-                        "상세주소",
-                        "집");
+                        addressRequest);
+        
         UUID mockUserId = UUID.randomUUID();
         UserDetailResponse mockDetail =
                 UserDetailResponse.builder()
@@ -90,6 +93,9 @@ public class SignupControllerTest {
     @DisplayName("실패 - 유효하지 않은 아이디 형식으로 회원가입 시도")
     void signupFailInvalidUsername() throws Exception {
         // given
+        CreateUserAddressRequest addressRequest = CreateUserAddressRequest.from(
+                "11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세주소", "집"
+        );
         SignupRequest request =
                 new SignupRequest(
                         "bad",
@@ -99,9 +105,7 @@ public class SignupControllerTest {
                         "테스터",
                         "닉네임",
                         UserRole.CUSTOMER,
-                        "도로명",
-                        "상세주소",
-                        "집");
+                        addressRequest);
 
         // when & then
         mockMvc.perform(
