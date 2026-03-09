@@ -4,6 +4,8 @@ import com.project.baedalsodae.store.entity.Store;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,7 +16,7 @@ public class StoreSummaryResponse {
     private String storeName;
     private Integer reviewCount;
     private Double avgRating;
-    private String storeStatus;
+    private StoreStatus storeStatus;
 
     public static StoreSummaryResponse fromEntity(Store store) {
         return StoreSummaryResponse.builder()
@@ -22,7 +24,7 @@ public class StoreSummaryResponse {
                 .storeName(store.getName())
                 .reviewCount(store.getReviewCount())
                 .avgRating(store.getAvgRating())
-                .storeStatus(store.getStoreStatus().name())
+                .storeStatus(store.getStoreStatus())
                 .build();
     }
 
