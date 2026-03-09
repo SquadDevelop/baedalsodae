@@ -1,6 +1,7 @@
 package com.project.baedalsodae.store.dto.response.store;
 
 import com.project.baedalsodae.store.entity.Store;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
@@ -14,7 +15,7 @@ public class StorePageResponse {
     private String storeCategoryName;
 
     private boolean hasNext;
-    private int storeCount;
+    private BigDecimal storeCount;
     private UUID lastCursorId;
     private List<StoreSummaryResponse> stores;
 
@@ -23,7 +24,7 @@ public class StorePageResponse {
                 .storeCategoryId(categoryId)
                 .storeCategoryName(categoryName)
                 .hasNext(slice.hasNext())
-                .storeCount(slice.getNumberOfElements())
+                .storeCount(BigDecimal.valueOf(slice.getNumberOfElements()))
                 .lastCursorId(getLastCursorId(slice))
                 .stores(StoreSummaryResponse.fromList(slice.getContent()))
                 .build();
