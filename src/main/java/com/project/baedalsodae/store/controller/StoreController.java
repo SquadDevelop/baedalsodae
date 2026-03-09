@@ -7,10 +7,7 @@ import com.project.baedalsodae.store.dto.request.store.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreStatusRequest;
-import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
-import com.project.baedalsodae.store.dto.response.store.StoreDetailResponse;
-import com.project.baedalsodae.store.dto.response.store.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.store.StoreSearchPageResponse;
+import com.project.baedalsodae.store.dto.response.store.*;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
@@ -54,6 +51,17 @@ public class StoreController {
             @PathVariable("storeId") UUID storeId) {
         StoreDetailResponse response = storeQueryService.getStoreDetail(storeId);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DETAIL_FOUND, response));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
+    @GetMapping("/{storeId}/reviews")
+    public ResponseEntity<ApiResponse<StoreReviewResponse>> getStoreReviews(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable("storeId") UUID storeId) {
+        StoreReviewResponse response =
+                storeQueryService.getStoreReview(storeId, userDetails.getUserId());
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.STORE_REVIEW_LIST_FOUND, response));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER','ROLE_MANAGER')")
