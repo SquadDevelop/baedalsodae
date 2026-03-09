@@ -47,7 +47,7 @@ services:
     image: redis:7-alpine
     container_name: baedalsodae-redis
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${SPRING_DATA_REDIS_PORT}:6379"
     volumes:
       - redisdata:/data
     healthcheck:

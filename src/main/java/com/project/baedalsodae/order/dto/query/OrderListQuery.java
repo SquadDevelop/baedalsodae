@@ -58,4 +58,17 @@ public record OrderListQuery(
                 .cursorId(request.cursorId())
                 .build();
     }
+
+    public static OrderListQuery forAdmin(OrderListRequest request) {
+        return OrderListQuery.builder()
+                .status(request.status())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
+                .keyword(request.keyword())
+                .orderNo(request.orderNo())
+                .size(request.size())
+                .cursorCreatedAt(request.cursorCreatedAt())
+                .cursorId(request.cursorId())
+                .build();
+    }
 }
