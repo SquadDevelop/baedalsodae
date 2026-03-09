@@ -106,7 +106,7 @@ public class User extends BaseAuditEntity {
 
     public void addAddresses(List<UserAddress> addresses) {
         addresses.forEach(this::addAddress);
-        if (this.userMainAddressId == null) {
+        if (this.userMainAddressId == null && !this.userAddresses.isEmpty()) {
             this.changeMainAddress(this.userAddresses.get(0).getId());
         }
     }
@@ -129,8 +129,8 @@ public class User extends BaseAuditEntity {
                             .ifPresentOrElse(
                                     existing ->
                                             existing.update(
-                                                    newAddr.getRoadAddress(),
-                                                    newAddr.getDetailAddress(),
+                                                    existing.getId(),
+                                                    newAddr.getAddress(),
                                                     newAddr.getDescription()),
                                     () -> this.addAddress(newAddr));
                 });
@@ -138,7 +138,7 @@ public class User extends BaseAuditEntity {
         if (this.userMainAddressId != null && this.getMainAddress() == null) {
             this.userMainAddressId =
                     this.userAddresses.isEmpty() ? null : this.userAddresses.get(0).getId();
-        } else if (!this.userAddresses.isEmpty()) {
+        } else if (this.userMainAddressId == null && !this.userAddresses.isEmpty()) {
             this.userMainAddressId = this.userAddresses.get(0).getId();
         }
     }

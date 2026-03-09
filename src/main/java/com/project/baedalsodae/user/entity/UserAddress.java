@@ -1,7 +1,9 @@
 package com.project.baedalsodae.user.entity;
 
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "p_user_address") // 추후 지역코드 & 지역명 관련 unique 제약조건 추가 필요
+@Table(name = "p_user_address")
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -35,40 +37,16 @@ public class UserAddress extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // 임시 주석 처리
-    //    @Column(name = "sido_code", nullable = false)
-    //    private String sidoCode;
-    //
-    //    @Column(name = "sido_name", nullable = false)
-    //    private String sidoName;
-    //
-    //    @Column(name = "sigg_code", nullable = false)
-    //    private String sigunguCode;
-    //
-    //    @Column(name = "sigg_name", nullable = false)
-    //    private String sigunguName;
-    //
-    //    @Column(name = "dong_code", nullable = false)
-    //    private String dongCode;
-    //
-    //    @Column(name = "dong_name", nullable = false)
-    //    private String dongName;
-
-    @Column(name = "road_address", nullable = false)
-    private String roadAddress;
-
-    @Column(name = "detail_address", nullable = false)
-    private String detailAddress;
+    @Embedded
+    private Address address;
 
     @Column(name = "description")
     private String description;
 
-    public static UserAddress create(
-            User user, String roadAddress, String detailAddress, String description) {
+    public static UserAddress create(User user, Address address, String description) {
         return UserAddress.builder()
                 .user(user)
-                .roadAddress(roadAddress)
-                .detailAddress(detailAddress)
+                .address(address)
                 .description(description)
                 .build();
     }
@@ -80,9 +58,11 @@ public class UserAddress extends BaseTimeEntity {
         this.user = user;
     }
 
-    public void update(String roadAddress, String detailAddress, String description) {
-        this.roadAddress = roadAddress;
-        this.detailAddress = detailAddress;
+    public void update(UUID userAddressId, Address address, String description) {
+        if (userAddressId != null) {
+            this.id = userAddressId;
+        }
+        this.address = address;
         this.description = description;
     }
 
