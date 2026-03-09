@@ -1,10 +1,14 @@
 package com.project.baedalsodae.event.listener;
 
+import com.project.baedalsodae.event.dto.PaymentCanceledEvent;
 import com.project.baedalsodae.event.dto.PaymentCreatedEvent;
 import com.project.baedalsodae.order.service.OrderService;
+import com.project.baedalsodae.payment.entity.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -13,7 +17,18 @@ public class OrderEventListener {
 
     @EventListener
     public void handlePaymentCreated(PaymentCreatedEvent event) {
-        // TODO: 결제 완료 후 주문 상태 업데이트 로직 구현
-        //        orderService.updateOrderStatus(event.orderId(), "PAYMENT_COMPLETED");
+        if (event.status() != PaymentStatus.SUCCESS) {
+            return;
+        }
+
+        orderService.requestOrder(event.userId(), event.orderId());
+    }
+
+    @EventListener
+    public void handlePaymentCanceled(PaymentCanceledEvent event) {
+        if (event.status() != PaymentStatus.CANCELED) {
+            return;
+        }
+        orderService.completeCancelOrder(event.userId(), event.orderId());
     }
 }

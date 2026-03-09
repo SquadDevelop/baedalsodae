@@ -106,4 +106,11 @@ public class PaymentServiceImpl implements PaymentService {
         // 주문 도메인에서 결제 결과에 따른 주문 상태 변경 이벤트 발행
         eventPublisher.publishPaymentEvent(payment, EventType.PAYMENT_CREATED);
     }
+
+    @Override
+    @Transactional
+    public void processPaymentCancel(UUID orderId, UUID userId, BigDecimal finalAmount) {
+
+        //TODO 결제 취소 서비스 로직 구현
+    }
 }

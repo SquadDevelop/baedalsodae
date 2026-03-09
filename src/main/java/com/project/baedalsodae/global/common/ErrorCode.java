@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     // common
     INTERNAL_SERVER_ERROR("Z001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 못한 오류가 발생했습니다"),
+    JSON_SERIALIZATION_ERROR("Z011", HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화 중 오류가 발생했습니다"),
     INVALID_REQUEST("Z002", HttpStatus.BAD_REQUEST, "요청값이 잘못됐습니다"),
     UNAUTHORIZED("Z003", HttpStatus.UNAUTHORIZED, "요청을 인가할 수 없습니다."),
     FORBIDDEN("Z004", HttpStatus.FORBIDDEN, "권한이 없습니다."),

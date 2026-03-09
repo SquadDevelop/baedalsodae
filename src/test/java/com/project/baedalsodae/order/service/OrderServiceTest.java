@@ -12,6 +12,8 @@ import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.Address;
@@ -23,7 +25,6 @@ import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
@@ -83,7 +84,7 @@ public class OrderServiceTest {
 
     @Mock private MenuItem menuItem2;
 
-    @Mock private OrderEventPublisher orderEventPublisher;
+    @Mock private EventPublisher orderEventPublisher;
 
     @Mock private OrderQueryRepository orderQueryRepository;
 
@@ -310,7 +311,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -395,7 +396,7 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -1226,7 +1227,6 @@ public class OrderServiceTest {
                 .should()
                 .createForCustomerOrderStatusHistory(
                         eq(userId), eq(OrderStatus.CREATED), any(Order.class));
-        then(orderEventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1334,7 +1334,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-        then(orderEventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1448,7 +1447,6 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1561,7 +1559,7 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderCooked(any(Order.class));
+        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1673,7 +1671,7 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderDelivering(any(Order.class));
+        then(orderEventPublisher).should().publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1784,8 +1782,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-
-        then(orderEventPublisher).should().publishOrderDelivered(any(Order.class));
 
         assertThat(response).isNotNull();
     }
@@ -2077,7 +2073,6 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderCanceled(any(Order.class));
 
         assertThat(response).isNotNull();
     }

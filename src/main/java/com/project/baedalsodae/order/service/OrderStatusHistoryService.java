@@ -12,4 +12,6 @@ public interface OrderStatusHistoryService {
 
     void createForOwnerOrderStatusHistory(
             UUID userId, OrderStatus fromStatus, Order savedOrder, String reason);
+
+    void createForSystemOrderStatusHistory(OrderStatus fromStatus, Order savedOrder);
 }
