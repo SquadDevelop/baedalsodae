@@ -55,6 +55,7 @@ class StoreControllerTest {
 
     private static final UUID STORE_ID = UUID.randomUUID();
     private static final UUID CATEGORY_ID = UUID.randomUUID();
+    private static final UUID USER_ID = UUID.randomUUID();
     private static final UserDetailsImpl ownerDetails = createOwnerUserDetails(UUID.randomUUID());
 
     private static UserDetailsImpl createOwnerUserDetails(UUID userId) {
@@ -233,9 +234,10 @@ class StoreControllerTest {
     @DisplayName("가게 상세 조회 - 성공")
     void getStoreDetail_success() throws Exception {
 
-        StoreDetailResponse detailResponse = StoreDetailResponse.of(storeSummary(), List.of());
+        StoreDetailResponse detailResponse =
+                StoreDetailResponse.of(storeSummary(), List.of(), true, true);
 
-        given(storeQueryService.getStoreDetail(STORE_ID)).willReturn(detailResponse);
+        given(storeQueryService.getStoreDetail(STORE_ID, USER_ID)).willReturn(detailResponse);
 
         mockMvc.perform(
                         get("/stores/{storeId}", STORE_ID)
