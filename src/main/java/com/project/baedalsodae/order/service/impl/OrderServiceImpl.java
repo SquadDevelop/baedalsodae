@@ -1,5 +1,6 @@
 package com.project.baedalsodae.order.service.impl;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
@@ -24,7 +25,9 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -46,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderEventPublisher orderEventPublisher;
     private final OrderQueryRepository orderQueryRepository;
     private final PaymentRepository paymentRepository;
+    private final AllowedRegionService allowedRegionService;
+    private final UserAddressService userAddressService;
 
     @Override
     @Transactional
@@ -65,6 +70,10 @@ public class OrderServiceImpl implements OrderService {
                         .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
+        if (!allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())) {
+            throw new BusinessException(ErrorCode.STORE_REGION_NOT_ALLOWED);
+        }
+
         BigDecimal totalAmount = cart.getTotalAmount();
         if (totalAmount.compareTo(BigDecimal.ZERO) <= 0)
             throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
@@ -75,6 +84,11 @@ public class OrderServiceImpl implements OrderService {
         final BigDecimal finalAmount = totalAmount.subtract(discountAmount).add(deliveryFee);
         if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
             throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
+
+        UserAddress userAddress = userAddressService.getMainUserAddress(userId);
+        if (!allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode())) {
+            throw new BusinessException(ErrorCode.USER_ADDRESS_NOT_ALLOWED);
+        }
 
         // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
         String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
@@ -120,6 +134,9 @@ public class OrderServiceImpl implements OrderService {
     public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
         validateDateRange(request.startDate(), request.endDate());
         // TODO 인증 도메인 완성 시 AOP로 권한 체크
+        if (UserRole.MANAGER.getRole().equals(role) || UserRole.MASTER.getRole().equals(role)) {
+            return getAdminOrders(request);
+        }
         if (UserRole.OWNER.getRole().equals(role)) {
             return getOwnerOrders(userId, request);
         }
@@ -147,6 +164,16 @@ public class OrderServiceImpl implements OrderService {
 
         OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
         List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+
+        boolean hasNext = orders.size() > query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
+    }
+
+    private OrderListResponse getAdminOrders(OrderListRequest request) {
+        OrderListQuery query = OrderListQuery.forAdmin(request);
+        List<OrderSummaryResponse> orders = orderQueryRepository.findAllOrders(query);
 
         boolean hasNext = orders.size() > query.resolvedSize();
         if (hasNext) orders = orders.subList(0, query.resolvedSize());

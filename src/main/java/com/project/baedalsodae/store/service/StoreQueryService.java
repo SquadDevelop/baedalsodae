@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 public interface StoreQueryService {
     StoreSearchPageResponse getStoreByKeyword(String keyword, Pageable pageable, SortType sortType);
 
-    StoreDetailResponse getStoreDetail(UUID storeId);
+    StoreDetailResponse getStoreDetail(UUID storeId, UUID userId);
 
     OwnerStoreResponse getOwnerStore(UUID storeId, UUID userId, UserRole role);
 

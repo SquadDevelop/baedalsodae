@@ -192,7 +192,7 @@ POSTGRES_USER=baedal_user
 POSTGRES_PASSWORD=your_password
 
 # Redis
-REDIS_PASSWORD=your_redis_password
+SPRING_DATA_REDIS_PASSWORD=your_redis_password
 
 # JWT
 JWT_SECRET=your_jwt_secret_key_at_least_32_chars
@@ -253,7 +253,7 @@ export POSTGRES_DB=baedalsodae
 export POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/baedalsodae
 export POSTGRES_USER=baedal_user
 export POSTGRES_PASSWORD=your_password
-export REDIS_HOST=localhost
+export SPRING_DATA_REDIS_HOST=localhost
 export JWT_SECRET=your_jwt_secret
 
 ./gradlew bootRun
