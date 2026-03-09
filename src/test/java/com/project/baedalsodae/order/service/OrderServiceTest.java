@@ -8,11 +8,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
@@ -32,11 +34,14 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+
+import com.project.baedalsodae.user.service.UserAddressService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,6 +59,10 @@ public class OrderServiceTest {
     @Mock private OrderStatusHistoryServiceImpl orderStatusHistoryService;
 
     @Mock private OrderRepository orderRepository;
+
+    @Mock private AllowedRegionService allowedRegionService;
+
+    @Mock private UserAddressService userAddressService;
 
     @Mock private OrderStatusHistoryRepository orderStatusHistoryRepository;
 
@@ -84,6 +93,10 @@ public class OrderServiceTest {
     @Mock private Payment payment;
 
     @Mock private OrderStatusHistory orderStatusHistory;
+
+    @Mock private Address address;
+
+    @Mock private UserAddress userAddress;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -209,9 +222,15 @@ public class OrderServiceTest {
         given(cart.getStore()).willReturn(store);
         given(store.getId()).willReturn(storeId);
 
+
         given(cart.hasNoItems()).willReturn(false);
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
+
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())).willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
@@ -259,6 +278,11 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())).willReturn(true);
+
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
@@ -266,6 +290,9 @@ public class OrderServiceTest {
         given(menuItem1.getName()).willReturn("치킨");
         given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
+
+        given(userAddress.getAddress()).willReturn(address);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
@@ -318,7 +345,15 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())).willReturn(true);
+
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
+
+        given(userAddress.getAddress()).willReturn(address);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
