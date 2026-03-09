@@ -1,5 +1,25 @@
 package com.project.baedalsodae.review.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
+import com.project.baedalsodae.global.common.TimeCursorPage;
+import com.project.baedalsodae.review.dto.request.ReviewRequest;
+import com.project.baedalsodae.review.dto.response.ReviewResponse;
+import com.project.baedalsodae.review.service.ReviewService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+import java.util.UUID;
+
 import static com.project.baedalsodae.review.fixture.ReviewTestConstants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,25 +32,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.baedalsodae.auth.security.UserDetailsImpl;
-import com.project.baedalsodae.global.common.TimeCursorPage;
-import com.project.baedalsodae.review.dto.request.ReviewRequest;
-import com.project.baedalsodae.review.dto.response.ReviewResponse;
-import com.project.baedalsodae.review.service.ReviewService;
-import java.util.List;
-import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ReviewController.class)
 @AutoConfigureMockMvc(addFilters = false)
