@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ public class UserAddressController {
 
     private final UserAddressService userAddressService;
 
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     @PostMapping
     public ApiResponse<Void> createAddress(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -29,6 +31,7 @@ public class UserAddressController {
         return ApiResponse.success(SuccessCode.USER_ADDRESS_CREATED, null);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     @GetMapping
     public ApiResponse<List<UserAddressResponse>> getAddressList(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -37,6 +40,7 @@ public class UserAddressController {
         return ApiResponse.success(SuccessCode.USER_ADDRESS_FOUND, response);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
     @GetMapping("/main")
     public ApiResponse<UserAddressResponse> getMainAddress(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -44,6 +48,7 @@ public class UserAddressController {
         return ApiResponse.success(SuccessCode.USER_ADDRESS_FOUND, response);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
     @PutMapping("/{addressId}")
     public ApiResponse<UserAddressResponse> updateAddress(
             @PathVariable("addressId") UUID addressId,
@@ -54,6 +59,7 @@ public class UserAddressController {
         return ApiResponse.success(SuccessCode.USER_ADDRESS_UPDATED, response);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     @PutMapping
     public ApiResponse<Void> updateAddressList(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -62,6 +68,7 @@ public class UserAddressController {
         return ApiResponse.success(SuccessCode.USER_ADDRESS_BULK_UPDATED, null);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     @DeleteMapping("/{addressId}")
     public ApiResponse<Void> deleteAddress(
             @PathVariable("addressId") UUID addressId,
@@ -70,6 +77,7 @@ public class UserAddressController {
         return ApiResponse.success(SuccessCode.USER_ADDRESS_DELETED, null);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     @PatchMapping("/{addressId}/main")
     public ApiResponse<Void> changeMainAddress(
             @PathVariable("addressId") UUID addressId,

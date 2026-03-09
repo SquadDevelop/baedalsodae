@@ -73,6 +73,8 @@ public class AuthConfig {
                                 .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
                                 .requestMatchers("/admins/**")
                                 .hasAuthority("ROLE_MANAGER")
+                                .requestMatchers("/user-addresses/**")
+                                .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER")
                                 .anyRequest()
                                 .permitAll());
 
