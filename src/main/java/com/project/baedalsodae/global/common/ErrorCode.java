@@ -102,9 +102,11 @@ public enum ErrorCode {
 
     // Address
     INVALID_ADDRESS_VALUE("AD001", HttpStatus.BAD_REQUEST, "유효하지 않은 주소 값입니다."),
-    ADDRESS_DUPLICATED("AD002", HttpStatus.CONFLICT, "이미 존재하는 허용 주소입니다."),
+    ALLOWED_REGION_CODE_DUPLICATED("AD002", HttpStatus.CONFLICT, "이미 존재하는 허용 주소입니다."),
     USER_ADDRESS_NOT_ALLOWED("AD003", HttpStatus.BAD_REQUEST, "배달 가능한 지역이 아닙니다."),
-    STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다.");
+    STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다."),
+    ALLOWED_REGION_NOT_FOUND("AD005", HttpStatus.NOT_FOUND, "허용된 지역 정보가 없습니다."),
+    ;
 
     private final String code;
     private final HttpStatus status;

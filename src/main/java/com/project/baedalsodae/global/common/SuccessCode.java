@@ -97,7 +97,11 @@ public enum SuccessCode {
     REVIEW_CREATED("RV202", HttpStatus.CREATED, "리뷰 작성 성공"),
     REVIEW_UPDATED("RV203", HttpStatus.OK, "리뷰 수정 성공"),
     REVIEW_DELETED("RV204", HttpStatus.OK, "리뷰 삭제 성공"),
-    ;
+
+    // allowed region
+    ALLOWED_REGION_LIST_FOUND("AR200", HttpStatus.OK, "허용 지역 목록 조회 성공"),
+    ALLOWED_REGION_CREATED("AR201", HttpStatus.CREATED, "허용 지역 생성 성공"),
+    ALLOWED_REGION_ACTIVATION_TOGGLED("AR202", HttpStatus.OK, "허용 지역 활성화 상태 변경 성공");
 
     private final String code;
     private final HttpStatus status;
