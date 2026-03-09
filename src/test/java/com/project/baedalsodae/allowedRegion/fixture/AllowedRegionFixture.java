@@ -1,4 +1,4 @@
-package com.project.baedalsodae.allowedRegion.service.fixture;
+package com.project.baedalsodae.allowedRegion.fixture;
 
 import com.project.baedalsodae.allowedRegion.dto.AllowedRegionCursorRequest;
 import com.project.baedalsodae.allowedRegion.entity.AllowedRegion;

@@ -1,6 +1,6 @@
 package com.project.baedalsodae.allowedRegion.service;
 
-import static com.project.baedalsodae.allowedRegion.service.fixture.AllowedRegionFixture.*;
+import static com.project.baedalsodae.allowedRegion.fixture.AllowedRegionFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
