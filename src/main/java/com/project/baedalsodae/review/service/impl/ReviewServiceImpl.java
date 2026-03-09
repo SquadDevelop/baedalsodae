@@ -3,6 +3,7 @@ package com.project.baedalsodae.review.service.impl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.TimeCursorPage;
+import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.review.dto.request.ReviewRequest;
 import com.project.baedalsodae.review.dto.response.ReviewResponse;
 import com.project.baedalsodae.review.entity.Review;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
+    private final OrderService orderService;
 
     @Override
     public TimeCursorPage<List<ReviewResponse>> getReviewsByUser(
@@ -56,6 +58,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewResponse createReview(
             final UUID userId, final UUID orderId, final ReviewRequest request) {
+        if (!orderService.isOrderDelivered(orderId))
+            throw new BusinessException(ErrorCode.REVIEW_BEFORE_DELIVERY_NOT_ALLOWED);
         Review savedReview =
                 reviewRepository.save(
                         Review.create(userId, orderId, request.rating(), request.comment()));
