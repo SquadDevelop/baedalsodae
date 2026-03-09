@@ -1,5 +1,6 @@
 package com.project.baedalsodae.user.dto.response;
 
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.user.entity.UserAddress;
 import java.util.Objects;
 import java.util.UUID;
@@ -16,6 +17,14 @@ import lombok.NoArgsConstructor;
 public class UserAddressResponse {
 
     private UUID userAddressId;
+    
+    private String sidoCode;
+    private String sidoName;
+    private String sigunguCode;
+    private String sigunguName;
+    private String dongCode;
+    private String dongName;
+    
     private String roadAddress;
     private String detailAddress;
     private String description;
@@ -23,10 +32,17 @@ public class UserAddressResponse {
     private boolean isMainAddress;
 
     public static UserAddressResponse from(UserAddress userAddress, UUID userMainAddressId) {
+        Address address = userAddress.getAddress();
         return UserAddressResponse.builder()
                 .userAddressId(userAddress.getId())
-                .roadAddress(userAddress.getRoadAddress())
-                .detailAddress(userAddress.getDetailAddress())
+                .sidoCode(address.getSidoCode())
+                .sidoName(address.getSidoName())
+                .sigunguCode(address.getSigunguCode())
+                .sigunguName(address.getSigunguName())
+                .dongCode(address.getDongCode())
+                .dongName(address.getDongName())
+                .roadAddress(address.getRoadAddress())
+                .detailAddress(address.getDetailAddress())
                 .description(userAddress.getDescription())
                 .isMainAddress(Objects.equals(userMainAddressId, userAddress.getId()))
                 .build();
