@@ -1,0 +1,39 @@
+### 영업시간 등록
+POST http://localhost:18082/api/v1/stores/{{storeId}}/hours
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+[
+  { "dayOfWeek": "MON", "openTime": "09:00:00", "closeTime": "22:00:00", "breakStart": "15:00:00", "breakEnd": "16:00:00", "open": true },
+  { "dayOfWeek": "TUE", "openTime": "09:00:00", "closeTime": "22:00:00", "breakStart": "15:00:00", "breakEnd": "16:00:00", "open": true },
+  { "dayOfWeek": "WED", "openTime": "09:00:00", "closeTime": "22:00:00", "breakStart": "15:00:00", "breakEnd": "16:00:00", "open": true },
+  { "dayOfWeek": "THU", "openTime": "09:00:00", "closeTime": "22:00:00", "breakStart": "15:00:00", "breakEnd": "16:00:00", "open": true },
+  { "dayOfWeek": "FRI", "openTime": "09:00:00", "closeTime": "22:00:00", "breakStart": "15:00:00", "breakEnd": "16:00:00", "open": true },
+  { "dayOfWeek": "SAT", "openTime": "10:00:00", "closeTime": "21:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "SUN", "openTime": "10:00:00", "closeTime": "21:00:00", "breakStart": null, "breakEnd": null, "open": false }
+]
+
+### 영업시간 조회
+GET http://localhost:18082/api/v1/stores/{{storeId}}/hours
+
+### 영업시간 수정
+PATCH http://localhost:18082/api/v1/stores/{{storeId}}/hours
+X-User-Id: {{userId}}
+X-User-Role: {{role}}
+Content-Type: application/json
+
+[
+  { "dayOfWeek": "MON", "openTime": "10:00:00", "closeTime": "23:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "TUE", "openTime": "10:00:00", "closeTime": "23:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "WED", "openTime": "10:00:00", "closeTime": "23:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "THU", "openTime": "10:00:00", "closeTime": "23:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "FRI", "openTime": "10:00:00", "closeTime": "23:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "SAT", "openTime": "11:00:00", "closeTime": "22:00:00", "breakStart": null, "breakEnd": null, "open": true },
+  { "dayOfWeek": "SUN", "openTime": "11:00:00", "closeTime": "22:00:00", "breakStart": null, "breakEnd": null, "open": false }
+]
+
+### 영업시간 삭제
+DELETE http://localhost:18082/api/v1/stores/{{storeId}}/hours
+X-User-Id: {{userId}}
+X-User-Role: {{role}}

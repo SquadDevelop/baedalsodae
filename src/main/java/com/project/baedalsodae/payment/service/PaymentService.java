@@ -14,4 +14,6 @@ public interface PaymentService {
     PaymentResponse getPayment(UUID paymentId);
 
     void processPayment(UUID orderId, UUID userId, BigDecimal finalAmount);
+
+    void processPaymentCancel(UUID orderId, UUID userId, BigDecimal finalAmount);
 }

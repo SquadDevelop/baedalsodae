@@ -3,6 +3,8 @@ package com.project.baedalsodae.order.service.impl;
 import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
@@ -13,7 +15,6 @@ import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderItem;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
@@ -46,7 +47,7 @@ public class OrderServiceImpl implements OrderService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-    private final OrderEventPublisher orderEventPublisher;
+    private final EventPublisher eventPublisher;
     private final OrderQueryRepository orderQueryRepository;
     private final PaymentRepository paymentRepository;
     private final AllowedRegionService allowedRegionService;
@@ -124,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
 
-        orderEventPublisher.publishOrderCreated(savedOrder);
+        eventPublisher.publishOrderEvent(savedOrder, EventType.ORDER_CREATED);
 
         return CreateOrderResponse.from(savedOrder);
     }
@@ -266,8 +267,6 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
-        orderEventPublisher.publishOrderRequested(order);
-
         return OrderActionStatusResponse.from(order, payment);
     }
 
@@ -294,8 +293,6 @@ public class OrderServiceImpl implements OrderService {
         order.accept();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
-
-        orderEventPublisher.publishOrderAccepted(order);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -325,8 +322,6 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryService.createForOwnerOrderStatusHistory(
                 userId, fromStatus, order, reason);
 
-        orderEventPublisher.publishOrderRejected(order);
-
         return OrderActionStatusResponse.from(order);
     }
 
@@ -354,7 +349,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        orderEventPublisher.publishOrderCooked(order);
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -384,7 +379,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        orderEventPublisher.publishOrderDelivering(order);
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -413,8 +408,6 @@ public class OrderServiceImpl implements OrderService {
         order.completeDelivery();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
-
-        orderEventPublisher.publishOrderDelivered(order);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -464,7 +457,27 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
-        orderEventPublisher.publishOrderCancelRequested(order);
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    private OrderActionStatusResponse cancelRequestByOwner(
+            UUID userId, UUID storeId, Order order, String reason) {
+        if (!order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canCancelRequestByOwner()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancelRequested();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(
+                userId, fromStatus, order, reason);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -486,8 +499,6 @@ public class OrderServiceImpl implements OrderService {
         order.cancel();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
-
-        orderEventPublisher.publishOrderCanceled(order);
 
         return OrderActionStatusResponse.from(order);
     }

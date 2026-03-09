@@ -8,11 +8,15 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
 import com.project.baedalsodae.cart.repository.CartRepository;
+import com.project.baedalsodae.event.entity.EventType;
+import com.project.baedalsodae.event.publisher.EventPublisher;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.order.dto.query.OrderListQuery;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
@@ -21,7 +25,6 @@ import com.project.baedalsodae.order.dto.response.*;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.OrderStatusHistory;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
-import com.project.baedalsodae.order.publisher.OrderEventPublisher;
 import com.project.baedalsodae.order.repository.OrderQueryRepository;
 import com.project.baedalsodae.order.repository.OrderRepository;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
@@ -32,7 +35,9 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -55,6 +60,10 @@ public class OrderServiceTest {
 
     @Mock private OrderRepository orderRepository;
 
+    @Mock private AllowedRegionService allowedRegionService;
+
+    @Mock private UserAddressService userAddressService;
+
     @Mock private OrderStatusHistoryRepository orderStatusHistoryRepository;
 
     @Mock private CartRepository cartRepository;
@@ -75,7 +84,7 @@ public class OrderServiceTest {
 
     @Mock private MenuItem menuItem2;
 
-    @Mock private OrderEventPublisher orderEventPublisher;
+    @Mock private EventPublisher orderEventPublisher;
 
     @Mock private OrderQueryRepository orderQueryRepository;
 
@@ -84,6 +93,10 @@ public class OrderServiceTest {
     @Mock private Payment payment;
 
     @Mock private OrderStatusHistory orderStatusHistory;
+
+    @Mock private Address address;
+
+    @Mock private UserAddress userAddress;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -213,6 +226,12 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
+
         given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
         // when
@@ -259,6 +278,12 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
+
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
@@ -266,6 +291,9 @@ public class OrderServiceTest {
         given(menuItem1.getName()).willReturn("치킨");
         given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
+
+        given(userAddress.getAddress()).willReturn(address);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
@@ -283,7 +311,9 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -318,7 +348,16 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
+
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
+
+        given(userAddress.getAddress()).willReturn(address);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
@@ -359,7 +398,9 @@ public class OrderServiceTest {
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
-        then(orderEventPublisher).should().publishOrderCreated(any(Order.class));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CREATED));
         assertThat(response).isNotNull();
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED);
     }
@@ -1190,7 +1231,6 @@ public class OrderServiceTest {
                 .should()
                 .createForCustomerOrderStatusHistory(
                         eq(userId), eq(OrderStatus.CREATED), any(Order.class));
-        then(orderEventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1298,7 +1338,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-        then(orderEventPublisher).should().publishOrderAccepted(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1412,7 +1451,6 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderRejected(any(Order.class));
         assertThat(response).isNotNull();
     }
 
@@ -1525,7 +1563,9 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderCooked(any(Order.class));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1637,7 +1677,9 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher).should().publishOrderDelivering(any(Order.class));
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1748,8 +1790,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-
-        then(orderEventPublisher).should().publishOrderDelivered(any(Order.class));
 
         assertThat(response).isNotNull();
     }
@@ -2040,8 +2080,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-
-        then(orderEventPublisher).should().publishOrderCanceled(any(Order.class));
 
         assertThat(response).isNotNull();
     }

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.cart.dto.request.AddCartItemRequest;
 import com.project.baedalsodae.cart.dto.request.UpdateCartItemQuantityRequest;
 import com.project.baedalsodae.cart.dto.response.CartResponse;
@@ -14,10 +15,12 @@ import com.project.baedalsodae.cart.service.CartService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.SuccessCode;
+import com.project.baedalsodae.user.entity.UserRole;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -43,6 +49,25 @@ class CartControllerTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
+        UserDetailsImpl userDetails =
+                UserDetailsImpl.builder()
+                        .userId(userId)
+                        .username("testUser")
+                        .password(null)
+                        .userRole(UserRole.CUSTOMER)
+                        .isDeleted(false)
+                        .build();
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated(
+                        userDetails, null, userDetails.getAuthorities()));
+        SecurityContextHolder.setContext(context);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -60,7 +85,7 @@ class CartControllerTest {
                         Instant.now());
         given(cartService.getCart(userId)).willReturn(response);
 
-        mockMvc.perform(get("/carts").header("X-User-Id", userId))
+        mockMvc.perform(get("/carts"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.CART_FOUND.getCode()));
@@ -72,9 +97,7 @@ class CartControllerTest {
         given(cartService.getCart(userId))
                 .willThrow(new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-        mockMvc.perform(get("/carts").header("X-User-Id", userId))
-                .andDo(print())
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/carts")).andDo(print()).andExpect(status().isNotFound());
     }
 
     @Test
@@ -99,7 +122,6 @@ class CartControllerTest {
 
         mockMvc.perform(
                         post("/carts/items")
-                                .header("X-User-Id", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -115,7 +137,6 @@ class CartControllerTest {
 
         mockMvc.perform(
                         post("/carts/items")
-                                .header("X-User-Id", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -130,7 +151,6 @@ class CartControllerTest {
 
         mockMvc.perform(
                         patch("/carts/items/{cartItemId}", cartItemId)
-                                .header("X-User-Id", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -144,7 +164,7 @@ class CartControllerTest {
     void removeCartItem_success() throws Exception {
         UUID cartItemId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/carts/items/{cartItemId}", cartItemId).header("X-User-Id", userId))
+        mockMvc.perform(delete("/carts/items/{cartItemId}", cartItemId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_REMOVED.getCode()));
@@ -153,7 +173,7 @@ class CartControllerTest {
     @Test
     @DisplayName("성공 - 장바구니 비우기")
     void clearCart_success() throws Exception {
-        mockMvc.perform(delete("/carts").header("X-User-Id", userId))
+        mockMvc.perform(delete("/carts"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.CART_CLEARED.getCode()));

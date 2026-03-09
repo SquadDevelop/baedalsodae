@@ -5,12 +5,13 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import java.util.UUID;
 
 public record PaymentCreatedEvent(
-        UUID orderId, UUID paymentId, PaymentStatus status, String pgTransactionId) {
+        UUID orderId, UUID paymentId, PaymentStatus status, String pgTransactionId, UUID userId) {
     public static PaymentCreatedEvent from(final Payment payment) {
         return new PaymentCreatedEvent(
                 payment.getOrderId(),
                 payment.getId(),
                 payment.getStatus(),
-                payment.getPgTransactionId());
+                payment.getPgTransactionId(),
+                payment.getUserId());
     }
 }

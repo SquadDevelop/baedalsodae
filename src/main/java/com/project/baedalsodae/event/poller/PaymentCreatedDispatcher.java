@@ -35,7 +35,12 @@ public class PaymentCreatedDispatcher implements EventDispatcher {
                         ? node.get("pgTransactionId").asText()
                         : null;
 
+        UUID userId =
+                node.has("userId") && !node.get("userId").isNull()
+                        ? UUID.fromString(node.get("userId").asText())
+                        : null;
+
         eventPublisher.publishEvent(
-                new PaymentCreatedEvent(orderId, paymentId, status, pgTransactionId));
+                new PaymentCreatedEvent(orderId, paymentId, status, pgTransactionId, userId));
     }
 }

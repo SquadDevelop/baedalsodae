@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     // common
     INTERNAL_SERVER_ERROR("Z001", HttpStatus.INTERNAL_SERVER_ERROR, "예기치 못한 오류가 발생했습니다"),
+    JSON_SERIALIZATION_ERROR("Z011", HttpStatus.INTERNAL_SERVER_ERROR, "JSON 직렬화 중 오류가 발생했습니다"),
     INVALID_REQUEST("Z002", HttpStatus.BAD_REQUEST, "요청값이 잘못됐습니다"),
     UNAUTHORIZED("Z003", HttpStatus.UNAUTHORIZED, "요청을 인가할 수 없습니다."),
     FORBIDDEN("Z004", HttpStatus.FORBIDDEN, "권한이 없습니다."),
@@ -18,6 +19,7 @@ public enum ErrorCode {
     JWT_UNSUPPORTED("Z008", HttpStatus.UNAUTHORIZED, "지원하지 않는 JWT 토큰입니다."),
     LOGIN_FAILED("Z009", HttpStatus.UNAUTHORIZED, "로그인 요청 처리에 실패했습니다."),
     SORT_UNSUPPORTED("Z010", HttpStatus.UNAUTHORIZED, "지원하지 않는 정렬입니다."),
+    UTILITY_ASSERTION("Z011", HttpStatus.INTERNAL_SERVER_ERROR, "유틸리티 클래스의 생성자 호출은 허용되지 않습니다."),
 
     // database
     DATABASE_UNAVAILABLE("DA001", HttpStatus.SERVICE_UNAVAILABLE, "데이터베이스 연결이 불가능합니다"),
@@ -102,9 +104,11 @@ public enum ErrorCode {
 
     // Address
     INVALID_ADDRESS_VALUE("AD001", HttpStatus.BAD_REQUEST, "유효하지 않은 주소 값입니다."),
-    ADDRESS_DUPLICATED("AD002", HttpStatus.CONFLICT, "이미 존재하는 허용 주소입니다."),
+    ALLOWED_REGION_CODE_DUPLICATED("AD002", HttpStatus.CONFLICT, "이미 존재하는 허용 주소입니다."),
     USER_ADDRESS_NOT_ALLOWED("AD003", HttpStatus.BAD_REQUEST, "배달 가능한 지역이 아닙니다."),
-    STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다.");
+    STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다."),
+    ALLOWED_REGION_NOT_FOUND("AD005", HttpStatus.NOT_FOUND, "허용된 지역 정보가 없습니다."),
+    ;
 
     private final String code;
     private final HttpStatus status;

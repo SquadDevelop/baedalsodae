@@ -1,13 +1,15 @@
 package com.project.baedalsodae.review.fixture;
 
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;
 
 public final class ReviewTestConstants {
 
     private ReviewTestConstants() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static UserDetailsImpl createCustomerUserDetails(UUID userId) {

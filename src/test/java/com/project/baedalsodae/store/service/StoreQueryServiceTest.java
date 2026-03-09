@@ -2,9 +2,11 @@ package com.project.baedalsodae.store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.Address;
@@ -22,7 +24,9 @@ import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
 import com.project.baedalsodae.store.service.impl.StoreQueryServiceImpl;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.service.UserAddressService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +52,8 @@ class StoreQueryServiceTest {
     @Mock private StoreCategoryRepository storeCategoryRepository;
     @Mock private StoreCustomRepository storeCustomRepository;
     @Mock private MenuCategoryCustomRepository menuCategoryCustomRepository;
+    @Mock private AllowedRegionService allowedRegionService;
+    @Mock private UserAddressService userAddressService;
 
     @InjectMocks private StoreQueryServiceImpl storeQueryService;
 
@@ -88,20 +94,85 @@ class StoreQueryServiceTest {
         @DisplayName("성공: 가게 기본 정보와 메뉴 카테고리 목록을 함께 반환한다.")
         void getStoreDetail_success() {
             // given
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            UserAddress userAddress = mock(UserAddress.class);
+            given(userAddress.getAddress())
+                    .willReturn(
+                            Address.createAddress(
+                                    "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
-            List<MenuCategoryItemsResponse> mockMenuList =
-                    List.of(mock(MenuCategoryItemsResponse.class));
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
-                    .willReturn(mockMenuList);
+                    .willReturn(List.of(mock(MenuCategoryItemsResponse.class)));
+            given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
+            given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
 
             // when
             StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
 
             // then
             assertThat(response).isNotNull();
-            verify(storeRepository).findById(storeId);
-            verify(menuCategoryCustomRepository).getStoreCategoryItems(storeId);
+            assertThat(response.isAllowedRegion()).isTrue();
+            assertThat(response.isDeliverableToUser()).isTrue();
+        }
+
+        @Test
+        @DisplayName("성공: 유저 주소가 배달 불가 지역이면 isDeliverableToUser=false를 반환한다.")
+        void getStoreDetail_storeValid() {
+            // given
+            UserAddress userAddress = mock(UserAddress.class);
+            given(userAddress.getAddress())
+                    .willReturn(
+                            Address.createAddress(
+                                    "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
+                    .willReturn(List.of());
+            given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
+            given(allowedRegionService.isAllowedByCode(anyString()))
+                    .willReturn(false)
+                    .willReturn(true);
+
+            // when
+            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
+
+            // then
+            assertThat(response.isDeliverableToUser()).isFalse();
+        }
+
+        @Test
+        @DisplayName("성공: 가게 주소가 배달 불가 지역이면 isAllowedRegion=false를 반환한다.")
+        void getStoreDetail_notDeliverable() {
+            // given
+            UserAddress userAddress = mock(UserAddress.class);
+            given(userAddress.getAddress())
+                    .willReturn(
+                            Address.createAddress(
+                                    "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
+                    .willReturn(List.of());
+            given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
+            given(allowedRegionService.isAllowedByCode(anyString()))
+                    .willReturn(false)
+                    .willReturn(true);
+
+            // when
+            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
+
+            // then
+            assertThat(response.isAllowedRegion()).isFalse();
+        }
+
+        @Test
+        @DisplayName("실패: 가게가 존재하지 않으면 예외가 발생한다.")
+        void getStoreDetail_storeNotFound() {
+            given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+
+            assertThrows(
+                    BusinessException.class,
+                    () -> storeQueryService.getStoreDetail(storeId, userId));
         }
     }
 
