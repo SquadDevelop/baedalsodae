@@ -5,6 +5,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
@@ -17,7 +19,7 @@ import java.util.UUID;
 public class MenuItemMockFixture {
 
     private MenuItemMockFixture() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static MenuItem createMockItemWithUnrelatedStore(

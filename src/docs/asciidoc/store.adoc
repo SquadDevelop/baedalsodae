@@ -99,6 +99,30 @@ include::{snippets}/store/get-owner-store/http-response.adoc[]
 
 ---
 
+[[store-get-reviews]]
+== 가게 리뷰 목록 및 요약 조회
+
+`GET /stores/{storeId}/reviews`
+
+권한: `CUSTOMER`, `OWNER`, `MANAGER`
+
+가게의 전체 리뷰 목록과 평균 평점, 총 리뷰 개수 등 요약 정보를 조회합니다.
+리뷰 목록 내 `isOwner` 필드를 통해 본인이 작성한 리뷰인지 확인할 수 있습니다.
+
+=== Path Parameters
+include::{snippets}/store/get-reviews/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/store/get-reviews/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/store/get-reviews/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/store/get-reviews/http-response.adoc[]
+
+---
+
 [[store-create]]
 == 가게 생성
 

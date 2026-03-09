@@ -192,7 +192,6 @@ class ReviewControllerTest {
                         document(
                                 "review/delete",
                                 pathParameters(parameterWithName("reviewId").description("리뷰 ID")),
-                                queryParameters(parameterWithName("userId").description("사용자 ID")),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("status").description("HTTP 상태"),

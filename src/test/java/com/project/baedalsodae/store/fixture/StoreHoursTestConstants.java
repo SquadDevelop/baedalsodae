@@ -1,6 +1,8 @@
 package com.project.baedalsodae.store.fixture;
 
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -8,7 +10,7 @@ import java.util.UUID;
 public final class StoreHoursTestConstants {
 
     private StoreHoursTestConstants() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static UserDetailsImpl createManagerUserDetails() {

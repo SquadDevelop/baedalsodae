@@ -5,6 +5,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.store.entity.Store;
@@ -15,7 +17,7 @@ import java.util.UUID;
 public class MenuCategoryMockFixture {
 
     private MenuCategoryMockFixture() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static Store createMockStoreWithRepository(

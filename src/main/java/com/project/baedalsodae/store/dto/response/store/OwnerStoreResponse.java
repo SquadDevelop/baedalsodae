@@ -14,7 +14,7 @@ public class OwnerStoreResponse {
     private String phoneNumber;
     private String businessNumber;
     private String description;
-    private Integer reviewCount;
+    private int reviewCount;
     private Double avgRating;
     private String storeStatus;
     private AddressResponse address;

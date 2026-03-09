@@ -2,6 +2,8 @@ package com.project.baedalsodae.menu.fixture;
 
 import static com.project.baedalsodae.menu.fixture.MenuTestConstants.*;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
@@ -13,7 +15,7 @@ import java.util.UUID;
 public class MenuItemRequestFixture {
 
     private MenuItemRequestFixture() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static MenuItemPostRequestBuilder aPostRequest() {

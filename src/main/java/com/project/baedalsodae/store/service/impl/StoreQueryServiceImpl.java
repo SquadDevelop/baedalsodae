@@ -5,6 +5,9 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryItemsResponse;
 import com.project.baedalsodae.menu.repository.custom.MenuCategoryCustomRepository;
+import com.project.baedalsodae.review.dto.query.ReviewSummary;
+import com.project.baedalsodae.review.dto.response.ReviewDetailResponse;
+import com.project.baedalsodae.review.repository.custom.ReviewCustomRepository;
 import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.response.store.*;
 import com.project.baedalsodae.store.entity.Store;
@@ -31,6 +34,7 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final StoreCustomRepository storeCustomRepository;
     private final StoreCategoryRepository storeCategoryRepository;
     private final MenuCategoryCustomRepository menuCategoryCustomRepository;
+    private final ReviewCustomRepository reviewCustomRepository;
     private final AllowedRegionService allowedRegionService;
     private final UserAddressService userAddressService;
 
@@ -47,6 +51,14 @@ public class StoreQueryServiceImpl implements StoreQueryService {
                         storeCategoryId, initializedCursor, sortType);
 
         return StorePageResponse.of(storeCategory.getId(), storeCategory.getName(), storeSlice);
+    }
+
+    @Override
+    public StoreReviewResponse getStoreReview(UUID storeId, UUID userId) {
+        getStore(storeId);
+        List<ReviewDetailResponse> reviews = reviewCustomRepository.findByStoreId(storeId, userId);
+        ReviewSummary reviewSummary = reviewCustomRepository.getSummary(storeId);
+        return StoreReviewResponse.of(reviews, reviewSummary);
     }
 
     @Override
