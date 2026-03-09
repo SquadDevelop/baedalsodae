@@ -134,6 +134,9 @@ public class OrderServiceImpl implements OrderService {
     public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
         validateDateRange(request.startDate(), request.endDate());
         // TODO 인증 도메인 완성 시 AOP로 권한 체크
+        if (UserRole.MANAGER.getRole().equals(role) || UserRole.MASTER.getRole().equals(role)) {
+            return getAdminOrders(request);
+        }
         if (UserRole.OWNER.getRole().equals(role)) {
             return getOwnerOrders(userId, request);
         }
@@ -161,6 +164,16 @@ public class OrderServiceImpl implements OrderService {
 
         OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
         List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+
+        boolean hasNext = orders.size() > query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
+    }
+
+    private OrderListResponse getAdminOrders(OrderListRequest request) {
+        OrderListQuery query = OrderListQuery.forAdmin(request);
+        List<OrderSummaryResponse> orders = orderQueryRepository.findAllOrders(query);
 
         boolean hasNext = orders.size() > query.resolvedSize();
         if (hasNext) orders = orders.subList(0, query.resolvedSize());
