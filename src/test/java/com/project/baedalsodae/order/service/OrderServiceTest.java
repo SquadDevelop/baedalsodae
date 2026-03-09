@@ -59,6 +59,10 @@ public class OrderServiceTest {
 
     @Mock private OrderRepository orderRepository;
 
+    @Mock private AllowedRegionService allowedRegionService;
+
+    @Mock private UserAddressService userAddressService;
+
     @Mock private OrderStatusHistoryRepository orderStatusHistoryRepository;
 
     @Mock private CartRepository cartRepository;
@@ -83,17 +87,15 @@ public class OrderServiceTest {
 
     @Mock private OrderQueryRepository orderQueryRepository;
 
-    @Mock private AllowedRegionService allowedRegionService;
-
-    @Mock private UserAddressService userAddressService;
-
-    @Mock private UserAddress userAddress;
-
     @Mock private Order order;
 
     @Mock private Payment payment;
 
     @Mock private OrderStatusHistory orderStatusHistory;
+
+    @Mock private Address address;
+
+    @Mock private UserAddress userAddress;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -223,10 +225,11 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(store.getAddress())
-                .willReturn(
-                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
-        given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
@@ -274,14 +277,11 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(store.getAddress())
-                .willReturn(
-                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
-        given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
-        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
-        given(userAddress.getAddress())
-                .willReturn(
-                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
@@ -290,6 +290,9 @@ public class OrderServiceTest {
         given(menuItem1.getName()).willReturn("치킨");
         given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
+
+        given(userAddress.getAddress()).willReturn(address);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
@@ -342,16 +345,16 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(store.getAddress())
-                .willReturn(
-                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
-        given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
-        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
-        given(userAddress.getAddress())
-                .willReturn(
-                        Address.createAddress("11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+        String sigunguCode = "ABC";
+        given(store.getAddress()).willReturn(address);
+        given(address.getSigunguCode()).willReturn(sigunguCode);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
+
+        given(userAddress.getAddress()).willReturn(address);
+        given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
