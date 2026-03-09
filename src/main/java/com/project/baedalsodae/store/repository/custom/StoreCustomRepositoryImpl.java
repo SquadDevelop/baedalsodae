@@ -5,7 +5,7 @@ import static com.project.baedalsodae.menu.entity.QMenuItem.menuItem;
 import static com.project.baedalsodae.store.entity.QStore.store;
 import static com.project.baedalsodae.store.entity.QStoreCategory.storeCategory;
 
-import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
+import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;

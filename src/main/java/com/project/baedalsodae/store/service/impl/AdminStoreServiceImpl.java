@@ -3,7 +3,7 @@ package com.project.baedalsodae.store.service.impl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.Address;
-import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
+import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;

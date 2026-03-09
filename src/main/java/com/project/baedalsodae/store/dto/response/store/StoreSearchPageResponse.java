@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.dto.response;
+package com.project.baedalsodae.store.dto.response.store;
 
 import com.project.baedalsodae.store.entity.Store;
 import java.util.List;

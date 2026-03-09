@@ -15,8 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
-import com.project.baedalsodae.store.dto.request.StoreHoursRequest;
-import com.project.baedalsodae.store.dto.response.StoreHoursResponse;
+import com.project.baedalsodae.store.dto.request.store.StoreHoursRequest;
+import com.project.baedalsodae.store.dto.response.store.StoreHoursResponse;
 import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import com.project.baedalsodae.store.fixture.StoreHoursRequestFixture;
 import com.project.baedalsodae.store.service.StoreHoursService;

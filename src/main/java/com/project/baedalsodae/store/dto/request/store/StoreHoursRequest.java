@@ -1,4 +1,4 @@
-package com.project.baedalsodae.store.dto.request;
+package com.project.baedalsodae.store.dto.request.store;
 
 import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import jakarta.validation.constraints.AssertTrue;

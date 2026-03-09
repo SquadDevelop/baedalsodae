@@ -15,8 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.dto.AddressRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreStatusRequest;
+import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
+import com.project.baedalsodae.store.dto.request.store.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.service.AdminStoreService;
 import com.project.baedalsodae.user.entity.UserRole;

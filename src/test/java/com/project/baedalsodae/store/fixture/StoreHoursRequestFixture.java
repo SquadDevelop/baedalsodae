@@ -2,7 +2,7 @@ package com.project.baedalsodae.store.fixture;
 
 import static com.project.baedalsodae.store.fixture.StoreHoursTestConstants.*;
 
-import com.project.baedalsodae.store.dto.request.StoreHoursRequest;
+import com.project.baedalsodae.store.dto.request.store.StoreHoursRequest;
 import com.project.baedalsodae.store.entity.enums.DayOfWeek;
 import java.util.Arrays;
 import java.util.List;

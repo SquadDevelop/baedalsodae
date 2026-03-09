@@ -17,11 +17,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.dto.AuditInfoResponse;
-import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryResponse;
+import com.project.baedalsodae.store.dto.request.storeCategory.CreateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.storeCategory.UpdateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryDetailResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryListResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.service.StoreCategoryService;
 import com.project.baedalsodae.user.entity.UserRole;

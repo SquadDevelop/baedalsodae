@@ -1,6 +1,6 @@
 package com.project.baedalsodae.store.service;
 
-import com.project.baedalsodae.store.dto.request.UpdateStoreRequest;
+import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import java.util.UUID;
 
