@@ -71,4 +71,29 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .limit(query.resolvedSize() + 1)
                 .fetch();
     }
+
+    @Override
+    public List<OrderSummaryResponse> findAllOrders(OrderListQuery query) {
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                OrderSummaryResponse.class,
+                                order.id,
+                                order.storeId,
+                                order.orderNo,
+                                order.status,
+                                order.storeNameSnapshot,
+                                order.finalAmount,
+                                order.createdAt))
+                .from(order)
+                .where(
+                        isDeletedIsFalse(),
+                        statusEq(query),
+                        dateRange(query),
+                        orderNoEqIgnoreCase(query),
+                        cursorCondition(query))
+                .orderBy(order.createdAt.desc(), order.id.desc())
+                .limit(query.resolvedSize() + 1)
+                .fetch();
+    }
 }

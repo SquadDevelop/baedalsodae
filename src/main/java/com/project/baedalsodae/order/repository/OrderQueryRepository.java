@@ -9,4 +9,6 @@ public interface OrderQueryRepository {
     List<OrderSummaryResponse> findOrdersByCustomer(OrderListQuery query);
 
     List<OrderSummaryResponse> findOrdersByStore(OrderListQuery query);
+
+    List<OrderSummaryResponse> findAllOrders(OrderListQuery query);
 }
