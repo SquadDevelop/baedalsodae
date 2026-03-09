@@ -5,24 +5,27 @@ services:
       dockerfile: Dockerfile
     container_name: baedalsodae-app
     ports:
-      - "8080:8080"
+      - "${API_SERVER_PORT}:${API_SERVER_PORT}"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://baedalsodae-postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      ENCRYPTION_AES_KEY: ${ENCRYPTION_AES_KEY}
       SPRING_PROFILES_ACTIVE: local
+    env_file:
+      - .env
     volumes:
       - ./logs:/app/logs  # Optional: for persistent logs
     depends_on:
        postgres:
+         condition: service_healthy
+       redis:
          condition: service_healthy
 
   postgres:
     image: postgres:17
     container_name: baedalsodae-postgres
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -40,6 +43,20 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: baedalsodae-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
   mock-pg:
     build:
       context: ./mock-pg
@@ -50,3 +67,4 @@ services:
 
 volumes:
   pgdata:
+  redisdata:

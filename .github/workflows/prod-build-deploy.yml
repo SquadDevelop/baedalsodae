@@ -1,0 +1,185 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t baedalsodae:latest .
+          docker save baedalsodae:latest | gzip > baedalsodae.tar.gz
+
+      - name: Upload image to API-1
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.API_SERVER_1_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          source: "baedalsodae.tar.gz"
+          target: "/home/ec2-user/baedalsodae"
+
+      - name: Upload image to API-2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.API_SERVER_2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          source: "baedalsodae.tar.gz"
+          target: "/home/ec2-user/baedalsodae"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to API-1
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.API_SERVER_1_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
+          script: |
+            cd /home/ec2-user/baedalsodae
+
+            echo "=== Loading Docker image ==="
+            docker load < baedalsodae.tar.gz
+
+            echo "=== Deploying ==="
+            docker stop baedalsodae-app 2>/dev/null || true
+            docker rm baedalsodae-app 2>/dev/null || true
+
+            docker run -d \
+              --name baedalsodae-app \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e API_SERVER_PORT=$API_SERVER_PORT \
+              -e ENCRYPTION_AES_KEY=$ENCRYPTION_AES_KEY \
+              -e JWT_SECRET=$JWT_SECRET \
+              -e JWT_EXPIRATION=$JWT_EXPIRATION \
+              -e JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION \
+              -e POSTGRES_DB=$POSTGRES_DB \
+              -e POSTGRES_DB_URL=$POSTGRES_DB_URL \
+              -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+              -e POSTGRES_PORT=$POSTGRES_PORT \
+              -e POSTGRES_USER=$POSTGRES_USER \
+              -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
+              -e REDIS_URL=$REDIS_URL \
+              -e REDIS_HOST=$REDIS_HOST \
+              -e REDIS_PORT=$REDIS_PORT \
+              -e REDIS_PASSWORD=$REDIS_PASSWORD \
+              baedalsodae:latest
+
+            echo "=== Cleanup ==="
+            rm -f baedalsodae.tar.gz
+            docker image prune -f
+
+            echo "=== Status ==="
+            docker ps
+        env:
+          API_SERVER_PORT: ${{ secrets.API_SERVER_PORT }}
+          ENCRYPTION_AES_KEY: ${{ secrets.ENCRYPTION_AES_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+          JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_DB_URL: ${{ secrets.POSTGRES_DB_URL }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_DEFAULT_SCHEMA: ${{ secrets.POSTGRES_DEFAULT_SCHEMA }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
+      - name: Health Check API-1
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.API_SERVER_1_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "=== Waiting for API-1 to be healthy ==="
+            for i in {1..12}; do
+              STATUS=$(curl -s http://localhost:8080/actuator/health | grep -o '"status":"UP"' || true)
+              if [ "$STATUS" = '"status":"UP"' ]; then
+                echo "API-1 is UP! Proceeding to API-2 deploy."
+                exit 0
+              fi
+              echo "Attempt $i/12 - not ready yet, waiting 10s..."
+              sleep 10
+            done
+            echo "API-1 health check failed after 2 minutes!"
+            exit 1
+
+      - name: Deploy to API-2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.API_SERVER_2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_KEY }}
+          envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
+          script: |
+            cd /home/ec2-user/baedalsodae
+
+            echo "=== Loading Docker image ==="
+            docker load < baedalsodae.tar.gz
+
+            echo "=== Deploying ==="
+            docker stop baedalsodae-app 2>/dev/null || true
+            docker rm baedalsodae-app 2>/dev/null || true
+
+            docker run -d \
+              --name baedalsodae-app \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e API_SERVER_PORT=$API_SERVER_PORT \
+              -e ENCRYPTION_AES_KEY=$ENCRYPTION_AES_KEY \
+              -e JWT_SECRET=$JWT_SECRET \
+              -e JWT_EXPIRATION=$JWT_EXPIRATION \
+              -e JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION \
+              -e POSTGRES_DB=$POSTGRES_DB \
+              -e POSTGRES_DB_URL=$POSTGRES_DB_URL \
+              -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+              -e POSTGRES_PORT=$POSTGRES_PORT \
+              -e POSTGRES_USER=$POSTGRES_USER \
+              -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
+              -e REDIS_URL=$REDIS_URL \
+              -e REDIS_HOST=$REDIS_HOST \
+              -e REDIS_PORT=$REDIS_PORT \
+              -e REDIS_PASSWORD=$REDIS_PASSWORD \
+              baedalsodae:latest
+
+            echo "=== Cleanup ==="
+            rm -f baedalsodae.tar.gz
+            docker image prune -f
+
+            echo "=== Status ==="
+            docker ps
+        env:
+          API_SERVER_PORT: ${{ secrets.API_SERVER_PORT }}
+          ENCRYPTION_AES_KEY: ${{ secrets.ENCRYPTION_AES_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+          JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_DB_URL: ${{ secrets.POSTGRES_DB_URL }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_DEFAULT_SCHEMA: ${{ secrets.POSTGRES_DEFAULT_SCHEMA }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
