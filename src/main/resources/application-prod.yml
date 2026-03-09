@@ -33,6 +33,9 @@ encryption:
   aes:
     key: ${ENCRYPTION_AES_KEY}
 
+pg:
+  url: http://localhost:8089
+
 logging:
   level:
     org.springframework.boot.diagnostics: ERROR

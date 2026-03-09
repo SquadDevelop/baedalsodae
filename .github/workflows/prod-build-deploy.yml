@@ -33,13 +33,18 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           docker save baedalsodae:latest | gzip > baedalsodae.tar.gz
 
-      - name: Upload image to HAProxy
+      - name: Build mock-pg image
+        run: |
+          docker build -t mock-pg:latest ./mock-pg
+          docker save mock-pg:latest | gzip > mock-pg.tar.gz
+
+      - name: Upload images to HAProxy
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
-          source: "baedalsodae.tar.gz"
+          source: "baedalsodae.tar.gz,mock-pg.tar.gz"
           target: "/home/ec2-user/baedalsodae"
 
   deploy:
@@ -55,14 +60,18 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
-            echo "=== SCP image to API-1 ==="
+            echo "=== SCP images to API-1 ==="
             ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 "mkdir -p ~/baedalsodae"
             scp -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no \
-              ~/baedalsodae/baedalsodae.tar.gz ec2-user@10.0.1.187:~/baedalsodae/
+              ~/baedalsodae/baedalsodae.tar.gz ~/baedalsodae/mock-pg.tar.gz ec2-user@10.0.1.187:~/baedalsodae/
 
             echo "=== Deploy to API-1 ==="
             ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 \
               "cd ~/baedalsodae && \
+              docker load < mock-pg.tar.gz && \
+              docker stop baedalsodae-mock-pg 2>/dev/null || true && \
+              docker rm baedalsodae-mock-pg 2>/dev/null || true && \
+              docker run -d --name baedalsodae-mock-pg -p 8089:8080 mock-pg:latest && \
               docker load < baedalsodae.tar.gz && \
               docker stop baedalsodae-app 2>/dev/null || true && \
               docker rm baedalsodae-app 2>/dev/null || true && \
@@ -86,7 +95,7 @@ jobs:
                 -e REDIS_PORT=$REDIS_PORT \
                 -e REDIS_PASSWORD=$REDIS_PASSWORD \
                 baedalsodae:latest && \
-              rm -f baedalsodae.tar.gz && \
+              rm -f baedalsodae.tar.gz mock-pg.tar.gz && \
               docker image prune -f && \
               docker ps"
         env:
@@ -135,14 +144,18 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
-            echo "=== SCP image to API-2 ==="
+            echo "=== SCP images to API-2 ==="
             ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.179 "mkdir -p ~/baedalsodae"
             scp -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no \
-              ~/baedalsodae/baedalsodae.tar.gz ec2-user@10.0.1.179:~/baedalsodae/
+              ~/baedalsodae/baedalsodae.tar.gz ~/baedalsodae/mock-pg.tar.gz ec2-user@10.0.1.179:~/baedalsodae/
 
             echo "=== Deploy to API-2 ==="
             ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.179 \
               "cd ~/baedalsodae && \
+              docker load < mock-pg.tar.gz && \
+              docker stop baedalsodae-mock-pg 2>/dev/null || true && \
+              docker rm baedalsodae-mock-pg 2>/dev/null || true && \
+              docker run -d --name baedalsodae-mock-pg -p 8089:8080 mock-pg:latest && \
               docker load < baedalsodae.tar.gz && \
               docker stop baedalsodae-app 2>/dev/null || true && \
               docker rm baedalsodae-app 2>/dev/null || true && \
@@ -166,7 +179,7 @@ jobs:
                 -e REDIS_PORT=$REDIS_PORT \
                 -e REDIS_PASSWORD=$REDIS_PASSWORD \
                 baedalsodae:latest && \
-              rm -f baedalsodae.tar.gz && \
+              rm -f baedalsodae.tar.gz mock-pg.tar.gz && \
               docker image prune -f && \
               docker ps"
         env:
