@@ -39,8 +39,9 @@ public class AllowedRegionServiceImpl implements AllowedRegionService {
     }
 
     @Override
+    @Transactional
     public AllowedRegionResponseDto createAllowedRegion(AllowedRegionRequestDto request) {
-        if (allowedRegionRepository.existsBySigunguCodeAndIsDeletedIsFalse(request.sigunguName())) {
+        if (allowedRegionRepository.existsBySigunguCodeAndIsDeletedIsFalse(request.sigunguCode())) {
             throw new BusinessException(ErrorCode.ALLOWED_REGION_CODE_DUPLICATED);
         }
         AllowedRegion allowedRegion =
