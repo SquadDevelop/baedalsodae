@@ -1,6 +1,9 @@
 package com.project.baedalsodae.store.repository.custom;
 
+import static com.project.baedalsodae.menu.entity.QMenuCategory.menuCategory;
+import static com.project.baedalsodae.menu.entity.QMenuItem.menuItem;
 import static com.project.baedalsodae.store.entity.QStore.store;
+import static com.project.baedalsodae.store.entity.QStoreCategory.storeCategory;
 
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
 import com.project.baedalsodae.store.entity.Store;
@@ -12,11 +15,10 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -47,6 +49,50 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
         }
 
         return new SliceImpl<>(content, PageRequest.ofSize(cursor.getSize()), hasNext);
+    }
+
+    @Override
+    public List<Store> searchStoreByKeyword(String keyword, Pageable pageable, SortType sortType) {
+        return queryFactory
+                .selectDistinct(store)
+                .from(store)
+                .join(store.storeCategory, storeCategory)
+                .fetchJoin()
+                .leftJoin(menuCategory)
+                .on(menuCategory.store.id.eq(store.id))
+                .leftJoin(menuItem)
+                .on(menuItem.menuCategory.id.eq(menuCategory.id))
+                .where(keywordCondition(keyword))
+                .orderBy(orderSpecifier(sortType), store.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+    }
+
+    @Override
+    public Long countStoresByKeyword(String keyword) {
+        return Optional.ofNullable(
+                        queryFactory
+                                .select(store.countDistinct())
+                                .from(store)
+                                .join(store.storeCategory, storeCategory)
+                                .leftJoin(menuCategory)
+                                .on(menuCategory.store.id.eq(store.id))
+                                .leftJoin(menuItem)
+                                .on(menuItem.menuCategory.id.eq(menuCategory.id))
+                                .where(keywordCondition(keyword))
+                                .fetchOne())
+                .orElse(0L);
+    }
+
+    private BooleanExpression keywordCondition(String keyword) {
+        String likeKeyword = "%" + keyword + "%";
+
+        return store.name
+                .like(likeKeyword)
+                .or(store.storeCategory.name.like(likeKeyword))
+                .or(menuCategory.name.like(likeKeyword))
+                .or(menuItem.name.like(likeKeyword));
     }
 
     private BooleanExpression cursorCondition(StoreCursorRequest cursor, SortType sortType) {

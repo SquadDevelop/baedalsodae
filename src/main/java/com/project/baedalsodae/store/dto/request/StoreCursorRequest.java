@@ -7,17 +7,22 @@ import java.util.UUID;
 
 public record StoreCursorRequest(
         UUID lastId,
+        SortType sortType,
         Instant lastCreatedAt,
         Double lastRating,
         Integer lastReviewCount,
         @Min(1) Integer size) {
-    public StoreCursorRequest normalize(SortType sortType) {
-        if (lastId != null) return this; // 첫 페이지 아니면 그대로
+    public StoreCursorRequest initCursor(SortType sortType) {
+        if (lastId != null) return this;
 
-        return switch (sortType) {
-            case LATEST -> new StoreCursorRequest(null, Instant.now(), null, null, size);
-            case RATING -> new StoreCursorRequest(null, null, Double.MAX_VALUE, null, size);
-            case REVIEW -> new StoreCursorRequest(null, null, null, Integer.MAX_VALUE, size);
+        SortType type = sortType == null ? SortType.LATEST : sortType;
+
+        return switch (type) {
+            case LATEST -> new StoreCursorRequest(null, type, Instant.now(), null, null, getSize());
+            case RATING ->
+                    new StoreCursorRequest(null, type, null, Double.MAX_VALUE, null, getSize());
+            case REVIEW ->
+                    new StoreCursorRequest(null, type, null, null, Integer.MAX_VALUE, getSize());
         };
     }
 

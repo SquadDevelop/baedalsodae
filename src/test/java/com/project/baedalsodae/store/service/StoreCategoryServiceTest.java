@@ -43,14 +43,15 @@ class StoreCategoryServiceTest {
         List<StoreCategory> repositoryData =
                 new ArrayList<>(List.of(category1, category2, category3));
 
-        given(storeCategoryRepository.findAllByIsDeletedFalse())
-                .willAnswer(
-                        invocation -> repositoryData.stream().filter(c -> !c.isDeleted()).toList());
-
         UUID deleteId = UUID.randomUUID();
         given(storeCategoryRepository.findById(deleteId)).willReturn(Optional.of(category2));
 
         storeCategoryService.deleteStoreCategory(deleteId);
+
+        given(storeCategoryRepository.findAllByIsDeletedFalse())
+                .willAnswer(
+                        invocation -> repositoryData.stream().filter(c -> !c.isDeleted()).toList());
+
         StoreCategoryListResponse response = storeCategoryService.getActiveStoreCategories();
 
         assertThat(response.getStoreCategoryList()).hasSize(2);

@@ -5,10 +5,7 @@ import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.dto.responseDto.category.MenuCategoryItemsResponse;
 import com.project.baedalsodae.menu.repository.custom.MenuCategoryCustomRepository;
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
-import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
-import com.project.baedalsodae.store.dto.response.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.StoreResponse;
-import com.project.baedalsodae.store.dto.response.StoreSummaryResponse;
+import com.project.baedalsodae.store.dto.response.*;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.SortType;
@@ -20,9 +17,9 @@ import com.project.baedalsodae.user.entity.UserRole;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,20 +30,39 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final MenuCategoryCustomRepository menuCategoryCustomRepository;
 
     @Override
-    public StorePageResponse getStorePage(
-            UUID storeCategoryId, StoreCursorRequest cursorRequest, SortType sortType) {
-        cursorRequest.normalize(sortType);
+    public StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest) {
+        SortType sortType = cursorRequest.sortType();
+        validateSortType(sortType);
+        StoreCursorRequest initializedCursor = cursorRequest.initCursor(sortType);
 
         StoreCategory storeCategory = getStoreCategory(storeCategoryId);
 
-        Slice<Store> result =
-                storeCustomRepository.findStoresByCursor(storeCategoryId, cursorRequest, sortType);
+        Slice<Store> storeSlice =
+                storeCustomRepository.findStoresByCursor(
+                        storeCategoryId, initializedCursor, sortType);
 
-        return StorePageResponse.of(storeCategory.getId(), storeCategory.getName(), result);
+        return StorePageResponse.of(storeCategory.getId(), storeCategory.getName(), storeSlice);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    public StoreSearchPageResponse getStoreByKeyword(
+            String keyword, Pageable pageable, SortType sortType) {
+        validateSortType(sortType);
+        List<Store> content =
+                storeCustomRepository.searchStoreByKeyword(keyword, pageable, sortType);
+
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) content.remove(content.size() - 1);
+
+        Long totalCount = null;
+        if (pageable.getPageNumber() == 0) {
+            totalCount = storeCustomRepository.countStoresByKeyword(keyword);
+        }
+
+        return StoreSearchPageResponse.of(content, totalCount, pageable, hasNext);
+    }
+
+    @Override
     public StoreDetailResponse getStoreDetail(UUID storeId) {
         Store store = getStore(storeId);
 
@@ -58,11 +74,11 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     }
 
     @Override
-    public StoreResponse getStoreForOwner(UUID storeId, UUID userId, String role) {
+    public OwnerStoreResponse getOwnerStore(UUID storeId, UUID userId, UserRole role) {
         Store store = getStore(storeId);
         validateStoreOwner(store.getUserId(), userId, role);
 
-        return StoreResponse.fromEntity(store);
+        return OwnerStoreResponse.fromEntity(store);
     }
 
     private StoreCategory getStoreCategory(UUID StoreCategoryId) {
@@ -77,9 +93,15 @@ public class StoreQueryServiceImpl implements StoreQueryService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
     }
 
-    private void validateStoreOwner(UUID storeOwnerId, UUID userId, String role) {
-        if (!userId.equals(storeOwnerId) || !role.equals(UserRole.OWNER.name())) {
+    private void validateStoreOwner(UUID storeOwnerId, UUID userId, UserRole role) {
+        if (!userId.equals(storeOwnerId) || !role.getRole().equals(UserRole.OWNER.name())) {
             throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
+        }
+    }
+
+    private void validateSortType(SortType sortType) {
+        if (!sortType.isStoreListSort()) {
+            throw new BusinessException(ErrorCode.SORT_UNSUPPORTED);
         }
     }
 }

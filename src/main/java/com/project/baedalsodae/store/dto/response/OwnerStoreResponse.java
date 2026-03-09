@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class StoreResponse {
+public class OwnerStoreResponse {
     private UUID storeId;
     private String storeName;
     private String phoneNumber;
@@ -20,8 +20,8 @@ public class StoreResponse {
 
     // TODO: 가게 운영시간 추가
 
-    public static StoreResponse fromEntity(Store store) {
-        return StoreResponse.builder()
+    public static OwnerStoreResponse fromEntity(Store store) {
+        return OwnerStoreResponse.builder()
                 .storeId(store.getId())
                 .storeName(store.getName())
                 .phoneNumber(store.getPhone())

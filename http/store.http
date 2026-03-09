@@ -1,20 +1,23 @@
 ### 가게 목록 조회 (최신순)
-GET http://localhost:18082/api/v1
+GET {{host}}
     /stores?storeCategoryId={{storeCategoryId}}&lastId={{lastId}}&lastCreatedAt={{lastCreatedAt}}&size=10&sortType=LATEST
 
 ### 가게 목록 조회 (리뷰순)
-GET http://localhost:18082/api/v1
+GET {{host}}
     /stores?storeCategoryId={{storeCategoryId}}&lastId={{lastId}}&lastReviewCount={{lastReviewCount}}&size=10&sortType=REVIEW
 
 ### 가게 목록 조회 (첫 페이지)
-GET http://localhost:18082/api/v1
+GET {{host}}
     /stores?storeCategoryId={{storeCategoryId}}&size=10&sortType=LATEST
 
 ### 가게 상세 조회
-GET http://localhost:18082/api/v1/stores/{{storeId}}
+GET {{host}}/stores/{{storeId}}
 
+### 가게 검색
+GET {{host}}/stores/keywords?keyword={{keyword}}&sortType={{sortType}}&page={{page}}&size={{size}}
+Content-Type: application/json
 
 ### 점주용 가게 조회
-GET http://localhost:18082/api/v1/stores/{{storeId}}/me
+GET {{host}}/stores/{{storeId}}/me
 X-User-Id: {{userId}}
 X-User-Role: {{role}}

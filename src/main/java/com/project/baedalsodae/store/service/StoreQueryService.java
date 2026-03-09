@@ -1,17 +1,21 @@
 package com.project.baedalsodae.store.service;
 
 import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
+import com.project.baedalsodae.store.dto.response.OwnerStoreResponse;
 import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
 import com.project.baedalsodae.store.dto.response.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.StoreResponse;
+import com.project.baedalsodae.store.dto.response.StoreSearchPageResponse;
 import com.project.baedalsodae.store.entity.enums.SortType;
+import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 
 public interface StoreQueryService {
+    StoreSearchPageResponse getStoreByKeyword(String keyword, Pageable pageable, SortType sortType);
+
     StoreDetailResponse getStoreDetail(UUID storeId);
 
-    StoreResponse getStoreForOwner(UUID storeId, UUID userId, String role);
+    OwnerStoreResponse getOwnerStore(UUID storeId, UUID userId, UserRole role);
 
-    StorePageResponse getStorePage(
-            UUID storeCategoryId, StoreCursorRequest cursorRequest, SortType sortType);
+    StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest);
 }
