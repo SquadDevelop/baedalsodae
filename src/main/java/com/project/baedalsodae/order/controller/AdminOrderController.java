@@ -28,10 +28,10 @@ public class AdminOrderController {
 	@GetMapping("/orders")
 	public ResponseEntity<ApiResponse<OrderListResponse>> getOrders(
 			@AuthenticationPrincipal UserDetailsImpl userDetails,
-			@RequestParam(name = "roleCategory") UserRole role, 	// UserRole 상수명 반환(예: 요청 시 /admins/orders?roleCategory=CUSTOMER)
 			@ModelAttribute OrderListRequest request) {
+		UserRole userRole = userDetails.getUserRole();
 		OrderListResponse response
-				= orderService.getOrders(userDetails.getUserId(), role.getRole(), request);
+				= orderService.getOrders(userDetails.getUserId(), userRole.getRole(), request);
 
 		return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_LIST, response));
 	}
