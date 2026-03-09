@@ -4,6 +4,8 @@ import static com.project.baedalsodae.store.fixture.StoreHoursTestConstants.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import com.project.baedalsodae.global.common.BusinessException;
+import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreHours;
 import com.project.baedalsodae.store.entity.enums.DayOfWeek;
@@ -16,7 +18,7 @@ import java.util.UUID;
 public class StoreHoursMockFixture {
 
     private StoreHoursMockFixture() {
-        throw new AssertionError("Utility class should not be instantiated");
+        throw new BusinessException(ErrorCode.UTILITY_ASSERTION);
     }
 
     public static Store createMockStoreWithRepository(

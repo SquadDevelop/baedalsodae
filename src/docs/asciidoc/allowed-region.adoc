@@ -1,0 +1,78 @@
+= 허용 지역 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[allowed-region-get-list]]
+== 허용 지역 목록 조회
+
+`GET /allowed-regions`
+
+권한: `MANAGER`
+
+커서 기반 페이지네이션으로 허용 지역 목록을 조회합니다.
+
+=== Query Parameters
+include::{snippets}/allowed-region/get-list/query-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/allowed-region/get-list/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/allowed-region/get-list/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/allowed-region/get-list/http-response.adoc[]
+
+---
+
+[[allowed-region-create]]
+== 허용 지역 등록
+
+`POST /allowed-regions`
+
+권한: `MANAGER`
+
+새로운 허용 지역을 등록합니다. 이미 등록된 시군구 코드는 등록할 수 없습니다.
+
+=== Request Fields
+include::{snippets}/allowed-region/create/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/allowed-region/create/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/allowed-region/create/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/allowed-region/create/http-response.adoc[]
+
+---
+
+[[allowed-region-toggle-activation]]
+== 허용 지역 활성화/비활성화 토글
+
+`PATCH /allowed-regions/{allowedRegionId}/activation?activation={activation}`
+
+권한: `MANAGER`
+
+허용 지역의 활성화 상태를 변경합니다. 비활성화된 지역은 주문 시 허용 지역으로 인식되지 않습니다.
+
+=== Path Parameters
+include::{snippets}/allowed-region/toggle-activation/path-parameters.adoc[]
+
+=== Query Parameters
+include::{snippets}/allowed-region/toggle-activation/query-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/allowed-region/toggle-activation/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/allowed-region/toggle-activation/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/allowed-region/toggle-activation/http-response.adoc[]
