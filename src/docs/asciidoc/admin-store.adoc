@@ -1,0 +1,81 @@
+= 관리자 가게 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[admin-store-update]]
+== 관리자 가게 정보 수정
+
+`PATCH /admins/stores/{storeId}`
+
+권한: `MANAGER`
+
+관리자가 가게 정보를 수정합니다.
+
+=== Path Parameters
+include::{snippets}/admin/store/update/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/admin/store/update/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin/store/update/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin/store/update/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin/store/update/http-response.adoc[]
+
+---
+
+[[admin-store-update-status]]
+== 관리자 가게 상태 수정
+
+`PATCH /admins/stores/{storeId}/status`
+
+권한: `MANAGER`
+
+관리자가 가게의 영업 상태를 변경합니다.
+
+=== Path Parameters
+include::{snippets}/admin/store/update-status/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/admin/store/update-status/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin/store/update-status/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin/store/update-status/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin/store/update-status/http-response.adoc[]
+
+---
+
+[[admin-store-delete]]
+== 관리자 가게 삭제
+
+`DELETE /admins/stores/{storeId}`
+
+권한: `MANAGER`
+
+관리자가 가게를 삭제합니다.
+
+=== Path Parameters
+include::{snippets}/admin/store/delete/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin/store/delete/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin/store/delete/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin/store/delete/http-response.adoc[]
