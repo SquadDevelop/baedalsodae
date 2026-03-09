@@ -13,7 +13,7 @@ import lombok.Getter;
 public class StoreSummaryResponse {
     private UUID storeId;
     private String storeName;
-    private Integer reviewCount;
+    private int reviewCount;
     private Double avgRating;
     private StoreStatus storeStatus;
 

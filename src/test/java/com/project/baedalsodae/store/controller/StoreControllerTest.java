@@ -98,7 +98,7 @@ class StoreControllerTest {
                         .storeCategoryId(CATEGORY_ID)
                         .storeCategoryName("한식")
                         .hasNext(false)
-                        .storeCount(BigDecimal.valueOf(1))
+                        .storeCount(1)
                         .lastCursorId(STORE_ID)
                         .stores(List.of(storeSummary()))
                         .build();
@@ -347,7 +347,7 @@ class StoreControllerTest {
                         .phoneNumber("02-1234-5678")
                         .businessNumber("123-45-67890")
                         .description("맛있는 치킨집입니다.")
-                        .reviewCount(BigDecimal.valueOf(10))
+                        .reviewCount(10)
                         .avgRating(4.5)
                         .storeStatus("OPEN")
                         .address(addressResponse())

@@ -2,7 +2,6 @@ package com.project.baedalsodae.store.dto.response.store;
 
 import com.project.baedalsodae.global.common.dto.AddressResponse;
 import com.project.baedalsodae.store.entity.Store;
-import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +14,7 @@ public class OwnerStoreResponse {
     private String phoneNumber;
     private String businessNumber;
     private String description;
-    private BigDecimal reviewCount;
+    private int reviewCount;
     private Double avgRating;
     private String storeStatus;
     private AddressResponse address;
@@ -27,7 +26,7 @@ public class OwnerStoreResponse {
                 .phoneNumber(store.getPhone())
                 .businessNumber(store.getBusinessNumber())
                 .description(store.getDescription())
-                .reviewCount(BigDecimal.valueOf(store.getReviewCount()))
+                .reviewCount(store.getReviewCount())
                 .avgRating(store.getAvgRating())
                 .storeStatus(store.getStoreStatus().name())
                 .address(AddressResponse.fromEntity(store.getAddress()))
