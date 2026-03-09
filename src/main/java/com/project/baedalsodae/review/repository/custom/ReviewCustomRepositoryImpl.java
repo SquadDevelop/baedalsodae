@@ -47,10 +47,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     public ReviewSummary getSummary(UUID storeId) {
         return queryFactory
                 .select(
-                        Projections.fields(
-                                ReviewSummary.class,
-                                review.rating.avg().as("averageRating"),
-                                review.count().as("totalReviews")))
+                        Projections.constructor(
+                                ReviewSummary.class, review.rating.avg(), review.count()))
                 .from(review)
                 .join(order)
                 .on(review.orderId.eq(order.id))

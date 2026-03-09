@@ -29,7 +29,6 @@ import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
 import com.project.baedalsodae.user.entity.UserRole;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
