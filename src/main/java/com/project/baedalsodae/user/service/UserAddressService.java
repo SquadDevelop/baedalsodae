@@ -12,7 +12,9 @@ public interface UserAddressService {
 
     List<UserAddressResponse> getAddressList(UUID userId);
 
-    UserAddressResponse updateAddress(UUID userId, UpdateUserAddressRequest request);
+    UserAddressResponse getMainAddress(UUID userId);
+
+    UserAddressResponse updateAddress(UUID userId, UUID addressId, UpdateUserAddressRequest request);
 
     void updateAddressList(UUID userId, List<UpdateUserAddressRequest> addresses);
 

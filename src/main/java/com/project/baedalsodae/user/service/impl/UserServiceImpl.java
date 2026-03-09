@@ -2,7 +2,6 @@ package com.project.baedalsodae.user.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
 import com.project.baedalsodae.user.dto.request.UserSearchRequest;
@@ -49,12 +48,9 @@ public class UserServiceImpl implements UserService {
                         createRequest.getRole());
 
         User savedUser = userRepository.save(newUser);
-        CreateUserAddressRequest addressRequest =
-                CreateUserAddressRequest.from(
-                        createRequest.getRoadAddress(),
-                        createRequest.getDetailAddress(),
-                        createRequest.getDescription());
-        userAddressService.createAddress(savedUser.getId(), addressRequest);
+        
+        // 수정: createRequest.getAddress()를 직접 전달
+        userAddressService.createAddress(savedUser.getId(), createRequest.getAddress());
 
         return UserDetailResponse.from(savedUser);
     }
@@ -103,18 +99,16 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserDetailResponse> getUsers(
-            UserRole role, UserSearchRequest request, Pageable pageable) {
+    public Page<UserDetailResponse> getUsers(UserRole role, UserSearchRequest request, Pageable pageable) {
+        // 요구사항: 10, 30, 50건 기준으로만 페이지 노출 가능. 아니면 10건 고정.
         int pageSize = pageable.getPageSize();
         if (!ALLOWED_PAGE_SIZE.contains(pageSize)) {
             pageSize = 10;
         }
 
-        Pageable validatedPageable =
-                PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+        Pageable validatedPageable = PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
 
-        return userRepository
-                .searchUsers(role, request, validatedPageable)
+        return userRepository.searchUsers(role, request, validatedPageable)
                 .map(UserDetailResponse::from);
     }
 
