@@ -32,29 +32,14 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           docker save baedalsodae:latest | gzip > baedalsodae.tar.gz
 
-      - name: Upload image to API-1
+      - name: Upload image to HAProxy
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.API_SERVER_1_HOST }}
+          host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
           source: "baedalsodae.tar.gz"
           target: "/home/ec2-user/baedalsodae"
-          proxy_host: ${{ secrets.HAPROXY_HOST }}
-          proxy_username: ec2-user
-          proxy_key: ${{ secrets.SSH_KEY }}
-
-      - name: Upload image to API-2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.API_SERVER_2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.SSH_KEY }}
-          source: "baedalsodae.tar.gz"
-          target: "/home/ec2-user/baedalsodae"
-          proxy_host: ${{ secrets.HAPROXY_HOST }}
-          proxy_username: ec2-user
-          proxy_key: ${{ secrets.SSH_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -64,50 +49,44 @@ jobs:
       - name: Deploy to API-1
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.API_SERVER_1_HOST }}
+          host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
-          proxy_host: ${{ secrets.HAPROXY_HOST }}
-          proxy_username: ec2-user
-          proxy_key: ${{ secrets.SSH_KEY }}
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
-            cd /home/ec2-user/baedalsodae
+            echo "=== SCP image to API-1 ==="
+            scp -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no \
+              ~/baedalsodae/baedalsodae.tar.gz ec2-user@10.0.1.187:~/baedalsodae/
 
-            echo "=== Loading Docker image ==="
-            docker load < baedalsodae.tar.gz
-
-            echo "=== Deploying ==="
-            docker stop baedalsodae-app 2>/dev/null || true
-            docker rm baedalsodae-app 2>/dev/null || true
-
-            docker run -d \
-              --name baedalsodae-app \
-              -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e API_SERVER_PORT=$API_SERVER_PORT \
-              -e ENCRYPTION_AES_KEY=$ENCRYPTION_AES_KEY \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION \
-              -e POSTGRES_DB=$POSTGRES_DB \
-              -e POSTGRES_DB_URL=$POSTGRES_DB_URL \
-              -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-              -e POSTGRES_PORT=$POSTGRES_PORT \
-              -e POSTGRES_USER=$POSTGRES_USER \
-              -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
-              -e REDIS_URL=$REDIS_URL \
-              -e REDIS_HOST=$REDIS_HOST \
-              -e REDIS_PORT=$REDIS_PORT \
-              -e REDIS_PASSWORD=$REDIS_PASSWORD \
-              baedalsodae:latest
-
-            echo "=== Cleanup ==="
-            rm -f baedalsodae.tar.gz
-            docker image prune -f
-
-            echo "=== Status ==="
-            docker ps
+            echo "=== Deploy to API-1 ==="
+            ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 \
+              "cd ~/baedalsodae && \
+              docker load < baedalsodae.tar.gz && \
+              docker stop baedalsodae-app 2>/dev/null || true && \
+              docker rm baedalsodae-app 2>/dev/null || true && \
+              docker run -d \
+                --name baedalsodae-app \
+                -p 8080:8080 \
+                -e SPRING_PROFILES_ACTIVE=prod \
+                -e API_SERVER_PORT=$API_SERVER_PORT \
+                -e ENCRYPTION_AES_KEY=$ENCRYPTION_AES_KEY \
+                -e JWT_SECRET=$JWT_SECRET \
+                -e JWT_EXPIRATION=$JWT_EXPIRATION \
+                -e JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION \
+                -e POSTGRES_DB=$POSTGRES_DB \
+                -e POSTGRES_DB_URL=$POSTGRES_DB_URL \
+                -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+                -e POSTGRES_PORT=$POSTGRES_PORT \
+                -e POSTGRES_USER=$POSTGRES_USER \
+                -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
+                -e REDIS_URL=$REDIS_URL \
+                -e REDIS_HOST=$REDIS_HOST \
+                -e REDIS_PORT=$REDIS_PORT \
+                -e REDIS_PASSWORD=$REDIS_PASSWORD \
+                baedalsodae:latest && \
+              rm -f baedalsodae.tar.gz && \
+              docker image prune -f && \
+              docker ps"
         env:
           API_SERVER_PORT: ${{ secrets.API_SERVER_PORT }}
           ENCRYPTION_AES_KEY: ${{ secrets.ENCRYPTION_AES_KEY }}
@@ -128,16 +107,14 @@ jobs:
       - name: Health Check API-1
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.API_SERVER_1_HOST }}
+          host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
-          proxy_host: ${{ secrets.HAPROXY_HOST }}
-          proxy_username: ec2-user
-          proxy_key: ${{ secrets.SSH_KEY }}
           script: |
             echo "=== Waiting for API-1 to be healthy ==="
             for i in {1..12}; do
-              STATUS=$(curl -s http://localhost:8080/actuator/health | grep -o '"status":"UP"' || true)
+              STATUS=$(ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 \
+                "curl -s http://localhost:8080/actuator/health | grep -o '\"status\":\"UP\"'" || true)
               if [ "$STATUS" = '"status":"UP"' ]; then
                 echo "API-1 is UP! Proceeding to API-2 deploy."
                 exit 0
@@ -151,50 +128,44 @@ jobs:
       - name: Deploy to API-2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.API_SERVER_2_HOST }}
+          host: ${{ secrets.HAPROXY_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
-          proxy_host: ${{ secrets.HAPROXY_HOST }}
-          proxy_username: ec2-user
-          proxy_key: ${{ secrets.SSH_KEY }}
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
-            cd /home/ec2-user/baedalsodae
+            echo "=== SCP image to API-2 ==="
+            scp -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no \
+              ~/baedalsodae/baedalsodae.tar.gz ec2-user@10.0.1.179:~/baedalsodae/
 
-            echo "=== Loading Docker image ==="
-            docker load < baedalsodae.tar.gz
-
-            echo "=== Deploying ==="
-            docker stop baedalsodae-app 2>/dev/null || true
-            docker rm baedalsodae-app 2>/dev/null || true
-
-            docker run -d \
-              --name baedalsodae-app \
-              -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e API_SERVER_PORT=$API_SERVER_PORT \
-              -e ENCRYPTION_AES_KEY=$ENCRYPTION_AES_KEY \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION \
-              -e POSTGRES_DB=$POSTGRES_DB \
-              -e POSTGRES_DB_URL=$POSTGRES_DB_URL \
-              -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-              -e POSTGRES_PORT=$POSTGRES_PORT \
-              -e POSTGRES_USER=$POSTGRES_USER \
-              -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
-              -e REDIS_URL=$REDIS_URL \
-              -e REDIS_HOST=$REDIS_HOST \
-              -e REDIS_PORT=$REDIS_PORT \
-              -e REDIS_PASSWORD=$REDIS_PASSWORD \
-              baedalsodae:latest
-
-            echo "=== Cleanup ==="
-            rm -f baedalsodae.tar.gz
-            docker image prune -f
-
-            echo "=== Status ==="
-            docker ps
+            echo "=== Deploy to API-2 ==="
+            ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.179 \
+              "cd ~/baedalsodae && \
+              docker load < baedalsodae.tar.gz && \
+              docker stop baedalsodae-app 2>/dev/null || true && \
+              docker rm baedalsodae-app 2>/dev/null || true && \
+              docker run -d \
+                --name baedalsodae-app \
+                -p 8080:8080 \
+                -e SPRING_PROFILES_ACTIVE=prod \
+                -e API_SERVER_PORT=$API_SERVER_PORT \
+                -e ENCRYPTION_AES_KEY=$ENCRYPTION_AES_KEY \
+                -e JWT_SECRET=$JWT_SECRET \
+                -e JWT_EXPIRATION=$JWT_EXPIRATION \
+                -e JWT_REFRESH_EXPIRATION=$JWT_REFRESH_EXPIRATION \
+                -e POSTGRES_DB=$POSTGRES_DB \
+                -e POSTGRES_DB_URL=$POSTGRES_DB_URL \
+                -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+                -e POSTGRES_PORT=$POSTGRES_PORT \
+                -e POSTGRES_USER=$POSTGRES_USER \
+                -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
+                -e REDIS_URL=$REDIS_URL \
+                -e REDIS_HOST=$REDIS_HOST \
+                -e REDIS_PORT=$REDIS_PORT \
+                -e REDIS_PASSWORD=$REDIS_PASSWORD \
+                baedalsodae:latest && \
+              rm -f baedalsodae.tar.gz && \
+              docker image prune -f && \
+              docker ps"
         env:
           API_SERVER_PORT: ${{ secrets.API_SERVER_PORT }}
           ENCRYPTION_AES_KEY: ${{ secrets.ENCRYPTION_AES_KEY }}
