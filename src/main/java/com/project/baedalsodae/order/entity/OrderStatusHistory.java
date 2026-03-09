@@ -75,4 +75,9 @@ public class OrderStatusHistory extends BaseTimeEntity {
         return new OrderStatusHistory(
                 order.getId(), fromStatus, order.getStatus(), ActorType.OWNER, userId);
     }
+
+    public static OrderStatusHistory createForSystem(Order order, OrderStatus fromStatus) {
+        return new OrderStatusHistory(
+                order.getId(), fromStatus, order.getStatus(), ActorType.SYSTEM, null);
+    }
 }

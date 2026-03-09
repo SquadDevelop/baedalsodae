@@ -4,10 +4,10 @@ import com.project.baedalsodae.payment.entity.Payment;
 import com.project.baedalsodae.payment.entity.PaymentStatus;
 import java.util.UUID;
 
-public record PaymentCreatedEvent(
+public record PaymentCanceledEvent(
         UUID orderId, UUID paymentId, PaymentStatus status, String pgTransactionId, UUID userId) {
-    public static PaymentCreatedEvent from(final Payment payment) {
-        return new PaymentCreatedEvent(
+    public static PaymentCanceledEvent from(final Payment payment) {
+        return new PaymentCanceledEvent(
                 payment.getOrderId(),
                 payment.getId(),
                 payment.getStatus(),
