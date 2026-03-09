@@ -1,6 +1,6 @@
 package com.project.baedalsodae.store.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -14,6 +14,7 @@ import com.project.baedalsodae.store.dto.request.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.response.OwnerStoreResponse;
 import com.project.baedalsodae.store.dto.response.StoreDetailResponse;
 import com.project.baedalsodae.store.dto.response.StorePageResponse;
+import com.project.baedalsodae.store.dto.response.StoreSearchPageResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.SortType;
@@ -22,6 +23,7 @@ import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
 import com.project.baedalsodae.store.service.impl.StoreQueryServiceImpl;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +35,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -152,22 +156,26 @@ class StoreQueryServiceTest {
     }
 
     @Nested
-    @DisplayName("가게 목록 조회 (Pagination)")
+    @DisplayName("가게 목록 조회")
     class GetStorePage {
         @Test
         @DisplayName("성공: 카테고리별 가게 목록을 슬라이스 형태로 반환한다.")
         void getStorePage_success() {
-            // given
-            StoreCursorRequest cursorRequest = mock(StoreCursorRequest.class);
             SortType sortType = SortType.LATEST;
+            StoreCursorRequest cursorRequest =
+                    new StoreCursorRequest(null, sortType, null, null, null, 10);
 
             given(storeCategoryRepository.findById(storeCategoryId))
                     .willReturn(Optional.of(storeCategory));
 
             Slice<Store> mockSlice = new SliceImpl<>(List.of(store));
+
+            // any()를 사용하거나 실제 생성한 객체를 맞춰줍니다.
             given(
                             storeCustomRepository.findStoresByCursor(
-                                    eq(storeCategoryId), any(), eq(sortType)))
+                                    eq(storeCategoryId),
+                                    any(StoreCursorRequest.class),
+                                    eq(sortType)))
                     .willReturn(mockSlice);
 
             // when
@@ -177,9 +185,78 @@ class StoreQueryServiceTest {
             // then
             assertThat(response).isNotNull();
             assertThat(response.getStoreCategoryId()).isEqualTo(storeCategoryId);
-            verify(cursorRequest).initCursor(sortType);
+
             verify(storeCustomRepository)
                     .findStoresByCursor(eq(storeCategoryId), any(), eq(sortType));
+        }
+    }
+
+    @Nested
+    @DisplayName("가게 키워드 검색")
+    class getStoreByKeyword {
+
+        @Test
+        @DisplayName("성공: 키워드 검색 시 첫 페이지라면 totalCount를 포함한 응답을 반환한다.")
+        void getStoreByKeyword_success_firstPage() {
+            // given
+            String keyword = "치킨";
+            SortType sortType = SortType.LATEST;
+            Pageable pageable = PageRequest.of(0, 10);
+
+            List<Store> mockContent = new ArrayList<>();
+            for (int i = 0; i < 11; i++) {
+                mockContent.add(store);
+            }
+
+            given(
+                            storeCustomRepository.searchStoreByKeyword(
+                                    eq(keyword), any(Pageable.class), eq(sortType)))
+                    .willReturn(mockContent);
+
+            // 첫 페이지(0)이므로 count 쿼리 호출 모킹
+            given(storeCustomRepository.countStoresByKeyword(keyword)).willReturn(100L);
+
+            // when
+            StoreSearchPageResponse response =
+                    storeQueryService.getStoreByKeyword(keyword, pageable, sortType);
+
+            // then
+            assertThat(response).isNotNull();
+            assertThat(response.getStores()).hasSize(10); // 로직에 의해 1개 제거됨
+            assertThat(response.getTotalCount()).isEqualTo(100L);
+            assertThat(response.getCurrentPage()).isEqualTo(1); // 0 + 1
+            assertThat(response.getHasNext()).isTrue();
+            assertThat(response.getHasPrevious()).isFalse();
+
+            verify(storeCustomRepository).countStoresByKeyword(keyword);
+        }
+
+        @Test
+        @DisplayName("성공: 두 번째 페이지 이후라면 totalCount는 null이며 hasPrevious는 true이다.")
+        void getStoreByKeyword_success_secondPage() {
+            // given
+            String keyword = "치킨";
+            SortType sortType = SortType.LATEST;
+            Pageable pageable = PageRequest.of(1, 10); // 두 번째 페이지
+
+            List<Store> mockContent = new ArrayList<>(List.of(store));
+
+            given(
+                            storeCustomRepository.searchStoreByKeyword(
+                                    eq(keyword), any(Pageable.class), eq(sortType)))
+                    .willReturn(mockContent);
+
+            // when
+            StoreSearchPageResponse response =
+                    storeQueryService.getStoreByKeyword(keyword, pageable, sortType);
+
+            // then
+            assertThat(response.getTotalCount()).isNull(); // 두 번째 페이지는 count 쿼리 안 함
+            assertThat(response.getCurrentPage()).isEqualTo(2); // 1 + 1
+            assertThat(response.getHasPrevious()).isTrue();
+
+            // 첫 페이지가 아니므로 count 쿼리가 호출되지 않았는지 검증
+            verify(storeCustomRepository, never()).countStoresByKeyword(anyString());
         }
     }
 }
