@@ -94,7 +94,7 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     }
 
     private void validateStoreOwner(UUID storeOwnerId, UUID userId, UserRole role) {
-        if (!userId.equals(storeOwnerId) || !role.getRole().equals(UserRole.OWNER.name())) {
+        if (!userId.equals(storeOwnerId) || !role.getRole().equals(UserRole.OWNER.getRole())) {
             throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
         }
     }

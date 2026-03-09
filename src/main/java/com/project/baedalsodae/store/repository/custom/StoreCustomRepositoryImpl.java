@@ -37,6 +37,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                 queryFactory
                         .selectFrom(store)
                         .where(
+                                isNotDeleted(),
                                 store.storeCategory.id.eq(storeCategoryId),
                                 cursor.lastId() != null ? cursorCondition(cursor, sortType) : null)
                         .orderBy(statusOrder.desc(), orderSpecifier(sortType), store.id.desc())
@@ -62,7 +63,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                 .on(menuCategory.store.id.eq(store.id))
                 .leftJoin(menuItem)
                 .on(menuItem.menuCategory.id.eq(menuCategory.id))
-                .where(keywordCondition(keyword))
+                .where(isNotDeleted(), keywordCondition(keyword))
                 .orderBy(orderSpecifier(sortType), store.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -80,9 +81,13 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                                 .on(menuCategory.store.id.eq(store.id))
                                 .leftJoin(menuItem)
                                 .on(menuItem.menuCategory.id.eq(menuCategory.id))
-                                .where(keywordCondition(keyword))
+                                .where(isNotDeleted(), keywordCondition(keyword))
                                 .fetchOne())
                 .orElse(0L);
+    }
+
+    private BooleanExpression isNotDeleted() {
+        return store.isDeleted.isFalse();
     }
 
     private BooleanExpression keywordCondition(String keyword) {
