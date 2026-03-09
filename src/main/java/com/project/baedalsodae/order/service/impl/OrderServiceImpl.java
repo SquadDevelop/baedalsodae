@@ -1,5 +1,6 @@
 package com.project.baedalsodae.order.service.impl;
 
+import com.project.baedalsodae.allowedRegion.service.AllowedRegionService;
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.repository.CartRepository;
 import com.project.baedalsodae.global.common.BusinessException;
@@ -24,13 +25,18 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
+import com.project.baedalsodae.user.service.UserAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +50,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderEventPublisher orderEventPublisher;
     private final OrderQueryRepository orderQueryRepository;
     private final PaymentRepository paymentRepository;
+    private final AllowedRegionService allowedRegionService;
+    private final UserAddressService userAddressService;
 
     @Override
     @Transactional
