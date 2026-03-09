@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -68,14 +67,17 @@ public class UserAddressControllerTest {
         UserDetailsImpl user = createUserDetails(userId, UserRole.CUSTOMER);
         CreateUserAddressRequest request = createCreateAddressRequest();
 
-        doNothing().when(userAddressService).createAddress(eq(userId), any(CreateUserAddressRequest.class));
+        doNothing()
+                .when(userAddressService)
+                .createAddress(eq(userId), any(CreateUserAddressRequest.class));
 
         // when & then
-        mockMvc.perform(post(BASE_URL)
-                        .with(user(user))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        post(BASE_URL)
+                                .with(user(user))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_ADDRESS_CREATED.getCode()));
     }
@@ -89,8 +91,7 @@ public class UserAddressControllerTest {
         given(userAddressService.getAddressList(userId)).willReturn(new ArrayList<>());
 
         // when & then
-        mockMvc.perform(get(BASE_URL)
-                        .with(user(user)))
+        mockMvc.perform(get(BASE_URL).with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_ADDRESS_FOUND.getCode()));
     }
@@ -104,8 +105,7 @@ public class UserAddressControllerTest {
         given(userAddressService.getMainAddress(userId)).willReturn(null);
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/main")
-                        .with(user(user)))
+        mockMvc.perform(get(BASE_URL + "/main").with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_ADDRESS_FOUND.getCode()));
     }
@@ -120,15 +120,18 @@ public class UserAddressControllerTest {
         UpdateUserAddressRequest request = createUpdateUserAddressRequest(addressId);
         UserAddressResponse response = createUserAddressResponse(addressId, true);
 
-        given(userAddressService.updateAddress(eq(userId), eq(addressId), any(UpdateUserAddressRequest.class)))
+        given(
+                        userAddressService.updateAddress(
+                                eq(userId), eq(addressId), any(UpdateUserAddressRequest.class)))
                 .willReturn(response);
 
         // when & then
-        mockMvc.perform(put(BASE_URL + "/" + addressId)
-                        .with(user(user))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(
+                        put(BASE_URL + "/" + addressId)
+                                .with(user(user))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_ADDRESS_UPDATED.getCode()));
     }
@@ -139,18 +142,21 @@ public class UserAddressControllerTest {
         // given
         UUID userId = UUID.randomUUID();
         UserDetailsImpl user = createUserDetails(userId, UserRole.CUSTOMER);
-        List<UpdateUserAddressRequest> requests = List.of(createUpdateUserAddressRequest(UUID.randomUUID()));
+        List<UpdateUserAddressRequest> requests =
+                List.of(createUpdateUserAddressRequest(UUID.randomUUID()));
 
         doNothing().when(userAddressService).updateAddressList(eq(userId), anyList());
 
         // when & then
-        mockMvc.perform(put(BASE_URL)
-                        .with(user(user))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requests)))
+        mockMvc.perform(
+                        put(BASE_URL)
+                                .with(user(user))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requests)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.USER_ADDRESS_BULK_UPDATED.getCode()));
+                .andExpect(
+                        jsonPath("$.code").value(SuccessCode.USER_ADDRESS_BULK_UPDATED.getCode()));
     }
 
     @Test
@@ -164,9 +170,7 @@ public class UserAddressControllerTest {
         doNothing().when(userAddressService).deleteAddress(userId, addressId);
 
         // when & then
-        mockMvc.perform(delete(BASE_URL + "/" + addressId)
-                        .with(user(user))
-                        .with(csrf()))
+        mockMvc.perform(delete(BASE_URL + "/" + addressId).with(user(user)).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.USER_ADDRESS_DELETED.getCode()));
     }
@@ -182,11 +186,10 @@ public class UserAddressControllerTest {
         doNothing().when(userAddressService).setMainAddress(userId, addressId);
 
         // when & then
-        mockMvc.perform(patch(BASE_URL + "/" + addressId + "/main")
-                        .with(user(user))
-                        .with(csrf()))
+        mockMvc.perform(patch(BASE_URL + "/" + addressId + "/main").with(user(user)).with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.USER_MAIN_ADDRESS_CHANGED.getCode()));
+                .andExpect(
+                        jsonPath("$.code").value(SuccessCode.USER_MAIN_ADDRESS_CHANGED.getCode()));
     }
 
     // Helper Methods

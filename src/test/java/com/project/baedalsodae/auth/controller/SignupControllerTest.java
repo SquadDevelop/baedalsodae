@@ -53,9 +53,9 @@ public class SignupControllerTest {
     @DisplayName("성공 - 회원가입 서비스 호출 및 응답 검증")
     void signupSuccess() throws Exception {
         // given
-        CreateUserAddressRequest addressRequest = CreateUserAddressRequest.from(
-                "11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세주소", "집"
-        );
+        CreateUserAddressRequest addressRequest =
+                CreateUserAddressRequest.from(
+                        "11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세주소", "집");
         SignupRequest request =
                 new SignupRequest(
                         "tester123",
@@ -66,7 +66,7 @@ public class SignupControllerTest {
                         "닉네임",
                         UserRole.CUSTOMER,
                         addressRequest);
-        
+
         UUID mockUserId = UUID.randomUUID();
         UserDetailResponse mockDetail =
                 UserDetailResponse.builder()
@@ -93,9 +93,9 @@ public class SignupControllerTest {
     @DisplayName("실패 - 유효하지 않은 아이디 형식으로 회원가입 시도")
     void signupFailInvalidUsername() throws Exception {
         // given
-        CreateUserAddressRequest addressRequest = CreateUserAddressRequest.from(
-                "11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세주소", "집"
-        );
+        CreateUserAddressRequest addressRequest =
+                CreateUserAddressRequest.from(
+                        "11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세주소", "집");
         SignupRequest request =
                 new SignupRequest(
                         "bad",

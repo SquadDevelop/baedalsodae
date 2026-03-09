@@ -107,7 +107,11 @@ public class AdminUserControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<UserDetailResponse> mockPage = new PageImpl<>(List.of(), pageable, 0);
 
-        given(userService.getUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class)))
+        given(
+                        userService.getUsers(
+                                eq(UserRole.MANAGER),
+                                any(UserSearchRequest.class),
+                                any(Pageable.class)))
                 .willReturn(mockPage);
 
         // when & then
@@ -148,16 +152,17 @@ public class AdminUserControllerTest {
                 .name("관리자")
                 .nickname("어드민")
                 .role(UserRole.MANAGER)
-                .address(CreateUserAddressRequest.builder()
-                        .roadAddress("도로명")
-                        .detailAddress("상세주소")
-                        .sidoCode("11")
-                        .sidoName("서울")
-                        .sigunguCode("110")
-                        .sigunguName("강남구")
-                        .dongCode("11010")
-                        .dongName("역삼동")
-                        .build())
+                .address(
+                        CreateUserAddressRequest.builder()
+                                .roadAddress("도로명")
+                                .detailAddress("상세주소")
+                                .sidoCode("11")
+                                .sidoName("서울")
+                                .sigunguCode("110")
+                                .sigunguName("강남구")
+                                .dongCode("11010")
+                                .dongName("역삼동")
+                                .build())
                 .build();
     }
 

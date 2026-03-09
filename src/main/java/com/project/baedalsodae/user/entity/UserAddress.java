@@ -37,18 +37,13 @@ public class UserAddress extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Embedded
-    private Address address;
+    @Embedded private Address address;
 
     @Column(name = "description")
     private String description;
 
     public static UserAddress create(User user, Address address, String description) {
-        return UserAddress.builder()
-                .user(user)
-                .address(address)
-                .description(description)
-                .build();
+        return UserAddress.builder().user(user).address(address).description(description).build();
     }
 
     public void changeUser(User user) {

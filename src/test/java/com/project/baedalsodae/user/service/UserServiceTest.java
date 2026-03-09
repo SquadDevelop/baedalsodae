@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
@@ -138,16 +137,23 @@ class UserServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> userPage = new PageImpl<>(List.of(manager1), pageable, 1);
 
-        given(userRepository.searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class)))
+        given(
+                        userRepository.searchUsers(
+                                eq(UserRole.MANAGER),
+                                any(UserSearchRequest.class),
+                                any(Pageable.class)))
                 .willReturn(userPage);
 
         // when
-        Page<UserDetailResponse> results = userService.getUsers(UserRole.MANAGER, request, pageable);
+        Page<UserDetailResponse> results =
+                userService.getUsers(UserRole.MANAGER, request, pageable);
 
         // then
         assertThat(results.getContent()).hasSize(1);
         assertThat(results.getContent().get(0).getRole()).isEqualTo(UserRole.MANAGER);
-        verify(userRepository).searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class));
+        verify(userRepository)
+                .searchUsers(
+                        eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class));
     }
 
     @Test
@@ -159,14 +165,20 @@ class UserServiceTest {
         Pageable expectedPageable = PageRequest.of(0, 10);
         Page<User> emptyPage = new PageImpl<>(List.of(), expectedPageable, 0);
 
-        given(userRepository.searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), eq(expectedPageable)))
+        given(
+                        userRepository.searchUsers(
+                                eq(UserRole.MANAGER),
+                                any(UserSearchRequest.class),
+                                eq(expectedPageable)))
                 .willReturn(emptyPage);
 
         // when
         userService.getUsers(UserRole.MANAGER, request, requestedPageable);
 
         // then
-        verify(userRepository).searchUsers(eq(UserRole.MANAGER), any(UserSearchRequest.class), eq(expectedPageable));
+        verify(userRepository)
+                .searchUsers(
+                        eq(UserRole.MANAGER), any(UserSearchRequest.class), eq(expectedPageable));
     }
 
     private CreateUserRequest createCreateRequest() {
@@ -178,17 +190,18 @@ class UserServiceTest {
                 .name("테스터")
                 .nickname("테스터A")
                 .role(UserRole.CUSTOMER)
-                .address(CreateUserAddressRequest.builder()
-                        .roadAddress("서울시 강남구 역삼동")
-                        .detailAddress("101호")
-                        .sidoCode("11")
-                        .sidoName("서울")
-                        .sigunguCode("110")
-                        .sigunguName("강남구")
-                        .dongCode("11010")
-                        .dongName("역삼동")
-                        .description("직장")
-                        .build())
+                .address(
+                        CreateUserAddressRequest.builder()
+                                .roadAddress("서울시 강남구 역삼동")
+                                .detailAddress("101호")
+                                .sidoCode("11")
+                                .sidoName("서울")
+                                .sigunguCode("110")
+                                .sigunguName("강남구")
+                                .dongCode("11010")
+                                .dongName("역삼동")
+                                .description("직장")
+                                .build())
                 .build();
     }
 

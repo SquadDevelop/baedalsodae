@@ -32,8 +32,7 @@ public class CreateUserRequest {
 
     @NotBlank private String nickname;
 
-    @NotNull
-    private UserRole role;
+    @NotNull private UserRole role;
 
     @Valid
     @NotNull(message = "주소 정보는 필수입니다")

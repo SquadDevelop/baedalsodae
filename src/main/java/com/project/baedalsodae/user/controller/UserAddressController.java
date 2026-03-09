@@ -32,31 +32,35 @@ public class UserAddressController {
     @GetMapping
     public ApiResponse<List<UserAddressResponse>> getAddressList(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<UserAddressResponse> response = userAddressService.getAddressList(userDetails.getUserId());
+        List<UserAddressResponse> response =
+                userAddressService.getAddressList(userDetails.getUserId());
         return ApiResponse.success(SuccessCode.USER_ADDRESS_FOUND, response);
     }
 
-	@GetMapping("/main")
-	public ApiResponse<UserAddressResponse> getMainAddress(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		UserAddressResponse response = userAddressService.getMainAddress(userDetails.getUserId());
-		return ApiResponse.success(SuccessCode.USER_ADDRESS_FOUND, response);
-	}
+    @GetMapping("/main")
+    public ApiResponse<UserAddressResponse> getMainAddress(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserAddressResponse response = userAddressService.getMainAddress(userDetails.getUserId());
+        return ApiResponse.success(SuccessCode.USER_ADDRESS_FOUND, response);
+    }
 
     @PutMapping("/{addressId}")
     public ApiResponse<UserAddressResponse> updateAddress(
             @PathVariable("addressId") UUID addressId,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @RequestBody UpdateUserAddressRequest request) {
-        UserAddressResponse response = userAddressService.updateAddress(userDetails.getUserId(), addressId, request);
+        UserAddressResponse response =
+                userAddressService.updateAddress(userDetails.getUserId(), addressId, request);
         return ApiResponse.success(SuccessCode.USER_ADDRESS_UPDATED, response);
     }
 
-	@PutMapping
-	public ApiResponse<Void> updateAddressList(
-			@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody List<UpdateUserAddressRequest> requests) {
-		userAddressService.updateAddressList(userDetails.getUserId(), requests);
-		return ApiResponse.success(SuccessCode.USER_ADDRESS_BULK_UPDATED, null);
-	}
+    @PutMapping
+    public ApiResponse<Void> updateAddressList(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Valid @RequestBody List<UpdateUserAddressRequest> requests) {
+        userAddressService.updateAddressList(userDetails.getUserId(), requests);
+        return ApiResponse.success(SuccessCode.USER_ADDRESS_BULK_UPDATED, null);
+    }
 
     @DeleteMapping("/{addressId}")
     public ApiResponse<Void> deleteAddress(

@@ -27,8 +27,7 @@ public record SignupRequest(
         @NotBlank String name,
         @NotBlank String nickname,
         @NotNull UserRole role,
-        @Valid @NotNull(message = "주소 정보는 필수입니다")
-        CreateUserAddressRequest address) {
+        @Valid @NotNull(message = "주소 정보는 필수입니다") CreateUserAddressRequest address) {
     public CreateUserRequest toCreateUserDto() {
         return CreateUserRequest.builder()
                 .username(this.username)

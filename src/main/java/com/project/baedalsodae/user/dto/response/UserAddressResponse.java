@@ -17,14 +17,14 @@ import lombok.NoArgsConstructor;
 public class UserAddressResponse {
 
     private UUID userAddressId;
-    
+
     private String sidoCode;
     private String sidoName;
     private String sigunguCode;
     private String sigunguName;
     private String dongCode;
     private String dongName;
-    
+
     private String roadAddress;
     private String detailAddress;
     private String description;

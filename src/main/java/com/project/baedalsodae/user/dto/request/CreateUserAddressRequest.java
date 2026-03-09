@@ -40,10 +40,14 @@ public class CreateUserAddressRequest {
     private String description;
 
     public static CreateUserAddressRequest from(
-            String sidoCode, String sidoName,
-            String sigunguCode, String sigunguName,
-            String dongCode, String dongName,
-            String roadAddress, String detailAddress,
+            String sidoCode,
+            String sidoName,
+            String sigunguCode,
+            String sigunguName,
+            String dongCode,
+            String dongName,
+            String roadAddress,
+            String detailAddress,
             String description) {
         return CreateUserAddressRequest.builder()
                 .sidoCode(sidoCode)

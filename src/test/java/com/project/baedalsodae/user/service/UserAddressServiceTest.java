@@ -47,7 +47,10 @@ class UserAddressServiceTest {
         CreateUserAddressRequest request = createCreateAddressRequest();
         User user = createTestUser(userId);
 
-        given(userAddressRepository.existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(eq(userId), any(), any()))
+        given(
+                        userAddressRepository
+                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
+                                        eq(userId), any(), any()))
                 .willReturn(false);
         given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
         given(userAddressRepository.save(any(UserAddress.class)))
@@ -67,7 +70,10 @@ class UserAddressServiceTest {
         UUID userId = UUID.randomUUID();
         CreateUserAddressRequest request = createCreateAddressRequest();
 
-        given(userAddressRepository.existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(eq(userId), any(), any()))
+        given(
+                        userAddressRepository
+                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
+                                        eq(userId), any(), any()))
                 .willReturn(true);
 
         // when & then
@@ -81,11 +87,14 @@ class UserAddressServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         UUID addressId = UUID.randomUUID();
-        UpdateUserAddressRequest request = createUpdateAddressRequest(addressId);
+        UpdateUserAddressRequest request = createUpdateUserAddressRequest(addressId);
         User user = createTestUser(userId);
         UserAddress address = createTestAddress(user, addressId);
 
-        given(userAddressRepository.existsByUserIdAndAddressRoadAddressAndAddressDetailAddressAndIdNot(eq(userId), any(), any(), eq(addressId)))
+        given(
+                        userAddressRepository
+                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddressAndIdNot(
+                                        eq(userId), any(), any(), eq(addressId)))
                 .willReturn(false);
         given(userAddressRepository.findByIdAndUserId(addressId, userId))
                 .willReturn(Optional.of(address));
@@ -104,7 +113,6 @@ class UserAddressServiceTest {
         UUID userId = UUID.randomUUID();
         User user = createTestUser(userId);
         UserAddress address1 = createTestAddress(user, UUID.randomUUID());
-        // 수정: Mutable 리스트로 주입
         ReflectionTestUtils.setField(user, "userAddresses", new ArrayList<>(List.of(address1)));
 
         given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
@@ -124,6 +132,7 @@ class UserAddressServiceTest {
         UUID addressId = UUID.randomUUID();
         User user = createTestUser(userId);
         UserAddress address = createTestAddress(user, addressId);
+        user.addAddress(address);
 
         given(userAddressRepository.findByIdAndUserId(addressId, userId))
                 .willReturn(Optional.of(address));
@@ -163,9 +172,10 @@ class UserAddressServiceTest {
         User user = createTestUser(userId);
         UserAddress mainAddress = createTestAddress(user, mainAddressId);
         UserAddress nextAddress = createTestAddress(user, nextAddressId);
-        
-        ReflectionTestUtils.setField(user, "userMainAddressId", mainAddressId);
-        ReflectionTestUtils.setField(user, "userAddresses", new ArrayList<>(List.of(mainAddress, nextAddress)));
+
+        user.addAddress(mainAddress);
+        user.addAddress(nextAddress);
+        user.changeMainAddress(mainAddressId);
 
         given(userAddressRepository.findByIdAndUserId(mainAddressId, userId))
                 .willReturn(Optional.of(mainAddress));
@@ -185,7 +195,6 @@ class UserAddressServiceTest {
         UUID userId = UUID.randomUUID();
         User user = createTestUser(userId);
         UserAddress address = createTestAddress(user, UUID.randomUUID());
-        // 수정: Mutable 리스트로 주입
         ReflectionTestUtils.setField(user, "userAddresses", new ArrayList<>(List.of(address)));
 
         given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
@@ -201,14 +210,22 @@ class UserAddressServiceTest {
     }
 
     private User createTestUser(UUID userId) {
-        User user = User.create("tester", "010-1234-5678", "test@test.com", "pwd", "테스터", "닉네임", UserRole.CUSTOMER);
+        User user =
+                User.create(
+                        "tester",
+                        "010-1234-5678",
+                        "test@test.com",
+                        "pwd",
+                        "테스터",
+                        "닉네임",
+                        UserRole.CUSTOMER);
         ReflectionTestUtils.setField(user, "id", userId);
         return user;
     }
 
     private UserAddress createTestAddress(User user, UUID addressId) {
-        // 수정: 실제 Address 객체 주입하여 NPE 방지
-        Address address = Address.createAddress("11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세");
+        Address address =
+                Address.createAddress("11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세");
         UserAddress userAddress = UserAddress.create(user, address, "설명");
         ReflectionTestUtils.setField(userAddress, "id", addressId);
         return userAddress;
@@ -218,14 +235,26 @@ class UserAddressServiceTest {
         return CreateUserAddressRequest.builder()
                 .roadAddress("도로명")
                 .detailAddress("상세주소")
+                .sidoCode("11")
+                .sidoName("서울")
+                .sigunguCode("110")
+                .sigunguName("강남구")
+                .dongCode("11010")
+                .dongName("역삼동")
                 .build();
     }
 
-    private UpdateUserAddressRequest createUpdateAddressRequest(UUID addressId) {
+    private UpdateUserAddressRequest createUpdateUserAddressRequest(UUID addressId) {
         return UpdateUserAddressRequest.builder()
                 .userAddressId(addressId)
                 .roadAddress("수정된 도로명")
                 .detailAddress("수정된 상세주소")
+                .sidoCode("11")
+                .sidoName("서울")
+                .sigunguCode("110")
+                .sigunguName("강남구")
+                .dongCode("11010")
+                .dongName("역삼동")
                 .build();
     }
 }

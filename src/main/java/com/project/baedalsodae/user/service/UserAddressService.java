@@ -14,7 +14,8 @@ public interface UserAddressService {
 
     UserAddressResponse getMainAddress(UUID userId);
 
-    UserAddressResponse updateAddress(UUID userId, UUID addressId, UpdateUserAddressRequest request);
+    UserAddressResponse updateAddress(
+            UUID userId, UUID addressId, UpdateUserAddressRequest request);
 
     void updateAddressList(UUID userId, List<UpdateUserAddressRequest> addresses);
 
