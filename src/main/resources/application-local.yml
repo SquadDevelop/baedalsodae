@@ -25,9 +25,11 @@ spring:
       port: ${SPRING_DATA_REDIS_PORT}
       password:
       ssl:
-        enabled: true
+        enabled: false
       repositories:
         enabled: false
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
 JWT_SECRET: ${JWT_SECRET}
 JWT_EXPIRATION: ${JWT_EXPIRATION}
