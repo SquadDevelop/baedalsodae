@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.dto.AddressRequest;
 import com.project.baedalsodae.global.common.dto.AddressResponse;
+import com.project.baedalsodae.review.dto.query.ReviewSummary;
+import com.project.baedalsodae.review.dto.response.ReviewDetailResponse;
 import com.project.baedalsodae.store.dto.request.store.CreateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
@@ -27,6 +29,7 @@ import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +76,7 @@ class StoreControllerTest {
                 .storeName("테스트 가게")
                 .reviewCount(10)
                 .avgRating(4.5)
-                .storeStatus(StoreStatus.OPEN.name())
+                .storeStatus(StoreStatus.OPEN)
                 .build();
     }
 
@@ -266,6 +269,72 @@ class StoreControllerTest {
     }
 
     @Test
+    @DisplayName("가게 리뷰 목록 및 요약 조회 - 성공")
+    void getStoreReviews_success() throws Exception {
+        // given
+        ReviewDetailResponse review1 =
+                new ReviewDetailResponse(
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                        ownerDetails.getUserId(),
+                        5,
+                        "정말 맛있어요! 광화문 최고 맛집입니다.",
+                        true);
+        ReviewDetailResponse review2 =
+                new ReviewDetailResponse(
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                        4,
+                        "배달이 빨라요.",
+                        false);
+
+        ReviewSummary summary = new ReviewSummary(2L, 4.5);
+
+        StoreReviewResponse response = StoreReviewResponse.of(List.of(review1, review2), summary);
+
+        given(storeQueryService.getStoreReview(any(UUID.class), any(UUID.class)))
+                .willReturn(response);
+
+        // when & than
+        mockMvc.perform(
+                        get("/stores/{storeId}/reviews", STORE_ID)
+                                .with(user(ownerDetails))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.reviewSummary.totalReviews").value(2))
+                .andExpect(jsonPath("$.data.reviewSummary.averageRating").value(4.5))
+                .andExpect(jsonPath("$.data.reviews[0].isOwner").value(true))
+                .andDo(
+                        document(
+                                "store/get-reviews",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(parameterWithName("storeId").description("가게 UUID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").description("응답 타임스탬프"),
+                                        fieldWithPath("data.reviewSummary.totalReviews")
+                                                .description("총 리뷰 개수"),
+                                        fieldWithPath("data.reviewSummary.averageRating")
+                                                .description("평균 별점"),
+                                        fieldWithPath("data.reviews[]").description("리뷰 목록"),
+                                        fieldWithPath("data.reviews[].reviewId")
+                                                .description("리뷰 UUID"),
+                                        fieldWithPath("data.reviews[].orderId")
+                                                .description("주문 UUID"),
+                                        fieldWithPath("data.reviews[].userId")
+                                                .description("작성자 UUID"),
+                                        fieldWithPath("data.reviews[].rating").description("별점"),
+                                        fieldWithPath("data.reviews[].comment")
+                                                .description("리뷰 내용"),
+                                        fieldWithPath("data.reviews[].isOwner")
+                                                .description("본인 작성 여부"))));
+    }
+
+    @Test
     @DisplayName("점주 가게 조회 - 성공")
     void getOwnerStore_success() throws Exception {
 
@@ -276,7 +345,7 @@ class StoreControllerTest {
                         .phoneNumber("02-1234-5678")
                         .businessNumber("123-45-67890")
                         .description("맛있는 치킨집입니다.")
-                        .reviewCount(10)
+                        .reviewCount(BigDecimal.valueOf(10))
                         .avgRating(4.5)
                         .storeStatus("OPEN")
                         .address(addressResponse())
