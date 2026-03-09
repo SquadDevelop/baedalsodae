@@ -37,9 +37,9 @@ spring:
       url: ${SPRING_DATA_REDIS_URL}
       host: ${SPRING_DATA_REDIS_HOST}
       port: ${SPRING_DATA_REDIS_PORT}
-      password:
+      password: ${SPRING_DATA_REDIS_PASSWORD}
       ssl:
-        enabled: true
+        enabled: false
       repositories:
         enabled: false
 

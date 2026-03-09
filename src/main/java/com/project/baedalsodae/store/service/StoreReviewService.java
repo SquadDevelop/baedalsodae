@@ -1,10 +1,7 @@
 package com.project.baedalsodae.store.service;
 
-import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 
-@Service
 public interface StoreReviewService {
         void calculateReviewCreated(UUID orderId, double rating);
 

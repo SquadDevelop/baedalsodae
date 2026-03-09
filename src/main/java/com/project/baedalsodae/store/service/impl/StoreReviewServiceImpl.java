@@ -8,10 +8,12 @@ import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.service.StoreReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Service
 @RequiredArgsConstructor
 public class StoreReviewServiceImpl implements StoreReviewService {
     private final StoreRepository storeRepository;

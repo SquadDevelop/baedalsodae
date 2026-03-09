@@ -1,8 +1,10 @@
 package com.project.baedalsodae.menu.service.impl;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.common.OrderUtil;
+import com.project.baedalsodae.menu.common.StoreOwnershipValidator;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
@@ -12,13 +14,15 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
+import com.project.baedalsodae.recommendation.service.MenuEmbeddingService;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.user.entity.UserRole;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -128,7 +132,7 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Transactional
     @Override
-    public void deleteMenuItem(UUID menuItemId) {
+    public void deleteMenuItem(UUID menuItemId, UserDetailsImpl userDetails) {
         MenuItem item =
                 menuItemRepository
                         .findByIdAndDeletedIsFalse(menuItemId)

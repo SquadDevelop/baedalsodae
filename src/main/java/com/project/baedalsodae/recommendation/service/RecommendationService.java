@@ -78,7 +78,7 @@ public class RecommendationService {
                                                 ms.store().getAvgRating(),
                                                 ms.menuItem().getId(),
                                                 ms.menuItem().getName(),
-                                                ms.menuItem().getPrice(),
+                                                ms.menuItem().getPrice().intValue(),
                                                 ms.menuItem().getDescription()))
                         .toList();
 
