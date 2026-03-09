@@ -78,4 +78,11 @@ public class UserAddress extends BaseTimeEntity {
                 && that.getId() != null
                 && Objects.equals(this.getId(), that.getId());
     }
+
+    public String makeDeliveryAddress() {
+        return this.getAddress().getSidoName() + " "
+                + this.getAddress().getSigunguName() + " "
+                + this.getAddress().getRoadAddress() + " "
+                + this.getAddress().getDetailAddress();
+    }
 }

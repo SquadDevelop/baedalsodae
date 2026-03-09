@@ -91,8 +91,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.USER_ADDRESS_NOT_ALLOWED);
         }
 
-        // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
-        String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
+        final String deliveryAddressSnapshot = userAddress.makeDeliveryAddress();
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
