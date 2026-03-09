@@ -1,11 +1,10 @@
 package com.project.baedalsodae.store.dto.response.store;
 
 import com.project.baedalsodae.store.entity.Store;
+import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import lombok.Builder;
 import lombok.Getter;
 
