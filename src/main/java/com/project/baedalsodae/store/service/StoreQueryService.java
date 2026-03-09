@@ -1,10 +1,7 @@
 package com.project.baedalsodae.store.service;
 
 import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
-import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
-import com.project.baedalsodae.store.dto.response.store.StoreDetailResponse;
-import com.project.baedalsodae.store.dto.response.store.StorePageResponse;
-import com.project.baedalsodae.store.dto.response.store.StoreSearchPageResponse;
+import com.project.baedalsodae.store.dto.response.store.*;
 import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;
@@ -18,4 +15,6 @@ public interface StoreQueryService {
     OwnerStoreResponse getOwnerStore(UUID storeId, UUID userId, UserRole role);
 
     StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest);
+
+    StoreReviewResponse getStoreReview(UUID storeId, UUID userId);
 }

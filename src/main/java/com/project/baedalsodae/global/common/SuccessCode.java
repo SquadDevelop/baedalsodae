@@ -45,6 +45,7 @@ public enum SuccessCode {
     STORE_DETAIL_FOUND("ST205", HttpStatus.OK, "가게 상세 조회 성공"),
     STORE_FOUND_FOR_OWNER("ST206", HttpStatus.OK, "가게 조회 성공"),
     STORE_LIST_FOUND_BY_KEYWORD("ST207", HttpStatus.OK, "가게 검색 성공"),
+    STORE_REVIEW_LIST_FOUND("ST208", HttpStatus.OK, "가게 리뷰 목록 조회 성공"),
 
     // store-hours
     STORE_HOURS_FOUND("SH200", HttpStatus.OK, "영업시간 조회 성공"),
