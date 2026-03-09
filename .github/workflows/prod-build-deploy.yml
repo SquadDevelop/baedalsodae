@@ -123,16 +123,20 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "=== Waiting for API-1 to be healthy ==="
+
             for i in {1..12}; do
               STATUS=$(ssh -i ~/.ssh/baedalsodae-keypair.pem -o StrictHostKeyChecking=no ec2-user@10.0.1.187 \
-                "curl -s http://localhost:8080/api/v1/actuator/health | grep -m1 -o '\"status\":\"UP\"'" || true)
-              if [ "$STATUS" = '"status":"UP"' ]; then
+                "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/v1/actuator/health" || true)
+            
+              if [ "$STATUS" = "200" ]; then
                 echo "API-1 is UP! Proceeding to API-2 deploy."
                 exit 0
               fi
+            
               echo "Attempt $i/12 - not ready yet, waiting 10s..."
               sleep 10
             done
+            
             echo "API-1 health check failed after 2 minutes!"
             exit 1
 
