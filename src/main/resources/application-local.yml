@@ -20,7 +20,9 @@ spring:
       mode: never
   data:
     redis:
-      url: ${REDIS_URL}
+      url: ${SPRING_DATA_REDIS_URL}
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
       password:
       ssl:
         enabled: true
