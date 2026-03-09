@@ -183,7 +183,9 @@ class AllowedRegionControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value(ErrorCode.ALLOWED_REGION_CODE_DUPLICATED.getCode()));
+                .andExpect(
+                        jsonPath("$.code")
+                                .value(ErrorCode.ALLOWED_REGION_CODE_DUPLICATED.getCode()));
     }
 
     @Test

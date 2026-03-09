@@ -78,7 +78,8 @@ public class AllowedRegionFixture {
     }
 
     public static AllowedRegionResponseDto createInactiveResponseDto() {
-        return new AllowedRegionResponseDto(ALLOWED_REGION_ID, "11", "서울특별시", "11010", "종로구", false);
+        return new AllowedRegionResponseDto(
+                ALLOWED_REGION_ID, "11", "서울특별시", "11010", "종로구", false);
     }
 
     public static AllowedRegionPageResponse createAllowedRegionPageResponse() {
