@@ -36,12 +36,11 @@ import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
-
-import com.project.baedalsodae.user.service.UserAddressService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -222,7 +221,6 @@ public class OrderServiceTest {
         given(cart.getStore()).willReturn(store);
         given(store.getId()).willReturn(storeId);
 
-
         given(cart.hasNoItems()).willReturn(false);
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
@@ -230,7 +228,8 @@ public class OrderServiceTest {
         String sigunguCode = "ABC";
         given(store.getAddress()).willReturn(address);
         given(address.getSigunguCode()).willReturn(sigunguCode);
-        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())).willReturn(true);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
@@ -281,7 +280,8 @@ public class OrderServiceTest {
         String sigunguCode = "ABC";
         given(store.getAddress()).willReturn(address);
         given(address.getSigunguCode()).willReturn(sigunguCode);
-        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())).willReturn(true);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
@@ -348,7 +348,8 @@ public class OrderServiceTest {
         String sigunguCode = "ABC";
         given(store.getAddress()).willReturn(address);
         given(address.getSigunguCode()).willReturn(sigunguCode);
-        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())).willReturn(true);
+        given(allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode()))
+                .willReturn(true);
 
         given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
 

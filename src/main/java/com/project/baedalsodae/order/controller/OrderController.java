@@ -38,8 +38,9 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderListResponse>> getOrders(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @ModelAttribute OrderListRequest request) {
-        OrderListResponse response = orderService.getOrders(
-                userDetails.getUserId(), userDetails.getUserRole().name(), request);
+        OrderListResponse response =
+                orderService.getOrders(
+                        userDetails.getUserId(), userDetails.getUserRole().name(), request);
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_LIST, response));
     }
 
@@ -74,7 +75,8 @@ public class OrderController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable("orderId") UUID orderId) {
 
-        OrderActionStatusResponse response = orderService.requestOrder(userDetails.getUserId(), orderId);
+        OrderActionStatusResponse response =
+                orderService.requestOrder(userDetails.getUserId(), orderId);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REQUESTED, response));
     }
@@ -101,7 +103,11 @@ public class OrderController {
 
         OrderActionStatusResponse response =
                 orderService.rejectOrder(
-                        userDetails.getUserId(), userDetails.getUserRole(), storeId, orderId, reason);
+                        userDetails.getUserId(),
+                        userDetails.getUserRole(),
+                        storeId,
+                        orderId,
+                        reason);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
     }
@@ -155,7 +161,11 @@ public class OrderController {
 
         OrderActionStatusResponse response =
                 orderService.cancelRequestOrder(
-                        userDetails.getUserId(), userDetails.getUserRole(), storeId, orderId, reason);
+                        userDetails.getUserId(),
+                        userDetails.getUserRole(),
+                        storeId,
+                        orderId,
+                        reason);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_CANCEL_REQUESTED, response));
     }

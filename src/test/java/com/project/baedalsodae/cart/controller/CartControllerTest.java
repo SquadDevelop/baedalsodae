@@ -97,9 +97,7 @@ class CartControllerTest {
         given(cartService.getCart(userId))
                 .willThrow(new BusinessException(ErrorCode.CART_NOT_FOUND));
 
-        mockMvc.perform(get("/carts"))
-                .andDo(print())
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/carts")).andDo(print()).andExpect(status().isNotFound());
     }
 
     @Test
