@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: CI-CD(Build, Deploy to Production)
 
 on:
   workflow_dispatch:
@@ -14,9 +14,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Build Docker image
         run: |
-          docker build -t baedalsodae:latest .
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max \
+            -t baedalsodae:latest \
+            --load .
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           docker save baedalsodae:latest | gzip > baedalsodae.tar.gz
 
       - name: Upload image to API-1
@@ -27,6 +40,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "baedalsodae.tar.gz"
           target: "/home/ec2-user/baedalsodae"
+          proxy_host: ${{ secrets.HAPROXY_HOST }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.SSH_KEY }}
 
       - name: Upload image to API-2
         uses: appleboy/scp-action@v0.1.7
@@ -36,6 +52,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "baedalsodae.tar.gz"
           target: "/home/ec2-user/baedalsodae"
+          proxy_host: ${{ secrets.HAPROXY_HOST }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.SSH_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,6 +67,9 @@ jobs:
           host: ${{ secrets.API_SERVER_1_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
+          proxy_host: ${{ secrets.HAPROXY_HOST }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.SSH_KEY }}
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
             cd /home/ec2-user/baedalsodae
@@ -109,6 +131,9 @@ jobs:
           host: ${{ secrets.API_SERVER_1_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
+          proxy_host: ${{ secrets.HAPROXY_HOST }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.SSH_KEY }}
           script: |
             echo "=== Waiting for API-1 to be healthy ==="
             for i in {1..12}; do
@@ -129,6 +154,9 @@ jobs:
           host: ${{ secrets.API_SERVER_2_HOST }}
           username: ec2-user
           key: ${{ secrets.SSH_KEY }}
+          proxy_host: ${{ secrets.HAPROXY_HOST }}
+          proxy_username: ec2-user
+          proxy_key: ${{ secrets.SSH_KEY }}
           envs: API_SERVER_PORT,ENCRYPTION_AES_KEY,JWT_SECRET,JWT_EXPIRATION,JWT_REFRESH_EXPIRATION,POSTGRES_DB,POSTGRES_DB_URL,POSTGRES_PASSWORD,POSTGRES_PORT,POSTGRES_USER,POSTGRES_DEFAULT_SCHEMA,REDIS_URL,REDIS_HOST,REDIS_PORT,REDIS_PASSWORD
           script: |
             cd /home/ec2-user/baedalsodae
