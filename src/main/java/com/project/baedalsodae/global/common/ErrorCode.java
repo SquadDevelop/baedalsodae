@@ -98,7 +98,14 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND("RV003", HttpStatus.NOT_FOUND, "리뷰가 없습니다."),
     REVIEW_UNAUTHORIZED("RV004", HttpStatus.UNAUTHORIZED, "이 리뷰에 대한 권한이 없습니다."),
     REVIEW_BEFORE_DELIVERY_NOT_ALLOWED(
-            "RV005", HttpStatus.BAD_REQUEST, "배송 완료 전에는 리뷰를 작성할 수 없습니다.");
+            "RV005", HttpStatus.BAD_REQUEST, "배송 완료 전에는 리뷰를 작성할 수 없습니다."),
+
+    // Address
+    INVALID_ADDRESS_VALUE("AD001", HttpStatus.BAD_REQUEST, "유효하지 않은 주소 값입니다."),
+    ADDRESS_DUPLICATED("AD002", HttpStatus.CONFLICT, "이미 존재하는 허용 주소입니다."),
+    USER_ADDRESS_NOT_ALLOWED("AD003", HttpStatus.BAD_REQUEST, "배달 가능한 지역이 아닙니다."),
+    STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다.");
+
     private final String code;
     private final HttpStatus status;
     private final String message;
