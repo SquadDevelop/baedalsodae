@@ -23,11 +23,13 @@ public class UserFixture {
 
     // UserDetails 픽스처
     public static UserDetailsImpl createUserDetails(UUID userId, UserRole role) {
-        return UserDetailsImpl.from(userId, "testUser_" + userId.toString().substring(0, 8), "password", role, false);
+        return UserDetailsImpl.from(
+                userId, "testUser_" + userId.toString().substring(0, 8), "password", role, false);
     }
 
     // 상세 정보 응답 픽스처
-    public static UserDetailResponse createUserDetailResponse(UUID userId, String username, UserRole role) {
+    public static UserDetailResponse createUserDetailResponse(
+            UUID userId, String username, UserRole role) {
         return UserDetailResponse.builder()
                 .userId(userId)
                 .username(username)

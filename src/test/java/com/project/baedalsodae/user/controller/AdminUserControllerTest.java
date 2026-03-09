@@ -69,7 +69,8 @@ public class AdminUserControllerTest {
         // given
         UserDetailsImpl master = createUserDetails(MASTER_ID, UserRole.MASTER);
         CreateUserRequest request = createManagerRequest("managerUser");
-        UserDetailResponse mockResponse = createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
 
         given(userService.createUser(any())).willReturn(mockResponse);
 
@@ -139,7 +140,8 @@ public class AdminUserControllerTest {
         // given
         UserDetailsImpl master = createUserDetails(MASTER_ID, UserRole.MASTER);
         Pageable pageable = PageRequest.of(0, 10);
-        UserDetailResponse managerResponse = createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
+        UserDetailResponse managerResponse =
+                createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
         Page<UserDetailResponse> mockPage = new PageImpl<>(List.of(managerResponse), pageable, 1);
 
         given(
@@ -166,9 +168,7 @@ public class AdminUserControllerTest {
                                         parameterWithName("page")
                                                 .description("페이지 번호 (0-based)")
                                                 .optional(),
-                                        parameterWithName("size")
-                                                .description("페이지 크기")
-                                                .optional()),
+                                        parameterWithName("size").description("페이지 크기").optional()),
                                 relaxedResponseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
@@ -178,13 +178,10 @@ public class AdminUserControllerTest {
                                                 .description("사용자 UUID"),
                                         fieldWithPath("data.content[].username")
                                                 .description("사용자 아이디"),
-                                        fieldWithPath("data.content[].email")
-                                                .description("이메일"),
+                                        fieldWithPath("data.content[].email").description("이메일"),
                                         fieldWithPath("data.content[].name").description("이름"),
-                                        fieldWithPath("data.content[].nickname")
-                                                .description("닉네임"),
-                                        fieldWithPath("data.content[].role")
-                                                .description("사용자 권한"),
+                                        fieldWithPath("data.content[].nickname").description("닉네임"),
+                                        fieldWithPath("data.content[].role").description("사용자 권한"),
                                         fieldWithPath("data.content[].createdAt")
                                                 .description("생성일시"),
                                         fieldWithPath("data.totalElements").description("전체 요소 수"),
@@ -198,7 +195,8 @@ public class AdminUserControllerTest {
     void getManagerDetail_ByMaster_Success() throws Exception {
         // given
         UserDetailsImpl master = createUserDetails(MASTER_ID, UserRole.MASTER);
-        UserDetailResponse mockResponse = createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
 
         given(userService.getUser(MANAGER_ID)).willReturn(mockResponse);
 
@@ -211,7 +209,8 @@ public class AdminUserControllerTest {
                                 "admin-user/get-manager-detail",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                pathParameters(parameterWithName("managerId").description("조회할 관리자 UUID")),
+                                pathParameters(
+                                        parameterWithName("managerId").description("조회할 관리자 UUID")),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
@@ -247,23 +246,30 @@ public class AdminUserControllerTest {
         UUID invalidManagerId = UUID.randomUUID();
 
         given(userService.getUser(invalidManagerId))
-                .willThrow(new com.project.baedalsodae.global.common.BusinessException(com.project.baedalsodae.global.common.ErrorCode.USER_NOT_FOUND));
+                .willThrow(
+                        new com.project.baedalsodae.global.common.BusinessException(
+                                com.project.baedalsodae.global.common.ErrorCode.USER_NOT_FOUND));
 
         // when & then
-        mockMvc.perform(get(BASE_URL + "/managers/{managerId}", invalidManagerId).with(user(master)))
+        mockMvc.perform(
+                        get(BASE_URL + "/managers/{managerId}", invalidManagerId)
+                                .with(user(master)))
                 .andExpect(status().isNotFound())
                 .andDo(
                         document(
                                 "admin-user/get-manager-detail-fail-notfound",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                pathParameters(parameterWithName("managerId").description("조회할 관리자 UUID")),
+                                pathParameters(
+                                        parameterWithName("managerId").description("조회할 관리자 UUID")),
                                 responseFields(
                                         fieldWithPath("code").description("에러 코드"),
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -271,7 +277,8 @@ public class AdminUserControllerTest {
     void getAdminDetail_ByManager_Success() throws Exception {
         // given
         UserDetailsImpl userDetails = createUserDetails(MANAGER_ID, UserRole.MANAGER);
-        UserDetailResponse mockResponse = createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(MANAGER_ID, "managerUser", UserRole.MANAGER);
 
         given(userService.getUser(MANAGER_ID)).willReturn(mockResponse);
 

@@ -25,7 +25,6 @@ import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.service.UserService;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,8 @@ public class UserControllerTest {
     void getMe_ByCustomer_Success() throws Exception {
         // given
         UserDetailsImpl customer = createUserDetails(USER_ID, UserRole.CUSTOMER);
-        UserDetailResponse mockResponse = createUserDetailResponse(USER_ID, "customerUser", UserRole.CUSTOMER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(USER_ID, "customerUser", UserRole.CUSTOMER);
 
         given(userService.getUser(USER_ID)).willReturn(mockResponse);
 
@@ -93,9 +93,15 @@ public class UserControllerTest {
                                                 .optional(),
                                         fieldWithPath("data.addresses").description("주소 목록"),
                                         fieldWithPath("data.createdAt").description("생성일시"),
-                                        fieldWithPath("data.updatedAt").description("수정일시").optional(),
-                                        fieldWithPath("data.createdBy").description("생성자 ID").optional(),
-                                        fieldWithPath("data.updatedBy").description("수정자 ID").optional())));
+                                        fieldWithPath("data.updatedAt")
+                                                .description("수정일시")
+                                                .optional(),
+                                        fieldWithPath("data.createdBy")
+                                                .description("생성자 ID")
+                                                .optional(),
+                                        fieldWithPath("data.updatedBy")
+                                                .description("수정자 ID")
+                                                .optional())));
     }
 
     @Test
@@ -104,7 +110,8 @@ public class UserControllerTest {
         // given
         UserDetailsImpl customer = createUserDetails(USER_ID, UserRole.CUSTOMER);
         UpdateUserRequest updateRequest = createUpdateUserRequest();
-        UserDetailResponse mockResponse = createUserDetailResponse(USER_ID, "customerUser", UserRole.CUSTOMER);
+        UserDetailResponse mockResponse =
+                createUserDetailResponse(USER_ID, "customerUser", UserRole.CUSTOMER);
 
         given(userService.updateUser(eq(USER_ID), any(UpdateUserRequest.class)))
                 .willReturn(mockResponse);
@@ -128,9 +135,7 @@ public class UserControllerTest {
                                         fieldWithPath("password")
                                                 .description("변경할 비밀번호")
                                                 .optional(),
-                                        fieldWithPath("nickname")
-                                                .description("변경할 닉네임")
-                                                .optional(),
+                                        fieldWithPath("nickname").description("변경할 닉네임").optional(),
                                         fieldWithPath("addresses")
                                                 .description("변경할 주소 목록")
                                                 .optional()),
@@ -151,9 +156,15 @@ public class UserControllerTest {
                                                 .optional(),
                                         fieldWithPath("data.addresses").description("주소 목록"),
                                         fieldWithPath("data.createdAt").description("생성일시"),
-                                        fieldWithPath("data.updatedAt").description("수정일시").optional(),
-                                        fieldWithPath("data.createdBy").description("생성자 ID").optional(),
-                                        fieldWithPath("data.updatedBy").description("수정자 ID").optional())));
+                                        fieldWithPath("data.updatedAt")
+                                                .description("수정일시")
+                                                .optional(),
+                                        fieldWithPath("data.createdBy")
+                                                .description("생성자 ID")
+                                                .optional(),
+                                        fieldWithPath("data.updatedBy")
+                                                .description("수정자 ID")
+                                                .optional())));
     }
 
     @Test
@@ -164,7 +175,10 @@ public class UserControllerTest {
         UpdateUserRequest updateRequest = createUpdateUserRequest();
 
         given(userService.updateUser(eq(USER_ID), any(UpdateUserRequest.class)))
-                .willThrow(new com.project.baedalsodae.global.common.BusinessException(com.project.baedalsodae.global.common.ErrorCode.USER_DUPLICATED_NICKNAME));
+                .willThrow(
+                        new com.project.baedalsodae.global.common.BusinessException(
+                                com.project.baedalsodae.global.common.ErrorCode
+                                        .USER_DUPLICATED_NICKNAME));
 
         // when & then
         mockMvc.perform(
@@ -183,7 +197,9 @@ public class UserControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -211,7 +227,6 @@ public class UserControllerTest {
                                         fieldWithPath("timestamp").description("응답 타임스탬프"),
                                         fieldWithPath("data.id").description("탈퇴 처리된 사용자 UUID"),
                                         fieldWithPath("data.deletedAt").description("탈퇴 일시"),
-                                        fieldWithPath("data.deletedBy")
-                                                .description("탈퇴 처리자 ID"))));
+                                        fieldWithPath("data.deletedBy").description("탈퇴 처리자 ID"))));
     }
 }

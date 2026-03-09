@@ -89,10 +89,12 @@ public class AuthControllerTest {
                                         fieldWithPath("username").description("아이디 (4-10자 소문자/숫자)"),
                                         fieldWithPath("phone").description("전화번호 (010-XXXX-XXXX)"),
                                         fieldWithPath("email").description("이메일"),
-                                        fieldWithPath("password").description("비밀번호 (8-15자 영문/숫자/특수문자)"),
+                                        fieldWithPath("password")
+                                                .description("비밀번호 (8-15자 영문/숫자/특수문자)"),
                                         fieldWithPath("name").description("실명"),
                                         fieldWithPath("nickname").description("닉네임"),
-                                        fieldWithPath("role").description("사용자 권한 (CUSTOMER, OWNER 등)"),
+                                        fieldWithPath("role")
+                                                .description("사용자 권한 (CUSTOMER, OWNER 등)"),
                                         fieldWithPath("address").description("기본 주소 정보"),
                                         fieldWithPath("address.roadAddress").description("도로명 주소"),
                                         fieldWithPath("address.detailAddress").description("상세 주소"),
@@ -102,7 +104,9 @@ public class AuthControllerTest {
                                         fieldWithPath("address.sigunguName").description("시군구 이름"),
                                         fieldWithPath("address.dongCode").description("동 코드"),
                                         fieldWithPath("address.dongName").description("동 이름"),
-                                        fieldWithPath("address.description").description("장소 설명 (선택)").optional()),
+                                        fieldWithPath("address.description")
+                                                .description("장소 설명 (선택)")
+                                                .optional()),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
@@ -117,7 +121,8 @@ public class AuthControllerTest {
     @DisplayName("실패 - 이미 존재하는 아이디로 회원가입 시도")
     void signup_Fail_DuplicatedUsername() throws Exception {
         SignupRequest request = createSignupRequest();
-        given(userService.createUser(any())).willThrow(new BusinessException(ErrorCode.USER_DUPLICATED_USERNAME));
+        given(userService.createUser(any()))
+                .willThrow(new BusinessException(ErrorCode.USER_DUPLICATED_USERNAME));
 
         mockMvc.perform(
                         post(BASE_URL + "/signup")
@@ -134,14 +139,17 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
     @DisplayName("실패 - 이미 존재하는 이메일로 회원가입 시도")
     void signup_Fail_DuplicatedEmail() throws Exception {
         SignupRequest request = createSignupRequest();
-        given(userService.createUser(any())).willThrow(new BusinessException(ErrorCode.USER_DUPLICATED_EMAIL));
+        given(userService.createUser(any()))
+                .willThrow(new BusinessException(ErrorCode.USER_DUPLICATED_EMAIL));
 
         mockMvc.perform(
                         post(BASE_URL + "/signup")
@@ -158,7 +166,9 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -183,14 +193,17 @@ public class AuthControllerTest {
                                         fieldWithPath("username").description("아이디"),
                                         fieldWithPath("password").description("비밀번호")),
                                 responseHeaders(
-                                        headerWithName("Authorization").description("Access Token (Bearer)")),
+                                        headerWithName("Authorization")
+                                                .description("Access Token (Bearer)")),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("응답 타임스탬프"),
-                                        fieldWithPath("data.accessToken").description("Access Token"),
-                                        fieldWithPath("data.refreshToken").description("Refresh Token"))));
+                                        fieldWithPath("data.accessToken")
+                                                .description("Access Token"),
+                                        fieldWithPath("data.refreshToken")
+                                                .description("Refresh Token"))));
     }
 
     @Test
@@ -214,7 +227,9 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -235,16 +250,20 @@ public class AuthControllerTest {
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestFields(
-                                        fieldWithPath("refreshToken").description("유효한 Refresh Token")),
+                                        fieldWithPath("refreshToken")
+                                                .description("유효한 Refresh Token")),
                                 responseHeaders(
-                                        headerWithName("Authorization").description("새로운 Access Token (Bearer)")),
+                                        headerWithName("Authorization")
+                                                .description("새로운 Access Token (Bearer)")),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("응답 타임스탬프"),
-                                        fieldWithPath("data.accessToken").description("새로운 Access Token"),
-                                        fieldWithPath("data.refreshToken").description("새로운 Refresh Token"))));
+                                        fieldWithPath("data.accessToken")
+                                                .description("새로운 Access Token"),
+                                        fieldWithPath("data.refreshToken")
+                                                .description("새로운 Refresh Token"))));
     }
 
     @Test
@@ -268,7 +287,9 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -292,13 +313,16 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
     @DisplayName("성공 - 로그아웃")
     void logout_Success() throws Exception {
-        UserDetailsImpl user = UserDetailsImpl.from(UUID.randomUUID(), "tester", "pass", UserRole.CUSTOMER, false);
+        UserDetailsImpl user =
+                UserDetailsImpl.from(UUID.randomUUID(), "tester", "pass", UserRole.CUSTOMER, false);
 
         mockMvc.perform(
                         post(BASE_URL + "/logout")
@@ -315,7 +339,9 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("응답 타임스탬프"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -335,6 +361,8 @@ public class AuthControllerTest {
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 }

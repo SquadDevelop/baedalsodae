@@ -97,7 +97,9 @@ public class UserAddressControllerTest {
                                         fieldWithPath("sigunguName").description("시군구 이름"),
                                         fieldWithPath("dongCode").description("동 코드"),
                                         fieldWithPath("dongName").description("동 이름"),
-                                        fieldWithPath("description").description("장소 설명").optional()),
+                                        fieldWithPath("description")
+                                                .description("장소 설명")
+                                                .optional()),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
@@ -130,7 +132,8 @@ public class UserAddressControllerTest {
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("응답 타임스탬프"),
-                                        fieldWithPath("data[].userAddressId").description("주소 UUID"),
+                                        fieldWithPath("data[].userAddressId")
+                                                .description("주소 UUID"),
                                         fieldWithPath("data[].sidoCode").description("시도 코드"),
                                         fieldWithPath("data[].sidoName").description("시도 이름"),
                                         fieldWithPath("data[].sigunguCode").description("시군구 코드"),
@@ -218,7 +221,9 @@ public class UserAddressControllerTest {
                                         fieldWithPath("sigunguName").description("시군구 이름"),
                                         fieldWithPath("dongCode").description("동 코드"),
                                         fieldWithPath("dongName").description("동 이름"),
-                                        fieldWithPath("description").description("장소 설명").optional()),
+                                        fieldWithPath("description")
+                                                .description("장소 설명")
+                                                .optional()),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
@@ -243,7 +248,8 @@ public class UserAddressControllerTest {
     void updateAddressList_Success() throws Exception {
         // given
         UserDetailsImpl user = createUserDetails(USER_ID, UserRole.CUSTOMER);
-        List<UpdateUserAddressRequest> requests = List.of(createUpdateUserAddressRequest(ADDRESS_ID));
+        List<UpdateUserAddressRequest> requests =
+                List.of(createUpdateUserAddressRequest(ADDRESS_ID));
 
         doNothing().when(userAddressService).updateAddressList(eq(USER_ID), anyList());
 
@@ -319,8 +325,12 @@ public class UserAddressControllerTest {
         // given
         UserDetailsImpl user = createUserDetails(USER_ID, UserRole.CUSTOMER);
 
-        doThrow(new com.project.baedalsodae.global.common.BusinessException(com.project.baedalsodae.global.common.ErrorCode.USER_ADDRESS_CANNOT_DELETE))
-                .when(userAddressService).deleteAddress(USER_ID, ADDRESS_ID);
+        doThrow(
+                        new com.project.baedalsodae.global.common.BusinessException(
+                                com.project.baedalsodae.global.common.ErrorCode
+                                        .USER_ADDRESS_CANNOT_DELETE))
+                .when(userAddressService)
+                .deleteAddress(USER_ID, ADDRESS_ID);
 
         // when & then
         mockMvc.perform(delete(BASE_URL + "/{addressId}", ADDRESS_ID).with(user(user)))
@@ -330,13 +340,16 @@ public class UserAddressControllerTest {
                                 "user-address/delete-fail-last",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                pathParameters(parameterWithName("addressId").description("삭제할 주소 UUID")),
+                                pathParameters(
+                                        parameterWithName("addressId").description("삭제할 주소 UUID")),
                                 responseFields(
                                         fieldWithPath("code").description("에러 코드"),
                                         fieldWithPath("message").description("에러 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("에러 발생 시각"),
-                                        fieldWithPath("data").description("응답 데이터 (null)").optional())));
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
     }
 
     @Test
@@ -348,9 +361,7 @@ public class UserAddressControllerTest {
         doNothing().when(userAddressService).setMainAddress(USER_ID, ADDRESS_ID);
 
         // when & then
-        mockMvc.perform(
-                        patch(BASE_URL + "/{addressId}/main", ADDRESS_ID)
-                                .with(user(user)))
+        mockMvc.perform(patch(BASE_URL + "/{addressId}/main", ADDRESS_ID).with(user(user)))
                 .andExpect(status().isOk())
                 .andExpect(
                         jsonPath("$.code").value(SuccessCode.USER_MAIN_ADDRESS_CHANGED.getCode()))
