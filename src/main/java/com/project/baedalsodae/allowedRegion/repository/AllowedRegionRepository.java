@@ -9,4 +9,8 @@ public interface AllowedRegionRepository extends JpaRepository<AllowedRegion, UU
     Optional<AllowedRegion> findBySigunguCodeAndIsDeletedIsFalse(String sigunguCode);
 
     Optional<AllowedRegion> findBySigunguNameAndIsDeletedIsFalse(String sigunguName);
+
+    Optional<AllowedRegion> findByIdAndIsDeletedIsFalse(UUID id);
+
+    boolean existsBySigunguCodeAndIsDeletedIsFalse(String sigunguCode);
 }
