@@ -90,10 +90,10 @@ jobs:
                 -e POSTGRES_PORT=$POSTGRES_PORT \
                 -e POSTGRES_USER=$POSTGRES_USER \
                 -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
-                -e SPRING_DATA_REDIS_URL=SPRING_DATA_REDIS_URL \
-                -e SPRING_DATA_REDIS_HOST=SPRING_DATA_REDIS_HOST \
-                -e SPRING_DATA_REDIS_PORT=SPRING_DATA_REDIS_PORT \
-                -e SPRING_DATA_REDIS_PASSWORD=SPRING_DATA_REDIS_PASSWORD \
+                -e SPRING_DATA_REDIS_URL=$SPRING_DATA_REDIS_URL \
+                -e SPRING_DATA_REDIS_HOST=$SPRING_DATA_REDIS_HOST \
+                -e SPRING_DATA_REDIS_PORT=$SPRING_DATA_REDIS_PORT \
+                -e SPRING_DATA_REDIS_PASSWORD=$SPRING_DATA_REDIS_PASSWORD \
                 baedalsodae:latest && \
               rm -f baedalsodae.tar.gz mock-pg.tar.gz && \
               docker image prune -f && \
@@ -174,10 +174,10 @@ jobs:
                 -e POSTGRES_PORT=$POSTGRES_PORT \
                 -e POSTGRES_USER=$POSTGRES_USER \
                 -e POSTGRES_DEFAULT_SCHEMA=$POSTGRES_DEFAULT_SCHEMA \
-                -e SPRING_DATA_REDIS_URL=SPRING_DATA_REDIS_URL \
-                -e SPRING_DATA_REDIS_HOST=SPRING_DATA_REDIS_HOST \
-                -e SPRING_DATA_REDIS_PORT=SPRING_DATA_REDIS_PORT \
-                -e SPRING_DATA_REDIS_PASSWORD=SPRING_DATA_REDIS_PASSWORD \
+                -e SPRING_DATA_REDIS_URL=$SPRING_DATA_REDIS_URL \
+                -e SPRING_DATA_REDIS_HOST=$SPRING_DATA_REDIS_HOST \
+                -e SPRING_DATA_REDIS_PORT=$SPRING_DATA_REDIS_PORT \
+                -e SPRING_DATA_REDIS_PASSWORD=$SPRING_DATA_REDIS_PASSWORD \
                 baedalsodae:latest && \
               rm -f baedalsodae.tar.gz mock-pg.tar.gz && \
               docker image prune -f && \
