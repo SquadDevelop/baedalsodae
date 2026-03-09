@@ -76,12 +76,14 @@ public class StoreQueryServiceImpl implements StoreQueryService {
         List<MenuCategoryItemsResponse> storeMenuCategoryItemsList =
                 menuCategoryCustomRepository.getStoreCategoryItems(storeId);
         UserAddress userAddress = userAddressService.getMainUserAddress(userId);
-        boolean isDeliverable = allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode());
+        boolean isDeliverable =
+                allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode());
 
         return StoreDetailResponse.of(
                 StoreSummaryResponse.fromEntity(store),
                 storeMenuCategoryItemsList,
-                isAllowedRegion,isDeliverable);
+                isAllowedRegion,
+                isDeliverable);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.project.baedalsodae.allowedRegion.service;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
+
 import com.project.baedalsodae.allowedRegion.entity.AllowedRegion;
 import com.project.baedalsodae.allowedRegion.repository.AllowedRegionRepository;
 import com.project.baedalsodae.allowedRegion.service.impl.AllowedRegionServiceImpl;
@@ -34,7 +35,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하고 활성화 상태이면 true를 반환한다")
         void returnsTrueWhenActiveRegionExists() {
-            AllowedRegion region = AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
+            AllowedRegion region =
+                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
             given(allowedRegionRepository.findBySigunguCodeAndIsDeletedIsFalse(SIGUNGU_CODE))
                     .willReturn(Optional.of(region));
 
@@ -46,7 +48,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하지만 비활성화 상태이면 false를 반환한다")
         void returnsFalseWhenInactiveRegionExists() {
-            AllowedRegion region = AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
+            AllowedRegion region =
+                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
             region.deactivate();
             given(allowedRegionRepository.findBySigunguCodeAndIsDeletedIsFalse(SIGUNGU_CODE))
                     .willReturn(Optional.of(region));
@@ -75,7 +78,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하고 활성화 상태이면 true를 반환한다")
         void returnsTrueWhenActiveRegionExists() {
-            AllowedRegion region = AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
+            AllowedRegion region =
+                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
             given(allowedRegionRepository.findBySigunguNameAndIsDeletedIsFalse(SIGUNGU_NAME))
                     .willReturn(Optional.of(region));
 
@@ -87,7 +91,8 @@ class AllowedRegionServiceImplTest {
         @Test
         @DisplayName("지역이 존재하지만 비활성화 상태이면 false를 반환한다")
         void returnsFalseWhenInactiveRegionExists() {
-            AllowedRegion region = AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
+            AllowedRegion region =
+                    AllowedRegion.create(SIDO_CODE, SIDO_NAME, SIGUNGU_CODE, SIGUNGU_NAME);
             region.deactivate();
             given(allowedRegionRepository.findBySigunguNameAndIsDeletedIsFalse(SIGUNGU_NAME))
                     .willReturn(Optional.of(region));

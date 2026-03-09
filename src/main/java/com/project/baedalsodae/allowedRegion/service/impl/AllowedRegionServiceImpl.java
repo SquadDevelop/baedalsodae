@@ -30,5 +30,4 @@ public class AllowedRegionServiceImpl implements AllowedRegionService {
                 .map(AllowedRegion::isActive)
                 .orElse(false);
     }
-
 }

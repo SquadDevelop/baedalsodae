@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
                         .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-        if(!allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())){
+        if (!allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())) {
             throw new BusinessException(ErrorCode.STORE_REGION_NOT_ALLOWED);
         }
 
@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
 
         UserAddress userAddress = userAddressService.getMainUserAddress(userId);
-        if(!allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode())){
+        if (!allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode())) {
             throw new BusinessException(ErrorCode.USER_ADDRESS_NOT_ALLOWED);
         }
 

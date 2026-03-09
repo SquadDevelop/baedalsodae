@@ -13,11 +13,11 @@ public class StoreDetailResponse {
     private boolean isAllowedRegion;
     private boolean isDeliverableToUser;
 
-
     public static StoreDetailResponse of(
             StoreSummaryResponse store,
             List<MenuCategoryItemsResponse> storeMenuCategoryItemsList,
-            boolean isAllowedRegion, boolean isDeliverableToUser) {
+            boolean isAllowedRegion,
+            boolean isDeliverableToUser) {
         return StoreDetailResponse.builder()
                 .store(store)
                 .storeMenuCategoryItems(storeMenuCategoryItemsList)
