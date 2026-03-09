@@ -15,4 +15,8 @@ public enum MenuStatus {
     MenuStatus(String description) {
         this.description = description;
     }
+
+    public boolean isPubliclyVisible() {
+        return this == AVAILABLE || this == SOLD_OUT;
+    }
 }

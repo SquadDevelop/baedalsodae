@@ -6,6 +6,7 @@ import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.item.MenuItemPutRequestDto;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,7 +51,7 @@ public class MenuItemRequestFixture {
     public static class MenuItemPostRequestBuilder {
         private String name = DEFAULT_MENU_ITEM_NAME;
         private String description = DEFAULT_ITEM_DESCRIPTION;
-        private Integer price = DEFAULT_ITEM_PRICE;
+        private BigDecimal price = DEFAULT_ITEM_PRICE;
         private Boolean isPopular = false;
         private MenuStatus menuStatus = MenuStatus.AVAILABLE;
         private List<String> tagNames = List.of("치킨", "바삭");
@@ -65,7 +66,7 @@ public class MenuItemRequestFixture {
             return this;
         }
 
-        public MenuItemPostRequestBuilder withPrice(Integer price) {
+        public MenuItemPostRequestBuilder withPrice(BigDecimal price) {
             this.price = price;
             return this;
         }
@@ -94,7 +95,7 @@ public class MenuItemRequestFixture {
     public static class MenuItemPutRequestBuilder {
         private String name = ALTERNATIVE_MENU_ITEM_NAME;
         private String description = ALTERNATIVE_ITEM_DESCRIPTION;
-        private Integer price = ALTERNATIVE_ITEM_PRICE;
+        private BigDecimal price = ALTERNATIVE_ITEM_PRICE;
         private Boolean isPopular = true;
         private UUID categoryId;
         private MenuStatus menuStatus = MenuStatus.AVAILABLE;
@@ -110,7 +111,7 @@ public class MenuItemRequestFixture {
             return this;
         }
 
-        public MenuItemPutRequestBuilder withPrice(Integer price) {
+        public MenuItemPutRequestBuilder withPrice(BigDecimal price) {
             this.price = price;
             return this;
         }
@@ -144,7 +145,7 @@ public class MenuItemRequestFixture {
     public static class MenuItemPatchRequestBuilder {
         private String name;
         private String description;
-        private Integer price;
+        private BigDecimal price;
         private Boolean isPopular;
         private UUID categoryId;
         private MenuStatus menuStatus;
@@ -160,7 +161,7 @@ public class MenuItemRequestFixture {
             return this;
         }
 
-        public MenuItemPatchRequestBuilder withPrice(Integer price) {
+        public MenuItemPatchRequestBuilder withPrice(BigDecimal price) {
             this.price = price;
             return this;
         }

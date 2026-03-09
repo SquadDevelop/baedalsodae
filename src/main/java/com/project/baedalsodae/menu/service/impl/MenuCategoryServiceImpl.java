@@ -1,8 +1,10 @@
 package com.project.baedalsodae.menu.service.impl;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.menu.common.OrderUtil;
+import com.project.baedalsodae.menu.common.StoreOwnershipValidator;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPatchRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPostRequestDto;
 import com.project.baedalsodae.menu.dto.requestDto.category.MenuCategoryPutRequestDto;
@@ -29,9 +31,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Override
     @Transactional
     public MenuCategoryResponseDto createMenuCategory(
-            UUID storeId, MenuCategoryPostRequestDto request) {
+            UUID storeId, MenuCategoryPostRequestDto request, UserDetailsImpl userDetails) {
 
         Store store = getStoreByStoreId(storeId);
+        StoreOwnershipValidator.verifyStoreOwnership(
+                store, userDetails, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         if (existsByStoreIdAndNameAndDeletedIsFalse(storeId, request.name())) {
             throw new BusinessException(ErrorCode.DUPLICATE_MENU_CATEGORY_NAME);
         }
@@ -48,9 +52,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     @Override
     @Transactional
     public MenuCategoryResponseDto updateMenuCategory(
-            UUID menuCategoryId, MenuCategoryPutRequestDto request) {
+            UUID menuCategoryId, MenuCategoryPutRequestDto request, UserDetailsImpl userDetails) {
 
         MenuCategory menuCategory = getMenuCategoryByMenuCategoryId(menuCategoryId);
+        StoreOwnershipValidator.verifyStoreOwnership(
+                menuCategory.getStore(), userDetails, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         if (!menuCategory.getName().equals(request.name())
                 && existsByStoreIdAndNameAndDeletedIsFalse(
                         menuCategory.getStore().getId(), request.name())) {
@@ -62,9 +68,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     @Override
     @Transactional
-    public void deleteMenuCategory(UUID menuCategoryId) {
+    public void deleteMenuCategory(UUID menuCategoryId, UserDetailsImpl userDetails) {
 
         MenuCategory menuCategory = getMenuCategoryByMenuCategoryId(menuCategoryId);
+        StoreOwnershipValidator.verifyStoreOwnership(
+                menuCategory.getStore(), userDetails, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         if (menuCategory.hasItem()) throw new BusinessException(ErrorCode.MENU_CATEGORY_HAS_ITEMS);
 
         UUID storeId = menuCategory.getStore().getId();
@@ -72,14 +80,16 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
                 menuCategoryRepository.findAllByStoreIdAndDeletedIsFalseWithLock(storeId);
 
         OrderUtil.deleteAndShift(menuCategories, menuCategory);
-        menuCategory.softDelete(null); // / 토큰 기능 추가 시 수정 필요
+        menuCategory.softDelete(userDetails.getUserId());
     }
 
     @Override
     @Transactional
     public MenuCategoryResponseDto updateMenuCategoryOrder(
-            UUID menuCategoryId, MenuCategoryPatchRequestDto request) {
+            UUID menuCategoryId, MenuCategoryPatchRequestDto request, UserDetailsImpl userDetails) {
         MenuCategory menuCategory = getMenuCategoryByMenuCategoryId(menuCategoryId);
+        StoreOwnershipValidator.verifyStoreOwnership(
+                menuCategory.getStore(), userDetails, ErrorCode.MENU_CATEGORY_FORBIDDEN);
         Integer from = menuCategory.getOrderNo();
         if (from == null) {
             throw new BusinessException(ErrorCode.INVALID_MENU_CATEGORY_ORDER);

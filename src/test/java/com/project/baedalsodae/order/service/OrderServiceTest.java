@@ -2,9 +2,11 @@ package com.project.baedalsodae.order.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verify;
 
 import com.project.baedalsodae.cart.entity.Cart;
 import com.project.baedalsodae.cart.entity.CartItem;
@@ -31,6 +33,7 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
@@ -210,7 +213,7 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(cart.getTotalAmount()).willReturn(0);
+        given(cart.getTotalAmount()).willReturn(BigDecimal.ZERO);
 
         // when
         Throwable throwable = catchThrowable(() -> orderService.createOrder(userId, request));
@@ -256,12 +259,12 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(cart.getTotalAmount()).willReturn(18000);
+        given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(18000));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -315,18 +318,18 @@ public class OrderServiceTest {
 
         given(storeRepository.findByIdAndIsDeletedIsFalse(storeId)).willReturn(Optional.of(store));
 
-        given(cart.getTotalAmount()).willReturn(26000);
+        given(cart.getTotalAmount()).willReturn(BigDecimal.valueOf(26000));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(cartItem1.getQuantity()).willReturn(1);
 
         given(cartItem2.getMenuItem()).willReturn(menuItem2);
         given(menuItem2.getId()).willReturn(menuItemId2);
         given(menuItem2.getName()).willReturn("짜장면");
-        given(menuItem2.getPrice()).willReturn(8000);
+        given(menuItem2.getPrice()).willReturn(BigDecimal.valueOf(8000));
         given(cartItem2.getQuantity()).willReturn(1);
 
         List<CartItem> cartItems = new ArrayList<>();
@@ -349,7 +352,10 @@ public class OrderServiceTest {
                         argThat(
                                 order ->
                                         order.getItems().size() == 2
-                                                && order.getTotalAmount() == 26000));
+                                                && order.getTotalAmount()
+                                                                .compareTo(
+                                                                        BigDecimal.valueOf(26000))
+                                                        == 0));
         then(orderStatusHistoryService)
                 .should()
                 .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
@@ -1094,7 +1100,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.empty());
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.empty());
 
         // when
         Throwable throwable = catchThrowable(() -> orderService.requestOrder(userId, orderId));
@@ -1116,7 +1122,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.PENDING);
 
@@ -1141,7 +1147,7 @@ public class OrderServiceTest {
 
         given(order.getUserId()).willReturn(userId);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
 
@@ -1167,8 +1173,9 @@ public class OrderServiceTest {
         given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 
         given(order.getUserId()).willReturn(userId);
+        given(order.getStatus()).willReturn(OrderStatus.CREATED);
 
-        given(paymentRepository.findByOrder(orderId)).willReturn(Optional.of(payment));
+        given(paymentRepository.findByOrderId(orderId)).willReturn(Optional.of(payment));
 
         given(payment.getStatus()).willReturn(PaymentStatus.SUCCESS);
 
@@ -1181,7 +1188,8 @@ public class OrderServiceTest {
         then(order).should().request();
         then(orderStatusHistoryService)
                 .should()
-                .createForCustomerOrderStatusHistory(eq(userId), any(Order.class));
+                .createForCustomerOrderStatusHistory(
+                        eq(userId), eq(OrderStatus.CREATED), any(Order.class));
         then(orderEventPublisher).should().publishOrderRequested(any(Order.class));
         assertThat(response).isNotNull();
     }
@@ -1742,6 +1750,298 @@ public class OrderServiceTest {
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
         then(orderEventPublisher).should().publishOrderDelivered(any(Order.class));
+
+        assertThat(response).isNotNull();
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 존재하지 않는 주문")
+    @Test
+    void cancelRequestOrder_fail_order_not_found() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_NOT_FOUND.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 이미 취소 대기 상태인 주문")
+    @Test
+    void cancelRequestOrder_fail_order_already_cancel_request() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStatus()).willReturn(OrderStatus.CANCEL_REQUESTED);
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 이미 취소된 주문")
+    @Test
+    void cancelRequestOrder_fail_order_already_cancel_end() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+        given(order.getStatus()).willReturn(OrderStatus.CANCELED);
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 본인 주문이 아님 (고객)")
+    @Test
+    void cancelRequestOrder_fail_not_my_order_customer() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(UUID.randomUUID());
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_FORBIDDEN.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 본인 가게 주문이 아님 (사장님)")
+    @Test
+    void cancelRequestOrder_fail_not_my_store() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(UUID.randomUUID());
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.OWNER, storeId, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_STORE_FORBIDDEN.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 취소 불가 상태")
+    @Test
+    void cancelRequestOrder_fail_invalid_status() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+        given(order.canCancelRequestByCustomer()).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_INVALID_STATUS.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 실패 - 주문 생성 후 5분 이후 취소 시도 (고객)")
+    @Test
+    void cancelRequestOrder_fail_invalid_Order_createdAt_five_minute() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+        given(order.canCancelRequestByCustomer()).willReturn(true);
+        given(order.getCreatedAt()).willReturn(Instant.now().minusSeconds(301));
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                orderService.cancelRequestOrder(
+                                        userId, UserRole.CUSTOMER, null, orderId, null))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorCode.ORDER_CANCEL_NOT_ALLOWED.getMessage());
+    }
+
+    @DisplayName("주문 취소 요청 성공 - REQUESTED 상태 고객 취소")
+    @Test
+    void cancelRequestOrder_success_customer_requested() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+        given(order.getStatus()).willReturn(OrderStatus.REQUESTED);
+        given(order.canCancelRequestByCustomer()).willReturn(true);
+        given(order.getCreatedAt()).willReturn(Instant.now().minusSeconds(120));
+
+        // when
+        orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null);
+
+        // then
+        verify(order).cancelRequested();
+        verify(orderStatusHistoryService)
+                .createForCustomerOrderStatusHistory(userId, OrderStatus.REQUESTED, order);
+    }
+
+    @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 고객 취소")
+    @Test
+    void cancelRequestOrder_success_customer_accepted() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getUserId()).willReturn(userId);
+        given(order.canCancelRequestByCustomer()).willReturn(true);
+        given(order.getCreatedAt()).willReturn(Instant.now().minusSeconds(120));
+
+        // when
+        orderService.cancelRequestOrder(userId, UserRole.CUSTOMER, null, orderId, null);
+
+        // then
+        verify(order).cancelRequested();
+    }
+
+    @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 사장 취소")
+    @Test
+    void cancelRequestOrder_success_owner() {
+
+        // given
+        UUID orderId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        UUID storeId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.getStoreId()).willReturn(storeId);
+        given(order.canCancelRequestByOwner()).willReturn(true);
+        given(order.getStatus()).willReturn(OrderStatus.ACCEPTED);
+
+        // when
+        orderService.cancelRequestOrder(userId, UserRole.OWNER, storeId, orderId, null);
+
+        // then
+        verify(order).cancelRequested();
+        verify(orderStatusHistoryService)
+                .createForOwnerOrderStatusHistory(userId, OrderStatus.ACCEPTED, order, null);
+    }
+
+    @DisplayName("주문 취소 실패 - 존재하지 않는 주문")
+    @Test
+    void completeCancelOrder_fail_order_not_found() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown = catchThrowable(() -> orderService.completeCancelOrder(userId, orderId));
+        log.info("throwable = " + thrown);
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_NOT_FOUND);
+    }
+
+    @DisplayName("주문 취소 실패 - CANCEL_REQUESTED 상태가 아님")
+    @Test
+    void completeCancelOrder_fail_invalid_status() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+        given(order.canCompleteCancel()).willReturn(false);
+
+        // when
+        Throwable thrown = catchThrowable(() -> orderService.completeCancelOrder(userId, orderId));
+        log.info("throwable = " + thrown);
+
+        // then
+        assertThat(thrown)
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_STATUS);
+    }
+
+    @DisplayName("주문 취소 성공 - 주문 취소 시 상태 변경 및 상태 이력 생성")
+    @Test
+    void completeCancelOrder_success() {
+
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        OrderStatus fromStatus = OrderStatus.CANCEL_REQUESTED;
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+        given(order.canCompleteCancel()).willReturn(true);
+        given(order.getStatus()).willReturn(fromStatus);
+
+        // when
+        OrderActionStatusResponse response = orderService.completeCancelOrder(userId, orderId);
+
+        // then
+        then(order).should().cancel();
+
+        then(orderStatusHistoryService)
+                .should()
+                .createForOwnerOrderStatusHistory(
+                        eq(userId), eq(fromStatus), any(Order.class), isNull());
+
+        then(orderEventPublisher).should().publishOrderCanceled(any(Order.class));
 
         assertThat(response).isNotNull();
     }

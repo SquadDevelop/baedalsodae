@@ -3,6 +3,7 @@ package com.project.baedalsodae.order.dto.response;
 import com.project.baedalsodae.global.common.util.TimeUtils;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,10 +32,10 @@ public class OrderDetailResponse {
 
     private String deliveryAddressSnapshot;
 
-    private int totalAmount;
-    private int deliveryFee;
-    private int discountAmount;
-    private int finalAmount;
+    private BigDecimal totalAmount;
+    private BigDecimal deliveryFee;
+    private BigDecimal discountAmount;
+    private BigDecimal finalAmount;
 
     private List<OrderItemDetailResponse> items;
 

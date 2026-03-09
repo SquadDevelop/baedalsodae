@@ -25,13 +25,12 @@ import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.user.entity.UserRole;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,14 +63,25 @@ public class OrderServiceImpl implements OrderService {
                         .findByIdAndIsDeletedIsFalse(storeId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
-        int totalAmount = cart.getTotalAmount();
-        if (totalAmount <= 0) throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
+        if (!allowedRegionService.isAllowedByCode(store.getAddress().getSigunguCode())) {
+            throw new BusinessException(ErrorCode.STORE_REGION_NOT_ALLOWED);
+        }
+
+        BigDecimal totalAmount = cart.getTotalAmount();
+        if (totalAmount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new BusinessException(ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
 
         // 할인 쿠폰 도메인, 배달 도메인이 없음
-        final int deliveryFee = 0;
-        final int discountAmount = 0;
-        final int finalAmount = totalAmount - discountAmount + deliveryFee;
-        if (finalAmount < 0) throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
+        final BigDecimal deliveryFee = BigDecimal.ZERO;
+        final BigDecimal discountAmount = BigDecimal.ZERO;
+        final BigDecimal finalAmount = totalAmount.subtract(discountAmount).add(deliveryFee);
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+            throw new BusinessException(ErrorCode.ORDER_INVALID_FINAL_AMOUNT);
+
+        UserAddress userAddress = userAddressService.getMainUserAddress(userId);
+        if (!allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode())) {
+            throw new BusinessException(ErrorCode.USER_ADDRESS_NOT_ALLOWED);
+        }
 
         // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
         String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
@@ -117,6 +127,9 @@ public class OrderServiceImpl implements OrderService {
     public OrderListResponse getOrders(UUID userId, String role, OrderListRequest request) {
         validateDateRange(request.startDate(), request.endDate());
         // TODO 인증 도메인 완성 시 AOP로 권한 체크
+        if (UserRole.MANAGER.getRole().equals(role) || UserRole.MASTER.getRole().equals(role)) {
+            return getAdminOrders(request);
+        }
         if (UserRole.OWNER.getRole().equals(role)) {
             return getOwnerOrders(userId, request);
         }
@@ -144,6 +157,16 @@ public class OrderServiceImpl implements OrderService {
 
         OrderListQuery query = OrderListQuery.forOwner(store.getId(), request);
         List<OrderSummaryResponse> orders = orderQueryRepository.findOrdersByStore(query);
+
+        boolean hasNext = orders.size() > query.resolvedSize();
+        if (hasNext) orders = orders.subList(0, query.resolvedSize());
+
+        return OrderListResponse.from(orders, hasNext);
+    }
+
+    private OrderListResponse getAdminOrders(OrderListRequest request) {
+        OrderListQuery query = OrderListQuery.forAdmin(request);
+        List<OrderSummaryResponse> orders = orderQueryRepository.findAllOrders(query);
 
         boolean hasNext = orders.size() > query.resolvedSize();
         if (hasNext) orders = orders.subList(0, query.resolvedSize());
@@ -219,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
 
         Payment payment =
                 paymentRepository
-                        .findByOrder(orderId)
+                        .findByOrderId(orderId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
 
         if (payment.getStatus() != PaymentStatus.SUCCESS) {
@@ -230,9 +253,11 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
         }
 
+        final OrderStatus fromStatus = order.getStatus();
+
         order.request();
 
-        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
         orderEventPublisher.publishOrderRequested(order);
 
@@ -383,6 +408,111 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
         orderEventPublisher.publishOrderDelivered(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse cancelRequestOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason) {
+
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getStatus() == OrderStatus.CANCEL_REQUESTED) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        if (order.getStatus() == OrderStatus.CANCELED) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        if (userRole == UserRole.CUSTOMER) {
+            return cancelRequestByCustomer(userId, order);
+        } else if (userRole == UserRole.OWNER) {
+            return cancelRequestByOwner(userId, storeId, order, reason);
+        }
+
+        throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+    }
+
+    private OrderActionStatusResponse cancelRequestByCustomer(UUID userId, Order order) {
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
+        }
+        if (!order.canCancelRequestByCustomer()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        if (order.getCreatedAt().plusSeconds(300).isBefore(Instant.now())) {
+            throw new BusinessException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancelRequested();
+
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
+
+        orderEventPublisher.publishOrderCancelRequested(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderActionStatusResponse completeCancelOrder(UUID userId, UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.canCompleteCancel()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancel();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        orderEventPublisher.publishOrderCanceled(order);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    @Override
+    public boolean isOrderDelivered(UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        return order.getStatus() == OrderStatus.DELIVERED;
+    }
+
+    private OrderActionStatusResponse cancelRequestByOwner(
+            UUID userId, UUID storeId, Order order, String reason) {
+        if (!order.getStoreId().equals(storeId)) {
+            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
+        }
+
+        if (!order.canCancelRequestByOwner()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancelRequested();
+
+        orderStatusHistoryService.createForOwnerOrderStatusHistory(
+                userId, fromStatus, order, reason);
+
+        orderEventPublisher.publishOrderCancelRequested(order);
 
         return OrderActionStatusResponse.from(order);
     }

@@ -1,9 +1,9 @@
 package com.project.baedalsodae.store.service;
 
-import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
+import com.project.baedalsodae.store.dto.request.storeCategory.CreateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.storeCategory.UpdateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryDetailResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryListResponse;
 import java.util.UUID;
 
 public interface StoreCategoryService {

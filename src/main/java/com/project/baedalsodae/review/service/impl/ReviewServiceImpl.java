@@ -8,20 +8,20 @@ import com.project.baedalsodae.review.dto.response.ReviewResponse;
 import com.project.baedalsodae.review.entity.Review;
 import com.project.baedalsodae.review.repository.ReviewRepository;
 import com.project.baedalsodae.review.service.ReviewService;
-import com.project.baedalsodae.store.service.StoreReviewService;
 import com.project.baedalsodae.user.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
+    private final OrderService orderService;
     private final StoreReviewService storeReviewService;
 
     @Override
@@ -57,6 +57,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewResponse createReview(
             final UUID userId, final UUID orderId, final ReviewRequest request) {
+        if (!orderService.isOrderDelivered(orderId))
+            throw new BusinessException(ErrorCode.REVIEW_BEFORE_DELIVERY_NOT_ALLOWED);
         Review savedReview =
                 reviewRepository.save(
                         Review.create(userId, orderId, request.rating(), request.comment()));

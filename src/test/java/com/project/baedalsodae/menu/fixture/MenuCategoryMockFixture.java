@@ -51,6 +51,17 @@ public class MenuCategoryMockFixture {
         return new CategoryAndStoreFixture(category, store);
     }
 
+    public static MenuCategory createMockCategoryWithUnrelatedStore(
+            MenuCategoryRepository menuCategoryRepository, UUID menuCategoryId) {
+        MenuCategory category = mock(MenuCategory.class);
+        Store store = mock(Store.class);
+        given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+                .willReturn(Optional.of(category));
+        given(category.getStore()).willReturn(store);
+        given(store.getUserId()).willReturn(UUID.randomUUID());
+        return category;
+    }
+
     public static MenuCategory createMockCategory(UUID categoryId, String categoryName) {
         MenuCategory category = mock(MenuCategory.class);
         given(category.getId()).willReturn(categoryId);

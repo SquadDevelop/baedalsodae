@@ -2,6 +2,7 @@ package com.project.baedalsodae.user.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserAddressRequest;
 import com.project.baedalsodae.user.dto.response.UserAddressResponse;
@@ -12,7 +13,7 @@ import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,8 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional
     @Override
     public void createAddress(UUID userId, CreateUserAddressRequest request) {
-        if (userAddressRepository.existsByRoadAddressAndDetailAddress(
-                request.getRoadAddress(), request.getDetailAddress())) {
+        if (userAddressRepository.existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
+                userId, request.getRoadAddress(), request.getDetailAddress())) {
             throw new BusinessException(ErrorCode.USER_ADDRESS_DUPLICATED);
         }
 
@@ -38,19 +39,35 @@ public class UserAddressServiceImpl implements UserAddressService {
                 userRepository
                         .findByUserIdAndIsDeletedFalse(userId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        UserAddress address =
-                UserAddress.create(
-                        foundUser,
-                        request.getRoadAddress(),
-                        request.getDetailAddress(),
-                        request.getDescription());
 
-        foundUser.addAddress(address);
-        UserAddress savedAddress = userAddressRepository.save(address);
+        Address address =
+                Address.createAddress(
+                        request.getSidoCode(), request.getSidoName(),
+                        request.getSigunguCode(), request.getSigunguName(),
+                        request.getDongCode(), request.getDongName(),
+                        request.getRoadAddress(), request.getDetailAddress());
 
-        if (foundUser.getUserMainAddressId() == null) {
-            foundUser.changeMainAddress(savedAddress.getId());
+        UserAddress userAddress = UserAddress.create(foundUser, address, request.getDescription());
+
+        // 수정: 엔티티 메서드 호출 (id 발급을 위해 저장 후 호출 고려 가능하나, Cascade에 의해 함께 저장됨)
+        foundUser.addAddress(userAddress);
+        userAddressRepository.save(userAddress);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserAddressResponse getMainAddress(UUID userId) {
+        User foundUser =
+                userRepository
+                        .findUserWithAddressesByIdAndIsDeletedFalse(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        UserAddress mainAddress = foundUser.getMainAddress();
+
+        if (mainAddress == null) {
+            return null;
         }
+
+        return UserAddressResponse.from(mainAddress, mainAddress.getId());
     }
 
     @Transactional(readOnly = true)
@@ -73,22 +90,30 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     @Transactional
     @Override
-    public UserAddressResponse updateAddress(UUID userId, UpdateUserAddressRequest request) {
-        if (userAddressRepository.existsByRoadAddressAndDetailAddressAndIdNot(
-                request.getRoadAddress(), request.getDetailAddress(), request.getUserAddressId())) {
+    public UserAddressResponse updateAddress(
+            UUID userId, UUID addressId, UpdateUserAddressRequest request) {
+        if (userAddressRepository
+                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddressAndIdNot(
+                        userId, request.getRoadAddress(), request.getDetailAddress(), addressId)) {
             throw new BusinessException(ErrorCode.USER_ADDRESS_DUPLICATED);
         }
 
         UserAddress addressToUpdate =
                 userAddressRepository
-                        .findByIdAndUserId(request.getUserAddressId(), userId)
+                        .findByIdAndUserId(addressId, userId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.USER_ADDRESS_NOT_FOUND));
-        User user = addressToUpdate.getUser();
 
-        addressToUpdate.update(
-                request.getRoadAddress(), request.getDetailAddress(), request.getDescription());
+        Address address =
+                Address.createAddress(
+                        request.getSidoCode(), request.getSidoName(),
+                        request.getSigunguCode(), request.getSigunguName(),
+                        request.getDongCode(), request.getDongName(),
+                        request.getRoadAddress(), request.getDetailAddress());
 
-        return UserAddressResponse.from(addressToUpdate, user.getUserMainAddressId());
+        addressToUpdate.update(addressToUpdate.getId(), address, request.getDescription());
+
+        return UserAddressResponse.from(
+                addressToUpdate, addressToUpdate.getUser().getUserMainAddressId());
     }
 
     @Transactional
@@ -99,34 +124,38 @@ public class UserAddressServiceImpl implements UserAddressService {
                         .findUserWithAddressesByIdAndIsDeletedFalse(userId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        Set<UUID> userAddressIds =
+        Map<UUID, UserAddress> existingAddressMap =
                 user.getUserAddresses().stream()
-                        .map(UserAddress::getId)
-                        .collect(Collectors.toSet());
+                        .collect(Collectors.toMap(UserAddress::getId, a -> a));
 
-        List<UserAddress> newAddresses =
+        List<UserAddress> targetAddresses =
                 updatedAddressReq.stream()
-                        .filter(
-                                req ->
-                                        req.getUserAddressId() == null
-                                                || userAddressIds.contains(
-                                                        req.getUserAddressId())) // 타인의 주소 ID는 무시
                         .map(
                                 req -> {
-                                    UserAddress userAddress =
-                                            UserAddress.builder()
-                                                    .id(req.getUserAddressId())
-                                                    .user(user)
-                                                    .build();
-                                    userAddress.update(
-                                            req.getRoadAddress(),
-                                            req.getDetailAddress(),
-                                            req.getDescription());
-                                    return userAddress;
+                                    Address address =
+                                            Address.createAddress(
+                                                    req.getSidoCode(), req.getSidoName(),
+                                                    req.getSigunguCode(), req.getSigunguName(),
+                                                    req.getDongCode(), req.getDongName(),
+                                                    req.getRoadAddress(), req.getDetailAddress());
+
+                                    if (req.getUserAddressId() != null
+                                            && existingAddressMap.containsKey(
+                                                    req.getUserAddressId())) {
+                                        UserAddress existing =
+                                                existingAddressMap.get(req.getUserAddressId());
+                                        existing.update(
+                                                existing.getId(), address, req.getDescription());
+                                        return existing;
+                                    } else {
+                                        return UserAddress.create(
+                                                user, address, req.getDescription());
+                                    }
                                 })
                         .toList();
 
-        user.updateAddresses(newAddresses);
+        // 수정: 엔티티에 비즈니스 로직 위임
+        user.updateAddresses(targetAddresses);
     }
 
     @Transactional
@@ -142,27 +171,17 @@ public class UserAddressServiceImpl implements UserAddressService {
             throw new BusinessException(ErrorCode.USER_ADDRESS_CANNOT_DELETE);
         }
 
-        UserAddress mainAddress = user.getMainAddress();
-        if (mainAddress != null && addressId.equals(mainAddress.getId())) {
-            UUID nextMainAddressId =
-                    user.getUserAddresses().stream()
-                            .map(UserAddress::getId)
-                            .filter(id -> !addressId.equals(id))
-                            .findAny()
-                            .orElse(null);
-            user.changeMainAddress(nextMainAddressId);
-        }
-
+        // 수정: 엔티티에서 안전하게 제거 및 대표 주소 관리
+        user.removeAddress(addressToDelete);
         userAddressRepository.delete(addressToDelete);
-        user.getUserAddresses().remove(addressToDelete);
     }
 
     @Transactional
     @Override
-    public void setMainAddress(UUID userId, UUID newMainAddressId) {
+    public void setMainAddress(UUID userId, UUID addressId) {
         UserAddress addressToSetMain =
                 userAddressRepository
-                        .findByIdAndUserId(newMainAddressId, userId)
+                        .findByIdAndUserId(addressId, userId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.USER_ADDRESS_NOT_FOUND));
         User user = addressToSetMain.getUser();
 
@@ -184,5 +203,12 @@ public class UserAddressServiceImpl implements UserAddressService {
 
         user.changeMainAddress(null);
         user.getUserAddresses().clear();
+    }
+
+    @Override
+    public UserAddress getMainUserAddress(UUID userId) {
+        return userAddressRepository
+                .findMainAddressByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_ADDRESS_NOT_FOUND));
     }
 }

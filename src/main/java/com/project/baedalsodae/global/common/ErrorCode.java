@@ -17,6 +17,7 @@ public enum ErrorCode {
     JWT_EXPIRED("Z007", HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다."),
     JWT_UNSUPPORTED("Z008", HttpStatus.UNAUTHORIZED, "지원하지 않는 JWT 토큰입니다."),
     LOGIN_FAILED("Z009", HttpStatus.UNAUTHORIZED, "로그인 요청 처리에 실패했습니다."),
+    SORT_UNSUPPORTED("Z010", HttpStatus.UNAUTHORIZED, "지원하지 않는 정렬입니다."),
 
     // database
     DATABASE_UNAVAILABLE("DA001", HttpStatus.SERVICE_UNAVAILABLE, "데이터베이스 연결이 불가능합니다"),
@@ -43,6 +44,12 @@ public enum ErrorCode {
     STORE_FORBIDDEN("S003", HttpStatus.FORBIDDEN, "해당 가게 권한이 없습니다."),
     STORE_STATUS_CHANGE_FORBIDDEN("S004", HttpStatus.FORBIDDEN, "가게 상태를 변경할 권한이 없습니다."),
 
+    // store-hours
+    STORE_HOURS_ALREADY_EXISTS("SH001", HttpStatus.CONFLICT, "이미 영업시간이 등록되어 있습니다."),
+    STORE_HOURS_INVALID_DAY_COUNT(
+            "SH002", HttpStatus.BAD_REQUEST, "7일치 영업시간 정보가 필요합니다. 요일이 중복되거나 누락되지 않았는지 확인해주세요."),
+    STORE_HOURS_NOT_FOUND("SH003", HttpStatus.NOT_FOUND, "영업시간 정보가 없습니다."),
+
     // menu-category
     MENU_CATEGORY_NOT_FOUND("MC001", HttpStatus.NOT_FOUND, "메뉴 카테고리가 없습니다"),
     INVALID_MENU_CATEGORY_ORDER("MC002", HttpStatus.BAD_REQUEST, "메뉴 카테고리 순서가 잘못됐습니다."),
@@ -50,12 +57,14 @@ public enum ErrorCode {
     MENU_CATEGORY_ORDER_CONFLICT("MC004", HttpStatus.CONFLICT, "메뉴 카테고리 순서가 충돌했습니다. 다시 시도해주세요."),
     MENU_CATEGORY_HAS_ITEMS(
             "MC005", HttpStatus.BAD_REQUEST, "메뉴 카테고리에 메뉴 아이템이 존재합니다. 먼저 메뉴 아이템을 삭제해주세요."),
+    MENU_CATEGORY_FORBIDDEN("MC006", HttpStatus.FORBIDDEN, "해당 메뉴 카테고리에 대한 권한이 없습니다."),
 
     // menuItem
     MENU_ITEM_NOT_FOUND("MI001", HttpStatus.NOT_FOUND, "메뉴 아이템이 없습니다"),
     INVALID_MENU_ITEM_ORDER("MI002", HttpStatus.BAD_REQUEST, "메뉴 순서가 유효하지 않습니다"),
     DUPLICATE_MENU_ITEM_NAME("MI003", HttpStatus.CONFLICT, "같은 카테고리에 같은 이름의 메뉴 아이템이 존재합니다"),
     MENU_ITEM_ORDER_CONFLICT("MI004", HttpStatus.CONFLICT, "메뉴 아이템 순서가 충돌했습니다. 다시 시도해주세요."),
+    MENU_ITEM_FORBIDDEN("MI005", HttpStatus.FORBIDDEN, "해당 메뉴 아이템에 대한 권한이 없습니다."),
 
     // cart
     CART_NOT_FOUND("CT001", HttpStatus.NOT_FOUND, "장바구니가 없습니다."),
@@ -73,6 +82,7 @@ public enum ErrorCode {
     ORDER_FORBIDDEN("OD006", HttpStatus.FORBIDDEN, "본인의 주문이 아닙니다."),
     ORDER_INVALID_STATUS("OD007", HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
     ORDER_PAYMENT_NOT_COMPLETED("OD008", HttpStatus.BAD_REQUEST, "주문의 결제가 완료되지 않았습니다."),
+    ORDER_CANCEL_NOT_ALLOWED("OD009", HttpStatus.BAD_REQUEST, "주문 취소는 주문 생성 5분전에 가능합니다."),
 
     // payment
     PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),
@@ -87,7 +97,15 @@ public enum ErrorCode {
     REVIEW_CONTENT_EMPTY("RV002", HttpStatus.BAD_REQUEST, "리뷰 내용은 비어있을 수 없습니다."),
     REVIEW_NOT_FOUND("RV003", HttpStatus.NOT_FOUND, "리뷰가 없습니다."),
     REVIEW_UNAUTHORIZED("RV004", HttpStatus.UNAUTHORIZED, "이 리뷰에 대한 권한이 없습니다."),
-    ;
+    REVIEW_BEFORE_DELIVERY_NOT_ALLOWED(
+            "RV005", HttpStatus.BAD_REQUEST, "배송 완료 전에는 리뷰를 작성할 수 없습니다."),
+
+    // Address
+    INVALID_ADDRESS_VALUE("AD001", HttpStatus.BAD_REQUEST, "유효하지 않은 주소 값입니다."),
+    ADDRESS_DUPLICATED("AD002", HttpStatus.CONFLICT, "이미 존재하는 허용 주소입니다."),
+    USER_ADDRESS_NOT_ALLOWED("AD003", HttpStatus.BAD_REQUEST, "배달 가능한 지역이 아닙니다."),
+    STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다.");
+
     private final String code;
     private final HttpStatus status;
     private final String message;

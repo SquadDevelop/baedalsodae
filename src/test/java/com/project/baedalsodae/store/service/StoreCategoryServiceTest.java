@@ -8,10 +8,10 @@ import static org.mockito.Mockito.verify;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
+import com.project.baedalsodae.store.dto.request.storeCategory.CreateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.storeCategory.UpdateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryDetailResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryListResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.service.impl.StoreCategoryServiceImpl;
@@ -43,14 +43,15 @@ class StoreCategoryServiceTest {
         List<StoreCategory> repositoryData =
                 new ArrayList<>(List.of(category1, category2, category3));
 
-        given(storeCategoryRepository.findAllByIsDeletedFalse())
-                .willAnswer(
-                        invocation -> repositoryData.stream().filter(c -> !c.isDeleted()).toList());
-
         UUID deleteId = UUID.randomUUID();
         given(storeCategoryRepository.findById(deleteId)).willReturn(Optional.of(category2));
 
         storeCategoryService.deleteStoreCategory(deleteId);
+
+        given(storeCategoryRepository.findAllByIsDeletedFalse())
+                .willAnswer(
+                        invocation -> repositoryData.stream().filter(c -> !c.isDeleted()).toList());
+
         StoreCategoryListResponse response = storeCategoryService.getActiveStoreCategories();
 
         assertThat(response.getStoreCategoryList()).hasSize(2);

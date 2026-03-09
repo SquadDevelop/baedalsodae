@@ -1,8 +1,10 @@
 package com.project.baedalsodae.user.dto.request;
 
 import com.project.baedalsodae.user.entity.UserRole;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
@@ -30,9 +32,9 @@ public class CreateUserRequest {
 
     @NotBlank private String nickname;
 
-    private UserRole role;
+    @NotNull private UserRole role;
 
-    private String roadAddress;
-    private String detailAddress;
-    private String description;
+    @Valid
+    @NotNull(message = "주소 정보는 필수입니다")
+    private CreateUserAddressRequest address;
 }

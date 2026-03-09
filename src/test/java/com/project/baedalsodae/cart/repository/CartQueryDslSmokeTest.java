@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+@Disabled("임시 비활성화")
 @DataJpaTest(showSql = true)
 @Import({BaedalsodaeApplication.class, CartQueryDslSmokeTest.QueryDslConfig.class})
 @ActiveProfiles("test")

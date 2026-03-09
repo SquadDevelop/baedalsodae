@@ -3,11 +3,12 @@ package com.project.baedalsodae.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.project.baedalsodae.global.common.BusinessException;
-import com.project.baedalsodae.global.common.ErrorCode;
+import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserAddressRequest;
 import com.project.baedalsodae.user.dto.response.UserAddressResponse;
@@ -17,22 +18,20 @@ import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.repository.UserAddressRepository;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.impl.UserAddressServiceImpl;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
-public class UserAddressServiceTest {
+class UserAddressServiceTest {
 
     @Mock private UserAddressRepository userAddressRepository;
 
@@ -40,189 +39,222 @@ public class UserAddressServiceTest {
 
     @InjectMocks private UserAddressServiceImpl userAddressService;
 
-    private UUID userId;
-    private User user;
+    @Test
+    @DisplayName("성공 - 사용자의 새로운 주소 등록")
+    void createAddress_Success() {
+        // given
+        UUID userId = UUID.randomUUID();
+        CreateUserAddressRequest request = createCreateAddressRequest();
+        User user = createTestUser(userId);
 
-    @BeforeEach
-    void setUp() {
-        userId = UUID.randomUUID();
-        user =
+        given(
+                        userAddressRepository
+                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
+                                        eq(userId), any(), any()))
+                .willReturn(false);
+        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+        given(userAddressRepository.save(any(UserAddress.class)))
+                .willReturn(createTestAddress(user, UUID.randomUUID()));
+
+        // when
+        userAddressService.createAddress(userId, request);
+
+        // then
+        verify(userAddressRepository).save(any(UserAddress.class));
+    }
+
+    @Test
+    @DisplayName("실패 - 동일한 사용자가 중복된 주소 등록 시도 시 예외 발생")
+    void createAddress_Duplicated_Failed() {
+        // given
+        UUID userId = UUID.randomUUID();
+        CreateUserAddressRequest request = createCreateAddressRequest();
+
+        given(
+                        userAddressRepository
+                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
+                                        eq(userId), any(), any()))
+                .willReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> userAddressService.createAddress(userId, request))
+                .isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    @DisplayName("성공 - 주소 상세 정보 수정")
+    void updateAddress_Success() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID addressId = UUID.randomUUID();
+        UpdateUserAddressRequest request = createUpdateUserAddressRequest(addressId);
+        User user = createTestUser(userId);
+        UserAddress address = createTestAddress(user, addressId);
+
+        given(
+                        userAddressRepository
+                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddressAndIdNot(
+                                        eq(userId), any(), any(), eq(addressId)))
+                .willReturn(false);
+        given(userAddressRepository.findByIdAndUserId(addressId, userId))
+                .willReturn(Optional.of(address));
+
+        // when
+        UserAddressResponse response = userAddressService.updateAddress(userId, addressId, request);
+
+        // then
+        assertThat(response.getRoadAddress()).isEqualTo(request.getRoadAddress());
+    }
+
+    @Test
+    @DisplayName("성공 - 사용자의 전체 주소 목록 조회")
+    void getAddressList_Success() {
+        // given
+        UUID userId = UUID.randomUUID();
+        User user = createTestUser(userId);
+        UserAddress address1 = createTestAddress(user, UUID.randomUUID());
+        ReflectionTestUtils.setField(user, "userAddresses", new ArrayList<>(List.of(address1)));
+
+        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+
+        // when
+        List<UserAddressResponse> results = userAddressService.getAddressList(userId);
+
+        // then
+        assertThat(results).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("성공 - 특정 주소를 대표 주소로 설정")
+    void setMainAddress_Success() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID addressId = UUID.randomUUID();
+        User user = createTestUser(userId);
+        UserAddress address = createTestAddress(user, addressId);
+        user.addAddress(address);
+
+        given(userAddressRepository.findByIdAndUserId(addressId, userId))
+                .willReturn(Optional.of(address));
+
+        // when
+        userAddressService.setMainAddress(userId, addressId);
+
+        // then
+        assertThat(user.getUserMainAddressId()).isEqualTo(addressId);
+    }
+
+    @Test
+    @DisplayName("실패 - 주소가 1개일 때 삭제 시도 시 예외 발생")
+    void deleteAddress_Failed_OnlyOneAddress() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID addressId = UUID.randomUUID();
+        User user = createTestUser(userId);
+        UserAddress address = createTestAddress(user, addressId);
+        ReflectionTestUtils.setField(user, "userAddresses", new ArrayList<>(List.of(address)));
+
+        given(userAddressRepository.findByIdAndUserId(addressId, userId))
+                .willReturn(Optional.of(address));
+
+        // when & then
+        assertThatThrownBy(() -> userAddressService.deleteAddress(userId, addressId))
+                .isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    @DisplayName("성공 - 대표 주소 삭제 시 다른 주소를 대표 주소로 위임")
+    void deleteAddress_DelegateMainAddress() {
+        // given
+        UUID userId = UUID.randomUUID();
+        UUID mainAddressId = UUID.randomUUID();
+        UUID nextAddressId = UUID.randomUUID();
+        User user = createTestUser(userId);
+        UserAddress mainAddress = createTestAddress(user, mainAddressId);
+        UserAddress nextAddress = createTestAddress(user, nextAddressId);
+
+        user.addAddress(mainAddress);
+        user.addAddress(nextAddress);
+        user.changeMainAddress(mainAddressId);
+
+        given(userAddressRepository.findByIdAndUserId(mainAddressId, userId))
+                .willReturn(Optional.of(mainAddress));
+
+        // when
+        userAddressService.deleteAddress(userId, mainAddressId);
+
+        // then
+        assertThat(user.getUserMainAddressId()).isEqualTo(nextAddressId);
+        verify(userAddressRepository).delete(mainAddress);
+    }
+
+    @Test
+    @DisplayName("성공 - 회원탈퇴 시 등록된 모든 주소 일괄 삭제")
+    void deleteAllAddresses_Success() {
+        // given
+        UUID userId = UUID.randomUUID();
+        User user = createTestUser(userId);
+        UserAddress address = createTestAddress(user, UUID.randomUUID());
+        ReflectionTestUtils.setField(user, "userAddresses", new ArrayList<>(List.of(address)));
+
+        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
+                .willReturn(Optional.of(user));
+
+        // when
+        userAddressService.deleteAllAddressesByUserId(userId);
+
+        // then
+        verify(userAddressRepository).deleteAllByUserId(userId);
+        assertThat(user.getUserAddresses()).isEmpty();
+        assertThat(user.getUserMainAddressId()).isNull();
+    }
+
+    private User createTestUser(UUID userId) {
+        User user =
                 User.create(
                         "tester",
                         "010-1234-5678",
-                        "tester@test.com",
-                        "pwd1234",
-                        "testerName",
-                        "testerNickname",
+                        "test@test.com",
+                        "pwd",
+                        "테스터",
+                        "닉네임",
                         UserRole.CUSTOMER);
         ReflectionTestUtils.setField(user, "id", userId);
+        return user;
     }
 
-    @Test
-    @DisplayName("성공 - 주소 추가 시 첫번째 주소를 메인 주소지로 지정")
-    void createAddress_Success() {
-        CreateUserAddressRequest request = createCreateRequest("도로명1", "상세1");
-
-        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
-        given(userAddressRepository.save(any()))
-                .willAnswer(
-                        invocationOnMock -> {
-                            UserAddress userAddress = invocationOnMock.getArgument(0);
-                            ReflectionTestUtils.setField(userAddress, "id", user.getId());
-                            return userAddress;
-                        });
-
-        userAddressService.createAddress(userId, request);
-
-        assertThat(user.getUserAddresses()).hasSize(1);
-        assertThat(user.getUserMainAddressId()).isNotNull();
-        verify(userAddressRepository).save(any());
+    private UserAddress createTestAddress(User user, UUID addressId) {
+        Address address =
+                Address.createAddress("11", "서울", "110", "강남구", "11010", "역삼동", "도로명", "상세");
+        UserAddress userAddress = UserAddress.create(user, address, "설명");
+        ReflectionTestUtils.setField(userAddress, "id", addressId);
+        return userAddress;
     }
 
-    @Test
-    @DisplayName("성공 - 사용자의 주소 목록을 반환")
-    void getAddressList_Success() {
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        UserAddress a1 = UserAddress.builder().id(id1).user(user).build();
-        UserAddress a2 = UserAddress.builder().id(id2).user(user).build();
-        user.addAddresses(List.of(a1, a2));
-        user.changeMainAddress(a2.getId());
-
-        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
-
-        List<UserAddressResponse> result = userAddressService.getAddressList(userId);
-
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).isMainAddress()).isFalse();
-        assertThat(result.get(1).getUserAddressId()).isEqualTo(a2.getId());
+    private CreateUserAddressRequest createCreateAddressRequest() {
+        return CreateUserAddressRequest.builder()
+                .roadAddress("도로명")
+                .detailAddress("상세주소")
+                .sidoCode("11")
+                .sidoName("서울")
+                .sigunguCode("110")
+                .sigunguName("강남구")
+                .dongCode("11010")
+                .dongName("역삼동")
+                .build();
     }
 
-    @Test
-    @DisplayName("성공 - 단건 주소 정보 수정")
-    void updateAddress_Success() {
-        UUID addrId = UUID.randomUUID();
-        UserAddress addr = UserAddress.builder().id(addrId).user(user).roadAddress("기존").build();
-        UpdateUserAddressRequest req =
-                UpdateUserAddressRequest.builder().userAddressId(addrId).roadAddress("수정").build();
-
-        given(userAddressRepository.findByIdAndUserId(addrId, userId))
-                .willReturn(Optional.of(addr));
-
-        userAddressService.updateAddress(userId, req);
-
-        assertThat(addr.getRoadAddress()).isEqualTo("수정");
-    }
-
-    @Test
-    @DisplayName("성공 - 주소 일괄 수정 기능")
-    void updateAddressList_Success() {
-        UUID myId1 = UUID.randomUUID();
-        UUID myId2 = UUID.randomUUID();
-        UserAddress myAddr1 =
-                UserAddress.builder().id(myId1).user(user).roadAddress("기존도로1").build();
-        UserAddress myAddr2 =
-                UserAddress.builder().id(myId2).user(user).roadAddress("기존도로2(삭제)").build();
-        user.addAddresses(List.of(myAddr1, myAddr2));
-
-        UpdateUserAddressRequest req1 = createUpdateRequest(myId1, "수정된도로명", "101호", "설명수정");
-        UpdateUserAddressRequest req3 = createUpdateRequest(null, "신규도로명", "303호", "신규주소");
-        List<UpdateUserAddressRequest> updatedAddressReq = List.of(req1, req3);
-
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
-                .willReturn(Optional.of(user));
-
-        userAddressService.updateAddressList(userId, updatedAddressReq);
-
-        assertThat(user.getUserAddresses()).hasSize(2);
-        assertThat(myAddr1.getRoadAddress()).isEqualTo("수정된도로명");
-        assertThat(myAddr1.getDetailAddress()).isEqualTo("101호");
-        assertThat(myAddr1.getDescription()).isEqualTo("설명수정");
-
-        boolean hasMyAddr2 =
-                user.getUserAddresses().stream()
-                        .anyMatch(
-                                addr ->
-                                        addr.getId() != null
-                                                && addr.getId().equals(myAddr2.getId()));
-        assertThat(hasMyAddr2).isFalse();
-
-        boolean hasMyAddr3 =
-                user.getUserAddresses().stream()
-                        .anyMatch(addr -> addr.getRoadAddress().equals("신규도로명"));
-        assertThat(hasMyAddr3).isTrue();
-    }
-
-    @Test
-    @DisplayName("성공 - 주소 삭제 및 대표 주소 변경")
-    void deleteAddress_Success() {
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        UserAddress a1 = UserAddress.builder().id(id1).user(user).build();
-        UserAddress a2 = UserAddress.builder().id(id2).user(user).build();
-        user.addAddresses(List.of(a1, a2));
-        user.changeMainAddress(id1);
-
-        given(userAddressRepository.findByIdAndUserId(id1, userId)).willReturn(Optional.of(a1));
-
-        userAddressService.deleteAddress(userId, id1);
-
-        assertThat(user.getUserAddresses()).hasSize(1);
-        assertThat(user.getUserMainAddressId()).isEqualTo(id2);
-    }
-
-    @Test
-    @DisplayName("실패 - 주소가 1개일 때는 삭제 불가")
-    void deleteAddress_Fail_OnlyOne() {
-        UUID id1 = UUID.randomUUID();
-        UserAddress a1 = UserAddress.builder().id(id1).user(user).build();
-        user.addAddress(a1);
-
-        given(userAddressRepository.findByIdAndUserId(id1, userId)).willReturn(Optional.of(a1));
-
-        assertThatThrownBy(() -> userAddressService.deleteAddress(userId, id1))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.USER_ADDRESS_CANNOT_DELETE.getMessage());
-    }
-
-    @Test
-    @DisplayName("성공 - 대표 주소 변경")
-    void setMainAddress_Success() {
-        UUID addrId = UUID.randomUUID();
-        UserAddress addr = UserAddress.builder().id(addrId).user(user).build();
-        given(userAddressRepository.findByIdAndUserId(addrId, userId))
-                .willReturn(Optional.of(addr));
-
-        userAddressService.setMainAddress(userId, addrId);
-
-        assertThat(user.getUserMainAddressId()).isEqualTo(addrId);
-    }
-
-    @Test
-    @DisplayName("성공 - 회원탈퇴 시 모든 주소 일괄 삭제")
-    void deleteAllAddresses_Success() {
-        user.addAddress(UserAddress.builder().id(UUID.randomUUID()).user(user).build());
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
-                .willReturn(Optional.of(user));
-
-        userAddressService.deleteAllAddressesByUserId(userId);
-
-        assertThat(user.getUserAddresses()).isEmpty();
-        assertThat(user.getUserMainAddressId()).isNull();
-        verify(userAddressRepository).deleteAllByUserId(userId);
-    }
-
-    private CreateUserAddressRequest createCreateRequest(String roadAddress, String detailAddress) {
-        return CreateUserAddressRequest.from(roadAddress, detailAddress, "");
-    }
-
-    private UpdateUserAddressRequest createUpdateRequest(
-            UUID userId, String roadAddress, String detailAddress, String description) {
+    private UpdateUserAddressRequest createUpdateUserAddressRequest(UUID addressId) {
         return UpdateUserAddressRequest.builder()
-                .userAddressId(userId)
-                .roadAddress(roadAddress)
-                .detailAddress(detailAddress)
-                .description(description)
+                .userAddressId(addressId)
+                .roadAddress("수정된 도로명")
+                .detailAddress("수정된 상세주소")
+                .sidoCode("11")
+                .sidoName("서울")
+                .sigunguCode("110")
+                .sigunguName("강남구")
+                .dongCode("11010")
+                .dongName("역삼동")
                 .build();
     }
 }

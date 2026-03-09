@@ -1,8 +1,8 @@
 package com.project.baedalsodae.store.dto.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
+import com.project.baedalsodae.store.dto.request.storeCategory.CreateStoreCategoryRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

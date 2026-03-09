@@ -2,11 +2,11 @@ package com.project.baedalsodae.store.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.store.dto.request.CreateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.request.UpdateStoreCategoryRequest;
-import com.project.baedalsodae.store.dto.response.StoreCategoryDetailResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryListResponse;
-import com.project.baedalsodae.store.dto.response.StoreCategoryResponse;
+import com.project.baedalsodae.store.dto.request.storeCategory.CreateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.request.storeCategory.UpdateStoreCategoryRequest;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryDetailResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryListResponse;
+import com.project.baedalsodae.store.dto.response.storeCategory.StoreCategoryResponse;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.service.StoreCategoryService;

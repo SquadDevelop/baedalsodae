@@ -1,12 +1,17 @@
 package com.project.baedalsodae.menu.fixture;
 
 import static com.project.baedalsodae.menu.fixture.MenuTestConstants.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 import com.project.baedalsodae.menu.entity.MenuCategory;
 import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.entity.enums.MenuStatus;
+import com.project.baedalsodae.menu.repository.MenuItemRepository;
+import com.project.baedalsodae.store.entity.Store;
+import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MenuItemMockFixture {
@@ -15,11 +20,24 @@ public class MenuItemMockFixture {
         throw new AssertionError("Utility class should not be instantiated");
     }
 
+    public static MenuItem createMockItemWithUnrelatedStore(
+            MenuItemRepository menuItemRepository, UUID menuItemId) {
+        MenuItem item = mock(MenuItem.class);
+        MenuCategory category = mock(MenuCategory.class);
+        Store store = mock(Store.class);
+        given(menuItemRepository.findByIdAndDeletedIsFalse(menuItemId))
+                .willReturn(Optional.of(item));
+        given(item.getMenuCategory()).willReturn(category);
+        given(category.getStore()).willReturn(store);
+        given(store.getUserId()).willReturn(UUID.randomUUID());
+        return item;
+    }
+
     public static MenuItem createMockMenuItem(
             UUID id,
             String name,
             String description,
-            int price,
+            BigDecimal price,
             int orderNo,
             boolean isPopular,
             MenuStatus menuStatus,

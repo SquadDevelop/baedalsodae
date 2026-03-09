@@ -96,13 +96,76 @@ public class OrderController {
             @RequestHeader("X-User-Id") UUID userId,
             @RequestHeader("X-User-Role") UserRole userRole,
             @RequestParam(name = "storeId", required = false) UUID storeId,
-            @RequestParam(name = "reason") String reason,
+            @RequestParam(name = "reason", required = false) String reason,
             @PathVariable("orderId") UUID orderId) {
 
         OrderActionStatusResponse response =
                 orderService.rejectOrder(userId, userRole, storeId, orderId, reason);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_REJECTED, response));
+    }
+
+    @PostMapping("/{orderId}/cooked")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> completeCookingOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.completeCookingOrder(userId, userRole, storeId, orderId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(SuccessCode.ORDER_COOKING_COMPLETED, response));
+    }
+
+    @PostMapping("/{orderId}/delivering")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> startDeliveryOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.startDeliveryOrder(userId, userRole, storeId, orderId);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_DELIVERING, response));
+    }
+
+    @PostMapping("/{orderId}/delivered")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> completeDeliveryOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.completeDeliveryOrder(userId, userRole, storeId, orderId);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_DELIVERED, response));
+    }
+
+    @PostMapping("/{orderId}/cancel-request")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> cancelRequestOrder(
+            @RequestHeader("X-User-Id") UUID userId,
+            @RequestHeader("X-User-Role") UserRole userRole,
+            @RequestParam(name = "storeId", required = false) UUID storeId,
+            @RequestParam(name = "reason", required = false) String reason,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.cancelRequestOrder(userId, userRole, storeId, orderId, reason);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_CANCEL_REQUESTED, response));
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> completeCancelOrder(
+            @RequestHeader("X-User-Id") UUID userId, @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response = orderService.completeCancelOrder(userId, orderId);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_CANCELED, response));
     }
 
     @PostMapping("/{orderId}/reviews")

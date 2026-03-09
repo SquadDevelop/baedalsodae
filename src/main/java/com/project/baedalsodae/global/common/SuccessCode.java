@@ -23,6 +23,11 @@ public enum SuccessCode {
     ORDER_REQUESTED("OR205", HttpStatus.OK, "주문 요청 성공"),
     ORDER_ACCEPTED("OR206", HttpStatus.OK, "주문 수락 성공"),
     ORDER_REJECTED("OR207", HttpStatus.OK, "주문 거절 성공"),
+    ORDER_COOKING_COMPLETED("OR208", HttpStatus.OK, "조리 완료 성공"),
+    ORDER_DELIVERING("OR209", HttpStatus.OK, "배달 시작 성공"),
+    ORDER_DELIVERED("OR210", HttpStatus.OK, "배달 완료 성공"),
+    ORDER_CANCEL_REQUESTED("OR211", HttpStatus.OK, "주문 취소 요청 성공"),
+    ORDER_CANCELED("OR212", HttpStatus.OK, "주문 취소 성공"),
 
     // store category
     STORE_CATEGORY_LIST_FOUND("SC200", HttpStatus.OK, "가게 카테고리 목록 조회 성공"),
@@ -39,13 +44,30 @@ public enum SuccessCode {
     STORE_DELETED("ST204", HttpStatus.OK, "가게 삭제 성공"),
     STORE_DETAIL_FOUND("ST205", HttpStatus.OK, "가게 상세 조회 성공"),
     STORE_FOUND_FOR_OWNER("ST206", HttpStatus.OK, "가게 조회 성공"),
+    STORE_LIST_FOUND_BY_KEYWORD("ST207", HttpStatus.OK, "가게 검색 성공"),
 
-    // user+auth
+    // store-hours
+    STORE_HOURS_FOUND("SH200", HttpStatus.OK, "영업시간 조회 성공"),
+    STORE_HOURS_CREATED("SH201", HttpStatus.CREATED, "영업시간 등록 성공"),
+    STORE_HOURS_UPDATED("SH202", HttpStatus.OK, "영업시간 수정 성공"),
+    STORE_HOURS_DELETED("SH203", HttpStatus.OK, "영업시간 삭제 성공"),
+    STORE_HOURS_NOT_SET("SH204", HttpStatus.OK, "설정된 영업시간이 없습니다."),
+
+    // user
     USER_FOUND("UR200", HttpStatus.OK, "회원 정보 조회 성공"),
     USER_CREATED("UR201", HttpStatus.CREATED, "회원가입 성공"),
     USER_UPDATED("UR202", HttpStatus.OK, "회원 정보 수정 성공"),
     USER_DELETED("UR203", HttpStatus.OK, "회원 탈퇴 성공"),
 
+    // user address
+    USER_ADDRESS_CREATED("UA200", HttpStatus.CREATED, "회원 주소 등록 성공"),
+    USER_ADDRESS_FOUND("UA201", HttpStatus.OK, "회원 주소 조회 성공"),
+    USER_ADDRESS_UPDATED("UA202", HttpStatus.OK, "회원 주소 수정 성공"),
+    USER_ADDRESS_BULK_UPDATED("UA203", HttpStatus.OK, "회원 주소 일괄 수정 성공"),
+    USER_ADDRESS_DELETED("UA204", HttpStatus.OK, "회원 주소 삭제 성공"),
+    USER_MAIN_ADDRESS_CHANGED("UA205", HttpStatus.OK, "회원 메인 주소지 변경 성공"),
+
+    // auth
     LOGIN_SUCCESS("AU200", HttpStatus.OK, "로그인 성공"),
     LOGOUT_SUCCESS("AU201", HttpStatus.OK, "로그아웃 성공"),
 

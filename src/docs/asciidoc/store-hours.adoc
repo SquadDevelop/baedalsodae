@@ -1,0 +1,102 @@
+= 가게 영업시간 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[store-hours-create]]
+== 영업시간 등록
+
+`POST /stores/{storeId}/hours`
+
+권한: `OWNER`, `MANAGER`
+
+7개 요일 전체의 영업시간을 한 번에 등록합니다.
+
+=== Path Parameters
+include::{snippets}/store-hours/create/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/store-hours/create/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/store-hours/create/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/store-hours/create/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/store-hours/create/http-response.adoc[]
+
+---
+
+[[store-hours-get]]
+== 영업시간 조회
+
+`GET /stores/{storeId}/hours`
+
+등록된 영업시간이 없으면 `data` 는 `null` 로 반환됩니다.
+
+=== Path Parameters
+include::{snippets}/store-hours/get/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/store-hours/get/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/store-hours/get/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/store-hours/get/http-response.adoc[]
+
+---
+
+[[store-hours-update]]
+== 영업시간 수정
+
+`PATCH /stores/{storeId}/hours`
+
+권한: `OWNER`, `MANAGER`
+
+7개 요일 전체를 교체합니다.
+
+=== Path Parameters
+include::{snippets}/store-hours/update/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/store-hours/update/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/store-hours/update/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/store-hours/update/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/store-hours/update/http-response.adoc[]
+
+---
+
+[[store-hours-delete]]
+== 영업시간 삭제
+
+`DELETE /stores/{storeId}/hours`
+
+권한: `OWNER`, `MANAGER`
+
+가게의 모든 영업시간을 삭제합니다.
+
+=== Path Parameters
+include::{snippets}/store-hours/delete/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/store-hours/delete/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/store-hours/delete/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/store-hours/delete/http-response.adoc[]

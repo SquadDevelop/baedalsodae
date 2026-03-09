@@ -8,6 +8,7 @@ import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +68,7 @@ public class EventPoller {
             JsonNode node = objectMapper.readTree(event.getPayload());
             UUID orderId = UUID.fromString(node.get("orderId").asText());
             UUID userId = UUID.fromString(node.get("userId").asText());
-            int finalAmount = node.get("finalAmount").asInt();
+            BigDecimal finalAmount = node.get("finalAmount").decimalValue();
 
             eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
         } else {

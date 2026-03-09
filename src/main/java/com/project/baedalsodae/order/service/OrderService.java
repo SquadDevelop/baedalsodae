@@ -3,7 +3,6 @@ package com.project.baedalsodae.order.service;
 import com.project.baedalsodae.order.dto.request.CreateOrderRequest;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
 import com.project.baedalsodae.order.dto.response.*;
-import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;
 
@@ -33,6 +32,13 @@ public interface OrderService {
 
     OrderActionStatusResponse completeDeliveryOrder(
             UUID userId, UserRole userRole, UUID storeId, UUID orderId);
+
+    OrderActionStatusResponse cancelRequestOrder(
+            UUID userId, UserRole userRole, UUID storeId, UUID orderId, String reason);
+
+    OrderActionStatusResponse completeCancelOrder(UUID userId, UUID orderId);
+
+    boolean isOrderDelivered(UUID orderId);
 
     Order findById(UUID orderId);
 }

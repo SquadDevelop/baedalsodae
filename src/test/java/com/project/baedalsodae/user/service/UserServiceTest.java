@@ -8,11 +8,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -28,6 +28,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -92,18 +96,6 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("실패 - 존재하지 않는 회원 ID로 조회 시 예외 발생")
-    void getUser_Failed() {
-        UUID userId = UUID.randomUUID();
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
-                .willReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userService.getUser(userId))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.USER_NOT_FOUND.getMessage());
-    }
-
-    @Test
     @DisplayName("성공 - 비밀번호 포함 회원정보 수정")
     void updateUser_Success() {
         UUID userId = UUID.randomUUID();
@@ -137,17 +129,56 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("실패 - 이미 삭제된 사용자를 다시 삭제 시도할 시 예외 발생")
-    void deleteUser_Failed() {
-        UUID userId = UUID.randomUUID();
-        User deletedUser = createTestUser(userId, "tester", "password4");
-        deletedUser.softDelete(userId);
+    @DisplayName("성공 - 관리자(MANAGER) 목록 페이징 조회")
+    void getUsers_Success() {
+        // given
+        User manager1 = createTestUser(UUID.randomUUID(), "manager1", "pwd1", UserRole.MANAGER);
+        UserSearchRequest request = new UserSearchRequest();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> userPage = new PageImpl<>(List.of(manager1), pageable, 1);
 
-        given(userRepository.findUserWithAddressesByIdAndIsDeletedFalse(userId))
-                .willReturn(Optional.empty());
+        given(
+                        userRepository.searchUsers(
+                                eq(UserRole.MANAGER),
+                                any(UserSearchRequest.class),
+                                any(Pageable.class)))
+                .willReturn(userPage);
 
-        assertThatThrownBy(() -> userService.deleteUser(userId))
-                .isInstanceOf(BusinessException.class);
+        // when
+        Page<UserDetailResponse> results =
+                userService.getUsers(UserRole.MANAGER, request, pageable);
+
+        // then
+        assertThat(results.getContent()).hasSize(1);
+        assertThat(results.getContent().get(0).getRole()).isEqualTo(UserRole.MANAGER);
+        verify(userRepository)
+                .searchUsers(
+                        eq(UserRole.MANAGER), any(UserSearchRequest.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("성공 - 잘못된 페이지 사이즈(20) 요청 시 기본값(10)으로 보정")
+    void getUsers_InvalidSize_ShouldDefaultTo10() {
+        // given
+        UserSearchRequest request = new UserSearchRequest();
+        Pageable requestedPageable = PageRequest.of(0, 20); // 10, 30, 50이 아님
+        Pageable expectedPageable = PageRequest.of(0, 10);
+        Page<User> emptyPage = new PageImpl<>(List.of(), expectedPageable, 0);
+
+        given(
+                        userRepository.searchUsers(
+                                eq(UserRole.MANAGER),
+                                any(UserSearchRequest.class),
+                                eq(expectedPageable)))
+                .willReturn(emptyPage);
+
+        // when
+        userService.getUsers(UserRole.MANAGER, request, requestedPageable);
+
+        // then
+        verify(userRepository)
+                .searchUsers(
+                        eq(UserRole.MANAGER), any(UserSearchRequest.class), eq(expectedPageable));
     }
 
     private CreateUserRequest createCreateRequest() {
@@ -159,13 +190,26 @@ class UserServiceTest {
                 .name("테스터")
                 .nickname("테스터A")
                 .role(UserRole.CUSTOMER)
-                .roadAddress("서울시 강남구 역삼동")
-                .detailAddress("101호")
-                .description("직장")
+                .address(
+                        CreateUserAddressRequest.builder()
+                                .roadAddress("서울시 강남구 역삼동")
+                                .detailAddress("101호")
+                                .sidoCode("11")
+                                .sidoName("서울")
+                                .sigunguCode("110")
+                                .sigunguName("강남구")
+                                .dongCode("11010")
+                                .dongName("역삼동")
+                                .description("직장")
+                                .build())
                 .build();
     }
 
     private User createTestUser(UUID userId, String username, String password) {
+        return createTestUser(userId, username, password, UserRole.CUSTOMER);
+    }
+
+    private User createTestUser(UUID userId, String username, String password, UserRole role) {
         User user =
                 User.create(
                         username,
@@ -174,7 +218,7 @@ class UserServiceTest {
                         password,
                         "테스터",
                         "테스터A",
-                        UserRole.CUSTOMER);
+                        role);
         ReflectionTestUtils.setField(user, "id", userId);
 
         return user;

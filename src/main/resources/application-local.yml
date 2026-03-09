@@ -12,7 +12,7 @@ spring:
     open-in-view: false
     properties:
       hibernate:
-        default_schema: baedalsodae
+        default_schema: ${POSTGRES_DEFAULT_SCHEMA}
         format_sql: true
         jdbc.time_zone: Asia/Seoul
   sql:
@@ -34,18 +34,18 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
+      url: ${SPRING_DATA_REDIS_URL}
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+      password:
+      ssl:
+        enabled: true
+      repositories:
+        enabled: false
 
-server:
-  port: 18082
-
-logging:
-  level:
-    org.springframework.boot.diagnostics: DEBUG
-    org.springframework.boot.web.embedded.tomcat: DEBUG
-    org.apache.catalina: DEBUG
+JWT_SECRET: ${JWT_SECRET}
+JWT_EXPIRATION: ${JWT_EXPIRATION}
+JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
 
 encryption:
   aes:
@@ -53,3 +53,21 @@ encryption:
 
 pg:
   url: http://localhost:8089
+
+logging:
+  level:
+    org.springframework.boot.diagnostics: DEBUG
+    org.springframework.boot.web.embedded.tomcat: DEBUG
+    org.apache.catalina: DEBUG
+
+server:
+  port: ${API_SERVER_PORT}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

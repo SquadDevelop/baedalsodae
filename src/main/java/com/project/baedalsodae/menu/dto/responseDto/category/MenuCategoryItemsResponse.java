@@ -1,6 +1,7 @@
 package com.project.baedalsodae.menu.dto.responseDto.category;
 
 import com.project.baedalsodae.menu.entity.MenuItem;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class MenuCategoryItemsResponse {
     public static class MenuItemSummary {
         private UUID id;
         private String name;
-        private int price;
+        private BigDecimal price;
         private String description;
         private int orderNo;
         private boolean popular;

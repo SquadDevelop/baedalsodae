@@ -19,6 +19,7 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -103,12 +104,12 @@ public class CartServiceTest {
 
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("후라이드 치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
 
         given(menuItem2.getId()).willReturn(menuItemId2);
         given(menuItem2.getName()).willReturn("짜장면");
-        given(menuItem2.getPrice()).willReturn(8000);
+        given(menuItem2.getPrice()).willReturn(BigDecimal.valueOf(8000));
         CartItem cartItem2 = CartItem.create(cart, menuItem2, 1);
 
         cart.addItem(cartItem1);
@@ -122,7 +123,7 @@ public class CartServiceTest {
 
         // then
         assertThat(response.items()).hasSize(2);
-        assertThat(response.totalAmount()).isEqualTo(26000);
+        assertThat(response.totalAmount()).isEqualByComparingTo(BigDecimal.valueOf(26000));
     }
 
     @Test
@@ -259,6 +260,7 @@ public class CartServiceTest {
         given(cartRepository.save(any(Cart.class))).willAnswer(inv -> inv.getArgument(0));
 
         given(menuItem1.getId()).willReturn(menuItemId1);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
 
         // when
         CartResponse response = cartService.addCartItem(userId, addCartItemRequest);
@@ -289,7 +291,7 @@ public class CartServiceTest {
 
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(store1.getId()).willReturn(storeId1);
         Cart cart = Cart.create(userId, store1);
         CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
@@ -301,7 +303,7 @@ public class CartServiceTest {
 
         given(menuItem2.getId()).willReturn(menuItemId2);
         given(menuItem2.getName()).willReturn("짜장면");
-        given(menuItem2.getPrice()).willReturn(8000);
+        given(menuItem2.getPrice()).willReturn(BigDecimal.valueOf(8000));
 
         // when
         CartResponse response = cartService.addCartItem(userId, addCartItemRequest);
@@ -312,7 +314,7 @@ public class CartServiceTest {
         assertThat(response.items()).hasSize(2);
         assertThat(response.items().get(0).menuItemId()).isEqualTo(menuItemId1);
         assertThat(response.items().get(1).menuItemId()).isEqualTo(menuItemId2);
-        assertThat(response.totalAmount()).isEqualTo(26000);
+        assertThat(response.totalAmount()).isEqualByComparingTo(BigDecimal.valueOf(26000));
     }
 
     @Test
@@ -332,7 +334,7 @@ public class CartServiceTest {
 
         given(menuItem1.getId()).willReturn(menuItemId1);
         given(menuItem1.getName()).willReturn("치킨");
-        given(menuItem1.getPrice()).willReturn(18000);
+        given(menuItem1.getPrice()).willReturn(BigDecimal.valueOf(18000));
         given(store1.getId()).willReturn(storeId1);
         Cart cart = Cart.create(userId, store1);
         CartItem cartItem1 = CartItem.create(cart, menuItem1, 1);
@@ -352,7 +354,7 @@ public class CartServiceTest {
         assertThat(response.items().get(0).menuItemId()).isEqualTo(menuItemId1);
         assertThat(response.items().get(0).quantity()).isEqualTo(2);
         assertThat(response.totalQuantity()).isEqualTo(2);
-        assertThat(response.totalAmount()).isEqualTo(36000);
+        assertThat(response.totalAmount()).isEqualByComparingTo(BigDecimal.valueOf(36000));
     }
 
     @Test

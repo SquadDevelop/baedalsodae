@@ -1,13 +1,14 @@
 package com.project.baedalsodae.user.repository;
 
 import com.project.baedalsodae.user.entity.User;
+import com.project.baedalsodae.user.repository.custom.UserCustomRepository;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID>, UserCustomRepository {
 
     Optional<User> findByUsername(@Param("username") String username);
 

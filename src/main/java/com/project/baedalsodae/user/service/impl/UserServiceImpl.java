@@ -2,17 +2,22 @@ package com.project.baedalsodae.user.service.impl;
 
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
-import com.project.baedalsodae.user.dto.request.CreateUserAddressRequest;
 import com.project.baedalsodae.user.dto.request.CreateUserRequest;
 import com.project.baedalsodae.user.dto.request.UpdateUserRequest;
+import com.project.baedalsodae.user.dto.request.UserSearchRequest;
 import com.project.baedalsodae.user.dto.response.UserDeleteResponse;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.User;
+import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import com.project.baedalsodae.user.service.UserService;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private static final List<Integer> ALLOWED_PAGE_SIZE = List.of(10, 30, 50);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,12 +48,9 @@ public class UserServiceImpl implements UserService {
                         createRequest.getRole());
 
         User savedUser = userRepository.save(newUser);
-        CreateUserAddressRequest addressRequest =
-                CreateUserAddressRequest.from(
-                        createRequest.getRoadAddress(),
-                        createRequest.getDetailAddress(),
-                        createRequest.getDescription());
-        userAddressService.createAddress(savedUser.getId(), addressRequest);
+
+        // 수정: createRequest.getAddress()를 직접 전달
+        userAddressService.createAddress(savedUser.getId(), createRequest.getAddress());
 
         return UserDetailResponse.from(savedUser);
     }
@@ -91,6 +95,24 @@ public class UserServiceImpl implements UserService {
         user.softDelete(userId);
 
         return UserDeleteResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<UserDetailResponse> getUsers(
+            UserRole role, UserSearchRequest request, Pageable pageable) {
+        // 요구사항: 10, 30, 50건 기준으로만 페이지 노출 가능. 아니면 10건 고정.
+        int pageSize = pageable.getPageSize();
+        if (!ALLOWED_PAGE_SIZE.contains(pageSize)) {
+            pageSize = 10;
+        }
+
+        Pageable validatedPageable =
+                PageRequest.of(pageable.getPageNumber(), pageSize, pageable.getSort());
+
+        return userRepository
+                .searchUsers(role, request, validatedPageable)
+                .map(UserDetailResponse::from);
     }
 
     private User findByUserId(UUID userId) {

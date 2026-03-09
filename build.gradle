@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.11'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '6.25.0'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.project'
@@ -31,6 +32,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt
 }
 
 repositories {
@@ -45,6 +47,7 @@ dependencyManagement {
 }
 
 def generated = 'src/main/generated'
+def snippetsDir = file('build/generated-snippets')
 
 dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
@@ -54,6 +57,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
@@ -72,11 +76,17 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += ["-parameters"]
     options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+tasks.named('compileJava') {
+    dependsOn 'spotlessJava'
 }
 
 sourceSets {
@@ -89,7 +99,8 @@ clean {
 
 tasks.named('test') {
     useJUnitPlatform()
-    
+    outputs.dir snippetsDir
+
     testLogging {
         events "passed", "skipped", "failed"
         showExceptions true
@@ -97,4 +108,10 @@ tasks.named('test') {
         showStackTraces true
         exceptionFormat "full"
     }
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
 }

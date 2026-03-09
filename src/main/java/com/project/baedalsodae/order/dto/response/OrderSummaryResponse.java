@@ -2,6 +2,7 @@ package com.project.baedalsodae.order.dto.response;
 
 import com.project.baedalsodae.global.common.util.TimeUtils;
 import com.project.baedalsodae.order.entity.enums.OrderStatus;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,7 +19,7 @@ public class OrderSummaryResponse {
     private String orderNo;
     private OrderStatus status;
     private String storeNameSnapshot;
-    private int finalAmount;
+    private BigDecimal finalAmount;
     private Instant createdAtCursor;
     private LocalDateTime createdAt;
 
@@ -28,7 +29,7 @@ public class OrderSummaryResponse {
             String orderNo,
             OrderStatus status,
             String storeNameSnapshot,
-            int finalAmount,
+            BigDecimal finalAmount,
             Instant createdAtCursor) {
         this.orderId = orderId;
         this.storeId = storeId;
