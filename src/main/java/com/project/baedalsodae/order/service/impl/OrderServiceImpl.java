@@ -465,6 +465,16 @@ public class OrderServiceImpl implements OrderService {
         return OrderActionStatusResponse.from(order);
     }
 
+    @Override
+    public boolean isOrderDelivered(UUID orderId) {
+        Order order =
+                orderRepository
+                        .findByIdAndIsDeletedFalse(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        return order.getStatus() == OrderStatus.DELIVERED;
+    }
+
     private OrderActionStatusResponse cancelRequestByOwner(
             UUID userId, UUID storeId, Order order, String reason) {
         if (!order.getStoreId().equals(storeId)) {
