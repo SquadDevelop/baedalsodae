@@ -40,7 +40,8 @@ public class EventPublisher {
     public void publishPaymentEvent(final Payment payment, final EventType type) {
         if (type == EventType.PAYMENT_CREATED) {
             final PaymentCreatedEvent event = PaymentCreatedEvent.from(payment);
-            eventService.save(Event.fromPayment(payment, EventType.PAYMENT_CREATED, JsonUtils.toJson(event)));
+            eventService.save(
+                    Event.fromPayment(payment, EventType.PAYMENT_CREATED, JsonUtils.toJson(event)));
         }
         // 다른 이벤트 타입이 추가될 경우 여기에 분기 처리 (예: PAYMENT_FAILED, PAYMENT_REFUNDED 등
     }

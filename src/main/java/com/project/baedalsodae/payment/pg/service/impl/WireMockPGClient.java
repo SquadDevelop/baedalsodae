@@ -5,6 +5,7 @@ import com.project.baedalsodae.payment.pg.dto.PGPaymentRequest;
 import com.project.baedalsodae.payment.pg.dto.PGPaymentResponse;
 import com.project.baedalsodae.payment.pg.enums.PGProviderType;
 import com.project.baedalsodae.payment.pg.service.PGClient;
+import java.net.http.HttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -12,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-
-import java.net.http.HttpClient;
 
 @Slf4j
 @Primary
@@ -24,14 +23,14 @@ public class WireMockPGClient implements PGClient {
 
     public WireMockPGClient(@Value("${pg.url}") String pgUrl) {
         log.info(">>>>> pgUrl {} ", pgUrl);
-        HttpClient httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .build();
+        HttpClient httpClient =
+                HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
-        this.restClient = RestClient.builder()
-        .baseUrl(pgUrl)
-        .requestFactory(new JdkClientHttpRequestFactory(httpClient))
-        .build();
+        this.restClient =
+                RestClient.builder()
+                        .baseUrl(pgUrl)
+                        .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+                        .build();
 
         log.info(">>>>> pgUrl {} ", httpClient);
     }

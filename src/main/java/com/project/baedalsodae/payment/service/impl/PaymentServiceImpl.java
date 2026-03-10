@@ -15,6 +15,7 @@ import com.project.baedalsodae.payment.pg.enums.PGProviderType;
 import com.project.baedalsodae.payment.pg.service.PGClient;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.payment.service.PaymentService;
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -23,8 +24,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,11 +40,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @PostConstruct
     public void init() {
-        paymentGateways = pgClients.stream()
-                .collect(Collectors.toMap(
-                        PGClient::getType,
-                        Function.identity()
-                ));
+        paymentGateways =
+                pgClients.stream()
+                        .collect(Collectors.toMap(PGClient::getType, Function.identity()));
     }
 
     @Override
@@ -112,7 +109,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         // pg에 결제 요청
         PGPaymentRequest pgPaymentRequest =
-                new PGPaymentRequest(orderId, userId, PaymentMethod.CREDIT_CARD, finalAmount.longValue());
+                new PGPaymentRequest(
+                        orderId, userId, PaymentMethod.CREDIT_CARD, finalAmount.longValue());
         PGPaymentResponse response = pgClient.pay(pgPaymentRequest);
 
         // 결제 결과 따라서 payment update

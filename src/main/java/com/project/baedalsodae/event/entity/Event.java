@@ -3,7 +3,6 @@ package com.project.baedalsodae.event.entity;
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import com.project.baedalsodae.order.entity.Order;
 import com.project.baedalsodae.payment.entity.Payment;
-import io.lettuce.core.json.JsonType;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -21,9 +20,12 @@ public class Event extends BaseTimeEntity {
     private UUID id;
 
     private UUID traceId;
+
     @Enumerated(EnumType.STRING)
     private AggregateType aggregateType;
+
     private UUID aggregateId;
+
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
@@ -33,6 +35,7 @@ public class Event extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private EventStatus status;
+
     private int retryCount;
     private Instant publishedAt;
 

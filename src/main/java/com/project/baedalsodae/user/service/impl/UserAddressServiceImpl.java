@@ -30,10 +30,11 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional
     @Override
     public void createAddress(UUID userId, CreateUserAddressRequest request) {
-//        if (userAddressRepository.existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
-//                userId, request.getRoadAddress(), request.getDetailAddress())) {
-//            throw new BusinessException(ErrorCode.USER_ADDRESS_DUPLICATED);
-//        }x`
+        //        if
+        // (userAddressRepository.existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
+        //                userId, request.getRoadAddress(), request.getDetailAddress())) {
+        //            throw new BusinessException(ErrorCode.USER_ADDRESS_DUPLICATED);
+        //        }x`
 
         User foundUser =
                 userRepository

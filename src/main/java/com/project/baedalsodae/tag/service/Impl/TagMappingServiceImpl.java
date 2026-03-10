@@ -22,7 +22,7 @@ public class TagMappingServiceImpl implements TagMappingService {
     @Override
     @Transactional
     public void createTagMappings(MenuItem menuItem, List<String> tagNames) {
-        if(tagNames == null || tagNames.isEmpty()) return;
+        if (tagNames == null || tagNames.isEmpty()) return;
 
         List<String> distinctNames = tagNames.stream().distinct().toList();
 
