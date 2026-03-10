@@ -21,6 +21,9 @@ spring:
     redis:
       host: localhost
       port: 6379
+  ai:
+    openai:
+      api-key: dummy-key-for-test
 
 JWT_SECRET: dGVzdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3Nlc09ubHk= #testSecretKeyForTestingPurposesOnly
 JWT_EXPIRATION: 100000
