@@ -143,7 +143,7 @@ public class AuthConfig {
                                         "ROLE_OWNER",
                                         "ROLE_MANAGER",
                                         "ROLE_MASTER")
-                                .requestMatchers("/stores/**/hours")
+                                .requestMatchers("/stores/*/hours")
                                 .hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
                                 .requestMatchers("/stores/**")
                                 .permitAll()
