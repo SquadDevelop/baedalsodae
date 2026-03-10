@@ -19,22 +19,21 @@ import org.springframework.test.util.ReflectionTestUtils;
 @Import(QueryDslConfig.class)
 public class UserRepositoryTest {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
 
     @Test
     @DisplayName("User 엔티티 저장 시 createdBy가 null이면 id 값으로 초기화되는지 확인")
     void user_Save_CheckCreatedByIsInitializedWithId() {
         // given
-        User user = User.create(
-                "testuser",
-                "010-1234-5678",
-                "test@test.com",
-                "encodedPassword",
-                "테스터",
-                "테스트닉네임",
-                UserRole.CUSTOMER
-        );
+        User user =
+                User.create(
+                        "testuser",
+                        "010-1234-5678",
+                        "test@test.com",
+                        "encodedPassword",
+                        "테스터",
+                        "테스트닉네임",
+                        UserRole.CUSTOMER);
 
         // when
         User savedUser = userRepository.saveAndFlush(user);
@@ -50,15 +49,15 @@ public class UserRepositoryTest {
     void user_Save_ByMaster_CheckCreatedByIsMasterId() {
         // given
         UUID masterId = UUID.randomUUID();
-        User manager = User.create(
-                "manager123",
-                "010-1111-2222",
-                "manager@test.com",
-                "encodedPassword",
-                "매니저",
-                "매니저닉네임",
-                UserRole.MANAGER
-        );
+        User manager =
+                User.create(
+                        "manager123",
+                        "010-1111-2222",
+                        "manager@test.com",
+                        "encodedPassword",
+                        "매니저",
+                        "매니저닉네임",
+                        UserRole.MANAGER);
         ReflectionTestUtils.setField(manager, "createdBy", masterId);
 
         // when
