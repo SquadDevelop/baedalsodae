@@ -1,9 +1,6 @@
 package com.project.baedalsodae.event.publisher;
 
-import com.project.baedalsodae.event.dto.OrderCancelRequestedEvent;
-import com.project.baedalsodae.event.dto.OrderCreatedEvent;
-import com.project.baedalsodae.event.dto.OrderDeliveredEvent;
-import com.project.baedalsodae.event.dto.PaymentCreatedEvent;
+import com.project.baedalsodae.event.dto.*;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.service.EventService;
@@ -36,9 +33,11 @@ public class EventPublisher {
     public void publishPaymentEvent(final Payment payment, final EventType type) {
         if (type == EventType.PAYMENT_CREATED) {
             final PaymentCreatedEvent event = PaymentCreatedEvent.from(payment);
-            eventPublisher.publishEvent(event);
-            eventService.save(Event.fromPayment(payment, EventType.PAYMENT_CREATED));
-        }
+            eventService.save(Event.fromPayment(payment, type, JsonUtils.toJson(event)));
+        } else if (type == EventType.PAYMENT_CANCEL_REQUESTED) {
+            final PaymentCancelRequestedEvent event = PaymentCancelRequestedEvent.from(payment);
+            eventService.save(Event.fromPayment(payment, type, JsonUtils.toJson(event)));
+         }
         // 다른 이벤트 타입이 추가될 경우 여기에 분기 처리 (예: PAYMENT_FAILED, PAYMENT_REFUNDED 등
     }
 }

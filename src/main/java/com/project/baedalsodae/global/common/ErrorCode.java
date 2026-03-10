@@ -93,6 +93,7 @@ public enum ErrorCode {
     PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),
     PAYMENT_DETAIL_NOT_FOUND("PY002", HttpStatus.NOT_FOUND, "결제 상세 정보가 없습니다."),
     PAYMENT_ALREADY_DONE("PY003", HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다."),
+    PAYMENT_ALREADY_CANCELED("PY004", HttpStatus.BAD_REQUEST, "이미 취소된 결제입니다."),
 
     // pg
     PAYMENT_GATEWAY_NOT_FOUND("PG001", HttpStatus.INTERNAL_SERVER_ERROR, "결제 게이트웨이 설정이 잘못됐습니다."),
@@ -111,6 +112,7 @@ public enum ErrorCode {
     USER_ADDRESS_NOT_ALLOWED("AD003", HttpStatus.BAD_REQUEST, "배달 가능한 지역이 아닙니다."),
     STORE_REGION_NOT_ALLOWED("AD004", HttpStatus.BAD_REQUEST, "해당 가게는 서비스 지원 지역이 아닙니다."),
     ALLOWED_REGION_NOT_FOUND("AD005", HttpStatus.NOT_FOUND, "허용된 지역 정보가 없습니다."),
+
     ;
 
     private final String code;

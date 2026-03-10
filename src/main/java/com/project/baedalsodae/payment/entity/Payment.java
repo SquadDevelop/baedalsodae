@@ -2,11 +2,12 @@ package com.project.baedalsodae.payment.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -123,5 +124,12 @@ public class Payment extends BaseTimeEntity {
             throw new IllegalStateException("결제 상태는 PENDING이어야 합니다.");
         }
         this.status = PaymentStatus.FAILED;
+    }
+
+    public void markAsCanceled() {
+        if (this.status != PaymentStatus.SUCCESS && this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태는 SUCCESS 또는 PENDING 이어야 합니다.");
+        }
+        this.status = PaymentStatus.CANCELED;
     }
 }
