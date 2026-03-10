@@ -8,7 +8,7 @@ import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.dto.response.store.*;
-import com.project.baedalsodae.store.entity.enums.SortType;
+import com.project.baedalsodae.store.enums.SortType;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
 import jakarta.validation.Valid;
@@ -27,35 +27,44 @@ public class StoreController {
     private final StoreCommandService storeCommandService;
     private final StoreQueryService storeQueryService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<StorePageResponse>> getStorePageByStoreCategory(
-            @RequestParam UUID storeCategoryId, @ModelAttribute StoreCursorRequest cursorRequest) {
-        StorePageResponse response = storeQueryService.getStorePage(storeCategoryId, cursorRequest);
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam UUID storeCategoryId,
+            @ModelAttribute StoreCursorRequest cursorRequest) {
+        StorePageResponse response =
+                storeQueryService.getStorePage(
+                        storeCategoryId, cursorRequest, userDetails.getUserRole());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_LIST_FOUND, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @GetMapping("/keywords")
     public ResponseEntity<ApiResponse<StoreSearchPageResponse>> getStorePageByKeyword(
-            @RequestParam String keyword, @RequestParam SortType sortType, Pageable pageable) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam String keyword,
+            @RequestParam SortType sortType,
+            Pageable pageable) {
         StoreSearchPageResponse response =
-                storeQueryService.getStoreByKeyword(keyword, pageable, sortType);
+                storeQueryService.getStoreByKeyword(
+                        keyword, pageable, sortType, userDetails.getUserRole());
         return ResponseEntity.ok(
                 ApiResponse.success(SuccessCode.STORE_LIST_FOUND_BY_KEYWORD, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @GetMapping("/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable("storeId") UUID storeId) {
         StoreDetailResponse response =
-                storeQueryService.getStoreDetail(storeId, userDetails.getUserId());
+                storeQueryService.getStoreDetail(
+                        storeId, userDetails.getUserId(), userDetails.getUserRole());
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_DETAIL_FOUND, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @GetMapping("/{storeId}/reviews")
     public ResponseEntity<ApiResponse<StoreReviewResponse>> getStoreReviews(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -66,7 +75,7 @@ public class StoreController {
                 ApiResponse.success(SuccessCode.STORE_REVIEW_LIST_FOUND, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER','ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER','ROLE_MANAGER', 'ROLE_MASTER')")
     @GetMapping("/{storeId}/manage")
     public ResponseEntity<ApiResponse<OwnerStoreResponse>> getOwnerStore(
             @AuthenticationPrincipal UserDetailsImpl userDetails,

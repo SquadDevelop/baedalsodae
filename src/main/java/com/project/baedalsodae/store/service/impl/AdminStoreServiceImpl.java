@@ -4,6 +4,7 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.entity.Address;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
+import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
@@ -21,6 +22,12 @@ public class AdminStoreServiceImpl implements AdminStoreService {
     private final StoreRepository storeRepository;
     private final StoreCategoryRepository storeCategoryRepository;
     private final StoreHoursService storeHoursService;
+
+    @Override
+    public OwnerStoreResponse getStoreDetail(UUID storeId) {
+        Store store = getStore(storeId);
+        return OwnerStoreResponse.fromEntity(store);
+    }
 
     @Override
     public void updateStore(UpdateStoreRequest request, UUID storeId) {

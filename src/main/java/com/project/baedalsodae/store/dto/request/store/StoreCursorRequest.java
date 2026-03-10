@@ -1,6 +1,6 @@
 package com.project.baedalsodae.store.dto.request.store;
 
-import com.project.baedalsodae.store.entity.enums.SortType;
+import com.project.baedalsodae.store.enums.SortType;
 import jakarta.validation.constraints.Min;
 import java.time.Instant;
 import java.util.UUID;

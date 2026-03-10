@@ -7,6 +7,29 @@
 :toclevels: 2
 :sectlinks:
 
+[[admin-store-get]]
+== 관리자 가게 상세 조회
+
+`GET /admins/stores/{storeId}`
+
+권한: `MANAGER`
+
+관리자가 특정 가게의 상세 정보를 조회합니다.
+
+=== Path Parameters
+include::{snippets}/admin/store/get/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin/store/get/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin/store/get/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin/store/get/http-response.adoc[]
+
+---
+
 [[admin-store-update]]
 == 관리자 가게 정보 수정
 
