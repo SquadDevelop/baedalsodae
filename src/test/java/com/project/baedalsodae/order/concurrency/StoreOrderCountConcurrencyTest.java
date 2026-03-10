@@ -92,10 +92,13 @@ class StoreOrderCountConcurrencyTest {
 
         System.out.println("성공: " + successCount.get() + ", 실패: " + failCount.get());
         System.out.println("최종 orderCount: " + store.getOrderCount());
+        System.out.println("최종 version: " + store.getVersion());
 
         // 성공 + 실패 = 전체 요청
         assertThat(successCount.get() + failCount.get()).isEqualTo(threadCount);
         // 최종 orderCount는 성공 횟수와 일치
         assertThat(store.getOrderCount()).isEqualTo(successCount.get());
+        // 낙관적 락이 실제 동작했음 - version 증가 횟수 = 성공 횟수
+        assertThat(store.getVersion()).isEqualTo((long) successCount.get());
     }
 }
