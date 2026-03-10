@@ -69,11 +69,7 @@ public class AdminOrderController {
 
         OrderActionStatusResponse response =
                 orderService.cancelRequestOrder(
-                        userDetails.getUserId(),
-                        userDetails.getUserRole(),
-                        null,
-                        orderId,
-                        reason);
+                        userDetails.getUserId(), userDetails.getUserRole(), null, orderId, reason);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_CANCEL_REQUESTED, response));
     }

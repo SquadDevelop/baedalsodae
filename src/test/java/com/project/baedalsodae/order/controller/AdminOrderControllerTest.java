@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,8 +33,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @ActiveProfiles("test")
 @WebMvcTest(AdminOrderController.class)
@@ -132,26 +131,28 @@ public class AdminOrderControllerTest {
         UUID adminId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
         UserDetailsImpl admin = createUserDetails(adminId, UserRole.MANAGER);
-        OrderActionStatusResponse mockResponse = OrderActionStatusResponse.builder()
-                .orderId(orderId)
-                .orderStatus(OrderStatus.CANCEL_REQUESTED)
-                .build();
+        OrderActionStatusResponse mockResponse =
+                OrderActionStatusResponse.builder()
+                        .orderId(orderId)
+                        .orderStatus(OrderStatus.CANCEL_REQUESTED)
+                        .build();
 
-        given(orderService.cancelRequestOrder(
-                eq(adminId),
-                eq(UserRole.MANAGER),
-                eq(null),
-                eq(orderId),
-                eq("관리자 취소 사유")))
+        given(
+                        orderService.cancelRequestOrder(
+                                eq(adminId),
+                                eq(UserRole.MANAGER),
+                                eq(null),
+                                eq(orderId),
+                                eq("관리자 취소 사유")))
                 .willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(post(BASE_URL + "/" + orderId + "/cancel-request")
-                        .with(user(admin))
-                        .with(csrf())
-                        .param("reason", "관리자 취소 사유"))
+        mockMvc.perform(
+                        post(BASE_URL + "/" + orderId + "/cancel-request")
+                                .with(user(admin))
+                                .with(csrf())
+                                .param("reason", "관리자 취소 사유"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCEL_REQUESTED.getCode()));
     }
-
 }

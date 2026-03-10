@@ -433,7 +433,7 @@ public class OrderServiceImpl implements OrderService {
             return cancelRequestByCustomer(userId, order);
         } else if (userRole == UserRole.OWNER) {
             return cancelRequestByOwner(userId, storeId, order, reason);
-        } else if (userRole == UserRole.MANAGER) {          // 추가
+        } else if (userRole == UserRole.MANAGER) { // 추가
             return cancelRequestByAdmin(userId, order, reason);
         }
 
@@ -496,7 +496,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.cancelRequested();
 
-        orderStatusHistoryService.createForAdminOrderStatusHistory(userId, fromStatus, order, reason);
+        orderStatusHistoryService.createForAdminOrderStatusHistory(
+                userId, fromStatus, order, reason);
 
         eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
 

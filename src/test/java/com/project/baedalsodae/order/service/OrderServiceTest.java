@@ -2094,8 +2094,8 @@ public class OrderServiceTest {
     void cancelRequestOrder_byAdmin_success() {
         // given
         String reason = "관리자 취소 사유";
-        UUID adminId  = UUID.randomUUID();
-        UUID orderId  = UUID.randomUUID();
+        UUID adminId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
 
         given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
 

@@ -6,8 +6,6 @@ import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderStatusHistoryService;
 import java.util.UUID;
-
-import com.project.baedalsodae.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

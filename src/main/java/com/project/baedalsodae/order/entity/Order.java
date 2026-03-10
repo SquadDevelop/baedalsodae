@@ -140,8 +140,7 @@ public class Order extends BaseAuditEntity {
     }
 
     public boolean canCancelRequestByAdmin() {
-        return this.status != OrderStatus.CANCELED
-                && this.status != OrderStatus.CANCEL_REQUESTED;
+        return this.status != OrderStatus.CANCELED && this.status != OrderStatus.CANCEL_REQUESTED;
     }
 
     private Order(
