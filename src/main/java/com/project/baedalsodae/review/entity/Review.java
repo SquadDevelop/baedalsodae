@@ -22,11 +22,11 @@ public class Review extends BaseAuditEntity {
 
     private UUID userId;
     private UUID orderId;
-    private double rating;
+    private int rating;
     private String content;
     private boolean isHidden;
 
-    private Review(UUID userId, UUID orderId, double rating, String content) {
+    private Review(UUID userId, UUID orderId, int rating, String content) {
         validate(rating, content);
         this.userId = userId;
         this.orderId = orderId;
@@ -35,7 +35,7 @@ public class Review extends BaseAuditEntity {
         this.isHidden = false;
     }
 
-    private void validate(double rating, String content) {
+    private void validate(int rating, String content) {
         if (rating < 1 || rating > 5) {
             throw new BusinessException(ErrorCode.RATING_OUT_OF_RANGE);
         }
@@ -44,13 +44,13 @@ public class Review extends BaseAuditEntity {
         }
     }
 
-    public void update(double rating, String content) {
+    public void update(int rating, String content) {
         validate(rating, content);
         this.rating = rating;
         this.content = content;
     }
 
-    public static Review create(UUID userId, UUID orderId, double rating, String content) {
+    public static Review create(UUID userId, UUID orderId, int rating, String content) {
         return new Review(userId, orderId, rating, content);
     }
 }
