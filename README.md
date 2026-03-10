@@ -423,6 +423,7 @@ erDiagram
 | **refreshToken + Redis 블랙리스트** | 무상태성 유지를 위해 accessToken/refreshToken 분리, 로그아웃된 토큰을 Redis TTL로 블랙리스트 관리 |
 | **아웃박스 패턴 + 이벤트 폴링**  | 트랜잭션 안정성을 위해 `@TransactionalEventListener` 대신 아웃박스 패턴 + 스케줄러 폴링 선택 |
 | **비관적 락 도입** | 메뉴 순서 변경 시 다중 row 동시 수정 → 낙관적 락 재시도 복잡도 문제로 비관적 락 선택 |
+| **WireMock 기반 가상 PG사 구현** | 실제 PG사 계약 없이 WireMock을 Docker Compose로 띄워 결제 승인·취소 전 흐름을 실제와 동일하게 검증 |
 | **pgvector + STT 기반 메뉴 추천** | 음성 입력(STT) → 텍스트 임베딩 → pgvector 유사도 검색으로 자연어 기반 메뉴 추천 구현 |
 
 ---
