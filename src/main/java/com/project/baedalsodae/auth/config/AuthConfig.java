@@ -8,11 +8,15 @@ import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.ErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +30,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -43,6 +50,13 @@ public class AuthConfig {
     }
 
     @Bean
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy);
+        return expressionHandler;
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
             throws Exception {
         return configuration.getAuthenticationManager();
@@ -55,6 +69,7 @@ public class AuthConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.sessionManagement(
@@ -64,17 +79,14 @@ public class AuthConfig {
         http.authorizeHttpRequests(
                 (authorizeHttpRequests) ->
                         authorizeHttpRequests
-                                .requestMatchers(
-                                        PathRequest.toStaticResources().atCommonLocations())
-                                .permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/**")
-                                .permitAll()
-                                .requestMatchers("/users/me")
-                                .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
-                                .requestMatchers("/admins/**")
-                                .hasAuthority("ROLE_MANAGER")
-                                .requestMatchers("/user-addresses/**")
-                                .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER")
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                                .requestMatchers("/actuator/health", "/health").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/login", "/auth/reissue").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/logout").authenticated()
+                                .requestMatchers("/users/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                                .requestMatchers("/admins/me").hasAuthority("ROLE_MANAGER")
+                                .requestMatchers("/admins/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/user-addresses/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
                                 .anyRequest()
                                 .permitAll());
 
@@ -91,6 +103,20 @@ public class AuthConfig {
         http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode)
