@@ -61,7 +61,7 @@ SET default_table_access_method = heap;
 -- Name: event; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.event (
+CREATE TABLE IF NOT EXISTS baedalsodae.event (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -85,7 +85,7 @@ ALTER TABLE baedalsodae.event OWNER TO baedalsodae_admin;
 -- Name: p_cart; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_cart (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_cart (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -100,7 +100,7 @@ ALTER TABLE baedalsodae.p_cart OWNER TO baedalsodae_admin;
 -- Name: p_cart_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_cart_item (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_cart_item (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -116,7 +116,7 @@ ALTER TABLE baedalsodae.p_cart_item OWNER TO baedalsodae_admin;
 -- Name: p_end_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_end_area (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_end_area (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -133,7 +133,7 @@ ALTER TABLE baedalsodae.p_end_area OWNER TO baedalsodae_admin;
 -- Name: p_menu_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_menu_category (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_menu_category (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -154,7 +154,7 @@ ALTER TABLE baedalsodae.p_menu_category OWNER TO baedalsodae_admin;
 -- Name: p_menu_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_menu_item (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_menu_item (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -180,7 +180,7 @@ ALTER TABLE baedalsodae.p_menu_item OWNER TO baedalsodae_admin;
 -- Name: p_order; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_order (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_order (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -208,13 +208,13 @@ CREATE TABLE baedalsodae.p_order (
 );
 
 
-ALTER TABLE baedalsodae.p_order OWNER TO baedalsodae_admin;
+ALTER TABLE  baedalsodae.p_order OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_order_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_order_item (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_order_item (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -232,7 +232,7 @@ ALTER TABLE baedalsodae.p_order_item OWNER TO baedalsodae_admin;
 -- Name: p_order_status_history; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_order_status_history (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_order_status_history (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -254,7 +254,7 @@ ALTER TABLE baedalsodae.p_order_status_history OWNER TO baedalsodae_admin;
 -- Name: p_payment; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_payment (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_payment (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -278,7 +278,7 @@ ALTER TABLE baedalsodae.p_payment OWNER TO baedalsodae_admin;
 -- Name: p_sido_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_sido_area (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_sido_area (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -294,7 +294,7 @@ ALTER TABLE baedalsodae.p_sido_area OWNER TO baedalsodae_admin;
 -- Name: p_sigg_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_sigg_area (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_sigg_area (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -310,7 +310,7 @@ ALTER TABLE baedalsodae.p_sigg_area OWNER TO baedalsodae_admin;
 -- Name: p_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_store (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_store (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -346,7 +346,7 @@ ALTER TABLE baedalsodae.p_store OWNER TO baedalsodae_admin;
 -- Name: p_store_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_store_category (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_store_category (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -366,7 +366,7 @@ ALTER TABLE baedalsodae.p_store_category OWNER TO baedalsodae_admin;
 -- Name: p_store_hours; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_store_hours (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_store_hours (
     id uuid NOT NULL,
     break_end timestamp(6) with time zone,
     break_start timestamp(6) with time zone,
@@ -385,7 +385,7 @@ ALTER TABLE baedalsodae.p_store_hours OWNER TO baedalsodae_admin;
 -- Name: p_tag; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_tag (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_tag (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone NOT NULL,
     name character varying(255) NOT NULL
@@ -398,7 +398,7 @@ ALTER TABLE baedalsodae.p_tag OWNER TO baedalsodae_admin;
 -- Name: p_tag_mapping; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_tag_mapping (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_tag_mapping (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone NOT NULL,
     order_no integer NOT NULL,
@@ -413,7 +413,7 @@ ALTER TABLE baedalsodae.p_tag_mapping OWNER TO baedalsodae_admin;
 -- Name: p_user; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_user (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_user (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -440,7 +440,7 @@ ALTER TABLE baedalsodae.p_user OWNER TO baedalsodae_admin;
 -- Name: p_user_address; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.p_user_address (
+CREATE TABLE IF NOT EXISTS baedalsodae.p_user_address (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -457,7 +457,7 @@ ALTER TABLE baedalsodae.p_user_address OWNER TO baedalsodae_admin;
 -- Name: review; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.review (
+CREATE TABLE IF NOT EXISTS baedalsodae.review (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
@@ -480,7 +480,7 @@ ALTER TABLE baedalsodae.review OWNER TO baedalsodae_admin;
 -- Name: vector_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE TABLE baedalsodae.vector_store (
+CREATE TABLE IF NOT EXISTS baedalsodae.vector_store (
     id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
     content text,
     metadata json,
