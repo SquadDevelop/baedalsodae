@@ -518,4 +518,11 @@ public class OrderServiceImpl implements OrderService {
 
         return order.getStatus() == OrderStatus.DELIVERED;
     }
+
+    @Override
+    public Order findById(final UUID orderId) {
+        return orderRepository
+                .findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+    }
 }
