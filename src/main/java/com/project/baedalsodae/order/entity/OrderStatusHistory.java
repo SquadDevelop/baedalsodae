@@ -54,6 +54,21 @@ public class OrderStatusHistory extends BaseTimeEntity {
         this.actorId = actorId;
     }
 
+    private OrderStatusHistory(
+            UUID orderId,
+            OrderStatus fromStatus,
+            OrderStatus toStatus,
+            ActorType actorType,
+            UUID actorId,
+            String reason) {
+        this.orderId = orderId;
+        this.fromStatus = fromStatus;
+        this.toStatus = toStatus;
+        this.actorType = actorType;
+        this.actorId = actorId;
+        this.reason = reason;
+    }
+
     public static OrderStatusHistory createForCustomer(Order order, UUID userId) {
         return new OrderStatusHistory(
                 order.getId(), null, order.getStatus(), ActorType.CUSTOMER, userId);
@@ -73,11 +88,22 @@ public class OrderStatusHistory extends BaseTimeEntity {
         if (reason == null) reason = "가게 사정으로 인하여 " + why + " 되었습니다.";
 
         return new OrderStatusHistory(
-                order.getId(), fromStatus, order.getStatus(), ActorType.OWNER, userId);
+                order.getId(), fromStatus, order.getStatus(), ActorType.OWNER, userId, reason);
     }
 
     public static OrderStatusHistory createForSystem(Order order, OrderStatus fromStatus) {
         return new OrderStatusHistory(
                 order.getId(), fromStatus, order.getStatus(), ActorType.SYSTEM, null);
+    }
+
+    public static OrderStatusHistory createForAdmin(
+            Order order, OrderStatus fromStatus, UUID adminId, String reason) {
+        String why = "";
+        why = order.getStatus().equals(OrderStatus.CANCELED) ? "주문 취소" : "";
+        why = order.getStatus().equals(OrderStatus.REJECTED) ? "주문 거절" : "";
+        if (reason == null) reason = "관리자의 강제 취소로 인하여 " + why + " 되었습니다.";
+
+        return new OrderStatusHistory(
+                order.getId(), fromStatus, order.getStatus(), ActorType.MANAGER, adminId, reason);
     }
 }

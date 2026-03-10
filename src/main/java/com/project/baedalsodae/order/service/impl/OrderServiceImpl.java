@@ -433,6 +433,8 @@ public class OrderServiceImpl implements OrderService {
             return cancelRequestByCustomer(userId, order);
         } else if (userRole == UserRole.OWNER) {
             return cancelRequestByOwner(userId, storeId, order, reason);
+        } else if (userRole == UserRole.MANAGER) { // 추가
+            return cancelRequestByAdmin(userId, order, reason);
         }
 
         throw new BusinessException(ErrorCode.ORDER_FORBIDDEN);
@@ -479,6 +481,25 @@ public class OrderServiceImpl implements OrderService {
                 userId, fromStatus, order, reason);
 
         eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
+
+        return OrderActionStatusResponse.from(order);
+    }
+
+    private OrderActionStatusResponse cancelRequestByAdmin(
+            UUID userId, Order order, String reason) {
+
+        if (!order.canCancelRequestByAdmin()) {
+            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
+        }
+
+        final OrderStatus fromStatus = order.getStatus();
+
+        order.cancelRequested();
+
+        orderStatusHistoryService.createForAdminOrderStatusHistory(
+                userId, fromStatus, order, reason);
+
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
 
         return OrderActionStatusResponse.from(order);
     }

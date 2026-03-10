@@ -2088,4 +2088,32 @@ public class OrderServiceTest {
 
         assertThat(response).isNotNull();
     }
+
+    @Test
+    @DisplayName("관리자 주문 취소 요청 - 성공")
+    void cancelRequestOrder_byAdmin_success() {
+        // given
+        String reason = "관리자 취소 사유";
+        UUID adminId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+
+        given(orderRepository.findByIdAndIsDeletedFalse(orderId)).willReturn(Optional.of(order));
+
+        given(order.canCancelRequestByAdmin()).willReturn(true);
+        given(order.getStatus()).willReturn(OrderStatus.ACCEPTED);
+        given(order.getId()).willReturn(orderId);
+
+        // when
+        OrderActionStatusResponse response =
+                orderService.cancelRequestOrder(adminId, UserRole.MANAGER, null, orderId, reason);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getOrderId()).isEqualTo(orderId);
+
+        verify(order).cancelRequested();
+        verify(orderStatusHistoryService)
+                .createForAdminOrderStatusHistory(adminId, OrderStatus.ACCEPTED, order, reason);
+        verify(orderEventPublisher).publishOrderEvent(order, EventType.ORDER_UPDATED);
+    }
 }
