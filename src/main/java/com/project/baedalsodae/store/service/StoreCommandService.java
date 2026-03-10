@@ -13,4 +13,6 @@ public interface StoreCommandService {
     void deleteStore(UUID storeId, UUID userId);
 
     void updateStoreOpened(UUID storeId, StoreStatus status, UUID userId);
+
+    void incrementOrderCount(UUID storeId);
 }

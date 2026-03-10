@@ -1,22 +1,15 @@
 package com.project.baedalsodae.event.poller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
-import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -26,8 +19,7 @@ public class EventPoller {
     private static final int MAX_RETRY = 3;
 
     private final EventRepository eventRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ObjectMapper objectMapper;
+    private final List<EventDispatcher> dispatchers;
 
     @Scheduled(fixedDelay = 1000)
     @Transactional
@@ -45,7 +37,15 @@ public class EventPoller {
             }
 
             try {
-                dispatch(event);
+//                dispatch(event);
+
+                dispatchers.stream()
+                        .filter(d -> d.getSupportedEventType() == event.getEventType())
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "[OutboxPoller] 처리되지 않은 이벤트 타입: " + event.getEventType()))
+                        .dispatch(event);
+
                 event.markPublished();
                 log.info(
                         "[OutboxPoller] 이벤트 발행 성공: id={}, type={}",
@@ -63,16 +63,16 @@ public class EventPoller {
         }
     }
 
-    private void dispatch(Event event) throws JsonProcessingException {
-        if (event.getEventType() == EventType.ORDER_CREATED) {
-            JsonNode node = objectMapper.readTree(event.getPayload());
-            UUID orderId = UUID.fromString(node.get("orderId").asText());
-            UUID userId = UUID.fromString(node.get("userId").asText());
-            BigDecimal finalAmount = node.get("finalAmount").decimalValue();
-
-            eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
-        } else {
-            log.warn("[OutboxPoller] 처리되지 않은 이벤트 타입: {}", event.getEventType());
-        }
-    }
+//    private void dispatch(Event event) throws JsonProcessingException {
+//        if (event.getEventType() == EventType.ORDER_CREATED) {
+//            JsonNode node = objectMapper.readTree(event.getPayload());
+//            UUID orderId = UUID.fromString(node.get("orderId").asText());
+//            UUID userId = UUID.fromString(node.get("userId").asText());
+//            BigDecimal finalAmount = node.get("finalAmount").decimalValue();
+//
+//            eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
+//        } else {
+//            log.warn("[OutboxPoller] 처리되지 않은 이벤트 타입: {}", event.getEventType());
+//        }
+//    }
 }

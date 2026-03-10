@@ -57,6 +57,17 @@ public class Store extends BaseAuditEntity {
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
 
+    @Column(name = "order_count", nullable = false)
+    private int orderCount = 0;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
+    public void incrementOrderCount() {
+        this.orderCount++;
+    }
+
     public void updateInfo(
             StoreCategory storeCategory,
             String name,

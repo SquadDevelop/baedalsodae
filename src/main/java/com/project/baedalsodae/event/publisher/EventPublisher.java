@@ -1,6 +1,7 @@
 package com.project.baedalsodae.event.publisher;
 
 import com.project.baedalsodae.event.dto.OrderCreatedEvent;
+import com.project.baedalsodae.event.dto.OrderDeliveredEvent;
 import com.project.baedalsodae.event.dto.PaymentCreatedEvent;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventType;
@@ -19,9 +20,11 @@ public class EventPublisher {
     private final EventService eventService;
 
     public void publishOrderEvent(final Order order, final EventType type) {
-        if (type == EventType.PAYMENT_CREATED) {
+        if (type == EventType.ORDER_CREATED) {
             final OrderCreatedEvent event = OrderCreatedEvent.from(order);
-            eventPublisher.publishEvent(event);
+            eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
+        } else if (type == EventType.ORDER_DELIVERED) {
+            final OrderDeliveredEvent event = OrderDeliveredEvent.from(order);
             eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
         }
     }
