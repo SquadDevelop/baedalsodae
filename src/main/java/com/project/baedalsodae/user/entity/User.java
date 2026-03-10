@@ -58,7 +58,11 @@ public class User extends BaseAuditEntity {
     private List<UserAddress> userAddresses = new ArrayList<>();
 
     @PrePersist
-    public void prePersist() {}
+    public void prePersist() {
+        if (this.createdBy == null) {
+            this.createdBy = this.id;
+        }
+    }
 
     public static User create(
             String username,
