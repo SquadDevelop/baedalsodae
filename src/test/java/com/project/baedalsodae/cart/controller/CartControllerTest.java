@@ -1,7 +1,10 @@
 package com.project.baedalsodae.cart.controller;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -36,6 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CartController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureRestDocs
 class CartControllerTest {
 
     @Autowired private MockMvc mockMvc;
@@ -88,7 +93,24 @@ class CartControllerTest {
         mockMvc.perform(get("/carts"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.CART_FOUND.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.CART_FOUND.getCode()))
+                .andDo(
+                        document(
+                                "cart/get-cart",
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.cartId").description("장바구니 ID"),
+                                        fieldWithPath("data.storeId").description("가게 ID"),
+                                        fieldWithPath("data.totalItemCount")
+                                                .description("총 아이템 종류 수"),
+                                        fieldWithPath("data.totalQuantity").description("총 수량"),
+                                        fieldWithPath("data.totalAmount").description("총 금액"),
+                                        fieldWithPath("data.items").description("장바구니 아이템 목록"),
+                                        fieldWithPath("data.createdAt").description("생성일시"),
+                                        fieldWithPath("data.updatedAt").description("수정일시"))));
     }
 
     @Test
@@ -126,7 +148,29 @@ class CartControllerTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_ADDED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_ADDED.getCode()))
+                .andDo(
+                        document(
+                                "cart/add-cart-item",
+                                requestFields(
+                                        fieldWithPath("storeId").description("가게 ID"),
+                                        fieldWithPath("menuItemId").description("메뉴 아이템 ID"),
+                                        fieldWithPath("quantity").description("수량 (1 이상)"),
+                                        fieldWithPath("validQuantity").ignored()),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.cartId").description("장바구니 ID"),
+                                        fieldWithPath("data.storeId").description("가게 ID"),
+                                        fieldWithPath("data.totalItemCount")
+                                                .description("총 아이템 종류 수"),
+                                        fieldWithPath("data.totalQuantity").description("총 수량"),
+                                        fieldWithPath("data.totalAmount").description("총 금액"),
+                                        fieldWithPath("data.items").description("장바구니 아이템 목록"),
+                                        fieldWithPath("data.createdAt").description("생성일시"),
+                                        fieldWithPath("data.updatedAt").description("수정일시"))));
     }
 
     @Test
@@ -156,7 +200,21 @@ class CartControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(
-                        jsonPath("$.code").value(SuccessCode.CART_ITEM_QUANTITY_UPDATED.getCode()));
+                        jsonPath("$.code").value(SuccessCode.CART_ITEM_QUANTITY_UPDATED.getCode()))
+                .andDo(
+                        document(
+                                "cart/update-cart-item-quantity",
+                                pathParameters(
+                                        parameterWithName("cartItemId").description("장바구니 아이템 ID")),
+                                requestFields(
+                                        fieldWithPath("quantity").description("변경할 수량 (1 이상)"),
+                                        fieldWithPath("validQuantity").ignored()),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data").optional().ignored())));
     }
 
     @Test
@@ -167,7 +225,18 @@ class CartControllerTest {
         mockMvc.perform(delete("/carts/items/{cartItemId}", cartItemId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_REMOVED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.CART_ITEM_REMOVED.getCode()))
+                .andDo(
+                        document(
+                                "cart/remove-cart-item",
+                                pathParameters(
+                                        parameterWithName("cartItemId").description("장바구니 아이템 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data").optional().ignored())));
     }
 
     @Test
@@ -176,6 +245,15 @@ class CartControllerTest {
         mockMvc.perform(delete("/carts"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.CART_CLEARED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.CART_CLEARED.getCode()))
+                .andDo(
+                        document(
+                                "cart/clear-cart",
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data").optional().ignored())));
     }
 }

@@ -1,7 +1,13 @@
 package com.project.baedalsodae.order.controller;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +35,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -40,6 +47,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(OrderController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureRestDocs
 class OrderControllerTest {
 
     @Autowired private MockMvc mockMvc;
@@ -109,7 +117,26 @@ class OrderControllerTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CREATED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CREATED.getCode()))
+                .andDo(
+                        document(
+                                "order/create-order",
+                                requestFields(
+                                        fieldWithPath("cartId").description("장바구니 ID"),
+                                        fieldWithPath("addressId").description("배달 주소 ID"),
+                                        fieldWithPath("storeRequestMessage")
+                                                .optional()
+                                                .description("가게 요청 메시지"),
+                                        fieldWithPath("deliveryRequestMessage")
+                                                .optional()
+                                                .description("배달 요청 메시지")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("생성된 주문 ID"),
+                                        fieldWithPath("data.status").description("주문 상태"))));
     }
 
     @Test
@@ -163,6 +190,7 @@ class OrderControllerTest {
         OrderSummaryResponse summary =
                 OrderSummaryResponse.builder()
                         .orderId(UUID.randomUUID())
+                        .storeId(UUID.randomUUID())
                         .orderNo("ORD-001")
                         .status(OrderStatus.CREATED)
                         .storeNameSnapshot("테스트 가게")
@@ -185,7 +213,63 @@ class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_LIST.getCode()))
                 .andExpect(jsonPath("$.data.hasNext").value(true))
-                .andExpect(jsonPath("$.data.orders[0].orderNo").value("ORD-001"));
+                .andExpect(jsonPath("$.data.orders[0].orderNo").value("ORD-001"))
+                .andDo(
+                        document(
+                                "order/get-orders",
+                                queryParameters(
+                                        parameterWithName("size")
+                                                .optional()
+                                                .description("페이지 크기 (기본값: 10)"),
+                                        parameterWithName("status")
+                                                .optional()
+                                                .description("주문 상태 필터"),
+                                        parameterWithName("startDate")
+                                                .optional()
+                                                .description("검색 시작 날짜 (yyyy-MM-dd)"),
+                                        parameterWithName("endDate")
+                                                .optional()
+                                                .description("검색 종료 날짜 (yyyy-MM-dd)"),
+                                        parameterWithName("keyword")
+                                                .optional()
+                                                .description("가게명/메뉴명 검색어"),
+                                        parameterWithName("storeId")
+                                                .optional()
+                                                .description("가게 ID (OWNER 역할에서 필요)"),
+                                        parameterWithName("orderNo")
+                                                .optional()
+                                                .description("주문번호 검색어 (OWNER용)"),
+                                        parameterWithName("cursorCreatedAt")
+                                                .optional()
+                                                .description("커서 기반 페이징 - 기준 생성일시"),
+                                        parameterWithName("cursorId")
+                                                .optional()
+                                                .description("커서 기반 페이징 - 기준 주문 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orders").description("주문 목록"),
+                                        fieldWithPath("data.orders[].orderId").description("주문 ID"),
+                                        fieldWithPath("data.orders[].storeId").description("가게 ID"),
+                                        fieldWithPath("data.orders[].orderNo").description("주문 번호"),
+                                        fieldWithPath("data.orders[].status").description("주문 상태"),
+                                        fieldWithPath("data.orders[].storeNameSnapshot")
+                                                .description("가게명"),
+                                        fieldWithPath("data.orders[].finalAmount")
+                                                .description("최종 결제 금액"),
+                                        fieldWithPath("data.orders[].createdAtCursor")
+                                                .description("생성일시 (커서용)"),
+                                        fieldWithPath("data.orders[].createdAt")
+                                                .description("생성일시"),
+                                        fieldWithPath("data.hasNext").description("다음 페이지 존재 여부"),
+                                        fieldWithPath("data.nextCursorCreatedAt")
+                                                .optional()
+                                                .description("다음 페이지 커서 - 기준 생성일시"),
+                                        fieldWithPath("data.nextCursorId")
+                                                .optional()
+                                                .description("다음 페이지 커서 - 기준 주문 ID"))));
     }
 
     @Test
@@ -284,6 +368,80 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("성공 - CUSTOMER 주문 상세 조회")
+    void getOrderDetail_success() throws Exception {
+        setSecurityContext(customerDetails);
+
+        UUID orderId = UUID.randomUUID();
+        OrderDetailResponse response =
+                OrderDetailResponse.builder()
+                        .orderId(orderId)
+                        .orderNo("ORD-20260310-0001")
+                        .userNickname("테스트고객")
+                        .userPhone("010-1234-5678")
+                        .storeId(UUID.randomUUID())
+                        .storeName("테스트 가게")
+                        .status(OrderStatus.CREATED)
+                        .storeRequestNote("요청사항 없음")
+                        .deliveryRequestNote("문 앞에 놓아주세요")
+                        .deliveryAddressSnapshot("서울특별시 강남구 테헤란로 1")
+                        .totalAmount(BigDecimal.valueOf(10000))
+                        .deliveryFee(BigDecimal.valueOf(3000))
+                        .discountAmount(BigDecimal.ZERO)
+                        .finalAmount(BigDecimal.valueOf(13000))
+                        .items(List.of())
+                        .orderCreatedAt(LocalDateTime.now())
+                        .orderedAt(LocalDateTime.now())
+                        .build();
+
+        given(
+                        orderService.getOrderDetail(
+                                ArgumentMatchers.eq(userId),
+                                ArgumentMatchers.eq(UserRole.CUSTOMER),
+                                ArgumentMatchers.isNull(),
+                                ArgumentMatchers.eq(orderId)))
+                .willReturn(response);
+
+        mockMvc.perform(get("/orders/{orderId}", orderId))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DETAIL.getCode()))
+                .andDo(
+                        document(
+                                "order/get-order-detail",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(
+                                        parameterWithName("storeId")
+                                                .optional()
+                                                .description("가게 ID (OWNER 역할에서 필요)")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderNo").description("주문 번호"),
+                                        fieldWithPath("data.userNickname").description("주문자 닉네임"),
+                                        fieldWithPath("data.userPhone").description("주문자 전화번호"),
+                                        fieldWithPath("data.storeId").description("가게 ID"),
+                                        fieldWithPath("data.storeName").description("가게명"),
+                                        fieldWithPath("data.status").description("주문 상태"),
+                                        fieldWithPath("data.storeRequestNote")
+                                                .description("가게 요청 사항"),
+                                        fieldWithPath("data.deliveryRequestNote")
+                                                .description("배달 요청 사항"),
+                                        fieldWithPath("data.deliveryAddressSnapshot")
+                                                .description("배달 주소"),
+                                        fieldWithPath("data.totalAmount").description("총 금액"),
+                                        fieldWithPath("data.deliveryFee").description("배달비"),
+                                        fieldWithPath("data.discountAmount").description("할인 금액"),
+                                        fieldWithPath("data.finalAmount").description("최종 결제 금액"),
+                                        fieldWithPath("data.items").description("주문 아이템 목록"),
+                                        fieldWithPath("data.orderCreatedAt").description("주문 생성일시"),
+                                        fieldWithPath("data.orderedAt").description("주문 요청일시"))));
+    }
+
+    @Test
     @DisplayName("성공 - 주문 상태 조회")
     void getOrderStatus_success() throws Exception {
         setSecurityContext(customerDetails);
@@ -305,7 +463,24 @@ class OrderControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_STATUS.getCode()))
-                .andExpect(jsonPath("$.data.orderId").value(orderId.toString()));
+                .andExpect(jsonPath("$.data.orderId").value(orderId.toString()))
+                .andDo(
+                        document(
+                                "order/get-order-status",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(
+                                        parameterWithName("storeId")
+                                                .optional()
+                                                .description("가게 ID (OWNER 역할에서 필요)")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.currentStatus").description("현재 주문 상태"),
+                                        fieldWithPath("data.histories")
+                                                .description("상태 전이 이력 목록"))));
     }
 
     @Test
@@ -360,7 +535,7 @@ class OrderControllerTest {
         OrderActionStatusResponse response =
                 OrderActionStatusResponse.builder()
                         .orderId(orderId)
-                        .orderStatus(OrderStatus.ACCEPTED)
+                        .orderStatus(OrderStatus.REQUESTED)
                         .build();
 
         given(orderService.requestOrder(userId, orderId)).willReturn(response);
@@ -368,7 +543,21 @@ class OrderControllerTest {
         mockMvc.perform(post("/orders/{orderId}/request", orderId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_REQUESTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_REQUESTED.getCode()))
+                .andDo(
+                        document(
+                                "order/request-order",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -398,7 +587,7 @@ class OrderControllerTest {
         OrderActionStatusResponse response =
                 OrderActionStatusResponse.builder()
                         .orderId(orderId)
-                        .orderStatus(OrderStatus.REJECTED)
+                        .orderStatus(OrderStatus.ACCEPTED)
                         .build();
 
         given(orderService.acceptOrder(userId, UserRole.OWNER, storeId, orderId))
@@ -406,10 +595,25 @@ class OrderControllerTest {
 
         mockMvc.perform(
                         post("/orders/{orderId}/accept", orderId)
-                                .param("storeId", storeId.toString()))
+                                .queryParam("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_ACCEPTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_ACCEPTED.getCode()))
+                .andDo(
+                        document(
+                                "order/accept-order",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(parameterWithName("storeId").description("가게 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -442,7 +646,7 @@ class OrderControllerTest {
         OrderActionStatusResponse response =
                 OrderActionStatusResponse.builder()
                         .orderId(orderId)
-                        .orderStatus(OrderStatus.REQUESTED)
+                        .orderStatus(OrderStatus.REJECTED)
                         .build();
 
         given(orderService.rejectOrder(userId, UserRole.OWNER, storeId, orderId, null))
@@ -450,10 +654,29 @@ class OrderControllerTest {
 
         mockMvc.perform(
                         post("/orders/{orderId}/reject", orderId)
-                                .param("storeId", storeId.toString()))
+                                .queryParam("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_REJECTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_REJECTED.getCode()))
+                .andDo(
+                        document(
+                                "order/reject-order",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(
+                                        parameterWithName("storeId").description("가게 ID"),
+                                        parameterWithName("reason")
+                                                .optional()
+                                                .description("거절 사유")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -494,10 +717,25 @@ class OrderControllerTest {
 
         mockMvc.perform(
                         post("/orders/{orderId}/cooked", orderId)
-                                .param("storeId", storeId.toString()))
+                                .queryParam("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_COOKING_COMPLETED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_COOKING_COMPLETED.getCode()))
+                .andDo(
+                        document(
+                                "order/complete-cooking",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(parameterWithName("storeId").description("가게 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -538,10 +776,25 @@ class OrderControllerTest {
 
         mockMvc.perform(
                         post("/orders/{orderId}/delivering", orderId)
-                                .param("storeId", storeId.toString()))
+                                .queryParam("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DELIVERING.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DELIVERING.getCode()))
+                .andDo(
+                        document(
+                                "order/start-delivery",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(parameterWithName("storeId").description("가게 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -582,10 +835,25 @@ class OrderControllerTest {
 
         mockMvc.perform(
                         post("/orders/{orderId}/delivered", orderId)
-                                .param("storeId", storeId.toString()))
+                                .queryParam("storeId", storeId.toString()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DELIVERED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_DELIVERED.getCode()))
+                .andDo(
+                        document(
+                                "order/complete-delivery",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(parameterWithName("storeId").description("가게 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -626,7 +894,28 @@ class OrderControllerTest {
         mockMvc.perform(post("/orders/{orderId}/cancel-request", orderId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCEL_REQUESTED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCEL_REQUESTED.getCode()))
+                .andDo(
+                        document(
+                                "order/cancel-request-order",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                queryParameters(
+                                        parameterWithName("storeId")
+                                                .optional()
+                                                .description("가게 ID (OWNER 역할에서 필요)"),
+                                        parameterWithName("reason")
+                                                .optional()
+                                                .description("취소 사유")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
@@ -663,7 +952,21 @@ class OrderControllerTest {
         mockMvc.perform(post("/orders/{orderId}/cancel", orderId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCELED.getCode()));
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCELED.getCode()))
+                .andDo(
+                        document(
+                                "order/complete-cancel-order",
+                                pathParameters(parameterWithName("orderId").description("주문 ID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").ignored(),
+                                        fieldWithPath("data.orderId").description("주문 ID"),
+                                        fieldWithPath("data.orderStatus").description("변경된 주문 상태"),
+                                        fieldWithPath("data.paymentStatus")
+                                                .optional()
+                                                .description("결제 상태"))));
     }
 
     @Test
