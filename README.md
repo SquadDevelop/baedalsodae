@@ -35,6 +35,9 @@
 
 ## 🚀 실행 방법
 
+<details>
+<summary>펼쳐보기</summary>
+
 ### 방법 1: Docker Compose (권장)
 
 #### 1. 사전 요구사항
@@ -130,6 +133,9 @@ export JWT_SECRET=your_jwt_secret
 
 ./gradlew bootRun
 ```
+
+</details>
+
 ---
 
 ## 🛠 기술 스택
@@ -471,6 +477,14 @@ open build/reports/tests/test/index.html
 <summary>펼쳐보기</summary>
 
 ```
+http/                                                          ← IntelliJ HTTP Client 수동 테스트
+├── cart.http
+├── menu.http
+├── order.http
+├── store.http
+├── store-hours.http
+└── (기타 도메인별 .http 파일)
+
 src/test/
 └── java/com/project/baedalsodae/
     ├── allowedRegion/
@@ -532,6 +546,16 @@ src/test/
 |------------|---------------------------------------------------------|--------------------------------------|
 | Service    | Mockito로 Repository 목킹, 비즈니스 로직 검증                      | JUnit 5 + Mockito                    |
 | Controller | `@WebMvcTest` + `MockMvc`로 HTTP 슬라이스 테스트 + API 문서 자동 생성 | JUnit 5 + MockMvc + Spring REST Docs |
+| 수동 E2E     | IntelliJ HTTP Client로 실제 서버 대상 API 흐름 검증                | `.http` 파일                           |
+
+### IntelliJ HTTP Client 도입 이유
+
+Postman 같은 별도 툴 없이 IDE 안에서 바로 API를 호출하고, `.http` 파일을 Git으로 팀 전체가 공유할 수 있어 도입했습니다.
+
+- **IDE 통합**: 별도 툴 설치 없이 IntelliJ에서 바로 실행
+- **형상관리**: `.http` 파일을 Git에 커밋하여 팀원 모두 동일한 요청 공유
+- **연속 호출**: JavaScript로 이전 응답값을 다음 요청에 활용 — 로그인 → 주문 생성 같은 2~3단계 흐름을 한 번에 실행 가능
+- **환경 분리**: `http-client.env.json`으로 dev/prod별 URL·토큰 등 환경변수 분리 관리
 
 ---
 

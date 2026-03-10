@@ -171,6 +171,24 @@ WHERE deleted_at IS NULL;
 
 ---
 
+### WireMock 기반 가상 PG사 구현 (정재빈 · 한병두)
+
+**문제**: 실제 PG사 연동 없이 결제 흐름(승인·취소)을 개발·테스트 환경에서 검증하기 어려움
+
+**선택**: WireMock을 Docker Compose로 띄워 가상 PG 서버로 운용
+
+```
+결제 요청 → WireMockPGClient → WireMock 서버 (포트 8999) → 매핑된 응답 반환
+```
+
+- `pg-pay.json` — 금액·결제수단 검증 후 승인 응답 반환
+- `pg-cancel.json` — 취소 요청 처리 응답 반환
+- `WireMockPGClient`가 `@Primary`로 등록되어 실제 PG 클라이언트와 인터페이스 공유
+
+**효과**: 실제 PG사 계약·비용 없이 결제 승인·취소 전 흐름을 실제와 동일하게 검증 가능
+
+---
+
 ### 롱폴링 vs SSE — 주문 상태 실시간 조회 (정재빈, 한병두)
 
 | 방식 | 장점 | 단점 |
