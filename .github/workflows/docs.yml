@@ -3,6 +3,7 @@ name: Deploy REST Docs to GitHub Pages
 on:
   push:
     branches: [ "dev", "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
