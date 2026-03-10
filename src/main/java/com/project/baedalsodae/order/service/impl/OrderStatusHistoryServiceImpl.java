@@ -6,6 +6,8 @@ import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.repository.OrderStatusHistoryRepository;
 import com.project.baedalsodae.order.service.OrderStatusHistoryService;
 import java.util.UUID;
+
+import com.project.baedalsodae.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -48,6 +50,15 @@ public class OrderStatusHistoryServiceImpl implements OrderStatusHistoryService 
     public void createForSystemOrderStatusHistory(OrderStatus fromStatus, Order savedOrder) {
         OrderStatusHistory orderStatusHistory =
                 OrderStatusHistory.createForSystem(savedOrder, fromStatus);
+        orderStatusHistoryRepository.save(orderStatusHistory);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void createForAdminOrderStatusHistory(
+            UUID adminId, OrderStatus fromStatus, Order savedOrder, String reason) {
+        OrderStatusHistory orderStatusHistory =
+                OrderStatusHistory.createForAdmin(savedOrder, fromStatus, adminId, reason);
         orderStatusHistoryRepository.save(orderStatusHistory);
     }
 }

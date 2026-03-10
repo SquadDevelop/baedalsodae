@@ -4,6 +4,7 @@ import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
+import com.project.baedalsodae.order.dto.response.OrderActionStatusResponse;
 import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
@@ -57,5 +58,23 @@ public class AdminOrderController {
                         userDetails.getUserId(), userDetails.getUserRole(), null, orderId);
 
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_STATUS, response));
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_MANAGER')")
+    @PostMapping("/orders/{orderId}/cancel-request")
+    public ResponseEntity<ApiResponse<OrderActionStatusResponse>> cancelRequestOrder(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(name = "reason", required = false) String reason,
+            @PathVariable("orderId") UUID orderId) {
+
+        OrderActionStatusResponse response =
+                orderService.cancelRequestOrder(
+                        userDetails.getUserId(),
+                        userDetails.getUserRole(),
+                        null,
+                        orderId,
+                        reason);
+
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.ORDER_CANCEL_REQUESTED, response));
     }
 }

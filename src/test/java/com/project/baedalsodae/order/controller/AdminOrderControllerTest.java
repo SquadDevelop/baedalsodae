@@ -15,9 +15,11 @@ import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.order.dto.request.OrderListRequest;
+import com.project.baedalsodae.order.dto.response.OrderActionStatusResponse;
 import com.project.baedalsodae.order.dto.response.OrderDetailResponse;
 import com.project.baedalsodae.order.dto.response.OrderListResponse;
 import com.project.baedalsodae.order.dto.response.OrderStatusResponse;
+import com.project.baedalsodae.order.entity.enums.OrderStatus;
 import com.project.baedalsodae.order.service.OrderService;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.UUID;
@@ -30,6 +32,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @ActiveProfiles("test")
 @WebMvcTest(AdminOrderController.class)
@@ -120,4 +124,34 @@ public class AdminOrderControllerTest {
     private UserDetailsImpl createUserDetails(UUID userId, UserRole role) {
         return UserDetailsImpl.from(userId, "adminUser", "password", role, false);
     }
+
+    @Test
+    @DisplayName("성공 - 관리자 권한으로 주문 취소 요청")
+    void cancelRequestOrder_ByAdmin_Success() throws Exception {
+        // given
+        UUID adminId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
+        UserDetailsImpl admin = createUserDetails(adminId, UserRole.MANAGER);
+        OrderActionStatusResponse mockResponse = OrderActionStatusResponse.builder()
+                .orderId(orderId)
+                .orderStatus(OrderStatus.CANCEL_REQUESTED)
+                .build();
+
+        given(orderService.cancelRequestOrder(
+                eq(adminId),
+                eq(UserRole.MANAGER),
+                eq(null),
+                eq(orderId),
+                eq("관리자 취소 사유")))
+                .willReturn(mockResponse);
+
+        // when & then
+        mockMvc.perform(post(BASE_URL + "/" + orderId + "/cancel-request")
+                        .with(user(admin))
+                        .with(csrf())
+                        .param("reason", "관리자 취소 사유"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(SuccessCode.ORDER_CANCEL_REQUESTED.getCode()));
+    }
+
 }
