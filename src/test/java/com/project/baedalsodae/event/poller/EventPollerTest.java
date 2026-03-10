@@ -1,5 +1,11 @@
 package com.project.baedalsodae.event.poller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.event.dto.OrderCreatedEvent;
@@ -8,6 +14,9 @@ import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.entity.EventType;
 import com.project.baedalsodae.event.repository.EventRepository;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,16 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EventPollerTest {
@@ -40,12 +39,17 @@ class EventPollerTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(orderCreatedDispatcher.getSupportedEventType()).thenReturn(EventType.ORDER_CREATED);
-        lenient().when(paymentCreatedDispatcher.getSupportedEventType()).thenReturn(EventType.PAYMENT_CREATED);
+        lenient()
+                .when(orderCreatedDispatcher.getSupportedEventType())
+                .thenReturn(EventType.ORDER_CREATED);
+        lenient()
+                .when(paymentCreatedDispatcher.getSupportedEventType())
+                .thenReturn(EventType.PAYMENT_CREATED);
 
         // 모든 테스트에서 공통으로 사용
-        eventPoller = new EventPoller(eventRepository,
-                List.of(orderCreatedDispatcher, paymentCreatedDispatcher));
+        eventPoller =
+                new EventPoller(
+                        eventRepository, List.of(orderCreatedDispatcher, paymentCreatedDispatcher));
     }
 
     // ======================== poll - 이벤트 없음 ========================
@@ -61,7 +65,7 @@ class EventPollerTest {
         eventPoller.poll();
 
         // then
-//        then(eventPublisher).shouldHaveNoInteractions();
+        //        then(eventPublisher).shouldHaveNoInteractions();
         then(orderCreatedDispatcher).shouldHaveNoMoreInteractions();
         then(paymentCreatedDispatcher).shouldHaveNoMoreInteractions();
     }
@@ -90,7 +94,7 @@ class EventPollerTest {
         // then
         assertThat(event.getStatus()).isEqualTo(EventStatus.PUBLISHED);
         assertThat(event.getPublishedAt()).isNotNull();
-//        then(eventPublisher).should().publishEvent(any(OrderCreatedEvent.class));
+        //        then(eventPublisher).should().publishEvent(any(OrderCreatedEvent.class));
         verify(orderCreatedDispatcher).dispatch(event);
     }
 
@@ -112,7 +116,8 @@ class EventPollerTest {
                 .willReturn(List.of(event));
 
         doThrow(new JsonProcessingException("dispatch 실패") {})
-        .when(orderCreatedDispatcher).dispatch(event);
+                .when(orderCreatedDispatcher)
+                .dispatch(event);
 
         // when
         eventPoller.poll();
@@ -137,7 +142,8 @@ class EventPollerTest {
                 .willReturn(List.of(event));
 
         doThrow(new JsonProcessingException("dispatch 실패") {})
-        .when(orderCreatedDispatcher).dispatch(event);
+                .when(orderCreatedDispatcher)
+                .dispatch(event);
 
         // when - 3회 폴링
         eventPoller.poll();
@@ -181,8 +187,8 @@ class EventPollerTest {
     @Test
     @DisplayName("poll() - Dispatcher가 없는 EventType이면 markFailed() 처리")
     void poll_unknownEventType_marksAsFailed() throws JsonProcessingException {
-        Event event = Event.create(
-                AggregateType.ORDER, UUID.randomUUID(), EventType.ORDER_UPDATED, "{}");
+        Event event =
+                Event.create(AggregateType.ORDER, UUID.randomUUID(), EventType.ORDER_UPDATED, "{}");
 
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));
