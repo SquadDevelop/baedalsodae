@@ -12,7 +12,8 @@ import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.response.store.*;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
-import com.project.baedalsodae.store.entity.enums.SortType;
+import com.project.baedalsodae.store.enums.SortType;
+import com.project.baedalsodae.store.enums.StoreQueryScope;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
@@ -39,16 +40,20 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final UserAddressService userAddressService;
 
     @Override
-    public StorePageResponse getStorePage(UUID storeCategoryId, StoreCursorRequest cursorRequest) {
+    public StorePageResponse getStorePage(
+            UUID storeCategoryId, StoreCursorRequest cursorRequest, UserRole userRole) {
         SortType sortType = cursorRequest.sortType();
-        validateSortType(sortType);
+
         StoreCursorRequest initializedCursor = cursorRequest.initCursor(sortType);
 
         StoreCategory storeCategory = getStoreCategory(storeCategoryId);
 
         Slice<Store> storeSlice =
                 storeCustomRepository.findStoresByCursor(
-                        storeCategoryId, initializedCursor, sortType);
+                        storeCategoryId,
+                        initializedCursor,
+                        sortType,
+                        StoreQueryScope.fromRole(userRole));
 
         return StorePageResponse.of(storeCategory.getId(), storeCategory.getName(), storeSlice);
     }
@@ -63,10 +68,11 @@ public class StoreQueryServiceImpl implements StoreQueryService {
 
     @Override
     public StoreSearchPageResponse getStoreByKeyword(
-            String keyword, Pageable pageable, SortType sortType) {
-        validateSortType(sortType);
+            String keyword, Pageable pageable, SortType sortType, UserRole userRole) {
+
         List<Store> content =
-                storeCustomRepository.searchStoreByKeyword(keyword, pageable, sortType);
+                storeCustomRepository.searchStoreByKeyword(
+                        keyword, pageable, sortType, StoreQueryScope.fromRole(userRole));
 
         boolean hasNext = content.size() > pageable.getPageSize();
         if (hasNext) content.remove(content.size() - 1);
@@ -80,13 +86,18 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     }
 
     @Override
-    public StoreDetailResponse getStoreDetail(UUID storeId, UUID userId) {
-        Store store = getStore(storeId);
+    public StoreDetailResponse getStoreDetail(UUID storeId, UUID userId, UserRole userRole) {
+        Store store =
+                storeCustomRepository
+                        .findByIdAndScope(storeId, StoreQueryScope.fromRole(userRole))
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
 
         String sigunguCode = store.getAddress().getSigunguCode();
         boolean isAllowedRegion = allowedRegionService.isAllowedByCode(sigunguCode);
+
         List<MenuCategoryItemsResponse> storeMenuCategoryItemsList =
                 menuCategoryCustomRepository.getStoreCategoryItems(storeId);
+
         UserAddress userAddress = userAddressService.getMainUserAddress(userId);
         boolean isDeliverable =
                 allowedRegionService.isAllowedByCode(userAddress.getAddress().getSigunguCode());
@@ -119,14 +130,11 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     }
 
     private void validateStoreOwner(UUID storeOwnerId, UUID userId, UserRole role) {
-        if (!userId.equals(storeOwnerId) || !role.getRole().equals(UserRole.OWNER.getRole())) {
+        if (role != UserRole.OWNER) {
             throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
         }
-    }
-
-    private void validateSortType(SortType sortType) {
-        if (!sortType.isStoreListSort()) {
-            throw new BusinessException(ErrorCode.SORT_UNSUPPORTED);
+        if (!userId.equals(storeOwnerId)) {
+            throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
         }
     }
 }
