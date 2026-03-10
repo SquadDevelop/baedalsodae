@@ -27,7 +27,7 @@ public class EventPublisher {
         }else if (type == EventType.ORDER_UPDATED) {
             final OrderCancelRequestedEvent event = OrderCancelRequestedEvent.from(order);
             eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
-        } else if (type == EventType.ORDER_DELIVERED) { 
+        } else if (type == EventType.ORDER_DELIVERED) {
             final OrderDeliveredEvent event = OrderDeliveredEvent.from(order);
             eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
         }
