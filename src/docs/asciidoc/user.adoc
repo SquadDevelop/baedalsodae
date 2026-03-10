@@ -1,0 +1,73 @@
+= 사용자 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[user-get-me]]
+== 내 정보 조회
+
+`GET /users/me`
+
+권한: `CUSTOMER`, `OWNER`
+
+현재 로그인한 사용자의 정보를 조회합니다.
+
+=== HTTP Request Example
+include::{snippets}/user/get-me/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user/get-me/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user/get-me/http-response.adoc[]
+
+---
+
+[[user-update-me]]
+== 내 정보 수정
+
+`PUT /users/me`
+
+권한: `CUSTOMER`, `OWNER`
+
+현재 로그인한 사용자의 정보를 수정합니다.
+
+=== Request Fields
+include::{snippets}/user/update-me/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/user/update-me/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user/update-me/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user/update-me/http-response.adoc[]
+
+==== 내 정보 수정 실패 (닉네임 중복)
+===== HTTP Response Example
+include::{snippets}/user/update-me-fail-nickname/http-response.adoc[]
+
+---
+
+[[user-delete-me]]
+== 회원 탈퇴
+
+`DELETE /users/me`
+
+권한: `CUSTOMER`, `OWNER`
+
+현재 로그인한 사용자를 탈퇴 처리(소프트 딜리트)합니다.
+
+=== HTTP Request Example
+include::{snippets}/user/delete-me/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user/delete-me/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user/delete-me/http-response.adoc[]
