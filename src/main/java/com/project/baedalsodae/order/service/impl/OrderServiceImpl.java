@@ -26,10 +26,8 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
-import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
-import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -48,7 +46,6 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final EventPublisher eventPublisher;
     private final OrderQueryRepository orderQueryRepository;
@@ -94,17 +91,14 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.USER_ADDRESS_NOT_ALLOWED);
         }
 
-        final String deliveryAddressSnapshot = userAddress.makeDeliveryAddress();
+        // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
+        String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
-        final User user =
-                userRepository
-                        .findByUserIdAndIsDeletedFalse(userId)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
-        final String userNickName = user.getNickname();
-        final String userPhone = user.getPhone();
+        // TODO 인증 도메인 완료 시 넣어줌
+        final String userNickName = "잽닝";
+        final String userPhone = "01011111111";
 
         Order order =
                 Order.create(
@@ -355,8 +349,6 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
-
         return OrderActionStatusResponse.from(order);
     }
 
@@ -385,8 +377,6 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
-
         return OrderActionStatusResponse.from(order);
     }
 
@@ -414,6 +404,9 @@ public class OrderServiceImpl implements OrderService {
         order.completeDelivery();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        // 가게의 주문수 필드 업데이트
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_DELIVERED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -465,7 +458,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -486,6 +479,8 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(
                 userId, fromStatus, order, reason);
+
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -537,5 +532,12 @@ public class OrderServiceImpl implements OrderService {
                         .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         return order.getStatus() == OrderStatus.DELIVERED;
+    }
+
+    @Override
+    public Order findById(final UUID orderId) {
+        return orderRepository
+                .findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
     }
 }

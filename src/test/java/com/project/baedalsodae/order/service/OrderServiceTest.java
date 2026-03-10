@@ -35,10 +35,8 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
-import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
-import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -73,10 +71,6 @@ public class OrderServiceTest {
     @Mock private StoreRepository storeRepository;
 
     @Mock private PaymentRepository paymentRepository;
-
-    @Mock private UserRepository userRepository;
-
-    @Mock private User user;
 
     @Mock private Cart cart;
 
@@ -250,6 +244,11 @@ public class OrderServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ORDER_INVALID_TOTAL_AMOUNT);
     }
 
+    // TODO 주소 도메인 완성 후 만들어야함
+    @Test
+    @DisplayName("실패 - 주문 생성 시 존재하지 않는 주소")
+    void createOrder_fail_addressNotFound() {}
+
     @Test
     @DisplayName("성공 - 정상적인 주문 생성 (단일 아이템)")
     void createOrder_success_singleItem() {
@@ -295,10 +294,6 @@ public class OrderServiceTest {
 
         given(userAddress.getAddress()).willReturn(address);
         given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
-
-        given(user.getNickname()).willReturn("잽닝이");
-        given(user.getPhone()).willReturn("01011112222");
-        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
 
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
@@ -363,10 +358,6 @@ public class OrderServiceTest {
 
         given(userAddress.getAddress()).willReturn(address);
         given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
-
-        given(user.getNickname()).willReturn("잽닝이");
-        given(user.getPhone()).willReturn("01011112222");
-        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);
@@ -1572,10 +1563,6 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher)
-                .should()
-                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
-
         assertThat(response).isNotNull();
     }
 
@@ -1685,10 +1672,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-
-        then(orderEventPublisher)
-                .should()
-                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1801,6 +1784,10 @@ public class OrderServiceTest {
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
         assertThat(response).isNotNull();
+
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_DELIVERED));
     }
 
     @DisplayName("주문 취소 요청 실패 - 존재하지 않는 주문")
@@ -1976,6 +1963,9 @@ public class OrderServiceTest {
         verify(order).cancelRequested();
         verify(orderStatusHistoryService)
                 .createForCustomerOrderStatusHistory(userId, OrderStatus.REQUESTED, order);
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
     }
 
     @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 고객 취소")
@@ -1998,6 +1988,9 @@ public class OrderServiceTest {
 
         // then
         verify(order).cancelRequested();
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
     }
 
     @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 사장 취소")
@@ -2022,6 +2015,9 @@ public class OrderServiceTest {
         verify(order).cancelRequested();
         verify(orderStatusHistoryService)
                 .createForOwnerOrderStatusHistory(userId, OrderStatus.ACCEPTED, order, null);
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
     }
 
     @DisplayName("주문 취소 실패 - 존재하지 않는 주문")

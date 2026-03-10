@@ -123,7 +123,22 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ErrorCode.DATA_ACCESS_ERROR));
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler({
+        jakarta.persistence.OptimisticLockException.class,
+        org.springframework.orm.ObjectOptimisticLockingFailureException.class,
+        org.hibernate.StaleObjectStateException.class,
+    })
+    public ResponseEntity<ApiResponse<Void>> handleConcurrencyException(Exception e) {
+        log.warn("Concurrency Exception: ", e);
+        return ResponseEntity.status(ErrorCode.COMMON_CONCURRENCY_ERROR.getStatus())
+                .body(ApiResponse.error(ErrorCode.COMMON_CONCURRENCY_ERROR));
+    }
+
+    @ExceptionHandler({
+        DataIntegrityViolationException.class,
+        org.springframework.dao.DuplicateKeyException.class,
+        java.sql.SQLIntegrityConstraintViolationException.class,
+    })
     public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(
             DataIntegrityViolationException exception) {
 

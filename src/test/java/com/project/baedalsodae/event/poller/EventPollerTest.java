@@ -2,10 +2,11 @@ package com.project.baedalsodae.event.poller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.entity.AggregateType;
@@ -16,25 +17,40 @@ import com.project.baedalsodae.event.repository.EventRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class EventPollerTest {
 
-    @InjectMocks private EventPoller eventPoller;
+    private EventPoller eventPoller;
 
     @Mock private EventRepository eventRepository;
 
-    @Mock private ApplicationEventPublisher eventPublisher;
-
     @Spy private ObjectMapper objectMapper;
+
+    @Mock private EventDispatcher orderCreatedDispatcher;
+    @Mock private EventDispatcher paymentCreatedDispatcher;
+
+    @BeforeEach
+    void setUp() {
+        lenient()
+                .when(orderCreatedDispatcher.getSupportedEventType())
+                .thenReturn(EventType.ORDER_CREATED);
+        lenient()
+                .when(paymentCreatedDispatcher.getSupportedEventType())
+                .thenReturn(EventType.PAYMENT_CREATED);
+
+        // 모든 테스트에서 공통으로 사용
+        eventPoller =
+                new EventPoller(
+                        eventRepository, List.of(orderCreatedDispatcher, paymentCreatedDispatcher));
+    }
 
     // ======================== poll - 이벤트 없음 ========================
 
@@ -49,7 +65,9 @@ class EventPollerTest {
         eventPoller.poll();
 
         // then
-        then(eventPublisher).shouldHaveNoInteractions();
+        //        then(eventPublisher).shouldHaveNoInteractions();
+        then(orderCreatedDispatcher).shouldHaveNoMoreInteractions();
+        then(paymentCreatedDispatcher).shouldHaveNoMoreInteractions();
     }
 
     // ======================== poll - 정상 dispatch ========================
@@ -61,7 +79,6 @@ class EventPollerTest {
         UUID orderId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         BigDecimal finalAmount = BigDecimal.valueOf(18000);
-
         String payload =
                 objectMapper.writeValueAsString(
                         new OrderCreatedEvent(orderId, userId, finalAmount));
@@ -77,14 +94,15 @@ class EventPollerTest {
         // then
         assertThat(event.getStatus()).isEqualTo(EventStatus.PUBLISHED);
         assertThat(event.getPublishedAt()).isNotNull();
-        then(eventPublisher).should().publishEvent(any(OrderCreatedEvent.class));
+        //        then(eventPublisher).should().publishEvent(any(OrderCreatedEvent.class));
+        verify(orderCreatedDispatcher).dispatch(event);
     }
 
     // ======================== poll - dispatch 실패 ========================
 
     @Test
     @DisplayName("poll() - dispatch 중 예외 발생 시 retryCount가 1 증가하고 PENDING 유지")
-    void poll_dispatchFails_incrementsRetryAndStaysPending() {
+    void poll_dispatchFails_incrementsRetryAndStaysPending() throws JsonProcessingException {
         // given
         // payload가 잘못된 JSON이면 dispatch 시 JsonProcessingException 발생
         Event event =
@@ -97,6 +115,10 @@ class EventPollerTest {
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));
 
+        doThrow(new JsonProcessingException("dispatch 실패") {})
+                .when(orderCreatedDispatcher)
+                .dispatch(event);
+
         // when
         eventPoller.poll();
 
@@ -107,7 +129,7 @@ class EventPollerTest {
 
     @Test
     @DisplayName("poll() - dispatch 3회 실패 시 FAILED 상태로 변경됨")
-    void poll_dispatchFailsMaxRetryTimes_becomesFailed() {
+    void poll_dispatchFailsMaxRetryTimes_becomesFailed() throws JsonProcessingException {
         // given
         Event event =
                 Event.create(
@@ -118,6 +140,10 @@ class EventPollerTest {
 
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));
+
+        doThrow(new JsonProcessingException("dispatch 실패") {})
+                .when(orderCreatedDispatcher)
+                .dispatch(event);
 
         // when - 3회 폴링
         eventPoller.poll();
@@ -133,7 +159,7 @@ class EventPollerTest {
 
     @Test
     @DisplayName("poll() - retryCount가 MAX_RETRY(3) 이상인 이벤트는 dispatch 시도 없이 skip됨")
-    void poll_exhaustedEvent_isSkipped() {
+    void poll_exhaustedEvent_isSkipped() throws JsonProcessingException {
         // given
         Event event =
                 Event.create(
@@ -153,27 +179,25 @@ class EventPollerTest {
         eventPoller.poll();
 
         // then - ApplicationEventPublisher는 호출되지 않아야 함
-        then(eventPublisher).should(never()).publishEvent(any());
+        then(orderCreatedDispatcher).should(never()).dispatch(any());
     }
 
     // ======================== poll - 알 수 없는 이벤트 타입 ========================
 
     @Test
-    @DisplayName("poll() - 처리되지 않은 EventType이면 dispatch 없이 무시됨 (PAYMENT_CREATED)")
-    void poll_unknownEventType_isIgnored() throws Exception {
-        // given - EventPoller는 현재 ORDER_CREATED만 처리하므로 PAYMENT_CREATED는 dispatch 안 됨
+    @DisplayName("poll() - Dispatcher가 없는 EventType이면 markFailed() 처리")
+    void poll_unknownEventType_marksAsFailed() throws JsonProcessingException {
         Event event =
-                Event.create(
-                        AggregateType.PAYMENT, UUID.randomUUID(), EventType.PAYMENT_CREATED, "{}");
+                Event.create(AggregateType.ORDER, UUID.randomUUID(), EventType.ORDER_UPDATED, "{}");
 
         given(eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING))
                 .willReturn(List.of(event));
 
-        // when
         eventPoller.poll();
 
-        // then
-        then(eventPublisher).should(never()).publishEvent(any());
-        assertThat(event.getStatus()).isEqualTo(EventStatus.PUBLISHED);
+        assertThat(event.getRetryCount()).isEqualTo(1);
+        assertThat(event.getStatus()).isEqualTo(EventStatus.PENDING);
+        then(orderCreatedDispatcher).should(never()).dispatch(any());
+        then(paymentCreatedDispatcher).should(never()).dispatch(any());
     }
 }

@@ -4,7 +4,7 @@ import com.project.baedalsodae.review.entity.Review;
 import java.util.UUID;
 
 public record ReviewDetailResponse(
-        UUID reviewId, UUID orderId, UUID userId, int rating, String comment, Boolean isOwner) {
+        UUID reviewId, UUID orderId, UUID userId, double rating, String comment, Boolean isOwner) {
     public static ReviewDetailResponse of(Review review, Boolean isOwner) {
         return new ReviewDetailResponse(
                 review.getId(),

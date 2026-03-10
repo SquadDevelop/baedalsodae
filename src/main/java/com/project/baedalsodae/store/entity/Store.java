@@ -5,7 +5,10 @@ import com.project.baedalsodae.global.common.entity.BaseAuditEntity;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import jakarta.persistence.*;
 import java.util.UUID;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
@@ -56,6 +59,42 @@ public class Store extends BaseAuditEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "store_status", nullable = false)
     private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
+
+    @Column(name = "order_count", nullable = false)
+    private int orderCount = 0;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
+    public void incrementOrderCount() {
+        this.orderCount++;
+    }
+
+    public void addRating(double newRating) {
+        double totalRating = this.avgRating * this.reviewCount;
+        totalRating += newRating;
+        this.reviewCount += 1;
+        this.avgRating = totalRating / this.reviewCount;
+    }
+
+    public void updateRating(double oldRating, double newRating) {
+        double totalRating = this.avgRating * this.reviewCount;
+        totalRating = totalRating - oldRating + newRating;
+        this.avgRating = totalRating / this.reviewCount;
+    }
+
+    public void deleteRating(double oldRating) {
+        if (this.reviewCount <= 1) {
+            this.avgRating = 0;
+            this.reviewCount = 0;
+            return;
+        }
+        double totalRating = this.avgRating * this.reviewCount;
+        totalRating -= oldRating;
+        this.reviewCount -= 1;
+        this.avgRating = totalRating / this.reviewCount;
+    }
 
     public void updateInfo(
             StoreCategory storeCategory,

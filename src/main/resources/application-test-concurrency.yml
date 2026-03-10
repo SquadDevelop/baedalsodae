@@ -6,7 +6,7 @@ spring:
     password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     defer-datasource-initialization: false
     show-sql: true
     open-in-view: false
@@ -18,26 +18,12 @@ spring:
   sql:
     init:
       mode: never
-
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      chat:
-        options:
-          model: gpt-4o-mini
-    vectorstore:
-      pgvector:
-        index-type: HNSW
-        distance-type: COSINE_DISTANCE
-        dimensions: 1536
-        initialize-schema: true
-
   data:
     redis:
       url: ${SPRING_DATA_REDIS_URL}
       host: ${SPRING_DATA_REDIS_HOST}
       port: ${SPRING_DATA_REDIS_PORT}
-      password: ${SPRING_DATA_REDIS_PASSWORD}
+      password:
       ssl:
         enabled: false
       repositories:
@@ -55,21 +41,3 @@ encryption:
 
 pg:
   url: http://localhost:8089
-
-logging:
-  level:
-    org.springframework.boot.diagnostics: DEBUG
-    org.springframework.boot.web.embedded.tomcat: DEBUG
-    org.apache.catalina: DEBUG
-
-server:
-  port: ${API_SERVER_PORT}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: always

@@ -105,4 +105,15 @@ public class StoreCommandServiceImpl implements StoreCommandService {
             throw new BusinessException(ErrorCode.STORE_FORBIDDEN);
         }
     }
+
+    @Override
+    @Transactional
+    public void incrementOrderCount(UUID storeId) {
+        Store store =
+                storeRepository
+                        .findByIdAndIsDeletedIsFalse(storeId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.STORE_NOT_FOUND));
+
+        store.incrementOrderCount();
+    }
 }
