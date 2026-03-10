@@ -1,0 +1,41 @@
+= BaedalSodae API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+== 개요
+
+BaedalSodae REST API 문서입니다. +
+기본 경로: `/api/v1`
+
+== API 목록
+
+=== 인증
+link:auth.html[인증 (Auth)] — 회원가입, 로그인, 로그아웃, 토큰 갱신
+
+=== 사용자
+link:user.html[사용자 (User)] — 프로필 조회/수정, 회원 탈퇴 +
+link:user-address.html[사용자 주소 (UserAddress)] — 배달 주소 등록/조회/수정/삭제
+
+=== 가게
+link:store-cetagory.html[가게 카테고리 (StoreCategory)] — 카테고리 관리 +
+link:store.html[가게 (Store)] — 가게 목록/상세 조회, 생성/수정/삭제 +
+link:store-hours.html[가게 운영시간 (StoreHours)] — 운영시간 등록/조회/수정/삭제
+
+=== 메뉴
+link:menu-category.html[메뉴 카테고리 (MenuCategory)] — 카테고리 관리 +
+link:menu-item.html[메뉴 아이템 (MenuItem)] — 메뉴 등록/수정/삭제
+
+=== 주문 / 결제 / 리뷰
+허용 지역, 장바구니, 주문, 결제, 리뷰 API는 서버에서 직접 확인하세요.
+
+=== 허용 지역
+link:allowed-region.html[허용 지역 (AllowedRegion)] — 서비스 가능 지역 관리 (관리자)
+
+=== 관리자
+link:admin-user.html[관리자 - 사용자 (Admin User)] — 관리자 계정 관리 +
+link:admin-store.html[관리자 - 가게 (Admin Store)] — 가게 관리자 기능

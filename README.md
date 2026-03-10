@@ -1,171 +1,42 @@
-# 🛵 BaedalSodae — 주문 · 배달 · 리뷰 플랫폼
+# 🛵 BaedalSodae — 음성 메뉴 추천 배달 플랫폼
 
-> 배달의 민족을 모티브로 한 음식 주문, 배달, 리뷰 통합 플랫폼입니다.  
-> Spring Boot 백엔드와 React 프론트엔드로 구성된 풀스택 프로젝트입니다.
+> **음성 가게 추천**을 지원하는 배달 서비스 플랫폼입니다.
+> 전국 지역을 대상으로 하며, 현재는 **광화문 내 지역**에서만 서비스를 지원합니다.
+> Spring Boot 백엔드 프로젝트입니다.
 
 ---
 
 ## 📑 목차
 
+- [팀원 역할분담](#-팀원-역할분담)
+- [서비스 구성 및 실행 방법](#-실행-방법)
+- [프로젝트 목적](#-프로젝트-목적)
+- [ERD](#-erd)
 - [기술 스택](#-기술-스택)
 - [아키텍처](#-아키텍처)
-- [주요 기능](#-주요-기능)
-- [데이터 모델](#-데이터-모델)
+- [기술적 의사결정](#-기술적-의사결정)
 - [API 엔드포인트](#-api-엔드포인트)
-- [실행 방법](#-실행-방법)
 - [테스트](#-테스트)
 - [기술 스택 선정 배경](#-기술-스택-선정-배경)
 
 ---
 
-## 🛠 기술 스택
+## 👥 팀원 역할분담
 
-| 구분 | 기술 |
-|---|---|
-| **Backend** | Spring Boot 3.5 · Java 17 · Spring Data JPA · Spring Security |
-| **Frontend** | React 19 · TypeScript · Vite |
-| **Database** | PostgreSQL 16 |
-| **Cache / Session** | Redis 7 |
-| **Infrastructure** | Docker · Docker Compose |
-| **Testing** | JUnit 5 · Mockito |
-| **빌드 도구** | Gradle |
-
----
-
-## 🏗 아키텍처
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Docker Compose                      │
-│                                                         │
-│  ┌───────────┐    ┌───────────┐    ┌──────────────────┐ │
-│  │  React    │───▶│  Spring   │───▶│   PostgreSQL 16  │ │
-│  │ Frontend  │    │   Boot    │    │  (주문/리뷰 데이터) │ │
-│  │ :5173     │    │ Backend   │    └──────────────────┘ │
-│  └───────────┘    │  :8080    │                         │
-│                   │           │───▶┌──────────────────┐ │
-│                   └───────────┘    │    Redis 7       │ │
-│                                    │  (세션 / 캐시)    │ │
-│                                    └──────────────────┘ │
-└─────────────────────────────────────────────────────────┘
-```
-
-### 디렉터리 구조
-
-```
-baedalsodae/
-├── src/
-│   ├── main/
-│   │   ├── java/com/project/baedalsodae/
-│   │   │   ├── domain/          # 도메인 엔티티 (User, Store, Order, Review …)
-│   │   │   ├── repository/      # Spring Data JPA 리포지토리
-│   │   │   ├── service/         # 비즈니스 로직
-│   │   │   ├── controller/      # REST 컨트롤러
-│   │   │   ├── dto/             # 요청/응답 DTO
-│   │   │   ├── security/        # JWT 인증/인가
-│   │   │   └── config/          # Redis, JPA 등 설정
-│   │   └── resources/
-│   │       └── application.yml
-│   └── test/                    # JUnit 5 + Mockito 테스트
-├── frontend/                    # React 프론트엔드
-├── docker-compose.yml
-├── Dockerfile
-└── build.gradle
-```
-
----
-
-## ✨ 주요 기능
-
-### 👤 사용자 (User)
-- 회원가입 · 로그인 · 로그아웃 (JWT + Redis 세션)
-- 프로필 조회 및 수정
-
-### 🏪 가게 (Store)
-- 가게 목록 조회 (카테고리 · 지역 필터)
-- 가게 상세 정보 조회
-- 메뉴 목록 조회
-
-### 🛒 주문 (Order)
-- 장바구니 담기 → 주문 생성
-- 주문 상태 조회 (`PENDING` → `ACCEPTED` → `DELIVERING` → `DELIVERED`)
-- 주문 내역 조회
-
-### 🚴 배달 (Delivery)
-- 배달 기사 배정 및 상태 업데이트
-- 배달 현황 실시간 조회
-
-### ⭐ 리뷰 (Review)
-- 배달 완료 주문에 대한 리뷰 작성 (별점 + 텍스트)
-- 리뷰 조회 · 수정 · 삭제
-- 가게별 평균 별점 집계
-
----
-
-## 🗄 데이터 모델
-
-```
-User ──< Order ──< OrderItem >── Menu >── Store
-                                           │
-                              Category ───┘
-Order ──< Review
-Order ──< Delivery
-```
-
-| 엔티티 | 주요 필드 |
-|---|---|
-| `User` | id, email, password, name, phone, address, role |
-| `Store` | id, name, category, address, minOrderAmount, deliveryFee |
-| `Menu` | id, store, name, price, description, imageUrl |
-| `Order` | id, user, store, status, totalPrice, deliveredAt |
-| `OrderItem` | id, order, menu, quantity, price |
-| `Delivery` | id, order, rider, status, estimatedTime |
-| `Review` | id, order, user, store, rating, content, createdAt |
-
----
-
-## 📡 API 엔드포인트
-
-### Auth
-| Method | URL | 설명 |
-|---|---|---|
-| `POST` | `/api/v1/auth/signup` | 회원가입 |
-| `POST` | `/api/v1/auth/login` | 로그인 (JWT 발급) |
-| `POST` | `/api/v1/auth/logout` | 로그아웃 (Redis 토큰 무효화) |
-| `POST` | `/api/v1/auth/refresh` | 토큰 갱신 |
-
-### Users
-| Method | URL | 설명 |
-|---|---|---|
-| `GET` | `/api/v1/users/me` | 내 프로필 조회 |
-| `PUT` | `/api/v1/users/me` | 내 프로필 수정 |
-
-### Stores
-| Method | URL | 설명 |
-|---|---|---|
-| `GET` | `/api/v1/stores` | 가게 목록 (카테고리/지역 필터) |
-| `GET` | `/api/v1/stores/{id}` | 가게 상세 조회 |
-| `GET` | `/api/v1/stores/{id}/menus` | 가게 메뉴 조회 |
-
-### Orders
-| Method | URL | 설명 |
-|---|---|---|
-| `POST` | `/api/v1/orders` | 주문 생성 |
-| `GET` | `/api/v1/orders` | 내 주문 목록 |
-| `GET` | `/api/v1/orders/{id}` | 주문 상세 조회 |
-| `PATCH` | `/api/v1/orders/{id}/status` | 주문 상태 변경 (가게/관리자) |
-
-### Reviews
-| Method | URL | 설명 |
-|---|---|---|
-| `POST` | `/api/v1/orders/{orderId}/reviews` | 리뷰 작성 |
-| `GET` | `/api/v1/stores/{storeId}/reviews` | 가게 리뷰 목록 |
-| `PUT` | `/api/v1/reviews/{id}` | 리뷰 수정 |
-| `DELETE` | `/api/v1/reviews/{id}` | 리뷰 삭제 |
+| 팀원      | 담당 도메인                       |
+|---------|------------------------------|
+| **신혜원** | 가게, 가게 카테고리, 지도 API 도입       |
+| **이현빈** | 로그인 및 JWT 인증, 회원, 회원 지역, 관리자 |
+| **정재빈** | 주문, 장바구니, 서버 구축 및 배포         |
+| **하지혜** | 메뉴, 태그, 가게 운영시간, 운영 허용 지역    |
+| **한병두** | 결제, 리뷰, 음성 추천 AI             |
 
 ---
 
 ## 🚀 실행 방법
+
+<details>
+<summary>펼쳐보기</summary>
 
 ### 방법 1: Docker Compose (권장)
 
@@ -211,19 +82,17 @@ docker compose up -d
 
 # 로그 확인
 docker compose logs -f backend
-docker compose logs -f frontend
 docker compose logs -f db
 docker compose logs -f redis
 ```
 
 #### 4. 접속 URL
 
-| 서비스 | URL |
-|---|---|
-| 프론트엔드 | http://localhost:5173 |
-| 백엔드 API | http://localhost:8080/api/v1 |
-| PostgreSQL | localhost:5432 |
-| Redis | localhost:6379 |
+| 서비스        | URL                          |
+|------------|------------------------------|
+| 백엔드 API    | http://localhost:8080/api/v1 |
+| PostgreSQL | localhost:5432               |
+| Redis      | localhost:6379               |
 
 #### 5. 서비스 종료
 
@@ -240,15 +109,21 @@ docker compose down -v
 ### 방법 2: 로컬 직접 실행
 
 #### 사전 요구사항
+
 - Java 17+
-- Node.js 20+
 - PostgreSQL 16
 - Redis 7
 
-#### 백엔드
+#### 실행
 
 ```bash
-# 환경 변수 설정 후 실행(인텔레제이 환경 변수 사용도 가능)
+# 1. 환경 변수 설정
+cp .env.example .env
+
+# 2. Docker로 PostgreSQL · Redis 실행
+docker-compose up -d
+
+# 3. 애플리케이션 실행 (IntelliJ 환경 변수 설정 후 실행 또는 아래 명령어)
 export POSTGRES_DB=baedalsodae
 export POSTGRES_DB_URL=jdbc:postgresql://localhost:5432/baedalsodae
 export POSTGRES_USER=baedal_user
@@ -259,66 +134,332 @@ export JWT_SECRET=your_jwt_secret
 ./gradlew bootRun
 ```
 
-#### 프론트엔드
+</details>
 
-```bash
-cd frontend
-npm install
-npm run dev
+---
+
+## 🛠 기술 스택
+
+| 구분                  | 기술                                                            |
+|---------------------|---------------------------------------------------------------|
+| **Backend**         | Spring Boot 3.5 · Java 17 · Spring Data JPA · Spring Security |
+| **Database**        | PostgreSQL 16                                                 |
+| **Cache / Session** | Redis 7                                                       |
+| **Query**           | QueryDSL 5.0 (커서 기반 페이지네이션)                                   |
+| **AI**              | Spring AI (OpenAI · pgvector)                                 |
+| **Infrastructure**  | Docker · Docker Compose                                       |
+| **Logging**         | Logback · logstash-logback-encoder (JSON)                     |
+| **API 문서**          | Spring REST Docs                                              |
+| **Testing**         | JUnit 5 · Mockito                                             |
+| **Build Tool**      | Gradle                                                        |
+
+---
+
+## 🎯 프로젝트 목적
+
+BaedalSodae는 **음성 주문**을 핵심 기능으로 하는 배달 서비스 플랫폼입니다.
+
+- **음성 주문**: Spring AI(OpenAI)를 활용해 사용자의 음성 입력을 분석하고 적합한 메뉴를 추천
+- **서비스 지역**: 전국 시/도 · 시/군/구 기반으로 설계되었으나, 현재는 **광화문 내 지역**에서만 서비스 운영 중
+
+
+---
+## 🏗 아키텍처
+
+![Architecture](src/main/resources/static/images/architecture.png)
+
+> AWS VPC 내 Public/Private Subnet 분리 구성.
+> HAProxy(80 port)가 트래픽을 2개의 Spring Boot 인스턴스(8080)로 분산하며,
+> PostgreSQL RDS와 ElastiCache Redis는 Private Subnet에 격리됩니다.
+
+### 디렉터리 구조
+
+<details>
+<summary>펼쳐보기</summary>
+
+```
+baedalsodae/
+├── src/
+│   ├── main/
+│   │   ├── java/com/project/baedalsodae/
+│   │   │   ├── allowedRegion/   # 허용 지역 관리
+│   │   │   ├── auth/            # 인증/인가 (JWT)
+│   │   │   ├── cart/            # 장바구니
+│   │   │   ├── event/           # 도메인 이벤트 발행/구독
+│   │   │   ├── global/          # 공통 응답, 예외, 유틸
+│   │   │   ├── menu/            # 메뉴 카테고리 · 메뉴 아이템
+│   │   │   ├── order/           # 주문
+│   │   │   ├── payment/         # 결제
+│   │   │   ├── recommendation/  # AI 추천 (Spring AI)
+│   │   │   ├── review/          # 리뷰
+│   │   │   ├── store/           # 가게 · 가게 카테고리 · 운영시간
+│   │   │   ├── tag/             # 태그
+│   │   │   └── user/            # 사용자 · 주소
+│   │   └── resources/
+│   │       ├── application.yml
+│   │       ├── application-local.yml
+│   │       ├── application-dev.yml
+│   │       ├── application-prod.yml
+│   │       └── logback-spring.xml
+│   ├── test/
+│   │   └── java/com/project/baedalsodae/
+│   │       ├── {domain}/
+│   │       │   ├── controller/  # @WebMvcTest + Spring REST Docs
+│   │       │   ├── service/     # Mockito 단위 테스트
+│   │       │   └── fixture/     # 테스트 픽스처
+│   │       ├── event/           # EventTest · EventPollerTest
+│   │       ├── payment/         # PaymentListenerTest · PaymentEventPublisherTest
+│   │       ├── cart/            # CartQueryDslSmokeTest
+│   │       └── global/config/   # TestSecurityConfig
+│   └── docs/asciidoc/           # REST Docs adoc 소스
+│       ├── allowed-region.adoc
+│       ├── auth.adoc
+│       ├── admin-store.adoc
+│       ├── admin-user.adoc
+│       ├── menu-category.adoc
+│       ├── menu-item.adoc
+│       ├── store.adoc
+│       ├── store-hours.adoc
+│       ├── store-category.adoc
+│       ├── user.adoc
+│       └── user-address.adoc
+├── docs/
+│   └── API.md                   # 전체 API 엔드포인트 목록
+├── docker-compose.yml
+├── Dockerfile
+└── build.gradle
+```
+
+</details>
+
+---
+## 🗄 ERD
+
+```mermaid
+erDiagram
+    p_user {
+        UUID id PK
+        string username UK
+        string email UK
+        string nickname UK
+        string phone
+        string password
+        string name
+        string role
+        UUID user_main_address_id
+    }
+    p_user_address {
+        UUID id PK
+        UUID user_id FK
+        string sido_code
+        string sido_name
+        string sigungu_code
+        string sigungu_name
+        string dong_code
+        string dong_name
+        string road_address
+        string detail_address
+        string description
+    }
+    p_store_category {
+        UUID id PK
+        string name
+        string description
+    }
+    p_store {
+        UUID id PK
+        UUID user_id
+        UUID store_category_id FK
+        string name
+        string business_number UK
+        string phone
+        string sido_code
+        string sigungu_code
+        string road_address
+        string detail_address
+        string description
+        double avg_rating
+        int review_count
+        string store_status
+    }
+    p_store_hours {
+        UUID id PK
+        UUID store_id FK
+        string day_of_week
+        time open_time
+        time close_time
+        time break_start
+        time break_end
+        boolean is_open
+    }
+    p_menu_category {
+        UUID id PK
+        UUID store_id FK
+        string name
+        int order_no
+    }
+    p_menu_item {
+        UUID id PK
+        UUID menu_category_id FK
+        string name
+        decimal price
+        string description
+        boolean is_popular
+        int order_no
+        string menu_status
+    }
+    p_tag {
+        UUID id PK
+        string name UK
+    }
+    p_tag_mapping {
+        UUID id PK
+        UUID tag_id FK
+        UUID menu_item_id FK
+        int order_no
+    }
+    p_cart {
+        UUID id PK
+        UUID user_id UK
+        UUID store_id FK
+    }
+    p_cart_item {
+        UUID id PK
+        UUID cart_id FK
+        UUID menu_item_id FK
+        int quantity
+    }
+    p_order {
+        UUID id PK
+        string order_no UK
+        UUID user_id
+        string user_nickname_snapshot
+        string user_phone_snapshot
+        UUID store_id
+        string store_name_snapshot
+        UUID address_id
+        string delivery_address_snapshot
+        string status
+        string store_request_note
+        string delivery_request_note
+        decimal total_amount
+        decimal delivery_fee
+        decimal discount_amount
+        decimal final_amount
+    }
+    p_order_item {
+        UUID id PK
+        UUID order_id FK
+        UUID menu_item_id
+        string name_snapshot
+        decimal price_snapshot
+        int quantity
+    }
+    p_order_status_history {
+        UUID id PK
+        UUID order_id
+        string from_status
+        string to_status
+        string actor_type
+        UUID actor_id
+        string reason
+    }
+    p_payment {
+        UUID id PK
+        UUID order_id
+        UUID user_id
+        decimal amount
+        string payment_method
+        string status
+        datetime paid_at
+        string pg_transaction_id
+    }
+    p_review {
+        UUID id PK
+        UUID order_id
+        UUID user_id
+        int rating
+        string content
+        boolean is_hidden
+    }
+    p_allowed_region {
+        UUID id PK
+        string sido_code
+        string sido_name
+        string sigungu_code UK
+        string sigungu_name
+        boolean is_active
+    }
+
+    p_user ||--o{ p_user_address : "has"
+    p_user ||--o| p_cart : "has"
+    p_store_category ||--o{ p_store : "categorizes"
+    p_store ||--o{ p_store_hours : "has"
+    p_store ||--o{ p_menu_category : "has"
+    p_store ||--o{ p_cart : "in"
+    p_menu_category ||--o{ p_menu_item : "has"
+    p_menu_item ||--o{ p_tag_mapping : "has"
+    p_menu_item ||--o{ p_cart_item : "in"
+    p_tag ||--o{ p_tag_mapping : "mapped"
+    p_cart ||--o{ p_cart_item : "has"
+    p_order ||--o{ p_order_item : "has"
+    p_order ||--o{ p_order_status_history : "tracks"
+    p_order ||--o| p_payment : "has"
+    p_order ||--o| p_review : "has"
 ```
 
 ---
 
-## 로컬 환경 세팅
+## 🔍 기술적 의사결정
 
-> 백엔드 단독 로컬 실행 시 사용하는 간단한 세팅 가이드입니다.
+> 상세 내용: [docs/decisions.md](docs/decisions.md)
 
-1. `.env.example`을 복사해서 `.env` 파일 생성 후 값 입력
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Docker로 PostgreSQL 실행
-   ```bash
-   docker-compose up -d
-   ```
-
-3. 애플리케이션 실행
-  - 인텔레제이 환경 변수 설정 후 실행
+| 주제 | 요약 |
+|---|---|
+| **커서 기반 페이지네이션** | offset 방식의 데이터 누락 문제를 해결하기 위해 cursor 방식 도입. QueryDSL로 다중 정렬 전략 구현 |
+| **RESTful API 설계** | 와이어프레임 기반 팀 얼라인 후 URI 명명, HTTP 메서드, 상태 코드 컨벤션 팀 전체 합의 |
+| **와이어프레임 기반 팀 얼라인** | 개발 전 기능 범위·화면 흐름을 시각화하여 요구사항 오해 방지 및 API 설계 기준 공유 |
+| **커서 기반 정렬 보장** | 복합 정렬 기준에서 동일 값 발생 시 `id` 타이브레이킹 + `crossBoundary` OR 조건으로 페이지 경계 정확성 보장 |
+| **refreshToken + Redis 블랙리스트** | 무상태성 유지를 위해 accessToken/refreshToken 분리, 로그아웃된 토큰을 Redis TTL로 블랙리스트 관리 |
+| **아웃박스 패턴 + 이벤트 폴링**  | 트랜잭션 안정성을 위해 `@TransactionalEventListener` 대신 아웃박스 패턴 + 스케줄러 폴링 선택 |
+| **비관적 락 도입** | 메뉴 순서 변경 시 다중 row 동시 수정 → 낙관적 락 재시도 복잡도 문제로 비관적 락 선택 |
+| **WireMock 기반 가상 PG사 구현** | 실제 PG사 계약 없이 WireMock을 Docker Compose로 띄워 결제 승인·취소 전 흐름을 실제와 동일하게 검증 |
+| **pgvector + STT 기반 메뉴 추천** | 음성 입력(STT) → 텍스트 임베딩 → pgvector 유사도 검색으로 자연어 기반 메뉴 추천 구현 |
 
 ---
-## 🧹 코드 포맷팅 (Spotless)
 
-이 프로젝트는 일관된 Java 코드 스타일을 유지하기 위해 **Spotless(Google Java Format)** 를 사용합니다.
-`main`, `dev` 브랜치로 PR(Pull Request)을 올릴 때 GitHub Actions CI를 통해 자동으로 코드 포맷을 검사하며, 포맷이 어긋난 코드의 머지를 차단합니다.
+## 📡 API 엔드포인트
 
-### 사용 방법
+> 기본 경로: `/api/v1` · 전체 목록: [docs/API.md](docs/API.md) · REST Docs: [GitHub Pages](https://SquadDevelop.github.io/baedalsodae/)
 
-로컬에서 코드를 수정한 후 커밋 및 푸시하기 전에, 반드시 아래 명령어를 실행하여 코드를 자동 정렬해야 합니다.
-
-```bash
-# 소스코드 포맷 자동 정렬 적용 (커밋 전 필수 실행 ✅)
-./gradlew spotlessApply
-
-# 현재 코드의 포맷 준수 여부 검사 (CI 검증 명령어)
-./gradlew spotlessCheck
-```
+| 그룹               | 주요 URL 패턴                               | 설명           |
+|------------------|------------------------------------------|--------------|
+| Auth             | `/auth/**`                               | 회원가입, 로그인, 토큰 |
+| Users            | `/users/me`                              | 프로필 조회/수정    |
+| User Address     | `/user-addresses/**`                     | 배달 주소 관리     |
+| Store Categories | `/store-categories/**`                   | 가게 카테고리 관리   |
+| Stores           | `/stores/**`                             | 가게 조회/관리     |
+| Store Hours      | `/stores/{id}/hours`                     | 운영시간 관리      |
+| Menu             | `/menu-categories/**`, `/menu-items/**`  | 메뉴 관리        |
+| Cart             | `/carts/**`                              | 장바구니         |
+| Orders           | `/orders/**`                             | 주문 생성/상태 관리  |
+| Reviews          | `/reviews/**`                            | 리뷰 작성/조회     |
+| Payments         | `/payments/**`                           | 결제 조회        |
+| Allowed Regions  | `/allowed-regions/**`                    | 허용 지역 관리     |
+| Tags             | `/tags`                                  | 태그 조회        |
+| Recommendations  | `/recommendations/**`                    | AI 음성 추천     |
+| Admin            | `/admins/**`                             | 관리자 전용       |
 
 ---
 
 ## 🧪 테스트
-
-### 백엔드 테스트 (JUnit 5 + Mockito)
 
 ```bash
 # 전체 테스트 실행
 ./gradlew test
 
 # 특정 클래스만 실행
-./gradlew test --tests "com.project.baedalsodae.service.ReviewServiceTest"
-
-# Docker 환경에서 실행
-docker compose exec backend ./gradlew test
+./gradlew test --tests "com.project.baedalsodae.order.service.OrderServiceTest"
 
 # 테스트 리포트 확인
 open build/reports/tests/test/index.html
@@ -326,140 +467,149 @@ open build/reports/tests/test/index.html
 
 ### 테스트 구조
 
+<details>
+<summary>펼쳐보기</summary>
+
 ```
+http/                                                          ← IntelliJ HTTP Client 수동 테스트
+├── cart.http
+├── menu.http
+├── order.http
+├── store.http
+├── store-hours.http
+└── (기타 도메인별 .http 파일)
+
 src/test/
 └── java/com/project/baedalsodae/
-    ├── service/              # Service 단위 테스트 (Mockito)
-    │   ├── UserServiceTest.java
-    │   ├── OrderServiceTest.java
-    │   └── ReviewServiceTest.java
-    ├── controller/           # Controller 슬라이스 테스트 (@WebMvcTest)
-    │   ├── AuthControllerTest.java
-    │   ├── OrderControllerTest.java
-    │   └── ReviewControllerTest.java
-    └── repository/           # Repository 통합 테스트 (@DataJpaTest)
-        ├── OrderRepositoryTest.java
-        └── ReviewRepositoryTest.java
+    ├── allowedRegion/
+    │   ├── controller/   AllowedRegionControllerTest            ← REST Docs
+    │   ├── service/      AllowedRegionServiceImplTest
+    │   └── fixture/      AllowedRegionFixture
+    ├── auth/
+    │   ├── controller/   AuthControllerTest                     ← REST Docs
+    │   ├── service/      AuthServiceTest
+    │   └── fixture/      AuthFixture
+    ├── cart/
+    │   ├── controller/   CartControllerTest                     ← REST Docs
+    │   ├── repository/   CartQueryDslSmokeTest                  ← QueryDSL 통합
+    │   └── service/      CartServiceTest
+    ├── event/
+    │   ├── entity/       EventTest
+    │   └── poller/       EventPollerTest
+    ├── menu/
+    │   ├── controller/   MenuCategoryControllerTest             ← REST Docs
+    │   │                 MenuItemControllerTest                 ← REST Docs
+    │   ├── service/      MenuCategoryServiceImplTest
+    │   │                 MenuItemServiceImplTest
+    │   └── fixture/      MenuCategoryMockFixture · MenuItemMockFixture · ...
+    ├── order/
+    │   ├── controller/   OrderControllerTest                    ← REST Docs
+    │   │                 AdminOrderControllerTest               ← REST Docs
+    │   └── service/      OrderServiceTest
+    ├── payment/
+    │   ├── listener/     PaymentListenerTest
+    │   └── publisher/    PaymentEventPublisherTest
+    ├── review/
+    │   ├── controller/   ReviewControllerTest                   ← REST Docs
+    │   └── fixture/      ReviewTestConstants
+    ├── store/
+    │   ├── controller/   StoreControllerTest                    ← REST Docs
+    │   │                 AdminStoreControllerTest               ← REST Docs
+    │   │                 StoreCategoryControllerTest            ← REST Docs
+    │   │                 StoreHourControllerTest                ← REST Docs
+    │   ├── service/      StoreCommandServiceTest · StoreQueryServiceTest
+    │   │                 StoreCategoryServiceTest · StoreHoursServiceImplTest
+    │   ├── dto/          CreateStoreCategoryRequestTest
+    │   └── fixture/      StoreHoursMockFixture · StoreHoursRequestFixture · ...
+    ├── tag/
+    │   └── service/      TagServiceImplTest · TagMappingServiceImplTest
+    ├── user/
+    │   ├── controller/   UserControllerTest                     ← REST Docs
+    │   │                 AdminUserControllerTest                ← REST Docs
+    │   │                 UserAddressControllerTest              ← REST Docs
+    │   ├── service/      UserServiceTest · UserAddressServiceTest
+    │   └── fixture/      UserFixture
+    └── global/config/    TestSecurityConfig
 ```
 
-### 테스트 커버리지
+</details>
 
-| 레이어 | 전략 | 도구 |
-|---|---|---|
-| Service | Mockito로 Repository 목킹, 비즈니스 로직 검증 | JUnit 5 + Mockito |
-| Controller | `@WebMvcTest` + `MockMvc`로 HTTP 슬라이스 테스트 | JUnit 5 + MockMvc |
-| Repository | `@DataJpaTest`로 실제 DB 쿼리 검증 | JUnit 5 + H2 |
+### 테스트 전략
 
-### Service 테스트 예시
+| 레이어        | 전략                                                      | 도구                                   |
+|------------|---------------------------------------------------------|--------------------------------------|
+| Service    | Mockito로 Repository 목킹, 비즈니스 로직 검증                      | JUnit 5 + Mockito                    |
+| Controller | `@WebMvcTest` + `MockMvc`로 HTTP 슬라이스 테스트 + API 문서 자동 생성 | JUnit 5 + MockMvc + Spring REST Docs |
+| 수동 E2E     | IntelliJ HTTP Client로 실제 서버 대상 API 흐름 검증                | `.http` 파일                           |
 
-```java
-@ExtendWith(MockitoExtension.class)
-class ReviewServiceTest {
+### IntelliJ HTTP Client 도입 이유
 
-    @Mock
-    private ReviewRepository reviewRepository;
-    @Mock
-    private OrderRepository orderRepository;
+Postman 같은 별도 툴 없이 IDE 안에서 바로 API를 호출하고, `.http` 파일을 Git으로 팀 전체가 공유할 수 있어 도입했습니다.
 
-    @InjectMocks
-    private ReviewService reviewService;
-
-    @Test
-    @DisplayName("배달 완료된 주문에 리뷰를 작성할 수 있다")
-    void createReview_Success() {
-        // given
-        Order order = Order.builder()
-            .status(OrderStatus.DELIVERED)
-            .build();
-        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
-
-        ReviewCreateRequest request = new ReviewCreateRequest(5, "맛있어요!");
-
-        // when
-        reviewService.createReview(1L, request, mockUser());
-
-        // then
-        verify(reviewRepository, times(1)).save(any(Review.class));
-    }
-
-    @Test
-    @DisplayName("배달 완료 전 주문에는 리뷰를 작성할 수 없다")
-    void createReview_Fail_NotDelivered() {
-        // given
-        Order order = Order.builder()
-            .status(OrderStatus.DELIVERING)
-            .build();
-        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
-
-        // when & then
-        assertThatThrownBy(() -> reviewService.createReview(1L, new ReviewCreateRequest(5, "맛있어요!"), mockUser()))
-            .isInstanceOf(ReviewNotAllowedException.class);
-    }
-}
-```
-
-### Controller 테스트 예시
-
-```java
-@WebMvcTest(ReviewController.class)
-class ReviewControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private ReviewService reviewService;
-
-    @Test
-    @DisplayName("POST /api/v1/orders/{orderId}/reviews - 리뷰 작성 성공")
-    void createReview_Returns201() throws Exception {
-        mockMvc.perform(post("/api/v1/orders/1/reviews")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {"rating": 5, "content": "맛있어요!"}
-                    """))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.rating").value(5));
-    }
-}
-```
+- **IDE 통합**: 별도 툴 설치 없이 IntelliJ에서 바로 실행
+- **형상관리**: `.http` 파일을 Git에 커밋하여 팀원 모두 동일한 요청 공유
+- **연속 호출**: JavaScript로 이전 응답값을 다음 요청에 활용 — 로그인 → 주문 생성 같은 2~3단계 흐름을 한 번에 실행 가능
+- **환경 분리**: `http-client.env.json`으로 dev/prod별 URL·토큰 등 환경변수 분리 관리
 
 ---
 
 ## 💡 기술 스택 선정 배경
 
 ### Spring Boot 3.5 + Java 17
+
 - **생산성**: Spring Boot Auto-configuration으로 빠른 개발
 - **안정성**: 대규모 서비스에서 검증된 프레임워크
 - **생태계**: Spring Security, Spring Data JPA 등 풍부한 라이브러리
 - **Java 17**: Record, Sealed Class 등 최신 문법 활용, LTS 버전으로 안정성 확보
 
 ### PostgreSQL 16
+
 - **신뢰성**: ACID 완전 지원, 복잡한 트랜잭션 (주문 처리) 안전하게 처리
-- **JSON 지원**: 영수증 정보 등 반정형 데이터를 JSONB로 저장 가능
+- **JSON 지원**: 반정형 데이터를 JSONB로 저장 가능
 - **성능**: 고급 인덱싱 (부분 인덱스, 복합 인덱스)으로 대용량 리뷰 쿼리 최적화
-- MySQL 대비 **표준 SQL 준수도** 우수
 
 ### Redis 7
+
 - **세션 관리**: JWT Refresh Token 중앙 저장 및 블랙리스트 관리
 - **캐싱**: 자주 조회되는 가게 목록, 메뉴 정보 캐싱으로 DB 부하 감소
-- **성능**: 인메모리 저장소로 밀리초 단위 응답
 - **TTL 지원**: 토큰 만료를 자동으로 처리
 
+### QueryDSL 5.0
+
+- **타입 안전**: 컴파일 타임에 쿼리 오류 감지
+- **동적 쿼리**: 커서 기반 페이지네이션, 다중 정렬 전략을 메서드 단위로 분리해서 관리
+
+### Spring AI + pgvector
+
+- **AI 추천**: OpenAI 임베딩 기반 메뉴 유사도 검색
+- **벡터 저장**: pgvector로 PostgreSQL에 임베딩 벡터 저장 및 검색
+
 ### Docker + Docker Compose
+
 - **환경 일관성**: 개발/스테이징/프로덕션 환경 동일하게 유지
 - **격리성**: 각 서비스(백엔드, DB, Redis)가 독립된 컨테이너에서 실행
 - **간편한 실행**: `docker compose up` 한 줄로 전체 스택 기동
 
-### JUnit 5 + Mockito
+### JUnit 5 + Mockito + Spring REST Docs
+
 - **JUnit 5**: `@ExtendWith`, `@DisplayName`, 파라미터화 테스트 등 강력한 테스트 표현력
 - **Mockito**: 외부 의존성을 목킹하여 순수 비즈니스 로직만 단위 테스트
-- **레이어별 전략**: `@DataJpaTest`, `@WebMvcTest`, `@SpringBootTest` 구분으로 빠른 피드백
+- **Spring REST Docs**: 테스트 코드로 API 문서를 자동 생성, 코드와 문서의 일치 보장
 
-### React 19 + TypeScript + Vite
-- **React**: 컴포넌트 기반 UI, 빠른 생태계와 풍부한 라이브러리
-- **TypeScript**: 컴파일 타임 타입 체크로 런타임 오류 사전 방지
-- **Vite**: 빠른 HMR(Hot Module Replacement)로 개발 생산성 향상
+---
+
+## 🧹 코드 포맷팅 (Spotless)
+
+이 프로젝트는 일관된 Java 코드 스타일을 유지하기 위해 **Spotless(Google Java Format)** 를 사용합니다.
+`main`, `dev` 브랜치로 PR을 올릴 때 GitHub Actions CI를 통해 자동으로 코드 포맷을 검사하며, 포맷이 어긋난 코드의 머지를 차단합니다.
+
+```bash
+# 포맷 자동 정렬 적용 (커밋 전 필수)
+./gradlew spotlessApply
+
+# 포맷 준수 여부 검사 (CI 검증 명령어)
+./gradlew spotlessCheck
+```
 
 ---
 
@@ -468,7 +618,6 @@ class ReviewControllerTest {
 - `.env` 파일은 절대 Git에 커밋하지 마세요 (`.gitignore`에 포함됨)
 - JWT Secret Key는 최소 32자 이상으로 설정하세요
 - 프로덕션 배포 시 `SPRING_PROFILES_ACTIVE=prod` 설정 필요
-- Node.js 20+ 권장
 
 ---
 
