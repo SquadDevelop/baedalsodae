@@ -349,8 +349,6 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
-
         return OrderActionStatusResponse.from(order);
     }
 
@@ -378,8 +376,6 @@ public class OrderServiceImpl implements OrderService {
         order.startDelivery();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
-
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -460,7 +456,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -481,6 +477,8 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(
                 userId, fromStatus, order, reason);
+
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
 
         return OrderActionStatusResponse.from(order);
     }
