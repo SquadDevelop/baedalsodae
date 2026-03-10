@@ -513,28 +513,6 @@ public class OrderServiceImpl implements OrderService {
         return order.getStatus() == OrderStatus.DELIVERED;
     }
 
-    private OrderActionStatusResponse cancelRequestByOwner(
-            UUID userId, UUID storeId, Order order, String reason) {
-        if (!order.getStoreId().equals(storeId)) {
-            throw new BusinessException(ErrorCode.ORDER_STORE_FORBIDDEN);
-        }
-
-        if (!order.canCancelRequestByOwner()) {
-            throw new BusinessException(ErrorCode.ORDER_INVALID_STATUS);
-        }
-
-        final OrderStatus fromStatus = order.getStatus();
-
-        order.cancelRequested();
-
-        orderStatusHistoryService.createForOwnerOrderStatusHistory(
-                userId, fromStatus, order, reason);
-
-        orderEventPublisher.publishOrderCancelRequested(order);
-
-        return OrderActionStatusResponse.from(order);
-    }
-
     @Override
     public Order findById(final UUID orderId) {
         return orderRepository
