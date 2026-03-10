@@ -25,6 +25,7 @@ import com.project.baedalsodae.menu.entity.enums.MenuStatus;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.impl.MenuItemServiceImpl;
+import com.project.baedalsodae.recommendation.service.MenuEmbeddingService;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import java.math.BigDecimal;
@@ -45,6 +46,7 @@ class MenuItemServiceImplTest {
     @Mock private MenuItemRepository menuItemRepository;
     @Mock private MenuCategoryRepository menuCategoryRepository;
     @Mock private TagMappingService tagMappingService;
+    @Mock private MenuEmbeddingService menuEmbeddingService;
 
     @InjectMocks private MenuItemServiceImpl menuItemService;
 
