@@ -1788,7 +1788,6 @@ public class OrderServiceTest {
         then(orderEventPublisher)
                 .should()
                 .publishOrderEvent(any(Order.class), eq(EventType.ORDER_DELIVERED));
-
     }
 
     @DisplayName("주문 취소 요청 실패 - 존재하지 않는 주문")
@@ -1967,7 +1966,6 @@ public class OrderServiceTest {
         then(orderEventPublisher)
                 .should()
                 .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
-
     }
 
     @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 고객 취소")
@@ -1993,7 +1991,6 @@ public class OrderServiceTest {
         then(orderEventPublisher)
                 .should()
                 .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
-
     }
 
     @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 사장 취소")
@@ -2021,7 +2018,6 @@ public class OrderServiceTest {
         then(orderEventPublisher)
                 .should()
                 .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
-
     }
 
     @DisplayName("주문 취소 실패 - 존재하지 않는 주문")
