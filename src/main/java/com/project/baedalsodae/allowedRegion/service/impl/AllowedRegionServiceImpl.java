@@ -11,6 +11,7 @@ import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class AllowedRegionServiceImpl implements AllowedRegionService {
                 .orElse(false);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER')")
     @Override
     @Transactional
     public AllowedRegionResponseDto createAllowedRegion(AllowedRegionRequestDto request) {
@@ -54,6 +56,7 @@ public class AllowedRegionServiceImpl implements AllowedRegionService {
         return AllowedRegionResponseDto.fromEntity(allowedRegion);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER')")
     @Override
     @Transactional
     public AllowedRegionResponseDto toggleAllowedRegionActivation(
@@ -68,6 +71,7 @@ public class AllowedRegionServiceImpl implements AllowedRegionService {
         return AllowedRegionResponseDto.fromEntity(allowedRegion);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER')")
     @Override
     @Transactional(readOnly = true)
     public AllowedRegionPageResponse getAllowedRegions(AllowedRegionCursorRequest cursorRequest) {

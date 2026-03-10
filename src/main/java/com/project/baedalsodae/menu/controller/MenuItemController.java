@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Positive;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,6 @@ public class MenuItemController {
 
     private final MenuItemService menuItemService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PutMapping("/{menuItemId}")
     public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItem(
             @PathVariable UUID menuItemId,
@@ -35,7 +33,6 @@ public class MenuItemController {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_UPDATED, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PatchMapping("/{menuItemId}")
     public ResponseEntity<ApiResponse<MenuItemResponseDto>> patchMenuItem(
             @PathVariable UUID menuItemId,
@@ -46,7 +43,6 @@ public class MenuItemController {
         return ResponseEntity.ok(ApiResponse.success(SuccessCode.MENU_ITEM_UPDATED, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @PatchMapping("/{menuItemId}/orders")
     public ResponseEntity<ApiResponse<MenuItemResponseDto>> updateMenuItemOrder(
             @PathVariable UUID menuItemId,
@@ -58,7 +54,6 @@ public class MenuItemController {
                 ApiResponse.success(SuccessCode.MENU_ITEM_ORDER_UPDATED, response));
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @DeleteMapping("/{menuItemId}")
     public ResponseEntity<ApiResponse<Void>> deleteMenuItem(
             @PathVariable UUID menuItemId, @AuthenticationPrincipal UserDetailsImpl userDetails) {

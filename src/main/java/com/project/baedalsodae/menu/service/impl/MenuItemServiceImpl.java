@@ -19,6 +19,7 @@ import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final TagMappingService tagMappingService;
     private final MenuEmbeddingService menuEmbeddingService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Transactional
     @Override
     public MenuItemResponseDto createMenuItem(
@@ -59,6 +61,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         return MenuItemResponseDto.fromEntity(item);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Transactional
     @Override
     public MenuItemResponseDto updateMenuItem(
@@ -89,6 +92,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         return MenuItemResponseDto.fromEntity(item);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Transactional
     @Override
     public MenuItemResponseDto patchMenuItem(
@@ -125,6 +129,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         return MenuItemResponseDto.fromEntity(item);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Transactional
     @Override
     public void deleteMenuItem(UUID menuItemId, UserDetailsImpl userDetails) {
@@ -148,6 +153,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         return existsByStoreIdAndNameAndDeletedIsFalse(storeId, name);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Transactional
     @Override
     public MenuItemResponseDto updateMenuItemOrder(
@@ -175,6 +181,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         return MenuItemResponseDto.fromEntity(item);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER')")
     @Override
     @Transactional(readOnly = true)
     public List<MenuItemResponseDto> getMenuItem(UUID menuCategoryId, UserDetailsImpl userDetails) {

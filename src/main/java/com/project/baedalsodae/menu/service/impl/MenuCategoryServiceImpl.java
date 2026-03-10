@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         return MenuCategoryResponseDto.fromEntity(menuCategory);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Override
     @Transactional
     public MenuCategoryResponseDto updateMenuCategory(
@@ -66,6 +68,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         return MenuCategoryResponseDto.fromEntity(menuCategory);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Override
     @Transactional
     public void deleteMenuCategory(UUID menuCategoryId, UserDetailsImpl userDetails) {
@@ -83,6 +86,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         menuCategory.softDelete(userDetails.getUserId());
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'ROLE_MANAGER')")
     @Override
     @Transactional
     public MenuCategoryResponseDto updateMenuCategoryOrder(
