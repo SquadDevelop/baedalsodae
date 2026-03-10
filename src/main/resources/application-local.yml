@@ -30,7 +30,8 @@ spring:
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 1536
-        initialize-schema: true
+        schema-name: public
+        initialize-schema: false
 
   data:
     redis:
