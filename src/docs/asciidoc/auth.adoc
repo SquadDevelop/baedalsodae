@@ -69,7 +69,7 @@ include::{snippets}/auth/login-fail/http-response.adoc[]
 
 `POST /auth/reissue`
 
-Refresh Token을 사용하여 만료된 Access Token을 재발급받습니다.
+Refresh Token을 사용하여 만료된 Access Token을 재발급받습니다. 반드시 Refresh Token 타입의 토큰을 사용해야 합니다.
 
 === Request Fields
 include::{snippets}/auth/reissue/request-fields.adoc[]
@@ -94,6 +94,10 @@ include::{snippets}/auth/reissue-fail-expired/http-response.adoc[]
 ===== HTTP Response Example
 include::{snippets}/auth/reissue-fail-invalid/http-response.adoc[]
 
+==== 토큰 재발급 실패 (Access Token을 사용한 경우)
+===== HTTP Response Example
+include::{snippets}/auth/reissue-fail-with-access-token/http-response.adoc[]
+
 ---
 
 [[auth-logout]]
@@ -101,7 +105,7 @@ include::{snippets}/auth/reissue-fail-invalid/http-response.adoc[]
 
 `POST /auth/logout`
 
-현재 로그인된 세션을 종료하고 토큰을 무효화합니다.
+현재 로그인된 세션을 종료하고 토큰을 무효화합니다. Access Token이 만료된 상태에서도 정상적으로 로그아웃이 가능합니다.
 
 === HTTP Request Example
 include::{snippets}/auth/logout/http-request.adoc[]
@@ -111,6 +115,10 @@ include::{snippets}/auth/logout/response-fields.adoc[]
 
 === HTTP Response Example
 include::{snippets}/auth/logout/http-response.adoc[]
+
+==== 로그아웃 성공 (만료된 토큰으로 시도 시)
+===== HTTP Response Example
+include::{snippets}/auth/logout-success-expired/http-response.adoc[]
 
 ==== 로그아웃 실패 (인증되지 않은 요청)
 ===== HTTP Response Example
