@@ -3,13 +3,12 @@ package com.project.baedalsodae.event.poller;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventStatus;
 import com.project.baedalsodae.event.repository.EventRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -37,13 +36,16 @@ public class EventPoller {
             }
 
             try {
-//                dispatch(event);
+                //                dispatch(event);
 
                 dispatchers.stream()
                         .filter(d -> d.getSupportedEventType() == event.getEventType())
                         .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException(
-                                "[OutboxPoller] 처리되지 않은 이벤트 타입: " + event.getEventType()))
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "[OutboxPoller] 처리되지 않은 이벤트 타입: "
+                                                        + event.getEventType()))
                         .dispatch(event);
 
                 event.markPublished();
@@ -63,16 +65,16 @@ public class EventPoller {
         }
     }
 
-//    private void dispatch(Event event) throws JsonProcessingException {
-//        if (event.getEventType() == EventType.ORDER_CREATED) {
-//            JsonNode node = objectMapper.readTree(event.getPayload());
-//            UUID orderId = UUID.fromString(node.get("orderId").asText());
-//            UUID userId = UUID.fromString(node.get("userId").asText());
-//            BigDecimal finalAmount = node.get("finalAmount").decimalValue();
-//
-//            eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
-//        } else {
-//            log.warn("[OutboxPoller] 처리되지 않은 이벤트 타입: {}", event.getEventType());
-//        }
-//    }
+    //    private void dispatch(Event event) throws JsonProcessingException {
+    //        if (event.getEventType() == EventType.ORDER_CREATED) {
+    //            JsonNode node = objectMapper.readTree(event.getPayload());
+    //            UUID orderId = UUID.fromString(node.get("orderId").asText());
+    //            UUID userId = UUID.fromString(node.get("userId").asText());
+    //            BigDecimal finalAmount = node.get("finalAmount").decimalValue();
+    //
+    //            eventPublisher.publishEvent(new OrderCreatedEvent(orderId, userId, finalAmount));
+    //        } else {
+    //            log.warn("[OutboxPoller] 처리되지 않은 이벤트 타입: {}", event.getEventType());
+    //        }
+    //    }
 }

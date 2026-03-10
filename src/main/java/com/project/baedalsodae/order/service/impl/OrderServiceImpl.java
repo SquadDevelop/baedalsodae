@@ -56,8 +56,6 @@ public class OrderServiceImpl implements OrderService {
     private final AllowedRegionService allowedRegionService;
     private final UserAddressService userAddressService;
 
-    private static final int MAX_RETRY = 3;
-
     @Override
     @Transactional
     public CreateOrderResponse createOrder(UUID userId, CreateOrderRequest request) {
@@ -417,7 +415,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        //가게의 주문수 필드 업데이트
+        // 가게의 주문수 필드 업데이트
         eventPublisher.publishOrderEvent(order, EventType.ORDER_DELIVERED);
 
         return OrderActionStatusResponse.from(order);

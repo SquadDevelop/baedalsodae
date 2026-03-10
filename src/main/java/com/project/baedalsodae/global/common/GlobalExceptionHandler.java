@@ -124,9 +124,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            jakarta.persistence.OptimisticLockException.class,
-            org.springframework.orm.ObjectOptimisticLockingFailureException.class,
-            org.hibernate.StaleObjectStateException.class,
+        jakarta.persistence.OptimisticLockException.class,
+        org.springframework.orm.ObjectOptimisticLockingFailureException.class,
+        org.hibernate.StaleObjectStateException.class,
     })
     public ResponseEntity<ApiResponse<Void>> handleConcurrencyException(Exception e) {
         log.warn("Concurrency Exception: ", e);
@@ -135,9 +135,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            DataIntegrityViolationException.class,
-            org.springframework.dao.DuplicateKeyException.class,
-            java.sql.SQLIntegrityConstraintViolationException.class,
+        DataIntegrityViolationException.class,
+        org.springframework.dao.DuplicateKeyException.class,
+        java.sql.SQLIntegrityConstraintViolationException.class,
     })
     public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(
             DataIntegrityViolationException exception) {

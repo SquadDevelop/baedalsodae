@@ -86,7 +86,8 @@ public enum ErrorCode {
     ORDER_INVALID_STATUS("OD007", HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
     ORDER_PAYMENT_NOT_COMPLETED("OD008", HttpStatus.BAD_REQUEST, "주문의 결제가 완료되지 않았습니다."),
     ORDER_CANCEL_NOT_ALLOWED("OD009", HttpStatus.BAD_REQUEST, "주문 취소는 주문 생성 5분전에 가능합니다."),
-    ORDER_STORE_ORDER_COUNT_UPDATE_FAILED("OD010", HttpStatus.CONFLICT, "가게 주문수 업데이트에 실패했습니다. 잠시 후 다시 시도해주세요."),
+    ORDER_STORE_ORDER_COUNT_UPDATE_FAILED(
+            "OD010", HttpStatus.CONFLICT, "가게 주문수 업데이트에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
     // payment
     PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),

@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.event.dto.OrderDeliveredEvent;
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.entity.EventType;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
