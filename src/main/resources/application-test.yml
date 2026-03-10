@@ -27,6 +27,7 @@ spring:
 
 JWT_SECRET: dGVzdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3Nlc09ubHk= #testSecretKeyForTestingPurposesOnly
 JWT_EXPIRATION: 100000
+JWT_REFRESH_EXPIRATION: 604800000
 
 encryption:
   aes:
