@@ -26,11 +26,11 @@ public class TagMapping {
     private int orderNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id", nullable = false)
+    @JoinColumn(name = "tag_id")
     private Tag tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_item", nullable = false)
+    @JoinColumn(name = "menu_item")
     private MenuItem menuItem;
 
     @CreatedDate

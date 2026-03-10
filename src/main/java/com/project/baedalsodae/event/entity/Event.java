@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -18,14 +20,22 @@ public class Event extends BaseTimeEntity {
     private UUID id;
 
     private UUID traceId;
+
+    @Enumerated(EnumType.STRING)
     private AggregateType aggregateType;
+
     private UUID aggregateId;
+
+    @Enumerated(EnumType.STRING)
     private EventType eventType;
 
     @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String payload;
 
+    @Enumerated(EnumType.STRING)
     private EventStatus status;
+
     private int retryCount;
     private Instant publishedAt;
 
@@ -39,8 +49,8 @@ public class Event extends BaseTimeEntity {
         this.retryCount = 0;
     }
 
-    public static Event fromPayment(Payment payment, EventType type) {
-        return new Event(AggregateType.PAYMENT, payment.getId(), type, null);
+    public static Event fromPayment(Payment payment, EventType type, String payload) {
+        return new Event(AggregateType.PAYMENT, payment.getId(), type, payload);
     }
 
     public static Event fromOrder(final Order order, final EventType type, String payload) {

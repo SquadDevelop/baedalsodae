@@ -3,6 +3,7 @@ package com.project.baedalsodae.payment.pg.service.impl;
 import com.project.baedalsodae.payment.pg.dto.PGCancelRequest;
 import com.project.baedalsodae.payment.pg.dto.PGPaymentRequest;
 import com.project.baedalsodae.payment.pg.dto.PGPaymentResponse;
+import com.project.baedalsodae.payment.pg.enums.PGProviderType;
 import com.project.baedalsodae.payment.pg.service.PGClient;
 import java.math.BigDecimal;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 public class MockPGClient implements PGClient {
 
     private static final BigDecimal PAYMENT_LIMIT = new BigDecimal("1000000"); // 1 million
+
+    @Override
+    public PGProviderType getType() {
+        return PGProviderType.WIREPG;
+    }
 
     @Override
     public PGPaymentResponse pay(PGPaymentRequest request) {

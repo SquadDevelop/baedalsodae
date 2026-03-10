@@ -51,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponse getReviewDetail(final UUID userId, final UUID reviewId) {
         Review foundReview =
                 reviewRepository
-                        .findByIdAndUserId(userId, reviewId)
+                        .findByIdAndUserId(reviewId, userId)
                         .orElseThrow(() -> new BusinessException(ErrorCode.REVIEW_NOT_FOUND));
         return ReviewResponse.from(foundReview);
     }

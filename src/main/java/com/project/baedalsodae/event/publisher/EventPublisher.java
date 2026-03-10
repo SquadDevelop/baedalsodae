@@ -13,6 +13,8 @@ import com.project.baedalsodae.payment.entity.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class EventPublisher {
     private final ApplicationEventPublisher eventPublisher;
     private final EventService eventService;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishOrderEvent(final Order order, final EventType type) {
         if (type == EventType.ORDER_CREATED) {
             final OrderCreatedEvent event = OrderCreatedEvent.from(order);
@@ -33,11 +36,12 @@ public class EventPublisher {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishPaymentEvent(final Payment payment, final EventType type) {
         if (type == EventType.PAYMENT_CREATED) {
             final PaymentCreatedEvent event = PaymentCreatedEvent.from(payment);
-            eventPublisher.publishEvent(event);
-            eventService.save(Event.fromPayment(payment, EventType.PAYMENT_CREATED));
+            eventService.save(
+                    Event.fromPayment(payment, EventType.PAYMENT_CREATED, JsonUtils.toJson(event)));
         }
         // 다른 이벤트 타입이 추가될 경우 여기에 분기 처리 (예: PAYMENT_FAILED, PAYMENT_REFUNDED 등
     }
