@@ -88,7 +88,8 @@ class OrderCancelConcurrencyTest {
 
     @Test
     @DisplayName("주문 취소 대기 동시 요청 10건 - 낙관적 락으로 단 1건만 성공")
-    void cancelRequestOrder_concurrency_optimisticLock_onlyOneSucceeds() throws InterruptedException {
+    void cancelRequestOrder_concurrency_optimisticLock_onlyOneSucceeds()
+            throws InterruptedException {
         // given
         int threadCount = 10;
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
@@ -128,7 +129,10 @@ class OrderCancelConcurrencyTest {
         System.out.println("최종 주문 상태: " + order.getStatus());
         System.out.println("최종 version: " + order.getVersion());
 
-        assertThat(successCount.get() + optimisticLockFailCount.get() + statusConflictFailCount.get())
+        assertThat(
+                        successCount.get()
+                                + optimisticLockFailCount.get()
+                                + statusConflictFailCount.get())
                 .isEqualTo(threadCount);
         assertThat(successCount.get()).isEqualTo(1);
         assertThat(order.getVersion()).isEqualTo(1L);
