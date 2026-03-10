@@ -4,7 +4,7 @@
 
 ## 1단계 — 프로젝트 설계 
 
-### 와이어프레임 기반 팀 얼라인 (팀 전체)
+### 와이어프레임 기반 팀 얼라인 
 
 **목적**: 개발 착수 전 기능 범위와 화면 흐름을 시각화하여 도메인별 요구사항 오해 방지
 
@@ -15,9 +15,9 @@
 
 ---
 
-### RESTful API 설계 의사결정 (팀 전체)
+### RESTful API 설계 의사결정 
 
-> 상세 회의록: [RESTful API 설계 의사결정 (한병두)](https://www.notion.so/teamsparta/RESTful-API-3142dc3ef51480f68ec9e68ecbf50c92)
+> 상세 회의록: [RESTful API 설계 의사결정](https://www.notion.so/teamsparta/RESTful-API-3142dc3ef51480f68ec9e68ecbf50c92)
 
 **문제**: 초기에 Store 조회 API를 역할(Role) 기준으로 분리 설계
 
@@ -43,9 +43,9 @@ DELETE /api/v1/me/stores/{storeId}
 
 ---
 
-## 2단계 — 공통 인프라 구축 (개발 초반)
+## 2단계 — 공통 인프라 구축 
 
-### GlobalException + 공통 응답 처리 (신혜원)
+### GlobalException + 공통 응답 처리 
 
 **설계**: `ErrorCode` / `SuccessCode` enum으로 응답 형식 통일
 
@@ -57,9 +57,9 @@ DELETE /api/v1/me/stores/{storeId}
 
 ---
 
-### JWT 기반 인증 설계 (이현빈)
+### JWT 기반 인증 설계 
 
-> 정리 문서: [Spring Security + JWT 기반 인증 전략 정리 (이현빈)](https://www.notion.so/teamsparta/Spring-Security-JWT-31c2dc3ef51480f09b44ec0cf1cd2fff)
+> 정리 문서: [Spring Security + JWT 기반 인증 전략 정리](https://www.notion.so/teamsparta/Spring-Security-JWT-31c2dc3ef51480f09b44ec0cf1cd2fff)
 
 **처리 방식 분리**:
 - JWT 토큰 검증: `JwtAuthorizationFilter` (필터 레이어)
@@ -70,7 +70,7 @@ DELETE /api/v1/me/stores/{storeId}
 
 ---
 
-### refreshToken + Redis 블랙리스트 (이현빈)
+### refreshToken + Redis 블랙리스트 
 
 **무상태성 유지 전략**:
 - `accessToken` 단기 만료 (1시간) + `refreshToken` 장기 만료 (7일)
@@ -82,7 +82,7 @@ DELETE /api/v1/me/stores/{storeId}
 
 ---
 
-### 카카오 주소 API 도입 (이현빈 아이디어 · 신혜원 구현)
+### 카카오 주소 API 도입 
 
 **문제**: 사용자가 직접 입력하는 주소는 정합성 보장 불가 (오타, 비표준 형식)
 
@@ -98,7 +98,7 @@ DELETE /api/v1/me/stores/{storeId}
 
 ## 3단계 — 도메인 개발 
 
-### 삭제 후 재생성 로직 — 메뉴 태그 / 가게 운영시간 (하지혜)
+### 삭제 후 재생성 로직 — 메뉴 태그 / 가게 운영시간
 
 **문제**: 태그·운영시간 수정 시 변경된 항목만 특정하기 어려움 (순서 변경 + 추가 + 삭제 혼재)
 
@@ -110,7 +110,7 @@ DELETE /api/v1/me/stores/{storeId}
 
 ---
 
-### Soft Delete + PostgreSQL Partial Index (하지혜)
+### Soft Delete + PostgreSQL Partial Index 
 
 **문제**: soft delete(`deleted_at IS NOT NULL`) 환경에서 `UNIQUE` 제약이 삭제된 데이터와 충돌
 
@@ -126,7 +126,7 @@ WHERE deleted_at IS NULL;
 
 ---
 
-### 비관적 락 도입 — 메뉴 순서 변경 (하지혜)
+### 비관적 락 도입 — 메뉴 순서 변경 
 
 **문제**: 메뉴 카테고리/아이템 순서 변경 시 여러 row를 한 번에 수정 → 동시 요청 시 race condition 발생 가능
 
@@ -140,7 +140,7 @@ WHERE deleted_at IS NULL;
 
 ---
 
-### 주문 취소 동시성 문제 (정재빈)
+### 주문 취소 동시성 문제 
 
 **시나리오**: 고객과 사장이 동시에 같은 주문에 취소 요청
 
@@ -156,7 +156,7 @@ WHERE deleted_at IS NULL;
 
 > 관련 문서: [주문, 결제에 관해서](https://www.notion.so/teamsparta/3192dc3ef51480fabc9dc98c57668c9b)
 
-### 아웃박스 패턴 + 이벤트 폴링 스케줄러 (정재빈 · 한병두)
+### 아웃박스 패턴 + 이벤트 폴링 스케줄러 
 
 **문제**: 주문 상태 변경 후 결제/알림 이벤트 발행 시 트랜잭션 커밋 전에 이벤트가 처리될 수 있음
 
@@ -171,7 +171,7 @@ WHERE deleted_at IS NULL;
 
 ---
 
-### WireMock 기반 가상 PG사 구현 (정재빈 · 한병두)
+### WireMock 기반 가상 PG사 구현 
 
 **문제**: 실제 PG사 연동 없이 결제 흐름(승인·취소)을 개발·테스트 환경에서 검증하기 어려움
 
@@ -189,7 +189,7 @@ WHERE deleted_at IS NULL;
 
 ---
 
-### 롱폴링 vs SSE — 주문 상태 실시간 조회 (정재빈, 한병두)
+### 롱폴링 vs SSE — 주문 상태 실시간 조회
 
 | 방식 | 장점 | 단점 |
 |---|---|---|
@@ -206,7 +206,7 @@ WHERE deleted_at IS NULL;
 
 > 관련 문서: [QueryDSL 의사결정 과정](https://www.notion.so/teamsparta/QueryDSL-3192dc3ef51480a994b3efb35e973e9f) · [JPQL vs NativeQuery vs QueryDSL](https://www.notion.so/teamsparta/JPQL-vs-NativeQuery-vs-QueryDsl-3192dc3ef51480a5aec7f47dd72bd7eb)
 
-### 커서 기반 페이지네이션 도입 (팀 전체)
+### 커서 기반 페이지네이션 도입 
 
 | 상황 | 선택 | 이유 |
 |---|---|---|
@@ -218,14 +218,14 @@ WHERE deleted_at IS NULL;
 
 **배경**: 팀 전체가 cursor 기반 페이지네이션 도입에 합의
 
-**적용 도메인**: 가게 목록 조회(신혜원), 주문 목록 조회(정재빈), 허용 지역 목록 조회(하지혜)
+**적용 도메인**: 가게 목록 조회, 주문 목록 조회, 허용 지역 목록 조회
 
 **구현 전략**:
 - 정렬 전략별 `BooleanExpression` 분리
 - 정렬 기준이 같은 경우를 대비해 `id`로 타이브레이킹
 - boolean 그룹 경계 처리를 위한 `crossBoundary` OR 조건 패턴
 
-### count 쿼리 최적화 (신혜원)
+### count 쿼리 최적화 
 
 **문제**: 페이지 조회 시 데이터 쿼리 + count 쿼리 총 2번 실행
 
@@ -240,7 +240,7 @@ if (cursor == null) {
 
 ## 6단계 — AI 기능 
 
-### pgvector + STT 기반 음성 메뉴 추천 (한병두)
+### pgvector + STT 기반 음성 메뉴 추천
 
 **흐름**:
 ```
@@ -257,7 +257,7 @@ if (cursor == null) {
 
 ## 7단계 — 배포 / 운영 (마무리)
 
-### 무중단 배포 전략 (정재빈)
+### 무중단 배포 전략 
 
 > 관련 문서: [AWS 인프라 배포 가이드](https://www.notion.so/teamsparta/AWS-31d2dc3ef51480809126d91f94bc97c0) · [VPC/서브넷/Gateway 설정](https://www.notion.so/teamsparta/vpc-Internet-Gateway-NAT-Gateway-31d2dc3ef514809292bad6ee9decdd3b) · [HAProxy 초기 설정 가이드](https://www.notion.so/teamsparta/HAProxy-1-31e2dc3ef51480fd8683dcc001e41744) · [AWS 배포 구성 및 트러블슈팅 총정리](https://www.notion.so/teamsparta/AWS-31e2dc3ef514806cadc7f722f666e192)
 
