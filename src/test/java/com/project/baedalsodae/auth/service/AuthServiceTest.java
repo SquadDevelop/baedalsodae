@@ -113,9 +113,9 @@ public class AuthServiceTest {
             Claims mockClaims = mock(Claims.class);
 
             given(jwtProvider.resolveToken(accessToken)).willReturn(resolvedAccessToken);
-            given(jwtProvider.getClaims(resolvedAccessToken)).willReturn(mockClaims);
+            given(jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken)).willReturn(mockClaims);
             given(mockClaims.getSubject()).willReturn(username);
-            given(jwtProvider.getRemainingTime(resolvedAccessToken)).willReturn(remainingTime);
+            given(jwtProvider.getRemainingTimeSafe(resolvedAccessToken)).willReturn(remainingTime);
 
             // when
             authService.logout(accessToken);
@@ -123,6 +123,29 @@ public class AuthServiceTest {
             // then
             verify(tokenRedisUtil, times(1)).deleteRefreshToken(username);
             verify(tokenRedisUtil, times(1)).saveBlacklist(resolvedAccessToken, remainingTime);
+        }
+
+        @Test
+        @DisplayName("성공 - 만료된 토큰으로 로그아웃 시도 시 블랙리스트에 등록하지 않고 Refresh Token만 삭제한다")
+        void logout_Success_WithExpiredToken() {
+            // given
+            String accessToken = "Bearer expired-token";
+            String resolvedAccessToken = "expired-token";
+            String username = "tester123";
+
+            Claims mockClaims = mock(Claims.class);
+
+            given(jwtProvider.resolveToken(accessToken)).willReturn(resolvedAccessToken);
+            given(jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken)).willReturn(mockClaims);
+            given(mockClaims.getSubject()).willReturn(username);
+            given(jwtProvider.getRemainingTimeSafe(resolvedAccessToken)).willReturn(0L);
+
+            // when
+            authService.logout(accessToken);
+
+            // then
+            verify(tokenRedisUtil, times(1)).deleteRefreshToken(username);
+            verify(tokenRedisUtil, times(0)).saveBlacklist(eq(resolvedAccessToken), anyLong());
         }
     }
 
@@ -143,6 +166,7 @@ public class AuthServiceTest {
                             UUID.randomUUID(), username, null, UserRole.CUSTOMER, false);
 
             given(jwtProvider.getClaims(oldRefreshToken)).willReturn(mockClaims);
+            given(jwtProvider.isRefreshToken(mockClaims)).willReturn(true);
             given(mockClaims.getSubject()).willReturn(username);
             given(tokenRedisUtil.hasValidateRefreshToken(username)).willReturn(true);
             given(tokenRedisUtil.getRefreshToken(username)).willReturn(oldRefreshToken);
@@ -164,6 +188,22 @@ public class AuthServiceTest {
         }
 
         @Test
+        @DisplayName("실패 - 리프레시 토큰이 아닌 토큰으로 재발급 시도 시 예외를 던진다")
+        void reissue_Fail_NotRefreshToken() {
+            // given
+            String accessToken = "not-a-refresh-token";
+            Claims mockClaims = mock(Claims.class);
+
+            given(jwtProvider.getClaims(accessToken)).willReturn(mockClaims);
+            given(jwtProvider.isRefreshToken(mockClaims)).willReturn(false);
+
+            // when & then
+            assertThatThrownBy(() -> authService.reissue(accessToken))
+                    .isInstanceOf(BusinessException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.JWT_INVALID);
+        }
+
+        @Test
         @DisplayName("실패 - Redis에 저장된 토큰과 일치하지 않으면 세션을 삭제하고 예외를 던진다")
         void reissue_Fail_TokenMismatch() {
             // given
@@ -172,6 +212,7 @@ public class AuthServiceTest {
             Claims mockClaims = mock(Claims.class);
 
             given(jwtProvider.getClaims(stolenRefreshToken)).willReturn(mockClaims);
+            given(jwtProvider.isRefreshToken(mockClaims)).willReturn(true);
             given(mockClaims.getSubject()).willReturn(username);
             given(tokenRedisUtil.hasValidateRefreshToken(username)).willReturn(true);
             given(tokenRedisUtil.getRefreshToken(username)).willReturn("different-token");
@@ -196,6 +237,7 @@ public class AuthServiceTest {
                             UUID.randomUUID(), username, null, UserRole.CUSTOMER, true);
 
             given(jwtProvider.getClaims(refreshToken)).willReturn(mockClaims);
+            given(jwtProvider.isRefreshToken(mockClaims)).willReturn(true);
             given(mockClaims.getSubject()).willReturn(username);
             given(tokenRedisUtil.hasValidateRefreshToken(username)).willReturn(true);
             given(tokenRedisUtil.getRefreshToken(username)).willReturn(refreshToken);
