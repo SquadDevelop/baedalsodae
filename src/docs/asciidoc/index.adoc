@@ -30,8 +30,10 @@ link:store-hours.html[가게 운영시간 (StoreHours)] — 운영시간 등록/
 link:menu-category.html[메뉴 카테고리 (MenuCategory)] — 카테고리 관리 +
 link:menu-item.html[메뉴 아이템 (MenuItem)] — 메뉴 등록/수정/삭제
 
-=== 주문 / 결제 / 리뷰
-허용 지역, 장바구니, 주문, 결제, 리뷰 API는 서버에서 직접 확인하세요.
+=== 장바구니 / 주문
+link:cart.html[장바구니 (Cart)] — 장바구니 조회/아이템 추가/수량 변경/삭제/비우기 +
+link:order.html[주문 (Order)] — 주문 생성/조회/상태 변경/취소 +
+link:admin-order.html[관리자 - 주문 (Admin Order)] — 전체 주문 조회/상세/이력/취소 (관리자)
 
 === 허용 지역
 link:allowed-region.html[허용 지역 (AllowedRegion)] — 서비스 가능 지역 관리 (관리자)

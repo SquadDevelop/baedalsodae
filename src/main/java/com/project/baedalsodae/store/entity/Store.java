@@ -58,7 +58,7 @@ public class Store extends BaseAuditEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "store_status", nullable = false)
-    private StoreStatus storeStatus = StoreStatus.PENDING_APPROVAL;
+    private StoreStatus storeStatus = StoreStatus.OPEN;
 
     @Column(name = "order_count", nullable = false)
     private int orderCount = 0;

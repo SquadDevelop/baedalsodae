@@ -35,8 +35,10 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -97,6 +99,10 @@ public class OrderServiceTest {
     @Mock private Address address;
 
     @Mock private UserAddress userAddress;
+
+    @Mock private UserRepository userRepository;
+
+    @Mock private User user;
 
     @Test
     @DisplayName("실패 - 주문 생성 시 장바구니가 존재하지 않음")
@@ -295,6 +301,10 @@ public class OrderServiceTest {
         given(userAddress.getAddress()).willReturn(address);
         given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
 
+        given(user.getNickname()).willReturn("잽닝이");
+        given(user.getPhone()).willReturn("01011112222");
+        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
+
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
 
@@ -358,6 +368,10 @@ public class OrderServiceTest {
 
         given(userAddress.getAddress()).willReturn(address);
         given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
+
+        given(user.getNickname()).willReturn("잽닝이");
+        given(user.getPhone()).willReturn("01011112222");
+        given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
 
         given(cartItem1.getMenuItem()).willReturn(menuItem1);
         given(menuItem1.getId()).willReturn(menuItemId1);

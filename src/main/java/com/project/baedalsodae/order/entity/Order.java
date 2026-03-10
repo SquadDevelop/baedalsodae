@@ -71,6 +71,10 @@ public class Order extends BaseAuditEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     public void addOrderItems(List<OrderItem> orderItems) {
         this.items.addAll(orderItems);
     }

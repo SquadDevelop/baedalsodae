@@ -15,22 +15,35 @@ import com.project.baedalsodae.payment.pg.enums.PGProviderType;
 import com.project.baedalsodae.payment.pg.service.PGClient;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.payment.service.PaymentService;
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PaymentServiceImpl implements PaymentService {
-    private final Map<PGProviderType, PGClient> paymentGateways;
+    private Map<PGProviderType, PGClient> paymentGateways;
     private final EventPublisher eventPublisher;
     private final PaymentRepository paymentRepository;
+    private final List<PGClient> pgClients;
+
+    @PostConstruct
+    public void init() {
+        paymentGateways =
+                pgClients.stream()
+                        .collect(Collectors.toMap(PGClient::getType, Function.identity()));
+    }
 
     @Override
     public TimeCursorPage<List<PaymentResponse>> getPayments(Instant cursor, int size) {
@@ -72,9 +85,12 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentRepository.existsByOrderId(orderId)) {
             throw new BusinessException(ErrorCode.PAYMENT_ALREADY_DONE);
         }
+        log.info("@@@@@@@@@@ : {}", paymentGateways);
+        log.info("@@@@@@@@@@ : {}", paymentGateways.get("WIREPG"));
 
         // pg 설정
         PGClient pgClient = paymentGateways.get(PGProviderType.WIREPG);
+        log.info("@@@@@@@@@@ : {}", pgClient);
         if (pgClient == null) {
             throw new BusinessException(ErrorCode.PAYMENT_GATEWAY_NOT_FOUND);
         }
@@ -93,12 +109,13 @@ public class PaymentServiceImpl implements PaymentService {
 
         // pg에 결제 요청
         PGPaymentRequest pgPaymentRequest =
-                new PGPaymentRequest(orderId, userId, PaymentMethod.CREDIT_CARD, finalAmount);
+                new PGPaymentRequest(
+                        orderId, userId, PaymentMethod.CREDIT_CARD, finalAmount.longValue());
         PGPaymentResponse response = pgClient.pay(pgPaymentRequest);
 
         // 결제 결과 따라서 payment update
-        if (response.status() == PaymentStatus.SUCCESS) {
-            payment.markAsSuccess(response.pgTransactionId());
+        if (response.getStatus() == PaymentStatus.SUCCESS) {
+            payment.markAsSuccess(response.getPgTransactionId());
         } else {
             payment.markAsFailed();
         }

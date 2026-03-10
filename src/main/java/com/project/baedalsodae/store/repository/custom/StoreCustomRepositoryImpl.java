@@ -62,7 +62,7 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     public List<Store> searchStoreByKeyword(
             String keyword, Pageable pageable, SortType sortType, StoreQueryScope scope) {
         return queryFactory
-                .selectDistinct(store)
+                .select(store)
                 .from(store)
                 .join(store.storeCategory, storeCategory)
                 .fetchJoin()

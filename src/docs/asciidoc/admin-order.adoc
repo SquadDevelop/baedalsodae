@@ -1,0 +1,95 @@
+= 관리자 주문 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[admin-order-get-list]]
+== 전체 주문 목록 조회
+
+`GET /admins/orders`
+
+권한: `MANAGER`
+
+=== Request Parameters
+include::{snippets}/admin-order/get-orders/request-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin-order/get-orders/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin-order/get-orders/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin-order/get-orders/http-response.adoc[]
+
+---
+
+[[admin-order-get-detail]]
+== 주문 상세 조회
+
+`GET /admins/orders/{orderId}`
+
+권한: `MANAGER`
+
+=== Path Parameters
+include::{snippets}/admin-order/get-order-detail/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin-order/get-order-detail/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin-order/get-order-detail/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin-order/get-order-detail/http-response.adoc[]
+
+---
+
+[[admin-order-get-status-history]]
+== 주문 상태 전이 이력 조회
+
+`GET /admins/orders/{orderId}/status-history`
+
+권한: `MANAGER`
+
+=== Path Parameters
+include::{snippets}/admin-order/get-order-status-history/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin-order/get-order-status-history/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin-order/get-order-status-history/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin-order/get-order-status-history/http-response.adoc[]
+
+---
+
+[[admin-order-cancel-request]]
+== 주문 취소 대기 요청 (관리자)
+
+`POST /admins/orders/{orderId}/cancel-request`
+
+권한: `MANAGER`
+
+* 취소 불가 상태(`CANCELED`, `CANCEL_REQUESTED`)를 제외한 모든 상태에서 취소 요청 가능합니다.
+
+=== Path Parameters
+include::{snippets}/admin-order/cancel-request-order/path-parameters.adoc[]
+
+=== Request Parameters
+include::{snippets}/admin-order/cancel-request-order/request-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/admin-order/cancel-request-order/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/admin-order/cancel-request-order/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/admin-order/cancel-request-order/http-response.adoc[]
