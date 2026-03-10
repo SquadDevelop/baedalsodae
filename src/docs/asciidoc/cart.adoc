@@ -1,0 +1,108 @@
+= 장바구니 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[cart-get]]
+== 장바구니 조회
+
+`GET /carts`
+
+권한: `CUSTOMER`
+
+=== HTTP Request Example
+include::{snippets}/cart/get-cart/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/cart/get-cart/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/cart/get-cart/http-response.adoc[]
+
+---
+
+[[cart-add-item]]
+== 장바구니 아이템 추가
+
+`POST /carts/items`
+
+권한: `CUSTOMER`
+
+=== Request Fields
+include::{snippets}/cart/add-cart-item/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/cart/add-cart-item/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/cart/add-cart-item/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/cart/add-cart-item/http-response.adoc[]
+
+---
+
+[[cart-update-item-quantity]]
+== 장바구니 아이템 수량 변경
+
+`PATCH /carts/items/{cartItemId}`
+
+권한: `CUSTOMER`
+
+=== Path Parameters
+include::{snippets}/cart/update-cart-item-quantity/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/cart/update-cart-item-quantity/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/cart/update-cart-item-quantity/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/cart/update-cart-item-quantity/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/cart/update-cart-item-quantity/http-response.adoc[]
+
+---
+
+[[cart-remove-item]]
+== 장바구니 아이템 삭제
+
+`DELETE /carts/items/{cartItemId}`
+
+권한: `CUSTOMER`
+
+=== Path Parameters
+include::{snippets}/cart/remove-cart-item/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/cart/remove-cart-item/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/cart/remove-cart-item/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/cart/remove-cart-item/http-response.adoc[]
+
+---
+
+[[cart-clear]]
+== 장바구니 비우기
+
+`DELETE /carts`
+
+권한: `CUSTOMER`
+
+=== HTTP Request Example
+include::{snippets}/cart/clear-cart/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/cart/clear-cart/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/cart/clear-cart/http-response.adoc[]
