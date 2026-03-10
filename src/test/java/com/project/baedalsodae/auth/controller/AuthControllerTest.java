@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.baedalsodae.auth.config.AuthConfig;
 import com.project.baedalsodae.auth.dto.request.LoginRequest;
 import com.project.baedalsodae.auth.dto.request.ReissueRequest;
 import com.project.baedalsodae.auth.dto.request.SignupRequest;
@@ -26,7 +27,6 @@ import com.project.baedalsodae.auth.service.AuthService;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
 import com.project.baedalsodae.global.common.SuccessCode;
-import com.project.baedalsodae.global.config.TestSecurityConfig;
 import com.project.baedalsodae.user.dto.response.UserDetailResponse;
 import com.project.baedalsodae.user.entity.UserRole;
 import com.project.baedalsodae.user.service.UserService;
@@ -45,7 +45,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(AuthController.class)
-@Import(TestSecurityConfig.class)
+@Import(AuthConfig.class)
 @AutoConfigureRestDocs
 public class AuthControllerTest {
 
@@ -319,6 +319,32 @@ public class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("실패 - 액세스 토큰으로 재발급 시도")
+    void reissue_Fail_WithAccessToken() throws Exception {
+        ReissueRequest request = new ReissueRequest(ACCESS_TOKEN);
+        given(authService.reissue(any())).willThrow(new BusinessException(ErrorCode.JWT_INVALID));
+
+        mockMvc.perform(
+                        post(BASE_URL + "/reissue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andDo(
+                        document(
+                                "auth/reissue-fail-with-access-token",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                responseFields(
+                                        fieldWithPath("code").description("에러 코드"),
+                                        fieldWithPath("message").description("에러 메시지"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("timestamp").description("에러 발생 시각"),
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
+    }
+
+    @Test
     @DisplayName("성공 - 로그아웃")
     void logout_Success() throws Exception {
         UserDetailsImpl user =
@@ -332,6 +358,32 @@ public class AuthControllerTest {
                 .andDo(
                         document(
                                 "auth/logout",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("timestamp").description("응답 타임스탬프"),
+                                        fieldWithPath("data")
+                                                .description("응답 데이터 (null)")
+                                                .optional())));
+    }
+
+    @Test
+    @DisplayName("성공 - 만료된 토큰으로 로그아웃 시도 (정상 처리)")
+    void logout_Success_WithExpiredToken() throws Exception {
+        UserDetailsImpl user =
+                UserDetailsImpl.from(UUID.randomUUID(), "tester", "pass", UserRole.CUSTOMER, false);
+
+        mockMvc.perform(
+                        post(BASE_URL + "/logout")
+                                .with(user(user))
+                                .header("Authorization", "Bearer expired-token"))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "auth/logout-success-expired",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 responseFields(
