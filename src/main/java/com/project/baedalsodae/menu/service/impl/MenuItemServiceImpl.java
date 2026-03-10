@@ -14,6 +14,7 @@ import com.project.baedalsodae.menu.entity.MenuItem;
 import com.project.baedalsodae.menu.repository.MenuCategoryRepository;
 import com.project.baedalsodae.menu.repository.MenuItemRepository;
 import com.project.baedalsodae.menu.service.MenuItemService;
+import com.project.baedalsodae.recommendation.service.MenuEmbeddingService;
 import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.*;
@@ -29,6 +30,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final MenuItemRepository menuItemRepository;
     private final MenuCategoryRepository menuCategoryRepository;
     private final TagMappingService tagMappingService;
+    private final MenuEmbeddingService menuEmbeddingService;
 
     @Transactional
     @Override
@@ -57,6 +59,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         } catch (DataIntegrityViolationException e) {
             throw new BusinessException(ErrorCode.MENU_ITEM_ORDER_CONFLICT);
         }
+        menuEmbeddingService.syncMenuItem(item);
         return MenuItemResponseDto.fromEntity(item);
     }
 
@@ -86,6 +89,7 @@ public class MenuItemServiceImpl implements MenuItemService {
                 request.isPopular());
         tagMappingService.deleteAllTagMappingByMenuItemId(menuItemId);
         tagMappingService.createTagMappings(item, request.tagNames());
+        menuEmbeddingService.syncMenuItem(item);
         return MenuItemResponseDto.fromEntity(item);
     }
 
@@ -121,6 +125,7 @@ public class MenuItemServiceImpl implements MenuItemService {
             tagMappingService.deleteAllTagMappingByMenuItemId(menuItemId);
             tagMappingService.createTagMappings(item, request.tagNames());
         }
+        menuEmbeddingService.syncMenuItem(item);
         return MenuItemResponseDto.fromEntity(item);
     }
 

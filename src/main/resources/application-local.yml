@@ -18,12 +18,26 @@ spring:
   sql:
     init:
       mode: never
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 1536
+        initialize-schema: true
+
   data:
     redis:
       url: ${SPRING_DATA_REDIS_URL}
       host: ${SPRING_DATA_REDIS_HOST}
       port: ${SPRING_DATA_REDIS_PORT}
-      password:
+      password: ${SPRING_DATA_REDIS_PASSWORD}
       ssl:
         enabled: false
       repositories:
