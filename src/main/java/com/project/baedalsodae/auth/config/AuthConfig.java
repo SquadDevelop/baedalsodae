@@ -86,7 +86,17 @@ public class AuthConfig {
                                 .requestMatchers("/users/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
                                 .requestMatchers("/admins/me").hasAuthority("ROLE_MANAGER")
                                 .requestMatchers("/admins/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/allowed-regions/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/carts/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
                                 .requestMatchers("/user-addresses/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/menu-categories/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/menu-items/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/orders/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/payments/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/store-categories/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/stores/**/hours").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/stores/**").permitAll()
+                                .requestMatchers("/tags/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
                                 .anyRequest()
                                 .permitAll());
 
