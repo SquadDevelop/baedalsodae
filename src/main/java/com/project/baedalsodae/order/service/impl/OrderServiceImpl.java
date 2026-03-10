@@ -129,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
         order.addOrderItems(orderItems);
         final Order savedOrder = orderRepository.save(order);
 
-        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, order);
+        orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, savedOrder);
 
         eventPublisher.publishOrderEvent(savedOrder, EventType.ORDER_CREATED);
 

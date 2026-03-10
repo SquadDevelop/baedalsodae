@@ -20,8 +20,7 @@ public class EventPoller {
     private final EventRepository eventRepository;
     private final List<EventDispatcher> dispatchers;
 
-    @Scheduled(fixedDelay = 1000)
-    @Transactional
+    @Scheduled(fixedDelay = 3000)
     public void poll() {
         List<Event> pendingEvents =
                 eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING);
@@ -49,6 +48,8 @@ public class EventPoller {
                         .dispatch(event);
 
                 event.markPublished();
+                eventRepository.save(event);
+
                 log.info(
                         "[OutboxPoller] 이벤트 발행 성공: id={}, type={}",
                         event.getId(),

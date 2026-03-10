@@ -14,16 +14,18 @@ public class TagBulkRepository {
 
     @Transactional
     public void bulkInsertIgnore(List<String> tagNames) {
-        if (tagNames == null || tagNames.isEmpty()) return;
+        return;
 
-        String sql =
-                """
-            INSERT INTO tag (name)
-            VALUES (?)
-            ON CONFLICT (name) DO NOTHING
-        """;
-
-        jdbcTemplate.batchUpdate(
-                sql, tagNames, tagNames.size(), (ps, name) -> ps.setString(1, name));
+//        if (tagNames == null || tagNames.isEmpty()) return;
+//
+//        String sql =
+//                """
+//            INSERT INTO baedalsodae.p_tag (name)
+//            VALUES (?)
+//            ON CONFLICT (name) DO NOTHING
+//        """;
+//
+//        jdbcTemplate.batchUpdate(
+//                sql, tagNames, tagNames.size(), (ps, name) -> ps.setString(1, name));
     }
 }
