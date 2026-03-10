@@ -7,6 +7,7 @@ import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.auth.security.util.TokenRedisUtil;
 import com.project.baedalsodae.global.common.BusinessException;
 import com.project.baedalsodae.global.common.ErrorCode;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,15 +43,23 @@ public class AuthService {
     public void logout(String accessToken) {
         String resolvedAccessToken = jwtProvider.resolveToken(accessToken);
 
-        String username = jwtProvider.getClaims(resolvedAccessToken).getSubject();
-        long remainingTime = jwtProvider.getRemainingTime(resolvedAccessToken);
+        Claims claims = jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken);
+        long remainingTime = jwtProvider.getRemainingTimeSafe(resolvedAccessToken);
 
-        tokenRedisUtil.deleteRefreshToken(username);
-        tokenRedisUtil.saveBlacklist(resolvedAccessToken, remainingTime);
+        tokenRedisUtil.deleteRefreshToken(claims.getSubject());
+        if (remainingTime > 0) {
+            tokenRedisUtil.saveBlacklist(resolvedAccessToken, remainingTime);
+        }
     }
 
     public LoginResponse reissue(String refreshToken) {
-        String username = jwtProvider.getClaims(refreshToken).getSubject();
+        Claims claims = jwtProvider.getClaims(refreshToken);
+
+        if (!jwtProvider.isRefreshToken(claims)) {
+            throw new BusinessException(ErrorCode.JWT_INVALID);
+        }
+
+        String username = claims.getSubject();
 
         if (!tokenRedisUtil.hasValidateRefreshToken(username)
                 || !refreshToken.equals(tokenRedisUtil.getRefreshToken(username))) {

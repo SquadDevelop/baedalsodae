@@ -67,6 +67,7 @@ public class AuthController {
                 .body(ApiResponse.success(SuccessCode.LOGIN_SUCCESS, response));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
         authService.logout(request.getHeader(AUTHORIZATION_HEADER));

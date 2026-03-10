@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -31,13 +32,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final TokenRedisUtil tokenRedisUtil;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-
-        return path.startsWith("/api/v1/auth");
-    }
-
-    @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -45,9 +39,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(resolvedAccessToken)) {
             try {
-                Claims claims = jwtProvider.getClaims(resolvedAccessToken);
+                if (isBlacklistedSafe(resolvedAccessToken)) {
+                    sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
+                    return;
+                }
 
-                if (tokenRedisUtil.isBlacklisted(resolvedAccessToken)) {
+                Claims claims = getClaimsForRequest(request, resolvedAccessToken);
+
+                if (!jwtProvider.isAccessToken(claims)) {
                     sendErrorResponse(response, ErrorCode.UNAUTHORIZED);
                     return;
                 }
@@ -63,6 +62,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isBlacklistedSafe(String token) {
+        try {
+            return tokenRedisUtil.isBlacklisted(token);
+        } catch (Exception e) {
+            log.error("Redis error during blacklist check (Fail-Open): {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private Claims getClaimsForRequest(HttpServletRequest request, String token)
+            throws BusinessException {
+        return isLogoutRequest(request)
+                ? jwtProvider.getClaimsIgnoreExpiration(token)
+                : jwtProvider.getClaims(token);
+    }
+
+    private boolean isLogoutRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String logoutPath = request.getContextPath() + "/auth/logout";
+        return HttpMethod.POST.matches(request.getMethod())
+                && (uri.equals(logoutPath) || uri.equals(logoutPath + "/"));
     }
 
     private void setAuthentication(Claims claims) {

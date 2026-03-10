@@ -101,6 +101,24 @@ public class JwtProvider {
         }
     }
 
+    public Claims getClaimsIgnoreExpiration(String inputToken) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(jwtSecretKey)
+                    .build()
+                    .parseSignedClaims(inputToken)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        } catch (SecurityException | MalformedJwtException e) {
+            throw new BusinessException(ErrorCode.JWT_SIGNATURE_INVALID);
+        } catch (UnsupportedJwtException e) {
+            throw new BusinessException(ErrorCode.JWT_UNSUPPORTED);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.JWT_INVALID);
+        }
+    }
+
     public long getRemainingTime(String token) {
         Claims claims = this.getClaims(token);
         Date expiration = claims.getExpiration();
@@ -109,7 +127,22 @@ public class JwtProvider {
         return Math.max(0, expiration.getTime() - now);
     }
 
+    public long getRemainingTimeSafe(String token) {
+        try {
+            return getRemainingTime(token);
+        } catch (BusinessException e) {
+            if (e.getErrorCode() == ErrorCode.JWT_EXPIRED) {
+                return 0;
+            }
+            throw e;
+        }
+    }
+
     public boolean isAccessToken(Claims claims) {
         return ACCESS_TYPE.equals(claims.get(TOKEN_TYPE));
+    }
+
+    public boolean isRefreshToken(Claims claims) {
+        return REFRESH_TYPE.equals(claims.get(TOKEN_TYPE));
     }
 }
