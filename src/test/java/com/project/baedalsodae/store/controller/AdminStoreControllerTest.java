@@ -2,6 +2,7 @@ package com.project.baedalsodae.store.controller;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -15,8 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.global.common.dto.AddressRequest;
+import com.project.baedalsodae.global.common.dto.AddressResponse;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreStatusRequest;
+import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import com.project.baedalsodae.store.service.AdminStoreService;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -29,6 +32,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AdminStoreController.class)
@@ -38,13 +42,13 @@ class AdminStoreControllerTest {
 
     @Autowired private MockMvc mockMvc;
 
-    @org.springframework.test.context.bean.override.mockito.MockitoBean
-    private AdminStoreService adminStoreService;
+    @MockitoBean private AdminStoreService adminStoreService;
 
     @Autowired private ObjectMapper objectMapper;
 
     private final UUID STORE_ID = UUID.randomUUID();
     private UserDetailsImpl managerDetails;
+    private AddressResponse addressResponse;
 
     @BeforeEach
     void setUp() {
@@ -52,6 +56,66 @@ class AdminStoreControllerTest {
         managerDetails =
                 UserDetailsImpl.from(
                         UUID.randomUUID(), "admin_user", "password", UserRole.MANAGER, false);
+
+        addressResponse =
+                new AddressResponse("11", "서울특별시", "110", "강남구", "11010", "역삼동", "테헤란로 427", "위워크");
+    }
+
+    @Test
+    @DisplayName("점주 가게 조회 - 성공")
+    void getOwnerStore_success() throws Exception {
+
+        OwnerStoreResponse ownerResponse =
+                OwnerStoreResponse.builder()
+                        .storeId(UUID.randomUUID())
+                        .storeName("감자네 치킨")
+                        .phoneNumber("02-1234-5678")
+                        .businessNumber("123-45-67890")
+                        .description("맛있는 치킨집입니다.")
+                        .reviewCount(10)
+                        .avgRating(4.5)
+                        .storeStatus("OPEN")
+                        .address(addressResponse)
+                        .build();
+
+        given(adminStoreService.getStoreDetail(any())).willReturn(ownerResponse);
+
+        mockMvc.perform(
+                        get("/admins/stores/{storeId}", STORE_ID)
+                                .with(user(managerDetails))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "admin/store/get",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(
+                                        parameterWithName("storeId").description("가게 UUID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").description("응답 타임스탬프"),
+                                        fieldWithPath("data.storeId").description("가게 UUID"),
+                                        fieldWithPath("data.storeName").description("가게 이름"),
+                                        fieldWithPath("data.phoneNumber").description("가게 전화번호"),
+                                        fieldWithPath("data.businessNumber").description("사업자 등록 번호"),
+                                        fieldWithPath("data.description").description("가게 상세 설명"),
+                                        fieldWithPath("data.reviewCount").description("총 리뷰 수"),
+                                        fieldWithPath("data.avgRating").description("평균 별점"),
+                                        fieldWithPath("data.storeStatus").description("가게 운영 상태 (OPEN, CLOSED)"),
+                                        fieldWithPath("data.address.sidoName").description("시/도 명칭"),
+                                        fieldWithPath("data.address.sigunguName").description("시/군/구 명칭"),
+                                        fieldWithPath("data.address.dongName").description("법정동/읍/면 명칭"),
+                                        fieldWithPath("data.address.roadAddress").description("도로명 주소"),
+                                        fieldWithPath("data.address.detailAddress").description("상세 주소"),
+                                        fieldWithPath("data.address.sidoCode").description("시/도 코드"),
+                                        fieldWithPath("data.address.sigunguCode").description("시/군/구 코드"),
+                                        fieldWithPath("data.address.dongCode").description("법정동 코드")
+                                )
+                        ));
     }
 
     @Test

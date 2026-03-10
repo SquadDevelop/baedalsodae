@@ -24,8 +24,8 @@ import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreStatusRequest;
 import com.project.baedalsodae.store.dto.response.store.*;
-import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
+import com.project.baedalsodae.store.enums.SortType;
 import com.project.baedalsodae.store.service.StoreCommandService;
 import com.project.baedalsodae.store.service.StoreQueryService;
 import com.project.baedalsodae.user.entity.UserRole;
@@ -102,7 +102,11 @@ class StoreControllerTest {
                         .stores(List.of(storeSummary()))
                         .build();
 
-        given(storeQueryService.getStorePage(eq(CATEGORY_ID), any(StoreCursorRequest.class)))
+        given(
+                        storeQueryService.getStorePage(
+                                eq(CATEGORY_ID),
+                                any(StoreCursorRequest.class),
+                                ownerDetails.getUserRole()))
                 .willReturn(pageResponse);
 
         mockMvc.perform(
@@ -179,9 +183,11 @@ class StoreControllerTest {
                         .hasNext(false)
                         .build();
 
-        given(
-                        storeQueryService.getStoreByKeyword(
-                                eq("테스트"), any(Pageable.class), eq(SortType.LATEST)))
+        given(storeQueryService.getStoreByKeyword(
+                eq("테스트"),
+                any(Pageable.class),
+                eq(SortType.LATEST),
+                eq(UserRole.OWNER)))
                 .willReturn(searchResponse);
 
         mockMvc.perform(
@@ -193,22 +199,19 @@ class StoreControllerTest {
                                 .param("size", "10")
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.totalCount").value(1))
+                .andExpect(jsonPath("$.data.totalCount").value(1L))
                 .andExpect(jsonPath("$.data.currentPage").value(1))
                 .andExpect(jsonPath("$.data.stores[0].storeName").value("테스트 가게"))
                 .andDo(
                         document(
-                                "store/get-by-keyword",
+                                "store/search-keyword", // 문서 저장 경로 (적절히 수정 가능)
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                queryParameters(
+                                queryParameters( // 요청 파라미터 문서화
                                         parameterWithName("keyword").description("검색 키워드"),
-                                        parameterWithName("sortType")
-                                                .description("정렬 타입 (LATEST / RATING / REVIEW)"),
-                                        parameterWithName("page")
-                                                .description("페이지 번호 (0-based)")
-                                                .optional(),
-                                        parameterWithName("size").description("페이지 크기").optional()),
+                                        parameterWithName("sortType").description("정렬 기준 (LATEST, RATING 등)"),
+                                        parameterWithName("page").description("페이지 번호 (0부터 시작)"),
+                                        parameterWithName("size").description("한 페이지당 개수")),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("message").description("응답 메시지"),
@@ -239,7 +242,8 @@ class StoreControllerTest {
         StoreDetailResponse detailResponse =
                 StoreDetailResponse.of(storeSummary(), List.of(), true, true);
 
-        given(storeQueryService.getStoreDetail(STORE_ID, USER_ID)).willReturn(detailResponse);
+        given(storeQueryService.getStoreDetail(STORE_ID, USER_ID, UserRole.CUSTOMER))
+                .willReturn(detailResponse);
 
         mockMvc.perform(
                         get("/stores/{storeId}", STORE_ID)
@@ -365,7 +369,30 @@ class StoreControllerTest {
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 pathParameters(
-                                        parameterWithName("storeId").description("가게 UUID"))));
+                                        parameterWithName("storeId").description("가게 UUID")),
+                                responseFields(
+                                        fieldWithPath("code").description("응답 코드"),
+                                        fieldWithPath("status").description("HTTP 상태"),
+                                        fieldWithPath("message").description("응답 메시지"),
+                                        fieldWithPath("timestamp").description("응답 타임스탬프"),
+                                        fieldWithPath("data.storeId").description("가게 UUID"),
+                                        fieldWithPath("data.storeName").description("가게 이름"),
+                                        fieldWithPath("data.phoneNumber").description("가게 전화번호"),
+                                        fieldWithPath("data.businessNumber").description("사업자 등록 번호"),
+                                        fieldWithPath("data.description").description("가게 상세 설명"),
+                                        fieldWithPath("data.reviewCount").description("총 리뷰 수"),
+                                        fieldWithPath("data.avgRating").description("평균 별점"),
+                                        fieldWithPath("data.storeStatus").description("가게 운영 상태 (OPEN, CLOSED)"),
+                                        fieldWithPath("data.address.sidoName").description("시/도 명칭"),
+                                        fieldWithPath("data.address.sigunguName").description("시/군/구 명칭"),
+                                        fieldWithPath("data.address.dongName").description("법정동/읍/면 명칭"),
+                                        fieldWithPath("data.address.roadAddress").description("도로명 주소"),
+                                        fieldWithPath("data.address.detailAddress").description("상세 주소"),
+                                        fieldWithPath("data.address.sidoCode").description("시/도 코드"),
+                                        fieldWithPath("data.address.sigunguCode").description("시/군/구 코드"),
+                                        fieldWithPath("data.address.dongCode").description("법정동 코드")
+                                )
+                        ));
     }
 
     @Test

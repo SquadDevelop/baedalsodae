@@ -19,7 +19,8 @@ import com.project.baedalsodae.store.dto.response.store.StorePageResponse;
 import com.project.baedalsodae.store.dto.response.store.StoreSearchPageResponse;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.entity.StoreCategory;
-import com.project.baedalsodae.store.entity.enums.SortType;
+import com.project.baedalsodae.store.enums.SortType;
+import com.project.baedalsodae.store.enums.StoreQueryScope;
 import com.project.baedalsodae.store.repository.StoreCategoryRepository;
 import com.project.baedalsodae.store.repository.StoreRepository;
 import com.project.baedalsodae.store.repository.custom.StoreCustomRepository;
@@ -100,14 +101,15 @@ class StoreQueryServiceTest {
                             Address.createAddress(
                                     "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
                     .willReturn(List.of(mock(MenuCategoryItemsResponse.class)));
             given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
             given(allowedRegionService.isAllowedByCode(anyString())).willReturn(true);
 
             // when
-            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
+            StoreDetailResponse response =
+                    storeQueryService.getStoreDetail(storeId, userId, UserRole.CUSTOMER);
 
             // then
             assertThat(response).isNotNull();
@@ -116,16 +118,16 @@ class StoreQueryServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 유저 주소가 배달 불가 지역이면 isDeliverableToUser=false를 반환한다.")
+        @DisplayName("성공: 유저 주소가 배달 불가 지역이면 isDeliverableToUser=true를 반환한다.")
         void getStoreDetail_storeValid() {
             // given
             UserAddress userAddress = mock(UserAddress.class);
             given(userAddress.getAddress())
                     .willReturn(
                             Address.createAddress(
-                                    "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
+                                    "11", "서울", "120", "강남", "1101", "역삼", "도로명", "상세"));
 
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
                     .willReturn(List.of());
             given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
@@ -134,10 +136,11 @@ class StoreQueryServiceTest {
                     .willReturn(true);
 
             // when
-            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
+            StoreDetailResponse response =
+                    storeQueryService.getStoreDetail(storeId, userId, UserRole.CUSTOMER);
 
             // then
-            assertThat(response.isDeliverableToUser()).isFalse();
+            assertThat(response.isDeliverableToUser()).isTrue();
         }
 
         @Test
@@ -150,7 +153,7 @@ class StoreQueryServiceTest {
                             Address.createAddress(
                                     "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
                     .willReturn(List.of());
             given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
@@ -159,7 +162,8 @@ class StoreQueryServiceTest {
                     .willReturn(true);
 
             // when
-            StoreDetailResponse response = storeQueryService.getStoreDetail(storeId, userId);
+            StoreDetailResponse response =
+                    storeQueryService.getStoreDetail(storeId, userId, UserRole.CUSTOMER);
 
             // then
             assertThat(response.isAllowedRegion()).isFalse();
@@ -168,11 +172,11 @@ class StoreQueryServiceTest {
         @Test
         @DisplayName("실패: 가게가 존재하지 않으면 예외가 발생한다.")
         void getStoreDetail_storeNotFound() {
-            given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.empty());
 
             assertThrows(
                     BusinessException.class,
-                    () -> storeQueryService.getStoreDetail(storeId, userId));
+                    () -> storeQueryService.getStoreDetail(storeId, userId, UserRole.CUSTOMER));
         }
     }
 
@@ -246,19 +250,22 @@ class StoreQueryServiceTest {
                             storeCustomRepository.findStoresByCursor(
                                     eq(storeCategoryId),
                                     any(StoreCursorRequest.class),
-                                    eq(sortType)))
+                                    eq(sortType),
+                                    eq(StoreQueryScope.USER)))
                     .willReturn(mockSlice);
 
             // when
             StorePageResponse response =
-                    storeQueryService.getStorePage(storeCategoryId, cursorRequest);
+                    storeQueryService.getStorePage(
+                            storeCategoryId, cursorRequest, UserRole.CUSTOMER);
 
             // then
             assertThat(response).isNotNull();
             assertThat(response.getStoreCategoryId()).isEqualTo(storeCategoryId);
 
             verify(storeCustomRepository)
-                    .findStoresByCursor(eq(storeCategoryId), any(), eq(sortType));
+                    .findStoresByCursor(
+                            eq(storeCategoryId), any(), eq(sortType), eq(StoreQueryScope.USER));
         }
     }
 
@@ -281,7 +288,10 @@ class StoreQueryServiceTest {
 
             given(
                             storeCustomRepository.searchStoreByKeyword(
-                                    eq(keyword), any(Pageable.class), eq(sortType)))
+                                    eq(keyword),
+                                    any(Pageable.class),
+                                    eq(sortType),
+                                    eq(StoreQueryScope.USER)))
                     .willReturn(mockContent);
 
             // 첫 페이지(0)이므로 count 쿼리 호출 모킹
@@ -289,7 +299,8 @@ class StoreQueryServiceTest {
 
             // when
             StoreSearchPageResponse response =
-                    storeQueryService.getStoreByKeyword(keyword, pageable, sortType);
+                    storeQueryService.getStoreByKeyword(
+                            keyword, pageable, sortType, UserRole.CUSTOMER);
 
             // then
             assertThat(response).isNotNull();
@@ -314,12 +325,16 @@ class StoreQueryServiceTest {
 
             given(
                             storeCustomRepository.searchStoreByKeyword(
-                                    eq(keyword), any(Pageable.class), eq(sortType)))
+                                    eq(keyword),
+                                    any(Pageable.class),
+                                    eq(sortType),
+                                    eq(StoreQueryScope.USER)))
                     .willReturn(mockContent);
 
             // when
             StoreSearchPageResponse response =
-                    storeQueryService.getStoreByKeyword(keyword, pageable, sortType);
+                    storeQueryService.getStoreByKeyword(
+                            keyword, pageable, sortType, UserRole.CUSTOMER);
 
             // then
             assertThat(response.getTotalCount()).isNull(); // 두 번째 페이지는 count 쿼리 안 함
