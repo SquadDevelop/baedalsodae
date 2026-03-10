@@ -1,10 +1,13 @@
 package com.project.baedalsodae.store.service;
 
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
+import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
 import java.util.UUID;
 
 public interface AdminStoreService {
+    OwnerStoreResponse getStoreDetail(UUID storeId);
+
     void updateStore(UpdateStoreRequest request, UUID storeId);
 
     void deleteStore(UUID storeId, UUID userId);

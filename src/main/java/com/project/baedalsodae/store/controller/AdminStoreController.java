@@ -5,6 +5,7 @@ import com.project.baedalsodae.global.common.ApiResponse;
 import com.project.baedalsodae.global.common.SuccessCode;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreRequest;
 import com.project.baedalsodae.store.dto.request.store.UpdateStoreStatusRequest;
+import com.project.baedalsodae.store.dto.response.store.OwnerStoreResponse;
 import com.project.baedalsodae.store.service.AdminStoreService;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -16,9 +17,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("admins/stores")
+@RequestMapping("/admins/stores")
 public class AdminStoreController {
     private final AdminStoreService adminStoreService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_MASTER')")
+    @GetMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<OwnerStoreResponse>> getStore(@PathVariable UUID storeId) {
+        OwnerStoreResponse response = adminStoreService.getStoreDetail(storeId);
+        return ResponseEntity.ok(ApiResponse.success(SuccessCode.STORE_UPDATED, response));
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_MASTER')")
     @PatchMapping("/{storeId}")
