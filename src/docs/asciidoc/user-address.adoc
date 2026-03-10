@@ -1,0 +1,168 @@
+= 사용자 주소 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+[[user-address-create]]
+== 신규 주소 등록
+
+`POST /user-addresses`
+
+권한: `CUSTOMER`
+
+사용자의 신규 주소를 등록합니다.
+
+=== Request Fields
+include::{snippets}/user-address/create/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/user-address/create/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/create/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/create/http-response.adoc[]
+
+---
+
+[[user-address-get-list]]
+== 주소 목록 조회
+
+`GET /user-addresses`
+
+권한: `CUSTOMER`
+
+사용자의 전체 주소 목록을 조회합니다.
+
+=== HTTP Request Example
+include::{snippets}/user-address/get-list/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/get-list/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/get-list/http-response.adoc[]
+
+---
+
+[[user-address-get-main]]
+== 대표 주소 조회
+
+`GET /user-addresses/main`
+
+권한: `CUSTOMER`, `OWNER`, `MANAGER`
+
+사용자의 대표 주소를 조회합니다.
+
+=== HTTP Request Example
+include::{snippets}/user-address/get-main/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/get-main/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/get-main/http-response.adoc[]
+
+---
+
+[[user-address-update]]
+== 특정 주소 수정
+
+`PUT /user-addresses/{addressId}`
+
+권한: `CUSTOMER`, `OWNER`, `MANAGER`
+
+특정 주소 정보를 수정합니다.
+
+=== Path Parameters
+include::{snippets}/user-address/update/path-parameters.adoc[]
+
+=== Request Fields
+include::{snippets}/user-address/update/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/user-address/update/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/update/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/update/http-response.adoc[]
+
+---
+
+[[user-address-update-bulk]]
+== 주소 목록 일괄 수정
+
+`PUT /user-addresses`
+
+권한: `CUSTOMER`
+
+사용자의 주소 목록을 일괄적으로 수정합니다.
+
+=== Request Fields
+include::{snippets}/user-address/update-bulk/request-fields.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/user-address/update-bulk/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/update-bulk/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/update-bulk/http-response.adoc[]
+
+---
+
+[[user-address-delete]]
+== 특정 주소 삭제
+
+`DELETE /user-addresses/{addressId}`
+
+권한: `CUSTOMER`
+
+특정 주소를 삭제합니다.
+
+=== Path Parameters
+include::{snippets}/user-address/delete/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/user-address/delete/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/delete/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/delete/http-response.adoc[]
+
+==== 특정 주소 삭제 실패 (마지막 남은 주소)
+===== HTTP Response Example
+include::{snippets}/user-address/delete-fail-last/http-response.adoc[]
+
+---
+
+[[user-address-change-main]]
+== 대표 주소 변경
+
+`PATCH /user-addresses/{addressId}/main`
+
+권한: `CUSTOMER`
+
+특정 주소를 대표 주소로 설정합니다.
+
+=== Path Parameters
+include::{snippets}/user-address/change-main/path-parameters.adoc[]
+
+=== HTTP Request Example
+include::{snippets}/user-address/change-main/http-request.adoc[]
+
+=== Response Fields
+include::{snippets}/user-address/change-main/response-fields.adoc[]
+
+=== HTTP Response Example
+include::{snippets}/user-address/change-main/http-response.adoc[]
