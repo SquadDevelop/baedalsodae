@@ -73,7 +73,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    private Claims getClaimsForRequest(HttpServletRequest request, String token) throws BusinessException {
+    private Claims getClaimsForRequest(HttpServletRequest request, String token)
+            throws BusinessException {
         return isLogoutRequest(request)
                 ? jwtProvider.getClaimsIgnoreExpiration(token)
                 : jwtProvider.getClaims(token);
@@ -82,8 +83,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private boolean isLogoutRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String logoutPath = request.getContextPath() + "/auth/logout";
-        return HttpMethod.POST.matches(request.getMethod()) && 
-               (uri.equals(logoutPath) || uri.equals(logoutPath + "/"));
+        return HttpMethod.POST.matches(request.getMethod())
+                && (uri.equals(logoutPath) || uri.equals(logoutPath + "/"));
     }
 
     private void setAuthentication(Claims claims) {

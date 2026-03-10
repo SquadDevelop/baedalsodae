@@ -9,7 +9,6 @@ import com.project.baedalsodae.global.common.ErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -50,8 +49,10 @@ public class AuthConfig {
     }
 
     @Bean
-    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
-        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+            RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler expressionHandler =
+                new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy);
         return expressionHandler;
     }
@@ -79,24 +80,79 @@ public class AuthConfig {
         http.authorizeHttpRequests(
                 (authorizeHttpRequests) ->
                         authorizeHttpRequests
-                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers("/actuator/health", "/health").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/login", "/auth/reissue").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/logout").authenticated()
-                                .requestMatchers("/users/me").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
-                                .requestMatchers("/admins/me").hasAuthority("ROLE_MANAGER")
-                                .requestMatchers("/admins/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/allowed-regions/**").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/carts/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/user-addresses/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/menu-categories/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/menu-items/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/orders/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/payments/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/store-categories/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/stores/**/hours").hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
-                                .requestMatchers("/stores/**").permitAll()
-                                .requestMatchers("/tags/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers(
+                                        PathRequest.toStaticResources().atCommonLocations())
+                                .permitAll()
+                                .requestMatchers("/actuator/health", "/health")
+                                .permitAll()
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/auth/signup",
+                                        "/auth/login",
+                                        "/auth/reissue")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/logout")
+                                .authenticated()
+                                .requestMatchers("/users/me")
+                                .hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OWNER")
+                                .requestMatchers("/admins/me")
+                                .hasAuthority("ROLE_MANAGER")
+                                .requestMatchers("/admins/**")
+                                .hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/allowed-regions/**")
+                                .hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/carts/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/user-addresses/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/menu-categories/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/menu-items/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/orders/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/payments/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/store-categories/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
+                                .requestMatchers("/stores/**/hours")
+                                .hasAnyAuthority("ROLE_MANAGER", "ROLE_MASTER")
+                                .requestMatchers("/stores/**")
+                                .permitAll()
+                                .requestMatchers("/tags/**")
+                                .hasAnyAuthority(
+                                        "ROLE_CUSTOMER",
+                                        "ROLE_OWNER",
+                                        "ROLE_MANAGER",
+                                        "ROLE_MASTER")
                                 .anyRequest()
                                 .permitAll());
 
@@ -119,7 +175,8 @@ public class AuthConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);

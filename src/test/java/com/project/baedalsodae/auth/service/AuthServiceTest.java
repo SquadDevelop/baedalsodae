@@ -113,7 +113,8 @@ public class AuthServiceTest {
             Claims mockClaims = mock(Claims.class);
 
             given(jwtProvider.resolveToken(accessToken)).willReturn(resolvedAccessToken);
-            given(jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken)).willReturn(mockClaims);
+            given(jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken))
+                    .willReturn(mockClaims);
             given(mockClaims.getSubject()).willReturn(username);
             given(jwtProvider.getRemainingTimeSafe(resolvedAccessToken)).willReturn(remainingTime);
 
@@ -136,7 +137,8 @@ public class AuthServiceTest {
             Claims mockClaims = mock(Claims.class);
 
             given(jwtProvider.resolveToken(accessToken)).willReturn(resolvedAccessToken);
-            given(jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken)).willReturn(mockClaims);
+            given(jwtProvider.getClaimsIgnoreExpiration(resolvedAccessToken))
+                    .willReturn(mockClaims);
             given(mockClaims.getSubject()).willReturn(username);
             given(jwtProvider.getRemainingTimeSafe(resolvedAccessToken)).willReturn(0L);
 
