@@ -429,7 +429,7 @@ erDiagram
 
 ## 📡 API 엔드포인트
 
-> 기본 경로: `/api/v1` · 전체 목록: [docs/API.md](docs/API.md) 
+> 기본 경로: `/api/v1` · 전체 목록: [docs/API.md](docs/API.md) · REST Docs: [GitHub Pages](https://SquadDevelop.github.io/baedalsodae/)
 
 | 그룹               | 주요 URL 패턴                               | 설명           |
 |------------------|------------------------------------------|--------------|
