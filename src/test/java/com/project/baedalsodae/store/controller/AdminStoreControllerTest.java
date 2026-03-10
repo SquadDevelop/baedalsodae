@@ -91,8 +91,7 @@ class AdminStoreControllerTest {
                                 "admin/store/get",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                pathParameters(
-                                        parameterWithName("storeId").description("가게 UUID")),
+                                pathParameters(parameterWithName("storeId").description("가게 UUID")),
                                 responseFields(
                                         fieldWithPath("code").description("응답 코드"),
                                         fieldWithPath("status").description("HTTP 상태"),
@@ -101,21 +100,29 @@ class AdminStoreControllerTest {
                                         fieldWithPath("data.storeId").description("가게 UUID"),
                                         fieldWithPath("data.storeName").description("가게 이름"),
                                         fieldWithPath("data.phoneNumber").description("가게 전화번호"),
-                                        fieldWithPath("data.businessNumber").description("사업자 등록 번호"),
+                                        fieldWithPath("data.businessNumber")
+                                                .description("사업자 등록 번호"),
                                         fieldWithPath("data.description").description("가게 상세 설명"),
                                         fieldWithPath("data.reviewCount").description("총 리뷰 수"),
                                         fieldWithPath("data.avgRating").description("평균 별점"),
-                                        fieldWithPath("data.storeStatus").description("가게 운영 상태 (OPEN, CLOSED)"),
-                                        fieldWithPath("data.address.sidoName").description("시/도 명칭"),
-                                        fieldWithPath("data.address.sigunguName").description("시/군/구 명칭"),
-                                        fieldWithPath("data.address.dongName").description("법정동/읍/면 명칭"),
-                                        fieldWithPath("data.address.roadAddress").description("도로명 주소"),
-                                        fieldWithPath("data.address.detailAddress").description("상세 주소"),
-                                        fieldWithPath("data.address.sidoCode").description("시/도 코드"),
-                                        fieldWithPath("data.address.sigunguCode").description("시/군/구 코드"),
-                                        fieldWithPath("data.address.dongCode").description("법정동 코드")
-                                )
-                        ));
+                                        fieldWithPath("data.storeStatus")
+                                                .description("가게 운영 상태 (OPEN, CLOSED)"),
+                                        fieldWithPath("data.address.sidoName")
+                                                .description("시/도 명칭"),
+                                        fieldWithPath("data.address.sigunguName")
+                                                .description("시/군/구 명칭"),
+                                        fieldWithPath("data.address.dongName")
+                                                .description("법정동/읍/면 명칭"),
+                                        fieldWithPath("data.address.roadAddress")
+                                                .description("도로명 주소"),
+                                        fieldWithPath("data.address.detailAddress")
+                                                .description("상세 주소"),
+                                        fieldWithPath("data.address.sidoCode")
+                                                .description("시/도 코드"),
+                                        fieldWithPath("data.address.sigunguCode")
+                                                .description("시/군/구 코드"),
+                                        fieldWithPath("data.address.dongCode")
+                                                .description("법정동 코드"))));
     }
 
     @Test

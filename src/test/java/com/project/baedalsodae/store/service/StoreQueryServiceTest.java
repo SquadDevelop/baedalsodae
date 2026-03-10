@@ -101,7 +101,8 @@ class StoreQueryServiceTest {
                             Address.createAddress(
                                     "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
-            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.of(store));
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER))
+                    .willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
                     .willReturn(List.of(mock(MenuCategoryItemsResponse.class)));
             given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
@@ -127,7 +128,8 @@ class StoreQueryServiceTest {
                             Address.createAddress(
                                     "11", "서울", "120", "강남", "1101", "역삼", "도로명", "상세"));
 
-            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.of(store));
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER))
+                    .willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
                     .willReturn(List.of());
             given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
@@ -153,7 +155,8 @@ class StoreQueryServiceTest {
                             Address.createAddress(
                                     "11", "서울", "110", "강남", "1101", "역삼", "도로명", "상세"));
 
-            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.of(store));
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER))
+                    .willReturn(Optional.of(store));
             given(menuCategoryCustomRepository.getStoreCategoryItems(storeId))
                     .willReturn(List.of());
             given(userAddressService.getMainUserAddress(userId)).willReturn(userAddress);
@@ -172,7 +175,8 @@ class StoreQueryServiceTest {
         @Test
         @DisplayName("실패: 가게가 존재하지 않으면 예외가 발생한다.")
         void getStoreDetail_storeNotFound() {
-            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER)).willReturn(Optional.empty());
+            given(storeCustomRepository.findByIdAndScope(storeId, StoreQueryScope.USER))
+                    .willReturn(Optional.empty());
 
             assertThrows(
                     BusinessException.class,
