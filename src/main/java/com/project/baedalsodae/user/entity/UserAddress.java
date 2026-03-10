@@ -53,6 +53,16 @@ public class UserAddress extends BaseTimeEntity {
         this.user = user;
     }
 
+    public String makeDeliveryAddress() {
+        return this.getAddress().getSidoName()
+                + " "
+                + this.getAddress().getSigunguName()
+                + " "
+                + this.getAddress().getRoadAddress()
+                + " "
+                + this.getAddress().getDetailAddress();
+    }
+
     public void update(UUID userAddressId, Address address, String description) {
         if (userAddressId != null) {
             this.id = userAddressId;

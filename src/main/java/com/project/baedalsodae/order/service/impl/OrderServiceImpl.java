@@ -26,8 +26,10 @@ import com.project.baedalsodae.payment.entity.PaymentStatus;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.store.entity.Store;
 import com.project.baedalsodae.store.repository.StoreRepository;
+import com.project.baedalsodae.user.entity.User;
 import com.project.baedalsodae.user.entity.UserAddress;
 import com.project.baedalsodae.user.entity.UserRole;
+import com.project.baedalsodae.user.repository.UserRepository;
 import com.project.baedalsodae.user.service.UserAddressService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -52,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentRepository paymentRepository;
     private final AllowedRegionService allowedRegionService;
     private final UserAddressService userAddressService;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -91,14 +94,17 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.USER_ADDRESS_NOT_ALLOWED);
         }
 
-        // TODO 주소 도메인 완성 후 만들어야함. 주소 조회, 주소를 배달 주소 스냅샷으로 변환
-        String deliveryAddressSnapshot = "서울특별시 강남구 테헤란로 123 (역삼동) 4층";
+        final String deliveryAddressSnapshot = userAddress.makeDeliveryAddress();
 
         final String createdOrderNo = OrderNoGenerator.generate();
 
-        // TODO 인증 도메인 완료 시 넣어줌
-        final String userNickName = "잽닝";
-        final String userPhone = "01011111111";
+        final User user =
+                userRepository
+                        .findByUserIdAndIsDeletedFalse(userId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        final String userNickName = user.getNickname();
+        final String userPhone = user.getPhone();
 
         Order order =
                 Order.create(
