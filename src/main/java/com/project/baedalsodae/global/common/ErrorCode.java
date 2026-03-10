@@ -20,6 +20,7 @@ public enum ErrorCode {
     LOGIN_FAILED("Z009", HttpStatus.UNAUTHORIZED, "로그인 요청 처리에 실패했습니다."),
     SORT_UNSUPPORTED("Z010", HttpStatus.UNAUTHORIZED, "지원하지 않는 정렬입니다."),
     UTILITY_ASSERTION("Z011", HttpStatus.INTERNAL_SERVER_ERROR, "유틸리티 클래스의 생성자 호출은 허용되지 않습니다."),
+    COMMON_CONCURRENCY_ERROR("Z013", HttpStatus.CONFLICT, "동시 요청으로 인해 처리에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
     // database
     DATABASE_UNAVAILABLE("DA001", HttpStatus.SERVICE_UNAVAILABLE, "데이터베이스 연결이 불가능합니다"),
@@ -85,6 +86,8 @@ public enum ErrorCode {
     ORDER_INVALID_STATUS("OD007", HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
     ORDER_PAYMENT_NOT_COMPLETED("OD008", HttpStatus.BAD_REQUEST, "주문의 결제가 완료되지 않았습니다."),
     ORDER_CANCEL_NOT_ALLOWED("OD009", HttpStatus.BAD_REQUEST, "주문 취소는 주문 생성 5분전에 가능합니다."),
+    ORDER_STORE_ORDER_COUNT_UPDATE_FAILED(
+            "OD010", HttpStatus.CONFLICT, "가게 주문수 업데이트에 실패했습니다. 잠시 후 다시 시도해주세요."),
 
     // payment
     PAYMENT_NOT_FOUND("PY001", HttpStatus.NOT_FOUND, "결제 목록 정보가 없습니다."),

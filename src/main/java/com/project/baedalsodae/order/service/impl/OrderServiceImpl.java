@@ -349,8 +349,6 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
-
         return OrderActionStatusResponse.from(order);
     }
 
@@ -379,8 +377,6 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
-
         return OrderActionStatusResponse.from(order);
     }
 
@@ -408,6 +404,9 @@ public class OrderServiceImpl implements OrderService {
         order.completeDelivery();
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(userId, fromStatus, order, null);
+
+        // 가게의 주문수 필드 업데이트
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_DELIVERED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -457,7 +456,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForCustomerOrderStatusHistory(userId, fromStatus, order);
 
-        eventPublisher.publishOrderEvent(order, EventType.ORDER_UPDATED);
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
 
         return OrderActionStatusResponse.from(order);
     }
@@ -478,6 +477,8 @@ public class OrderServiceImpl implements OrderService {
 
         orderStatusHistoryService.createForOwnerOrderStatusHistory(
                 userId, fromStatus, order, reason);
+
+        eventPublisher.publishOrderEvent(order, EventType.ORDER_CANCEL_REQUESTED);
 
         return OrderActionStatusResponse.from(order);
     }

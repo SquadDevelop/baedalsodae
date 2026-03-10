@@ -1563,10 +1563,6 @@ public class OrderServiceTest {
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
-        then(orderEventPublisher)
-                .should()
-                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
-
         assertThat(response).isNotNull();
     }
 
@@ -1676,10 +1672,6 @@ public class OrderServiceTest {
                 .should()
                 .createForOwnerOrderStatusHistory(
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
-
-        then(orderEventPublisher)
-                .should()
-                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_UPDATED));
 
         assertThat(response).isNotNull();
     }
@@ -1792,6 +1784,10 @@ public class OrderServiceTest {
                         eq(userId), eq(fromStatus), any(Order.class), isNull());
 
         assertThat(response).isNotNull();
+
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_DELIVERED));
     }
 
     @DisplayName("주문 취소 요청 실패 - 존재하지 않는 주문")
@@ -1967,6 +1963,9 @@ public class OrderServiceTest {
         verify(order).cancelRequested();
         verify(orderStatusHistoryService)
                 .createForCustomerOrderStatusHistory(userId, OrderStatus.REQUESTED, order);
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
     }
 
     @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 고객 취소")
@@ -1989,6 +1988,9 @@ public class OrderServiceTest {
 
         // then
         verify(order).cancelRequested();
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
     }
 
     @DisplayName("주문 취소 요청 성공 - ACCEPTED 상태 사장 취소")
@@ -2013,6 +2015,9 @@ public class OrderServiceTest {
         verify(order).cancelRequested();
         verify(orderStatusHistoryService)
                 .createForOwnerOrderStatusHistory(userId, OrderStatus.ACCEPTED, order, null);
+        then(orderEventPublisher)
+                .should()
+                .publishOrderEvent(any(Order.class), eq(EventType.ORDER_CANCEL_REQUESTED));
     }
 
     @DisplayName("주문 취소 실패 - 존재하지 않는 주문")

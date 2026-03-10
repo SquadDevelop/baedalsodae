@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: false
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: ${POSTGRES_DEFAULT_SCHEMA}
+        format_sql: true
+        jdbc.time_zone: Asia/Seoul
+  sql:
+    init:
+      mode: never
+  data:
+    redis:
+      url: ${SPRING_DATA_REDIS_URL}
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+      password:
+      ssl:
+        enabled: false
+      repositories:
+        enabled: false
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+JWT_SECRET: ${JWT_SECRET}
+JWT_EXPIRATION: ${JWT_EXPIRATION}
+JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+
+encryption:
+  aes:
+    key: ${ENCRYPTION_AES_KEY}
+
+pg:
+  url: http://localhost:8089
