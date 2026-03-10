@@ -213,4 +213,10 @@ public class MenuItemServiceImpl implements MenuItemService {
                 .findByIdAndDeletedIsFalse(menuCategoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
     }
+
+    private MenuCategory getMenuCategoryByMenuCategoryIdWithLock(UUID menuCategoryId) {
+        return menuCategoryRepository
+                .findByIdAndDeletedIsFalseWithLock(menuCategoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    }
 }
