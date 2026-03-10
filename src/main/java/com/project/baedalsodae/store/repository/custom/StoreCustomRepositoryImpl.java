@@ -7,8 +7,9 @@ import static com.project.baedalsodae.store.entity.QStoreCategory.storeCategory;
 
 import com.project.baedalsodae.store.dto.request.store.StoreCursorRequest;
 import com.project.baedalsodae.store.entity.Store;
-import com.project.baedalsodae.store.entity.enums.SortType;
 import com.project.baedalsodae.store.entity.enums.StoreStatus;
+import com.project.baedalsodae.store.enums.SortType;
+import com.project.baedalsodae.store.enums.StoreQueryScope;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -29,18 +30,23 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
 
     @Override
     public Slice<Store> findStoresByCursor(
-            UUID storeCategoryId, StoreCursorRequest cursor, SortType sortType) {
-        NumberExpression<Integer> statusOrder =
-                new CaseBuilder().when(store.storeStatus.eq(StoreStatus.OPEN)).then(1).otherwise(0);
+            UUID storeCategoryId,
+            StoreCursorRequest cursor,
+            SortType sortType,
+            StoreQueryScope scope) {
 
         List<Store> content =
                 queryFactory
                         .selectFrom(store)
                         .where(
-                                isNotDeleted(),
+                                isVisibleToUser(scope),
+                                scope == StoreQueryScope.USER ? isNotDeleted() : null,
                                 store.storeCategory.id.eq(storeCategoryId),
                                 cursor.lastId() != null ? cursorCondition(cursor, sortType) : null)
-                        .orderBy(statusOrder.desc(), orderSpecifier(sortType), store.id.desc())
+                        .orderBy(
+                                scope == StoreQueryScope.USER ? getStatusOrder().desc() : null,
+                                orderSpecifier(sortType),
+                                store.id.desc())
                         .limit(cursor.getSize() + 1)
                         .fetch();
 
@@ -53,7 +59,8 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
     }
 
     @Override
-    public List<Store> searchStoreByKeyword(String keyword, Pageable pageable, SortType sortType) {
+    public List<Store> searchStoreByKeyword(
+            String keyword, Pageable pageable, SortType sortType, StoreQueryScope scope) {
         return queryFactory
                 .selectDistinct(store)
                 .from(store)
@@ -63,8 +70,14 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                 .on(menuCategory.store.id.eq(store.id))
                 .leftJoin(menuItem)
                 .on(menuItem.menuCategory.id.eq(menuCategory.id))
-                .where(isNotDeleted(), keywordCondition(keyword))
-                .orderBy(orderSpecifier(sortType), store.id.desc())
+                .where(
+                        isVisibleToUser(scope),
+                        scope == StoreQueryScope.USER ? isNotDeleted() : null,
+                        keywordCondition(keyword))
+                .orderBy(
+                        scope == StoreQueryScope.USER ? getStatusOrder().desc() : null,
+                        orderSpecifier(sortType),
+                        store.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -84,6 +97,17 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
                                 .where(isNotDeleted(), keywordCondition(keyword))
                                 .fetchOne())
                 .orElse(0L);
+    }
+
+    @Override
+    public Optional<Store> findByIdAndScope(UUID storeId, StoreQueryScope scope) {
+        Store result =
+                queryFactory
+                        .selectFrom(store)
+                        .where(store.id.eq(storeId), isVisibleToUser(scope))
+                        .fetchOne();
+
+        return Optional.ofNullable(result);
     }
 
     private BooleanExpression isNotDeleted() {
@@ -132,5 +156,16 @@ public class StoreCustomRepositoryImpl implements StoreCustomRepository {
             case RATING -> store.avgRating.desc();
             case REVIEW -> store.reviewCount.desc();
         };
+    }
+
+    private BooleanExpression isVisibleToUser(StoreQueryScope scope) {
+        if (scope != StoreQueryScope.USER) {
+            return null;
+        }
+        return store.storeStatus.in(StoreStatus.OPEN, StoreStatus.TEMPORARILY_CLOSED);
+    }
+
+    private NumberExpression<Integer> getStatusOrder() {
+        return new CaseBuilder().when(store.storeStatus.eq(StoreStatus.OPEN)).then(1).otherwise(0);
     }
 }
