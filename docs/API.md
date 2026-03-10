@@ -1,6 +1,7 @@
 # 📡 API 엔드포인트
 
 > 기본 경로: `/api/v1`
+> 권한 계층: `CUSTOMER` < `OWNER` < `MANAGER` < `MASTER` . `MANAGER` 이상 권한이 필요한 API는 `MASTER`도 접근 가능합니다.
 
 ## Auth
 
@@ -138,11 +139,11 @@
 
 ## Allowed Regions
 
-| Method  | URL                                             | 설명          | 권한        |
-|---------|-------------------------------------------------|-------------|-----------|
-| `GET`   | `/allowed-regions`                              | 허용 지역 목록 조회 | `MANAGER` |
-| `POST`  | `/allowed-regions`                              | 허용 지역 등록    | `MANAGER` |
-| `PATCH` | `/allowed-regions/{allowedRegionId}/activation` | 활성화/비활성화 토글 | `MANAGER` |
+| Method  | URL                                             | 설명          | 권한               |
+|---------|-------------------------------------------------|-------------|------------------|
+| `GET`   | `/allowed-regions`                              | 허용 지역 목록 조회 | `MANAGER` 이상     |
+| `POST`  | `/allowed-regions`                              | 허용 지역 등록    | `MANAGER` 이상     |
+| `PATCH` | `/allowed-regions/{allowedRegionId}/activation` | 활성화/비활성화 토글 | `MANAGER` 이상     |
 
 ## Tags
 
@@ -159,25 +160,25 @@
 
 ## Admin — Users
 
-| Method | URL                            | 설명          | 권한        |
-|--------|--------------------------------|-------------|-----------|
-| `POST` | `/admins/managers`             | 관리자 계정 생성   | `MASTER`  |
-| `GET`  | `/admins/managers`             | 관리자 목록 조회   | `MASTER`  |
-| `GET`  | `/admins/managers/{managerId}` | 관리자 상세 조회   | `MASTER`  |
-| `GET`  | `/admins/me`                   | 내 관리자 정보 조회 | `MANAGER` |
+| Method | URL                            | 설명          | 권한           |
+|--------|--------------------------------|-------------|--------------|
+| `POST` | `/admins/managers`             | 관리자 계정 생성   | `MASTER` 전용  |
+| `GET`  | `/admins/managers`             | 관리자 목록 조회   | `MASTER` 전용  |
+| `GET`  | `/admins/managers/{managerId}` | 관리자 상세 조회   | `MASTER` 전용  |
+| `GET`  | `/admins/me`                   | 내 관리자 정보 조회 | `MANAGER` 이상 |
 
 ## Admin — Stores
 
-| Method   | URL                               | 설명       | 권한        |
-|----------|-----------------------------------|----------|-----------|
-| `PATCH`  | `/admins/stores/{storeId}`        | 가게 정보 수정 | `MANAGER` |
-| `PATCH`  | `/admins/stores/{storeId}/status` | 가게 상태 변경 | `MANAGER` |
-| `DELETE` | `/admins/stores/{storeId}`        | 가게 삭제    | `MANAGER` |
+| Method   | URL                               | 설명       | 권한           |
+|----------|-----------------------------------|----------|--------------|
+| `PATCH`  | `/admins/stores/{storeId}`        | 가게 정보 수정 | `MANAGER` 이상 |
+| `PATCH`  | `/admins/stores/{storeId}/status` | 가게 상태 변경 | `MANAGER` 이상 |
+| `DELETE` | `/admins/stores/{storeId}`        | 가게 삭제    | `MANAGER` 이상 |
 
 ## Admin — Orders
 
-| Method | URL                                       | 설명          | 권한        |
-|--------|-------------------------------------------|-------------|-----------|
-| `GET`  | `/admins/orders`                          | 전체 주문 목록 조회 | `MANAGER` |
-| `GET`  | `/admins/orders/{orderId}`                | 주문 상세 조회    | `MANAGER` |
-| `GET`  | `/admins/orders/{orderId}/status-history` | 주문 상태 이력 조회 | `MANAGER` |
+| Method | URL                                       | 설명          | 권한           |
+|--------|-------------------------------------------|-------------|--------------|
+| `GET`  | `/admins/orders`                          | 전체 주문 목록 조회 | `MANAGER` 이상 |
+| `GET`  | `/admins/orders/{orderId}`                | 주문 상세 조회    | `MANAGER` 이상 |
+| `GET`  | `/admins/orders/{orderId}/status-history` | 주문 상태 이력 조회 | `MANAGER` 이상 |
