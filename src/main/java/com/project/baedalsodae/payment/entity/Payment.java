@@ -2,12 +2,11 @@ package com.project.baedalsodae.payment.entity;
 
 import com.project.baedalsodae.global.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)

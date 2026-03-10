@@ -16,16 +16,15 @@ import com.project.baedalsodae.payment.pg.enums.PGProviderType;
 import com.project.baedalsodae.payment.pg.service.PGClient;
 import com.project.baedalsodae.payment.repository.PaymentRepository;
 import com.project.baedalsodae.payment.service.PaymentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -113,11 +112,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void processPaymentCancel(UUID orderId, UUID userId, BigDecimal finalAmount) {
 
-        Payment foundPayment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
+        Payment foundPayment =
+                paymentRepository
+                        .findByOrderId(orderId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.PAYMENT_NOT_FOUND));
 
         // 이미 취소된 결제인지 확인
-        if(foundPayment.getStatus().equals(PaymentStatus.CANCELED)){
+        if (foundPayment.getStatus().equals(PaymentStatus.CANCELED)) {
             throw new BusinessException(ErrorCode.PAYMENT_ALREADY_CANCELED);
         }
 
@@ -129,7 +130,12 @@ public class PaymentServiceImpl implements PaymentService {
 
         // pg 취소 요청
         PGCancelRequest pgCancelRequest =
-                new PGCancelRequest(orderId, userId, PaymentMethod.CREDIT_CARD, finalAmount, foundPayment.getPgTransactionId());
+                new PGCancelRequest(
+                        orderId,
+                        userId,
+                        PaymentMethod.CREDIT_CARD,
+                        finalAmount,
+                        foundPayment.getPgTransactionId());
         PGPaymentResponse pgPaymentResponse = pgClient.cancel(pgCancelRequest);
 
         // payment status 취소로 업데이트

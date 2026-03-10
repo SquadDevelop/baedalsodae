@@ -37,7 +37,7 @@ public class EventPublisher {
         } else if (type == EventType.PAYMENT_CANCEL_REQUESTED) {
             final PaymentCancelRequestedEvent event = PaymentCancelRequestedEvent.from(payment);
             eventService.save(Event.fromPayment(payment, type, JsonUtils.toJson(event)));
-         }
+        }
         // 다른 이벤트 타입이 추가될 경우 여기에 분기 처리 (예: PAYMENT_FAILED, PAYMENT_REFUNDED 등
     }
 }
