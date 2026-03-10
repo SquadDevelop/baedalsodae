@@ -20,7 +20,7 @@ public class BaseAuditEntity extends BaseTimeEntity {
 
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    private UUID createdBy;
+    protected UUID createdBy;
 
     @LastModifiedBy
     @Column(name = "updated_by")
