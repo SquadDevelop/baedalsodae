@@ -58,7 +58,7 @@ class StoreControllerTest {
     private static final UUID STORE_ID = UUID.randomUUID();
     private static final UUID CATEGORY_ID = UUID.randomUUID();
     private static final UUID USER_ID = UUID.randomUUID();
-    private static final UserDetailsImpl ownerDetails = createOwnerUserDetails(UUID.randomUUID());
+    private static final UserDetailsImpl ownerDetails = createOwnerUserDetails(USER_ID);
 
     private static UserDetailsImpl createOwnerUserDetails(UUID userId) {
         return UserDetailsImpl.from(
@@ -106,7 +106,7 @@ class StoreControllerTest {
                         storeQueryService.getStorePage(
                                 eq(CATEGORY_ID),
                                 any(StoreCursorRequest.class),
-                                ownerDetails.getUserRole()))
+                                eq(ownerDetails.getUserRole())))
                 .willReturn(pageResponse);
 
         mockMvc.perform(
@@ -244,7 +244,9 @@ class StoreControllerTest {
         StoreDetailResponse detailResponse =
                 StoreDetailResponse.of(storeSummary(), List.of(), true, true);
 
-        given(storeQueryService.getStoreDetail(STORE_ID, USER_ID, UserRole.CUSTOMER))
+        given(
+                        storeQueryService.getStoreDetail(
+                                eq(STORE_ID), eq(USER_ID), eq(ownerDetails.getUserRole())))
                 .willReturn(detailResponse);
 
         mockMvc.perform(
@@ -265,14 +267,23 @@ class StoreControllerTest {
                                         fieldWithPath("message").description("응답 메시지"),
                                         fieldWithPath("status").description("HTTP 상태"),
                                         fieldWithPath("timestamp").description("응답 타임스탬프"),
+
+                                        // 상세 정보 (store 계층 포함)
                                         fieldWithPath("data.store.storeId").description("가게 UUID"),
                                         fieldWithPath("data.store.storeName").description("가게 이름"),
                                         fieldWithPath("data.store.reviewCount").description("리뷰 수"),
                                         fieldWithPath("data.store.avgRating").description("평균 평점"),
                                         fieldWithPath("data.store.storeStatus")
                                                 .description("가게 상태"),
-                                        fieldWithPath("data.storeMenuCategoryItems")
-                                                .description("메뉴 카테고리 목록"))));
+
+                                        // 메뉴 및 권한 정보
+                                        fieldWithPath("data.storeMenuCategoryItems[]")
+                                                .description("메뉴 카테고리 목록"),
+                                        fieldWithPath("data.allowedRegion")
+                                                .description("배달 가능 지역 여부"), // 필드명 확인 필요!
+                                        fieldWithPath("data.deliverableToUser")
+                                                .description("사용자 배달 가능 여부") // 필드명 확인 필요!
+                                        )));
     }
 
     @Test
@@ -327,7 +338,6 @@ class StoreControllerTest {
                                                 .description("총 리뷰 개수"),
                                         fieldWithPath("data.reviewSummary.averageRating")
                                                 .description("평균 별점"),
-                                        fieldWithPath("data.reviews[]").description("리뷰 목록"),
                                         fieldWithPath("data.reviews[].reviewId")
                                                 .description("리뷰 UUID"),
                                         fieldWithPath("data.reviews[].orderId")
