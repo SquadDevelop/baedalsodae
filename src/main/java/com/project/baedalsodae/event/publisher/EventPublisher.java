@@ -1,5 +1,6 @@
 package com.project.baedalsodae.event.publisher;
 
+import com.project.baedalsodae.event.dto.OrderCancelRequestedEvent;
 import com.project.baedalsodae.event.dto.OrderCreatedEvent;
 import com.project.baedalsodae.event.dto.OrderDeliveredEvent;
 import com.project.baedalsodae.event.dto.PaymentCreatedEvent;
@@ -23,7 +24,10 @@ public class EventPublisher {
         if (type == EventType.ORDER_CREATED) {
             final OrderCreatedEvent event = OrderCreatedEvent.from(order);
             eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
-        } else if (type == EventType.ORDER_DELIVERED) {
+        }else if (type == EventType.ORDER_UPDATED) {
+            final OrderCancelRequestedEvent event = OrderCancelRequestedEvent.from(order);
+            eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
+        } else if (type == EventType.ORDER_DELIVERED) { 
             final OrderDeliveredEvent event = OrderDeliveredEvent.from(order);
             eventService.save(Event.fromOrder(order, type, JsonUtils.toJson(event)));
         }
