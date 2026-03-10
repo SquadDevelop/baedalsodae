@@ -4,9 +4,11 @@ import com.project.baedalsodae.recommendation.dto.VoiceRecommendationRequest;
 import com.project.baedalsodae.recommendation.dto.VoiceRecommendationResponse;
 import com.project.baedalsodae.recommendation.service.MenuEmbeddingService;
 import com.project.baedalsodae.recommendation.service.RecommendationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -18,9 +20,10 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final MenuEmbeddingService menuEmbeddingService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @PostMapping("/voice")
     public ResponseEntity<VoiceRecommendationResponse> recommendByVoice(
-            @RequestBody VoiceRecommendationRequest request) {
+            @Valid @RequestBody VoiceRecommendationRequest request) {
         log.info("[Voice Recommendation] Input Text: {}", request.transcribedText());
         VoiceRecommendationResponse response = recommendationService.recommendMenuItems(request);
         log.info(
@@ -30,6 +33,7 @@ public class RecommendationController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_MASTER')")
     @PostMapping("/sync-embeddings")
     public ResponseEntity<String> syncAllEmbeddings() {
         menuEmbeddingService.syncAllMenuItemsToVectorStore();
