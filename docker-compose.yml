@@ -11,12 +11,6 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_PROFILES_ACTIVE: local
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
-      SPRING_DATA_REDIS_PORT: ${SPRING_DATA_REDIS_PORT}
-      SPRING_DATA_REDIS_URL: ${SPRING_DATA_REDIS_URL}
-      JWT_EXPIRATION: ${JWT_EXPIRATION}
-      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
     env_file:
       - .env
     volumes:
@@ -28,7 +22,7 @@ services:
          condition: service_healthy
 
   postgres:
-    image: pgvector/pgvector:pg17
+    image: postgres:17
     container_name: baedalsodae-postgres
     ports:
       - "${POSTGRES_PORT}:5432"

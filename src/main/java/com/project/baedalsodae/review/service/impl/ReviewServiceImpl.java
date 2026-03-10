@@ -9,7 +9,6 @@ import com.project.baedalsodae.review.dto.response.ReviewResponse;
 import com.project.baedalsodae.review.entity.Review;
 import com.project.baedalsodae.review.repository.ReviewRepository;
 import com.project.baedalsodae.review.service.ReviewService;
-import com.project.baedalsodae.store.service.StoreReviewService;
 import com.project.baedalsodae.user.service.UserService;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -25,7 +24,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final OrderService orderService;
-    private final StoreReviewService storeReviewService;
 
     @Override
     public TimeCursorPage<List<ReviewResponse>> getReviewsByUser(
@@ -65,7 +63,6 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview =
                 reviewRepository.save(
                         Review.create(userId, orderId, request.rating(), request.comment()));
-        storeReviewService.calculateReviewCreated(orderId, request.rating());
         return ReviewResponse.from(savedReview);
     }
 
@@ -80,10 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (foundReview.getUserId() != userId) {
             throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
         }
-        double oldRating = foundReview.getRating();
         foundReview.update(request.rating(), request.comment());
-        storeReviewService.calculateReviewUpdated(
-                reviewId, foundReview.getOrderId(), oldRating, request.rating());
         return ReviewResponse.from(foundReview);
     }
 
@@ -98,8 +92,6 @@ public class ReviewServiceImpl implements ReviewService {
             throw new BusinessException(ErrorCode.REVIEW_UNAUTHORIZED);
         }
         foundReview.softDelete(userId);
-        storeReviewService.calculateReviewDeleted(
-                reviewId, foundReview.getOrderId(), foundReview.getRating());
         return ReviewResponse.from(foundReview);
     }
 }
