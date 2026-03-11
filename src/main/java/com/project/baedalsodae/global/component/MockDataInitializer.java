@@ -33,9 +33,8 @@ public class MockDataInitializer implements ApplicationRunner {
                     "--",
                     ";",
                     "/*",
-                    "*/"
-            );
-        log.info("[MockDataInitializer] data.sql 실행 완료");
+                    "*/");
+            log.info("[MockDataInitializer] data.sql 실행 완료");
         } catch (Exception e) {
             log.warn("[MockDataInitializer] data.sql 실행 중 오류 (이미 데이터 있을 수 있음): {}", e.getMessage());
         }
