@@ -3,6 +3,7 @@ package com.project.baedalsodae.global.component;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("!test")
 @RequiredArgsConstructor
+@DependsOn("dataSourceScriptDatabaseInitializer")
 public class DatabaseIndexInitializer implements ApplicationRunner {
 
     private final JdbcTemplate jdbcTemplate;
