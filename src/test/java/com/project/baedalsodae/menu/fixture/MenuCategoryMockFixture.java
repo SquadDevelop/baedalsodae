@@ -44,7 +44,7 @@ public class MenuCategoryMockFixture {
             MenuCategoryRepository menuCategoryRepository, UUID menuCategoryId, UUID storeId) {
         MenuCategory category = mock(MenuCategory.class);
         Store store = mock(Store.class);
-        given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+        given(menuCategoryRepository.findByIdAndDeletedIsFalseWithLock(menuCategoryId))
                 .willReturn(Optional.of(category));
         given(category.getStore()).willReturn(store);
         given(store.getId()).willReturn(storeId);

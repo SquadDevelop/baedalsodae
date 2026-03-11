@@ -3,7 +3,6 @@ package com.project.baedalsodae.menu.service;
 import static com.project.baedalsodae.menu.fixture.MenuCategoryMockFixture.CategoryAndStoreFixture;
 import static com.project.baedalsodae.menu.fixture.MenuCategoryMockFixture.createCategoryAndStoreFixture;
 import static com.project.baedalsodae.menu.fixture.MenuCategoryMockFixture.createMockCategory;
-import static com.project.baedalsodae.menu.fixture.MenuCategoryMockFixture.createMockCategoryWithUnrelatedStore;
 import static com.project.baedalsodae.menu.fixture.MenuItemMockFixture.createMockItemWithUnrelatedStore;
 import static com.project.baedalsodae.menu.fixture.MenuItemMockFixture.createMockMenuItem;
 import static com.project.baedalsodae.menu.fixture.MenuItemRequestFixture.*;
@@ -38,7 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
 class MenuItemServiceImplTest {
@@ -105,7 +103,7 @@ class MenuItemServiceImplTest {
         @DisplayName("실패: 카테고리가 존재하지 않으면 예외가 발생한다")
         void createMenuItem_fail_categoryNotFound() {
             // given
-            given(menuCategoryRepository.findByIdAndDeletedIsFalse(menuCategoryId))
+            given(menuCategoryRepository.findByIdAndDeletedIsFalseWithLock(menuCategoryId))
                     .willReturn(Optional.empty());
 
             // when & then
@@ -122,7 +120,12 @@ class MenuItemServiceImplTest {
         @DisplayName("실패: OWNER가 본인 가게가 아니면 예외가 발생한다")
         void createMenuItem_fail_forbidden() {
             // given
-            createMockCategoryWithUnrelatedStore(menuCategoryRepository, menuCategoryId);
+            MenuCategory category = mock(MenuCategory.class);
+            Store store = mock(Store.class);
+            given(menuCategoryRepository.findByIdAndDeletedIsFalseWithLock(menuCategoryId))
+                    .willReturn(Optional.of(category));
+            given(category.getStore()).willReturn(store);
+            given(store.getUserId()).willReturn(UUID.randomUUID());
 
             // when & then
             assertThatThrownBy(
@@ -151,30 +154,6 @@ class MenuItemServiceImplTest {
                     .isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue(
                             ERROR_CODE_FIELD, ErrorCode.DUPLICATE_MENU_ITEM_NAME);
-        }
-
-        @Test
-        @DisplayName("실패: 순서 저장 중 충돌이 발생하면 예외가 발생한다")
-        void createMenuItem_fail_orderConflict() {
-            // given
-            givenCategoryAndStoreExist();
-            given(
-                            menuItemRepository.existsByStoreIdAndNameAndDeletedIsFalse(
-                                    storeId, DEFAULT_MENU_ITEM_NAME))
-                    .willReturn(false);
-            given(menuItemRepository.findMaxOrderNoByMenuCategoryId(menuCategoryId))
-                    .willReturn(Optional.of(0));
-            given(menuItemRepository.save(any(MenuItem.class)))
-                    .willThrow(new DataIntegrityViolationException("order conflict"));
-
-            // when & then
-            assertThatThrownBy(
-                            () ->
-                                    menuItemService.createMenuItem(
-                                            menuCategoryId, request, managerUserDetails))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue(
-                            ERROR_CODE_FIELD, ErrorCode.MENU_ITEM_ORDER_CONFLICT);
         }
 
         @Test
