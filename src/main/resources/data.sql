@@ -1,4 +1,3 @@
-
 -- ============================================================
 -- MOCK DATA (ON CONFLICT DO NOTHING)
 -- ============================================================
@@ -17,7 +16,7 @@ VALUES
     ('a0000001-0000-0000-0000-000000000009', '43', '충청북도',   NOW(), NOW(), 0),
     ('a0000001-0000-0000-0000-000000000010', '44', '충청남도',   NOW(), NOW(), 0)
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 0-B. p_sigg_area (10건)
 INSERT INTO baedalsodae.p_sigg_area (id, adm_code, name, created_at, updated_at, version)
@@ -33,7 +32,7 @@ VALUES
     ('b0000002-0000-0000-0000-000000000009', '11680', '강남구',   NOW(), NOW(), 0),
     ('b0000002-0000-0000-0000-000000000010', '11710', '송파구',   NOW(), NOW(), 0)
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 0-C. p_end_area (10건)
 INSERT INTO baedalsodae.p_end_area (id, adm_code, name, created_at, updated_at, version)
@@ -49,7 +48,7 @@ VALUES
     ('c0000003-0000-0000-0000-000000000009', '1168010100', '잠원동',   NOW(), NOW(), 0),
     ('c0000003-0000-0000-0000-000000000010', '1168010400', '역삼1동',  NOW(), NOW(), 0)
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 1. p_user (100건)
 INSERT INTO baedalsodae.p_user (
@@ -78,7 +77,7 @@ SELECT
     NULL, NULL, NULL, NULL, false
 FROM generate_series(1, 100) AS i
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 2. p_user_address (100건)
 INSERT INTO baedalsodae.p_user_address (
@@ -101,7 +100,7 @@ FROM (
     LIMIT 100
 ) u
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- user_main_address_id 업데이트
 UPDATE baedalsodae.p_user u
@@ -110,7 +109,7 @@ SET user_main_address_id = (
 )
 WHERE u.user_main_address_id IS NULL
   AND EXISTS (SELECT 1 FROM baedalsodae.p_user_address a WHERE a.user_id = u.id)
-^^^ ---
+;
 
 -- 3. p_store_category (10건)
 INSERT INTO baedalsodae.p_store_category (
@@ -136,7 +135,7 @@ FROM (VALUES
 WHERE NOT EXISTS (
     SELECT 1 FROM baedalsodae.p_store_category WHERE name = v.cat_name
 )
-^^^ ---
+;
 
 -- 4. p_store (100건)
 INSERT INTO baedalsodae.p_store (
@@ -179,7 +178,7 @@ JOIN (
     FROM baedalsodae.p_store_category
 ) cats ON cats.rn = ((i - 1) % 10) + 1
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 5. p_menu_category (100건)
 INSERT INTO baedalsodae.p_menu_category (
@@ -202,7 +201,7 @@ JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_store
 ) st ON st.rn = i
-^^^ ---
+;
 
 -- 6. p_menu_item (100건)
 INSERT INTO baedalsodae.p_menu_item (
@@ -239,7 +238,7 @@ JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_menu_category
 ) mc ON mc.rn = i
-^^^ ---
+;
 
 -- 7. p_cart (100건)
 INSERT INTO baedalsodae.p_cart (id, user_id, store_id, created_at, updated_at)
@@ -260,7 +259,7 @@ JOIN (
     LIMIT 100
 ) st ON st.rn = cust.rn
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 8. p_cart_item (100건)
 INSERT INTO baedalsodae.p_cart_item (id, cart_id, menu_item_id, quantity, created_at, updated_at)
@@ -278,7 +277,7 @@ JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn FROM baedalsodae.p_menu_item LIMIT 100
 ) mi ON mi.rn = c.rn
 ON CONFLICT DO NOTHING
-^^^ ---
+;
 
 -- 9. p_order (100건)
 INSERT INTO baedalsodae.p_order (
@@ -323,7 +322,7 @@ JOIN (
     SELECT id, name, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_store WHERE store_status = 'OPEN'
 ) st ON st.rn = ((i - 1) % 90) + 1
-^^^ ---
+;
 
 -- 10. p_order_item (100건)
 INSERT INTO baedalsodae.p_order_item (
@@ -347,7 +346,7 @@ JOIN (
     SELECT id, name, price, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_menu_item
 ) mi ON mi.rn = o.rn
-^^^ ---
+;
 
 -- 11. p_payment (100건)
 INSERT INTO baedalsodae.p_payment (
@@ -374,7 +373,7 @@ SELECT
     o.created_at,
     o.created_at + INTERVAL '1 minute'
 FROM baedalsodae.p_order o
-^^^ ---
+;
 
 -- 12. 태그 및 태그 매핑 삽입 (메뉴당 3~5개)
 DO $$
@@ -413,4 +412,4 @@ BEGIN
         END LOOP;
     END LOOP;
 END $$
-^^^ ---
+;
