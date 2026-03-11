@@ -6,14 +6,14 @@ spring:
     password: ${POSTGRES_PASSWORD:postgres}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     defer-datasource-initialization: false
-    show-sql: false
+    show-sql: true
     open-in-view: false
     properties:
       hibernate:
         default_schema: ${POSTGRES_DEFAULT_SCHEMA:public}
-        format_sql: false
+        format_sql: true
         jdbc.time_zone: Asia/Seoul
   sql:
     init:
