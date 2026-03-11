@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface EventRepository extends JpaRepository<Event, UUID> {
     List<Event> findTop10ByStatusOrderByCreatedAtAsc(EventStatus status);
 
-    @Query(value = "SELECT * FROM baedalsodae.p_event WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 10 FOR UPDATE SKIP LOCKED", nativeQuery = true)
+    @Query(value = "SELECT * FROM baedalsodae.event WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 10 FOR UPDATE SKIP LOCKED", nativeQuery = true)
     List<Event> findTop10PendingWithLock();
 }
