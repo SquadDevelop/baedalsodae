@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.event (
     trace_id uuid
 );
 
-ALTER TABLE baedalsodae.event OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.event OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_cart; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_cart (
 );
 
 
-ALTER TABLE baedalsodae.p_cart OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_cart OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_cart_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_cart_item (
 );
 
 
-ALTER TABLE baedalsodae.p_cart_item OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_cart_item OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_end_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_end_area (
 );
 
 
-ALTER TABLE baedalsodae.p_end_area OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_end_area OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_menu_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_menu_category (
 );
 
 
-ALTER TABLE baedalsodae.p_menu_category OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_menu_category OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_menu_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_menu_item (
 );
 
 
-ALTER TABLE baedalsodae.p_menu_item OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_menu_item OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_order; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_order (
 );
 
 
-ALTER TABLE  baedalsodae.p_order OWNER TO baedalsodae_admin;
+-- ALTER TABLE  baedalsodae.p_order OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_order_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_order_item (
 );
 
 
-ALTER TABLE baedalsodae.p_order_item OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_order_item OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_order_status_history; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_order_status_history (
 );
 
 
-ALTER TABLE baedalsodae.p_order_status_history OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_order_status_history OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_payment; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_payment (
 );
 
 
-ALTER TABLE baedalsodae.p_payment OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_payment OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_sido_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_sido_area (
 );
 
 
-ALTER TABLE baedalsodae.p_sido_area OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_sido_area OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_sigg_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_sigg_area (
 );
 
 
-ALTER TABLE baedalsodae.p_sigg_area OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_sigg_area OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_store (
 );
 
 
-ALTER TABLE baedalsodae.p_store OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_store OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_store_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -295,7 +295,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_store_category (
 );
 
 
-ALTER TABLE baedalsodae.p_store_category OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_store_category OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_store_hours; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_store_hours (
 );
 
 
-ALTER TABLE baedalsodae.p_store_hours OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_store_hours OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_tag; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_tag (
 );
 
 
-ALTER TABLE baedalsodae.p_tag OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_tag OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_tag_mapping; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -342,7 +342,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_tag_mapping (
 );
 
 
-ALTER TABLE baedalsodae.p_tag_mapping OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_tag_mapping OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_user; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -369,7 +369,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_user (
 );
 
 
-ALTER TABLE baedalsodae.p_user OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_user OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_user_address; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -386,7 +386,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_user_address (
 );
 
 
-ALTER TABLE baedalsodae.p_user_address OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_user_address OWNER TO baedalsodae_admin;
 
 --
 -- Name: review; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -409,7 +409,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.review (
 );
 
 
-ALTER TABLE baedalsodae.review OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.review OWNER TO baedalsodae_admin;
 
 --
 -- Name: vector_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -423,7 +423,7 @@ CREATE TABLE IF NOT EXISTS baedalsodae.vector_store (
 );
 
 
-ALTER TABLE baedalsodae.vector_store OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.vector_store OWNER TO baedalsodae_admin;
 
 --
 -- Name: event event_pkey; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
