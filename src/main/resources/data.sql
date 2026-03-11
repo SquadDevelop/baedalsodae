@@ -81,12 +81,18 @@ ON CONFLICT DO NOTHING
 
 -- 2. p_user_address (100건)
 INSERT INTO baedalsodae.p_user_address (
-    id, user_id, road_address, detail_address, description,
+    id, user_id, sido_code, sigungu_code, dong_code,sido_name, sigungu_name, dong_name, road_address, detail_address, description,
     created_at, updated_at
 )
 SELECT
     gen_random_uuid(),
     u.id,
+    '11',
+    '11680',
+    '1168010400',
+    '서울특별시',
+'강남구',
+    '역삼동',
     '서울특별시 강남구 테헤란로 ' || (u.rn * 3)::text,
     '101동 ' || (u.rn % 300 + 101)::text || '호',
     CASE (u.rn % 3) WHEN 0 THEN '집' WHEN 1 THEN '회사' ELSE '기타' END,
@@ -139,7 +145,7 @@ WHERE NOT EXISTS (
 
 -- 4. p_store (100건)
 INSERT INTO baedalsodae.p_store (
-    id, user_id, store_category_id, name, business_number, phone,
+    id, user_id, order_count, version, store_category_id, name, business_number, phone,
     sido_code, sido_name, sigungu_code, sigungu_name, dong_code, dong_name,
     road_address, detail_address,
     description, avg_rating, review_count, store_status,
@@ -148,6 +154,8 @@ INSERT INTO baedalsodae.p_store (
 SELECT
     gen_random_uuid(),
     owners.id,
+    0,
+    0,
     cats.id,
     CASE (i % 10)
         WHEN 0 THEN '맛있는한식당'   WHEN 1 THEN '중화루'
@@ -281,13 +289,14 @@ ON CONFLICT DO NOTHING
 
 -- 9. p_order (100건)
 INSERT INTO baedalsodae.p_order (
-    id, order_no, user_id, user_nickname_snapshot, user_phone_snapshot, store_id, store_name_snapshot, status,
+    id, version, order_no, user_id, user_nickname_snapshot, user_phone_snapshot, store_id, store_name_snapshot, status,
     store_request_note, delivery_request_note, address_id, delivery_address_snapshot,
     total_amount, delivery_fee, discount_amount, final_amount,
     created_at, updated_at, created_by, updated_by, deleted_at, deleted_by, is_deleted
 )
 SELECT
     gen_random_uuid(),
+    0,
     'ORD-' || TO_CHAR(NOW() - (i || ' hours')::interval, 'YYYYMMDD') || '-' || LPAD(i::text, 6, '0'),
     cust.id,
     cust.nickname,
