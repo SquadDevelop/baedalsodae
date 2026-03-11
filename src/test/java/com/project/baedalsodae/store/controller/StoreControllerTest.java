@@ -205,7 +205,7 @@ class StoreControllerTest {
                 .andExpect(jsonPath("$.data.stores[0].storeName").value("테스트 가게"))
                 .andDo(
                         document(
-                                "store/search-keyword", // 문서 저장 경로 (적절히 수정 가능)
+                                "store/search-keyword",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 queryParameters( // 요청 파라미터 문서화

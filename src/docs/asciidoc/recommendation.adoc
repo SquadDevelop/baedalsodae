@@ -1,0 +1,32 @@
+= 추천 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+
+== 음성 메뉴 추천
+
+=== 요청
+
+include::{snippets}/recommendations/voice/http-request.adoc[]
+include::{snippets}/recommendations/voice/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/recommendations/voice/http-response.adoc[]
+include::{snippets}/recommendations/voice/response-fields.adoc[]
+
+---
+
+== 메뉴 임베딩 동기화
+
+=== 요청
+
+include::{snippets}/recommendations/sync-embeddings/http-request.adoc[]
+
+=== 응답
+
+include::{snippets}/recommendations/sync-embeddings/http-response.adoc[]

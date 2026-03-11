@@ -40,16 +40,16 @@ include::{snippets}/store/get-by-category/http-response.adoc[]
 키워드로 가게를 검색합니다. 오프셋 기반 페이지네이션을 사용합니다.
 
 === Query Parameters
-include::{snippets}/store/get-by-keyword/query-parameters.adoc[]
+include::{snippets}/store/search-keyword/query-parameters.adoc[]
 
 === HTTP Request Example
-include::{snippets}/store/get-by-keyword/http-request.adoc[]
+include::{snippets}/store/search-keyword/http-request.adoc[]
 
 === Response Fields
-include::{snippets}/store/get-by-keyword/response-fields.adoc[]
+include::{snippets}/store/search-keyword/response-fields.adoc[]
 
 === HTTP Response Example
-include::{snippets}/store/get-by-keyword/http-response.adoc[]
+include::{snippets}/store/search-keyword/http-response.adoc[]
 
 ---
 
