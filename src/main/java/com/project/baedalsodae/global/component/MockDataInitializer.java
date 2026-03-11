@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Profile({"prod","local"})
+@Profile({"prod", "local"})
 @RequiredArgsConstructor
 @Order(1)
 public class MockDataInitializer implements ApplicationRunner {

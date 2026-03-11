@@ -49,9 +49,10 @@ class EventPollerTest {
                 .thenReturn(EventType.PAYMENT_CREATED);
 
         // 모든 테스트에서 공통으로 사용
-//        eventPoller =
-//                new EventPoller(eventRepository, List.of(orderCreatedDispatcher, paymentCreatedDispatcher));
-//
+        //        eventPoller =
+        //                new EventPoller(eventRepository, List.of(orderCreatedDispatcher,
+        // paymentCreatedDispatcher));
+        //
 
     }
 

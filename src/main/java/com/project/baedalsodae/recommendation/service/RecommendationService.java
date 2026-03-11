@@ -5,7 +5,6 @@ import com.project.baedalsodae.recommendation.dto.VoiceRecommendationResponse;
 import com.project.baedalsodae.recommendation.dto.VoiceRecommendationResponse.RecommendedMenu;
 import java.util.List;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -20,7 +19,8 @@ public class RecommendationService {
     private final ChatClient chatClient;
     private final MenuSearchService menuSearchService;
 
-    public VoiceRecommendationResponse recommendMenuItems(VoiceRecommendationRequest request, UUID userId) {
+    public VoiceRecommendationResponse recommendMenuItems(
+            VoiceRecommendationRequest request, UUID userId) {
         // 1. 읽기 트랜잭션 (빠르게 종료)
         List<RecommendedMenu> top3 =
                 menuSearchService.recommendMenuItems(request.transcribedText());
@@ -36,11 +36,7 @@ public class RecommendationService {
                     chatClient
                             .prompt()
                             .user(buildPrompt(request.transcribedText(), top3))
-                            .advisors(
-                                    a ->
-                                            a.param(
-                                                    ChatMemory.CONVERSATION_ID,
-                                                    userId.toString()))
+                            .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, userId.toString()))
                             .call()
                             .content();
         } catch (Exception e) {
