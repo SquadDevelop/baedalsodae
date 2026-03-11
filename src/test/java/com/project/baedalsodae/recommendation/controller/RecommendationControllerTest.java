@@ -84,7 +84,7 @@ class RecommendationControllerTest {
 
             given(
                             recommendationService.recommendMenuItems(
-                                    any(VoiceRecommendationRequest.class), any(UUID.class)))
+                                    any(VoiceRecommendationRequest.class)))
                     .willReturn(response);
 
             // when & then
@@ -100,8 +100,7 @@ class RecommendationControllerTest {
                                     "recommendations/voice",
                                     requestFields(
                                             fieldWithPath("transcribedText")
-                                                    .description("음성 인식 텍스트"),
-                                            fieldWithPath("userId").description("사용자 ID")),
+                                                    .description("음성 인식 텍스트")),
                                     responseFields(
                                             fieldWithPath("aiMessage").description("AI 추천 메시지"),
                                             fieldWithPath("recommendedMenus")
@@ -133,7 +132,7 @@ class RecommendationControllerTest {
 
             given(
                             recommendationService.recommendMenuItems(
-                                    any(VoiceRecommendationRequest.class), any(UUID.class)))
+                                    any(VoiceRecommendationRequest.class)))
                     .willReturn(response);
 
             // when & then

@@ -22,15 +22,16 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
     private final MenuEmbeddingService menuEmbeddingService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @PostMapping("/voice")
     public ResponseEntity<VoiceRecommendationResponse> recommendByVoice(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+//            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @RequestBody VoiceRecommendationRequest request) {
 
         log.info("[Voice Recommendation] Input Text: {}", request.transcribedText());
         VoiceRecommendationResponse response =
-                recommendationService.recommendMenuItems(request, userDetails.getUserId());
+//                recommendationService.recommendMenuItems(request, userDetails.getUserId());
+                recommendationService.recommendMenuItems(request);
         log.info(
                 "[Voice Recommendation] Response AI Message: '{}', Recommended Menu Count: {}",
                 response.aiMessage(),
@@ -38,7 +39,7 @@ public class RecommendationController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_MASTER')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_MASTER')")
     @PostMapping("/sync-embeddings")
     public ResponseEntity<String> syncAllEmbeddings() {
         menuEmbeddingService.syncAllMenuItemsToVectorStore();

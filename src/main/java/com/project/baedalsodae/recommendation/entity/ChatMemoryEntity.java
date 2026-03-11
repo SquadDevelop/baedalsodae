@@ -16,7 +16,7 @@ public class ChatMemoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "conversation_id", length = 36, nullable = false)
+    @Column(name = "conversation_id", length = 36)
     private String conversationId;
 
     @Column(columnDefinition = "TEXT", nullable = false)
