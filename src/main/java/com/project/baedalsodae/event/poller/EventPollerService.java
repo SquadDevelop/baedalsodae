@@ -2,12 +2,11 @@ package com.project.baedalsodae.event.poller;
 
 import com.project.baedalsodae.event.entity.Event;
 import com.project.baedalsodae.event.repository.EventRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -15,15 +14,15 @@ import java.util.List;
 public class EventPollerService {
 
     private static final int MAX_RETRY = 3;
-	 private final List<EventDispatcher> dispatchers;
+    private final List<EventDispatcher> dispatchers;
 
-	final private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     @Transactional
     public void processEvents() {
 
-//        List<Event> pendingEvents =
-//                eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING);
+        //        List<Event> pendingEvents =
+        //                eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING);
 
         List<Event> pendingEvents = eventRepository.findTop10PendingWithLock();
 
