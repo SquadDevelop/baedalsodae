@@ -12,7 +12,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
 
     @Query(
             value =
-                    "SELECT * FROM baedalsodae.event WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 10 FOR UPDATE SKIP LOCKED",
+                    "SELECT * FROM event WHERE status = 'PENDING' ORDER BY created_at ASC LIMIT 10 FOR UPDATE SKIP LOCKED",
             nativeQuery = true)
     List<Event> findTop10PendingWithLock();
 }
