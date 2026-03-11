@@ -17,8 +17,7 @@ spring:
         jdbc.time_zone: Asia/Seoul
   sql:
     init:
-      mode: always
-      separator: "^^^ ---"
+      mode: never
       data-locations: classpath:data.sql
 
   ai:
