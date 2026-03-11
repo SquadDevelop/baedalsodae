@@ -24,6 +24,11 @@ spring:
   ai:
     openai:
       api-key: dummy-key-for-test
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: never
 
 JWT_SECRET: dGVzdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3Nlc09ubHk= #testSecretKeyForTestingPurposesOnly
 JWT_EXPIRATION: 100000
