@@ -1,83 +1,18 @@
--- Role이 없을 때만 생성 (DO 블록 안에서는 CREATE ROLE만)
-DO
-$$
-BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_catalog.pg_roles
-      WHERE rolname = 'baedalsodae_admin'
-   ) THEN
-      CREATE ROLE baedalsodae_admin LOGIN PASSWORD 'p@ssw0rd';
-   END IF;
-END
-$$;
 
--- GRANT/ALTER는 DO 블록 밖에서 실행 (멱등성 보장)
-ALTER USER baedalsodae_admin CREATEDB;
-GRANT ALL PRIVILEGES ON DATABASE baedalsodae TO baedalsodae_admin;
-
-ALTER DATABASE baedalsodae SET search_path TO baedalsodae_admin, public;
-
-CREATE SCHEMA IF NOT EXISTS baedalsodae AUTHORIZATION baedalsodae_admin;
-GRANT ALL ON SCHEMA baedalsodae TO baedalsodae_admin;
-GRANT ALL ON ALL TABLES IN SCHEMA baedalsodae TO baedalsodae_admin;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA baedalsodae TO baedalsodae_admin;
-
-SET search_path TO baedalsodae;
-
--- pgvector extension 추가 (public 스키마에 명시적으로 추가)
-CREATE EXTENSION IF NOT EXISTS vector SCHEMA public;
-
--- uuid_generate_v4() 사용을 위한 extension 추가 (public 스키마에 명시적으로 추가)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;
-
---
--- PostgreSQL database dump
---
-
-\restrict 6D8KnLjnaPopOmaUATkQdb6N7rjahzKKwhh4rH2el97xucJxgar3XXWGnTbKKbf
-
--- Dumped from database version 17.9 (Debian 17.9-1.pgdg12+1)
--- Dumped by pg_dump version 17.9 (Debian 17.9-1.pgdg12+1)
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- Name: event; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
---
 
 CREATE TABLE IF NOT EXISTS baedalsodae.event (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
     updated_at timestamp(6) with time zone,
     aggregate_id uuid,
-    aggregate_type smallint,
-    event_type smallint,
+    aggregate_type character varying(255) NOT NULL,
+    event_type character varying(255) NOT NULL,
     payload jsonb,
     published_at timestamp(6) with time zone,
     retry_count integer NOT NULL,
-    status smallint,
-    trace_id uuid,
---     CONSTRAINT event_aggregate_type_check CHECK (((aggregate_type >= 0) AND (aggregate_type <= 1))),
---     CONSTRAINT event_event_type_check CHECK (((event_type >= 0) AND (event_type <= 5))),
---     CONSTRAINT event_status_check CHECK (((status >= 0) AND (status <= 2)))
+    status character varying(255) NOT NULL,
+    trace_id uuid
 );
-
 
 ALTER TABLE baedalsodae.event OWNER TO baedalsodae_admin;
 
