@@ -71,12 +71,14 @@ jobs:
               docker load < mock-pg.tar.gz && \
               docker stop baedalsodae-mock-pg 2>/dev/null || true && \
               docker rm baedalsodae-mock-pg 2>/dev/null || true && \
-              docker run -d --name baedalsodae-mock-pg -p 8089:8080 mock-pg:latest && \
+              docker network create baedalsodae-network 2>/dev/null || true && \
+              docker run -d --name baedalsodae-mock-pg --network baedalsodae-network -p 8089:8080 mock-pg:latest && \
               docker load < baedalsodae.tar.gz && \
               docker stop baedalsodae-app 2>/dev/null || true && \
               docker rm baedalsodae-app 2>/dev/null || true && \
               docker run -d \
                 --name baedalsodae-app \
+                --network baedalsodae-network \
                 -p 8080:8080 \
                 -e SPRING_PROFILES_ACTIVE=prod \
                 -e API_SERVER_PORT=$API_SERVER_PORT \
@@ -159,12 +161,14 @@ jobs:
               docker load < mock-pg.tar.gz && \
               docker stop baedalsodae-mock-pg 2>/dev/null || true && \
               docker rm baedalsodae-mock-pg 2>/dev/null || true && \
-              docker run -d --name baedalsodae-mock-pg -p 8089:8080 mock-pg:latest && \
+              docker network create baedalsodae-network 2>/dev/null || true && \
+              docker run -d --name baedalsodae-mock-pg --network baedalsodae-network -p 8089:8080 mock-pg:latest && \
               docker load < baedalsodae.tar.gz && \
               docker stop baedalsodae-app 2>/dev/null || true && \
               docker rm baedalsodae-app 2>/dev/null || true && \
               docker run -d \
                 --name baedalsodae-app \
+                --network baedalsodae-network \
                 -p 8080:8080 \
                 -e SPRING_PROFILES_ACTIVE=prod \
                 -e API_SERVER_PORT=$API_SERVER_PORT \
