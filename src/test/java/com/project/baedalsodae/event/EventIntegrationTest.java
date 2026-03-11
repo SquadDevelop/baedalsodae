@@ -59,9 +59,10 @@ class EventIntegrationTest {
         // when 1. 이벤트 발행 (Status가 PENDING으로 DB에 저장됨)
         eventPublisher.publishOrderEvent(order, EventType.ORDER_CREATED);
 
-        List<Event> pendingEvents = eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING);
+        List<Event> pendingEvents =
+                eventRepository.findTop10ByStatusOrderByCreatedAtAsc(EventStatus.PENDING);
         assertThat(pendingEvents).hasSize(1);
-        
+
         Event savedEvent = pendingEvents.get(0);
         assertThat(savedEvent.getEventType()).isEqualTo(EventType.ORDER_CREATED);
 
