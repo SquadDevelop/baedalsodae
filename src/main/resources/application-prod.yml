@@ -44,7 +44,7 @@ encryption:
     key: ${ENCRYPTION_AES_KEY}
 
 pg:
-  url: http://localhost:8089
+  url: http://baedalsodae-mock-pg:8080
 
 logging:
   level:
