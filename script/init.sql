@@ -112,22 +112,6 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_cart_item (
 
 ALTER TABLE baedalsodae.p_cart_item OWNER TO baedalsodae_admin;
 
---
--- Name: p_end_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-CREATE TABLE IF NOT EXISTS baedalsodae.p_end_area (
-    id uuid NOT NULL,
-    created_at timestamp(6) with time zone,
-    updated_at timestamp(6) with time zone,
-    adm_code character varying(50) NOT NULL,
-    location character varying(255),
-    name character varying(100) NOT NULL,
-    version bigint
-);
-
-
-ALTER TABLE baedalsodae.p_end_area OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_menu_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -274,37 +258,6 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_payment (
 
 ALTER TABLE baedalsodae.p_payment OWNER TO baedalsodae_admin;
 
---
--- Name: p_sido_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-CREATE TABLE IF NOT EXISTS baedalsodae.p_sido_area (
-    id uuid NOT NULL,
-    created_at timestamp(6) with time zone,
-    updated_at timestamp(6) with time zone,
-    adm_code character varying(50) NOT NULL,
-    name character varying(100) NOT NULL,
-    version bigint
-);
-
-
-ALTER TABLE baedalsodae.p_sido_area OWNER TO baedalsodae_admin;
-
---
--- Name: p_sigg_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-CREATE TABLE IF NOT EXISTS baedalsodae.p_sigg_area (
-    id uuid NOT NULL,
-    created_at timestamp(6) with time zone,
-    updated_at timestamp(6) with time zone,
-    adm_code character varying(50) NOT NULL,
-    name character varying(100) NOT NULL,
-    version bigint
-);
-
-
-ALTER TABLE baedalsodae.p_sigg_area OWNER TO baedalsodae_admin;
 
 --
 -- Name: p_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -514,13 +467,6 @@ ALTER TABLE ONLY baedalsodae.p_cart
     ADD CONSTRAINT p_cart_pkey PRIMARY KEY (id);
 
 
---
--- Name: p_end_area p_end_area_pkey; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-ALTER TABLE ONLY baedalsodae.p_end_area
-    ADD CONSTRAINT p_end_area_pkey PRIMARY KEY (id);
-
 
 --
 -- Name: p_menu_category p_menu_category_pkey; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -570,20 +516,6 @@ ALTER TABLE ONLY baedalsodae.p_payment
     ADD CONSTRAINT p_payment_pkey PRIMARY KEY (id);
 
 
---
--- Name: p_sido_area p_sido_area_pkey; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-ALTER TABLE ONLY baedalsodae.p_sido_area
-    ADD CONSTRAINT p_sido_area_pkey PRIMARY KEY (id);
-
-
---
--- Name: p_sigg_area p_sigg_area_pkey; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-ALTER TABLE ONLY baedalsodae.p_sigg_area
-    ADD CONSTRAINT p_sigg_area_pkey PRIMARY KEY (id);
 
 
 --
@@ -658,13 +590,6 @@ ALTER TABLE ONLY baedalsodae.vector_store
     ADD CONSTRAINT vector_store_pkey PRIMARY KEY (id);
 
 
---
--- Name: p_end_area uk48liqt663gvogebd75xwexsa3; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-ALTER TABLE ONLY baedalsodae.p_end_area
-    ADD CONSTRAINT uk48liqt663gvogebd75xwexsa3 UNIQUE (adm_code);
-
 
 --
 -- Name: p_user uk9739vq99qad264nukqskib9l5; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -674,12 +599,6 @@ ALTER TABLE ONLY baedalsodae.p_user
     ADD CONSTRAINT uk9739vq99qad264nukqskib9l5 UNIQUE (nickname);
 
 
---
--- Name: p_sigg_area ukc6wffef85ir8q7isat0o44ebb; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-ALTER TABLE ONLY baedalsodae.p_sigg_area
-    ADD CONSTRAINT ukc6wffef85ir8q7isat0o44ebb UNIQUE (adm_code);
 
 
 --
@@ -712,14 +631,6 @@ ALTER TABLE ONLY baedalsodae.p_user
 
 ALTER TABLE ONLY baedalsodae.p_user
     ADD CONSTRAINT ukpk8x5a850e4nwxtqdk3yj2e40 UNIQUE (username);
-
-
---
--- Name: p_sido_area uktfnfpk2sjgauwc9u1wfhtcfoe; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
---
-
-ALTER TABLE ONLY baedalsodae.p_sido_area
-    ADD CONSTRAINT uktfnfpk2sjgauwc9u1wfhtcfoe UNIQUE (adm_code);
 
 
 --
@@ -883,51 +794,6 @@ ALTER TABLE ONLY baedalsodae.p_tag_mapping
 -- ============================================================
 -- MOCK DATA (ON CONFLICT DO NOTHING)
 -- ============================================================
-
--- 0-A. p_sido_area (10건)
-INSERT INTO baedalsodae.p_sido_area (id, adm_code, name, created_at, updated_at, version)
-VALUES
-    ('a0000001-0000-0000-0000-000000000001', '11', '서울특별시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000002', '26', '부산광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000003', '27', '대구광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000004', '28', '인천광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000005', '29', '광주광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000006', '30', '대전광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000007', '31', '울산광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000008', '41', '경기도',     NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000009', '43', '충청북도',   NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000010', '44', '충청남도',   NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING;
-
--- 0-B. p_sigg_area (10건)
-INSERT INTO baedalsodae.p_sigg_area (id, adm_code, name, created_at, updated_at, version)
-VALUES
-    ('b0000002-0000-0000-0000-000000000001', '11110', '종로구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000002', '11140', '중구',     NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000003', '11215', '광진구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000004', '11230', '동대문구', NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000005', '11380', '은평구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000006', '11440', '마포구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000007', '11560', '영등포구', NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000008', '11650', '서초구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000009', '11680', '강남구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000010', '11710', '송파구',   NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING;
-
--- 0-C. p_end_area (10건)
-INSERT INTO baedalsodae.p_end_area (id, adm_code, name, created_at, updated_at, version)
-VALUES
-    ('c0000003-0000-0000-0000-000000000001', '1111010100', '청운동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000002', '1111010200', '신교동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000003', '1114010100', '무교동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000004', '1121510100', '중곡1동',  NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000005', '1123010100', '회기동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000006', '1138010100', '증산동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000007', '1144010100', '아현동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000008', '1156010100', '여의도동', NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000009', '1168010100', '잠원동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000010', '1168010400', '역삼1동',  NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING;
 
 -- 1. p_user (100건)
 INSERT INTO baedalsodae.p_user (

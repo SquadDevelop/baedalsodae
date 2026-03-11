@@ -2,54 +2,6 @@
 -- MOCK DATA (ON CONFLICT DO NOTHING)
 -- ============================================================
 
--- 0-A. p_sido_area (10건)
-INSERT INTO baedalsodae.p_sido_area (id, adm_code, name, created_at, updated_at, version)
-VALUES
-    ('a0000001-0000-0000-0000-000000000001', '11', '서울특별시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000002', '26', '부산광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000003', '27', '대구광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000004', '28', '인천광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000005', '29', '광주광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000006', '30', '대전광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000007', '31', '울산광역시', NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000008', '41', '경기도',     NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000009', '43', '충청북도',   NOW(), NOW(), 0),
-    ('a0000001-0000-0000-0000-000000000010', '44', '충청남도',   NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING
-;
-
--- 0-B. p_sigg_area (10건)
-INSERT INTO baedalsodae.p_sigg_area (id, adm_code, name, created_at, updated_at, version)
-VALUES
-    ('b0000002-0000-0000-0000-000000000001', '11110', '종로구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000002', '11140', '중구',     NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000003', '11215', '광진구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000004', '11230', '동대문구', NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000005', '11380', '은평구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000006', '11440', '마포구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000007', '11560', '영등포구', NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000008', '11650', '서초구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000009', '11680', '강남구',   NOW(), NOW(), 0),
-    ('b0000002-0000-0000-0000-000000000010', '11710', '송파구',   NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING
-;
-
--- 0-C. p_end_area (10건)
-INSERT INTO baedalsodae.p_end_area (id, adm_code, name, created_at, updated_at, version)
-VALUES
-    ('c0000003-0000-0000-0000-000000000001', '1111010100', '청운동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000002', '1111010200', '신교동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000003', '1114010100', '무교동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000004', '1121510100', '중곡1동',  NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000005', '1123010100', '회기동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000006', '1138010100', '증산동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000007', '1144010100', '아현동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000008', '1156010100', '여의도동', NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000009', '1168010100', '잠원동',   NOW(), NOW(), 0),
-    ('c0000003-0000-0000-0000-000000000010', '1168010400', '역삼1동',  NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING
-;
-
 -- 1. p_user (100건)
 INSERT INTO baedalsodae.p_user (
     id, username, phone, email, password, name, nickname, role,
@@ -157,12 +109,22 @@ SELECT
     0,
     0,
     cats.id,
-    CASE (i % 10)
-        WHEN 0 THEN '맛있는한식당'   WHEN 1 THEN '중화루'
-        WHEN 2 THEN '스시마루'        WHEN 3 THEN '팔레스레스토랑'
-        WHEN 4 THEN '황금치킨'        WHEN 5 THEN '나폴리피자'
-        WHEN 6 THEN '분식천국'        WHEN 7 THEN '달콤카페'
-        WHEN 8 THEN '버거킹덤'        ELSE '메콩델타'
+    CASE (i % 30)
+        WHEN 0  THEN '맛있는한식당'    WHEN 1  THEN '중화루'
+        WHEN 2  THEN '스시마루'         WHEN 3  THEN '팔레스레스토랑'
+        WHEN 4  THEN '황금치킨'         WHEN 5  THEN '나폴리피자'
+        WHEN 6  THEN '분식천국'         WHEN 7  THEN '달콤카페'
+        WHEN 8  THEN '버거킹덤'         WHEN 9  THEN '메콩델타'
+        WHEN 10 THEN '옛날국밥'         WHEN 11 THEN '사천요리'
+        WHEN 12 THEN '하카타라멘'       WHEN 13 THEN '브라세리'
+        WHEN 14 THEN '바삭통닭'         WHEN 15 THEN '로마피자'
+        WHEN 16 THEN '엄마손분식'       WHEN 17 THEN '빈스커피'
+        WHEN 18 THEN '쉐이크쉑버거'     WHEN 19 THEN '포반미'
+        WHEN 20 THEN '시골밥상'         WHEN 21 THEN '북경반점'
+        WHEN 22 THEN '오마카세스시'     WHEN 23 THEN '스테이크하우스'
+        WHEN 24 THEN '노랑통닭'         WHEN 25 THEN '화덕피자'
+        WHEN 26 THEN '떡볶이세상'       WHEN 27 THEN '커피빈'
+        WHEN 28 THEN '맥도날드형'       ELSE '쌀국수하노이'
     END || i || '호점',
     '123-45-' || LPAD(i::text, 3, '0'),
     '02-' || LPAD((1000 + i)::text, 4, '0') || '-' || LPAD((i * 3 % 10000)::text, 4, '0'),
@@ -384,41 +346,50 @@ SELECT
 FROM baedalsodae.p_order o
 ;
 
--- 12. 태그 및 태그 매핑 삽입 (메뉴당 3~5개)
-DO $$
-DECLARE
-    tag_names text[] := ARRAY['매콤한', '달콤한', '짭짤한', '바삭한', '부드러운', '치즈듬뿍', '가성비', '프리미엄', '야식', '간식', '안주', '아이들간식', '혼밥', '비건', '글루텐프리', '다이어트', '단백질', '매니아', '베스트', '신메뉴', '따뜻한', '시원한', '1인분', '술안주'];
-    t_name text;
-    t_id uuid;
-    m_record record;
-    random_tag_count int;
-    i int;
-BEGIN
-    -- 1. 태그 생성
-    FOREACH t_name IN ARRAY tag_names
-    LOOP
-        INSERT INTO baedalsodae.p_tag (id, name, created_at)
-        VALUES (public.uuid_generate_v4(), t_name, now())
-        ON CONFLICT (name) DO NOTHING;
-    END LOOP;
+-- 12. 태그 삽입
+INSERT INTO baedalsodae.p_tag (id, name, created_at)
+VALUES
+    (public.uuid_generate_v4(), '매콤한', now()),
+    (public.uuid_generate_v4(), '달콤한', now()),
+    (public.uuid_generate_v4(), '짭짤한', now()),
+    (public.uuid_generate_v4(), '바삭한', now()),
+    (public.uuid_generate_v4(), '부드러운', now()),
+    (public.uuid_generate_v4(), '치즈듬뿍', now()),
+    (public.uuid_generate_v4(), '가성비', now()),
+    (public.uuid_generate_v4(), '프리미엄', now()),
+    (public.uuid_generate_v4(), '야식', now()),
+    (public.uuid_generate_v4(), '간식', now()),
+    (public.uuid_generate_v4(), '안주', now()),
+    (public.uuid_generate_v4(), '아이들간식', now()),
+    (public.uuid_generate_v4(), '혼밥', now()),
+    (public.uuid_generate_v4(), '비건', now()),
+    (public.uuid_generate_v4(), '글루텐프리', now()),
+    (public.uuid_generate_v4(), '다이어트', now()),
+    (public.uuid_generate_v4(), '단백질', now()),
+    (public.uuid_generate_v4(), '매니아', now()),
+    (public.uuid_generate_v4(), '베스트', now()),
+    (public.uuid_generate_v4(), '신메뉴', now()),
+    (public.uuid_generate_v4(), '따뜻한', now()),
+    (public.uuid_generate_v4(), '시원한', now()),
+    (public.uuid_generate_v4(), '1인분', now()),
+    (public.uuid_generate_v4(), '술안주', now())
+ON CONFLICT (name) DO NOTHING
+;
 
-    -- 기존 매핑 제거 (재실행 위한 멱등성 보장)
-    DELETE FROM baedalsodae.p_tag_mapping;
-
-    -- 2. 메뉴별 3~5개 랜덤 태그 매핑
-    FOR m_record IN SELECT id FROM baedalsodae.p_menu_item
-    LOOP
-        random_tag_count := floor(random() * 3 + 3)::int; -- 3, 4, or 5
-        
-        i := 1;
-        FOR t_id IN (
-            SELECT id FROM baedalsodae.p_tag ORDER BY random() LIMIT random_tag_count
-        )
-        LOOP
-            INSERT INTO baedalsodae.p_tag_mapping (id, created_at, order_no, menu_item, tag_id)
-            VALUES (public.uuid_generate_v4(), now(), i, m_record.id, t_id);
-            i := i + 1;
-        END LOOP;
-    END LOOP;
-END $$
+-- 13. 태그 매핑 삽입 (메뉴당 3~5개 랜덤)
+INSERT INTO baedalsodae.p_tag_mapping (id, created_at, order_no, menu_item, tag_id)
+SELECT
+    public.uuid_generate_v4(),
+    now(),
+    ROW_NUMBER() OVER (PARTITION BY m.id ORDER BY random()),
+    m.id,
+    t.id
+FROM baedalsodae.p_menu_item m
+CROSS JOIN LATERAL (
+    SELECT id
+    FROM baedalsodae.p_tag
+    ORDER BY random()
+    LIMIT 3 + floor(random() * 3)::int
+) t
+ON CONFLICT DO NOTHING
 ;
