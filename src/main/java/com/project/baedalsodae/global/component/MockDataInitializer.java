@@ -1,5 +1,7 @@
 package com.project.baedalsodae.global.component;
 
+import java.sql.Connection;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -9,9 +11,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
 
 @Slf4j
 @Component
@@ -25,8 +24,7 @@ public class MockDataInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         try (Connection conn = dataSource.getConnection()) {
-            ScriptUtils.executeSqlScript(conn, 
-                new ClassPathResource("data.sql"));
+            ScriptUtils.executeSqlScript(conn, new ClassPathResource("data.sql"));
             log.info("[MockDataInitializer] data.sql 실행 완료");
         } catch (Exception e) {
             log.warn("[MockDataInitializer] data.sql 실행 중 오류 (이미 데이터 있을 수 있음): {}", e.getMessage());
