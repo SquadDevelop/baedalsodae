@@ -1,5 +1,3 @@
-
-
 CREATE TABLE IF NOT EXISTS baedalsodae.event (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone,
@@ -12,9 +10,11 @@ CREATE TABLE IF NOT EXISTS baedalsodae.event (
     retry_count integer NOT NULL,
     status character varying(255) NOT NULL,
     trace_id uuid
-);
+)
+^^^ ---
 
--- ALTER TABLE baedalsodae.event OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.event OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_cart; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -26,10 +26,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_cart (
     updated_at timestamp(6) with time zone,
     user_id uuid NOT NULL,
     store_id uuid NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_cart OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_cart OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_cart_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -42,10 +44,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_cart_item (
     quantity integer NOT NULL,
     cart_id uuid NOT NULL,
     menu_item_id uuid NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_cart_item OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_cart_item OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_end_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -59,10 +63,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_end_area (
     location character varying(255),
     name character varying(100) NOT NULL,
     version bigint
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_end_area OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_end_area OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_menu_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -80,10 +86,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_menu_category (
     name character varying(255) NOT NULL,
     order_no integer,
     store_id uuid NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_menu_category OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_menu_category OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_menu_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -106,10 +114,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_menu_item (
     price integer NOT NULL,
     menu_category_id uuid NOT NULL,
     CONSTRAINT p_menu_item_menu_status_check CHECK (((menu_status)::text = ANY ((ARRAY['AVAILABLE'::character varying, 'UNAVAILABLE'::character varying, 'SOLD_OUT'::character varying, 'PREPARING'::character varying, 'HIDDEN'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_menu_item OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_menu_item OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_order; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -140,10 +150,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_order (
     user_nickname_snapshot character varying(255) NOT NULL,
     user_phone_snapshot character varying(255) NOT NULL,
     CONSTRAINT p_order_status_check CHECK (((status)::text = ANY ((ARRAY['CREATED'::character varying, 'REQUESTED'::character varying, 'ACCEPTED'::character varying, 'REJECTED'::character varying, 'COOKING'::character varying, 'COOKED'::character varying, 'DELIVERING'::character varying, 'DELIVERED'::character varying, 'FAILED'::character varying, 'CANCELED'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE  baedalsodae.p_order OWNER TO baedalsodae_admin;
+-- ALTER TABLE  baedalsodae.p_order OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_order_item; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -158,10 +170,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_order_item (
     price_snapshot integer,
     quantity integer,
     order_id uuid NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_order_item OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_order_item OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_order_status_history; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -180,10 +194,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_order_status_history (
     CONSTRAINT p_order_status_history_actor_type_check CHECK (((actor_type)::text = ANY ((ARRAY['SYSTEM'::character varying, 'CUSTOMER'::character varying, 'OWNER'::character varying, 'MANAGER'::character varying, 'MASTER'::character varying])::text[]))),
     CONSTRAINT p_order_status_history_from_status_check CHECK (((from_status)::text = ANY ((ARRAY['CREATED'::character varying, 'REQUESTED'::character varying, 'ACCEPTED'::character varying, 'REJECTED'::character varying, 'COOKING'::character varying, 'COOKED'::character varying, 'DELIVERING'::character varying, 'DELIVERED'::character varying, 'FAILED'::character varying, 'CANCELED'::character varying])::text[]))),
     CONSTRAINT p_order_status_history_to_status_check CHECK (((to_status)::text = ANY ((ARRAY['CREATED'::character varying, 'REQUESTED'::character varying, 'ACCEPTED'::character varying, 'REJECTED'::character varying, 'COOKING'::character varying, 'COOKED'::character varying, 'DELIVERING'::character varying, 'DELIVERED'::character varying, 'FAILED'::character varying, 'CANCELED'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_order_status_history OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_order_status_history OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_payment; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -204,10 +220,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_payment (
     user_id uuid NOT NULL,
     CONSTRAINT p_payment_payment_method_check CHECK (((payment_method >= 0) AND (payment_method <= 4))),
     CONSTRAINT p_payment_payment_status_check CHECK (((payment_status)::text = ANY ((ARRAY['PENDING'::character varying, 'SUCCESS'::character varying, 'FAILED'::character varying, 'CANCELED'::character varying, 'REFUNDING'::character varying, 'REFUNDED'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_payment OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_payment OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_sido_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -220,10 +238,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_sido_area (
     adm_code character varying(50) NOT NULL,
     name character varying(100) NOT NULL,
     version bigint
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_sido_area OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_sido_area OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_sigg_area; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -236,10 +256,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_sigg_area (
     adm_code character varying(50) NOT NULL,
     name character varying(100) NOT NULL,
     version bigint
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_sigg_area OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_sigg_area OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -272,10 +294,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_store (
     user_id uuid NOT NULL,
     store_category_id uuid NOT NULL,
     CONSTRAINT p_store_store_status_check CHECK (((store_status)::text = ANY ((ARRAY['OPEN'::character varying, 'TEMPORARILY_CLOSED'::character varying, 'SUSPENDED'::character varying, 'PENDING_APPROVAL'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_store OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_store OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_store_category; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -292,10 +316,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_store_category (
     updated_by uuid,
     description character varying(200),
     name character varying(50)
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_store_category OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_store_category OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_store_hours; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -311,10 +337,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_store_hours (
     open_time timestamp(6) with time zone,
     store_id uuid NOT NULL,
     CONSTRAINT p_store_hours_day_of_week_check CHECK (((day_of_week)::text = ANY ((ARRAY['MONDAY'::character varying, 'TUESDAY'::character varying, 'WEDNESDAY'::character varying, 'THURSDAY'::character varying, 'FRIDAY'::character varying, 'SATURDAY'::character varying, 'SUNDAY'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_store_hours OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_store_hours OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_tag; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -324,10 +352,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_tag (
     id uuid NOT NULL,
     created_at timestamp(6) with time zone NOT NULL,
     name character varying(255) NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_tag OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_tag OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_tag_mapping; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -339,10 +369,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_tag_mapping (
     order_no integer NOT NULL,
     menu_item uuid NOT NULL,
     tag_id uuid NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_tag_mapping OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_tag_mapping OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_user; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -366,10 +398,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_user (
     user_main_address_id uuid,
     username character varying(20) NOT NULL,
     CONSTRAINT p_user_role_check CHECK (((role)::text = ANY ((ARRAY['CUSTOMER'::character varying, 'OWNER'::character varying, 'MANAGER'::character varying, 'MASTER'::character varying])::text[])))
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_user OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_user OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: p_user_address; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -383,10 +417,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.p_user_address (
     detail_address character varying(255) NOT NULL,
     road_address character varying(255) NOT NULL,
     user_id uuid NOT NULL
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.p_user_address OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.p_user_address OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: review; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -406,10 +442,12 @@ CREATE TABLE IF NOT EXISTS baedalsodae.review (
     order_id uuid,
     rating double precision NOT NULL,
     user_id uuid
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.review OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.review OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: vector_store; Type: TABLE; Schema: baedalsodae; Owner: baedalsodae_admin
@@ -420,17 +458,20 @@ CREATE TABLE IF NOT EXISTS baedalsodae.vector_store (
     content text,
     metadata json,
     embedding public.vector(1536)
-);
+)
+^^^ ---
 
 
--- ALTER TABLE baedalsodae.vector_store OWNER TO baedalsodae_admin;
+-- ALTER TABLE baedalsodae.vector_store OWNER TO baedalsodae_admin
+^^^ ---
 
 --
 -- Name: event event_pkey; Type: CONSTRAINT; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
 ALTER TABLE ONLY baedalsodae.event
-    ADD CONSTRAINT event_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT event_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -438,7 +479,8 @@ ALTER TABLE ONLY baedalsodae.event
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart_item
-    ADD CONSTRAINT p_cart_item_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_cart_item_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -446,7 +488,8 @@ ALTER TABLE ONLY baedalsodae.p_cart_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart
-    ADD CONSTRAINT p_cart_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_cart_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -454,7 +497,8 @@ ALTER TABLE ONLY baedalsodae.p_cart
 --
 
 ALTER TABLE ONLY baedalsodae.p_end_area
-    ADD CONSTRAINT p_end_area_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_end_area_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -462,7 +506,8 @@ ALTER TABLE ONLY baedalsodae.p_end_area
 --
 
 ALTER TABLE ONLY baedalsodae.p_menu_category
-    ADD CONSTRAINT p_menu_category_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_menu_category_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -470,7 +515,8 @@ ALTER TABLE ONLY baedalsodae.p_menu_category
 --
 
 ALTER TABLE ONLY baedalsodae.p_menu_item
-    ADD CONSTRAINT p_menu_item_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_menu_item_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -478,7 +524,8 @@ ALTER TABLE ONLY baedalsodae.p_menu_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_order_item
-    ADD CONSTRAINT p_order_item_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_order_item_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -486,7 +533,8 @@ ALTER TABLE ONLY baedalsodae.p_order_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_order
-    ADD CONSTRAINT p_order_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_order_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -494,7 +542,8 @@ ALTER TABLE ONLY baedalsodae.p_order
 --
 
 ALTER TABLE ONLY baedalsodae.p_order_status_history
-    ADD CONSTRAINT p_order_status_history_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_order_status_history_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -502,7 +551,8 @@ ALTER TABLE ONLY baedalsodae.p_order_status_history
 --
 
 ALTER TABLE ONLY baedalsodae.p_payment
-    ADD CONSTRAINT p_payment_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_payment_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -510,7 +560,8 @@ ALTER TABLE ONLY baedalsodae.p_payment
 --
 
 ALTER TABLE ONLY baedalsodae.p_sido_area
-    ADD CONSTRAINT p_sido_area_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_sido_area_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -518,7 +569,8 @@ ALTER TABLE ONLY baedalsodae.p_sido_area
 --
 
 ALTER TABLE ONLY baedalsodae.p_sigg_area
-    ADD CONSTRAINT p_sigg_area_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_sigg_area_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -526,7 +578,8 @@ ALTER TABLE ONLY baedalsodae.p_sigg_area
 --
 
 ALTER TABLE ONLY baedalsodae.p_store_category
-    ADD CONSTRAINT p_store_category_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_store_category_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -534,7 +587,8 @@ ALTER TABLE ONLY baedalsodae.p_store_category
 --
 
 ALTER TABLE ONLY baedalsodae.p_store_hours
-    ADD CONSTRAINT p_store_hours_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_store_hours_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -542,7 +596,8 @@ ALTER TABLE ONLY baedalsodae.p_store_hours
 --
 
 ALTER TABLE ONLY baedalsodae.p_store
-    ADD CONSTRAINT p_store_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_store_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -550,7 +605,8 @@ ALTER TABLE ONLY baedalsodae.p_store
 --
 
 ALTER TABLE ONLY baedalsodae.p_tag_mapping
-    ADD CONSTRAINT p_tag_mapping_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_tag_mapping_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -558,7 +614,8 @@ ALTER TABLE ONLY baedalsodae.p_tag_mapping
 --
 
 ALTER TABLE ONLY baedalsodae.p_tag
-    ADD CONSTRAINT p_tag_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_tag_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -566,7 +623,8 @@ ALTER TABLE ONLY baedalsodae.p_tag
 --
 
 ALTER TABLE ONLY baedalsodae.p_user_address
-    ADD CONSTRAINT p_user_address_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_user_address_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -574,7 +632,8 @@ ALTER TABLE ONLY baedalsodae.p_user_address
 --
 
 ALTER TABLE ONLY baedalsodae.p_user
-    ADD CONSTRAINT p_user_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT p_user_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -582,7 +641,8 @@ ALTER TABLE ONLY baedalsodae.p_user
 --
 
 ALTER TABLE ONLY baedalsodae.review
-    ADD CONSTRAINT review_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT review_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -590,7 +650,8 @@ ALTER TABLE ONLY baedalsodae.review
 --
 
 ALTER TABLE ONLY baedalsodae.vector_store
-    ADD CONSTRAINT vector_store_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT vector_store_pkey PRIMARY KEY (id)
+^^^ ---
 
 
 --
@@ -598,7 +659,8 @@ ALTER TABLE ONLY baedalsodae.vector_store
 --
 
 ALTER TABLE ONLY baedalsodae.p_end_area
-    ADD CONSTRAINT uk48liqt663gvogebd75xwexsa3 UNIQUE (adm_code);
+    ADD CONSTRAINT uk48liqt663gvogebd75xwexsa3 UNIQUE (adm_code)
+^^^ ---
 
 
 --
@@ -606,7 +668,8 @@ ALTER TABLE ONLY baedalsodae.p_end_area
 --
 
 ALTER TABLE ONLY baedalsodae.p_user
-    ADD CONSTRAINT uk9739vq99qad264nukqskib9l5 UNIQUE (nickname);
+    ADD CONSTRAINT uk9739vq99qad264nukqskib9l5 UNIQUE (nickname)
+^^^ ---
 
 
 --
@@ -614,7 +677,8 @@ ALTER TABLE ONLY baedalsodae.p_user
 --
 
 ALTER TABLE ONLY baedalsodae.p_sigg_area
-    ADD CONSTRAINT ukc6wffef85ir8q7isat0o44ebb UNIQUE (adm_code);
+    ADD CONSTRAINT ukc6wffef85ir8q7isat0o44ebb UNIQUE (adm_code)
+^^^ ---
 
 
 --
@@ -622,7 +686,8 @@ ALTER TABLE ONLY baedalsodae.p_sigg_area
 --
 
 ALTER TABLE ONLY baedalsodae.p_order
-    ADD CONSTRAINT ukdmica10vdoubxovddj7cf66rj UNIQUE (order_no);
+    ADD CONSTRAINT ukdmica10vdoubxovddj7cf66rj UNIQUE (order_no)
+^^^ ---
 
 
 --
@@ -630,7 +695,8 @@ ALTER TABLE ONLY baedalsodae.p_order
 --
 
 ALTER TABLE ONLY baedalsodae.p_tag
-    ADD CONSTRAINT ukk97bmi9ssbd7u65hmv1dx4udc UNIQUE (name);
+    ADD CONSTRAINT ukk97bmi9ssbd7u65hmv1dx4udc UNIQUE (name)
+^^^ ---
 
 
 --
@@ -638,7 +704,8 @@ ALTER TABLE ONLY baedalsodae.p_tag
 --
 
 ALTER TABLE ONLY baedalsodae.p_user
-    ADD CONSTRAINT ukogywo3ggsigo9oljx32xua8hg UNIQUE (email);
+    ADD CONSTRAINT ukogywo3ggsigo9oljx32xua8hg UNIQUE (email)
+^^^ ---
 
 
 --
@@ -646,7 +713,8 @@ ALTER TABLE ONLY baedalsodae.p_user
 --
 
 ALTER TABLE ONLY baedalsodae.p_user
-    ADD CONSTRAINT ukpk8x5a850e4nwxtqdk3yj2e40 UNIQUE (username);
+    ADD CONSTRAINT ukpk8x5a850e4nwxtqdk3yj2e40 UNIQUE (username)
+^^^ ---
 
 
 --
@@ -654,7 +722,8 @@ ALTER TABLE ONLY baedalsodae.p_user
 --
 
 ALTER TABLE ONLY baedalsodae.p_sido_area
-    ADD CONSTRAINT uktfnfpk2sjgauwc9u1wfhtcfoe UNIQUE (adm_code);
+    ADD CONSTRAINT uktfnfpk2sjgauwc9u1wfhtcfoe UNIQUE (adm_code)
+^^^ ---
 
 
 --
@@ -662,7 +731,8 @@ ALTER TABLE ONLY baedalsodae.p_sido_area
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart_item
-    ADD CONSTRAINT uq_cart_item_menu_item UNIQUE (cart_id, menu_item_id);
+    ADD CONSTRAINT uq_cart_item_menu_item UNIQUE (cart_id, menu_item_id)
+^^^ ---
 
 
 --
@@ -670,7 +740,8 @@ ALTER TABLE ONLY baedalsodae.p_cart_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart
-    ADD CONSTRAINT uq_cart_user_store UNIQUE (user_id);
+    ADD CONSTRAINT uq_cart_user_store UNIQUE (user_id)
+^^^ ---
 
 
 --
@@ -678,7 +749,8 @@ ALTER TABLE ONLY baedalsodae.p_cart
 --
 
 ALTER TABLE ONLY baedalsodae.p_menu_category
-    ADD CONSTRAINT uq_menu_category_order_no UNIQUE (store_id, order_no);
+    ADD CONSTRAINT uq_menu_category_order_no UNIQUE (store_id, order_no)
+^^^ ---
 
 
 --
@@ -686,7 +758,8 @@ ALTER TABLE ONLY baedalsodae.p_menu_category
 --
 
 ALTER TABLE ONLY baedalsodae.p_menu_item
-    ADD CONSTRAINT uq_menu_item_order_no UNIQUE (menu_category_id, order_no);
+    ADD CONSTRAINT uq_menu_item_order_no UNIQUE (menu_category_id, order_no)
+^^^ ---
 
 
 --
@@ -694,7 +767,8 @@ ALTER TABLE ONLY baedalsodae.p_menu_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_store
-    ADD CONSTRAINT uq_store_business_number UNIQUE (business_number);
+    ADD CONSTRAINT uq_store_business_number UNIQUE (business_number)
+^^^ ---
 
 
 --
@@ -702,21 +776,24 @@ ALTER TABLE ONLY baedalsodae.p_store
 --
 
 ALTER TABLE ONLY baedalsodae.p_store_hours
-    ADD CONSTRAINT uq_store_hours_day UNIQUE (store_id, day_of_week);
+    ADD CONSTRAINT uq_store_hours_day UNIQUE (store_id, day_of_week)
+^^^ ---
 
 
 --
 -- Name: uq_menu_category_name_active; Type: INDEX; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE UNIQUE INDEX uq_menu_category_name_active ON baedalsodae.p_menu_category USING btree (store_id, name) WHERE (is_deleted = false);
+CREATE UNIQUE INDEX uq_menu_category_name_active ON baedalsodae.p_menu_category USING btree (store_id, name) WHERE (is_deleted = false)
+^^^ ---
 
 
 --
 -- Name: vector_store_embedding_idx; Type: INDEX; Schema: baedalsodae; Owner: baedalsodae_admin
 --
 
-CREATE INDEX vector_store_embedding_idx ON baedalsodae.vector_store USING hnsw (embedding public.vector_cosine_ops);
+CREATE INDEX vector_store_embedding_idx ON baedalsodae.vector_store USING hnsw (embedding public.vector_cosine_ops)
+^^^ ---
 
 
 --
@@ -724,7 +801,8 @@ CREATE INDEX vector_store_embedding_idx ON baedalsodae.vector_store USING hnsw (
 --
 
 ALTER TABLE ONLY baedalsodae.p_menu_category
-    ADD CONSTRAINT fk1eujvnaldty37vg6tpkac2qby FOREIGN KEY (store_id) REFERENCES baedalsodae.p_store(id);
+    ADD CONSTRAINT fk1eujvnaldty37vg6tpkac2qby FOREIGN KEY (store_id) REFERENCES baedalsodae.p_store(id)
+^^^ ---
 
 
 --
@@ -732,7 +810,8 @@ ALTER TABLE ONLY baedalsodae.p_menu_category
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart
-    ADD CONSTRAINT fk1j68lwv22q6o3emn797nwjyqu FOREIGN KEY (store_id) REFERENCES baedalsodae.p_store(id);
+    ADD CONSTRAINT fk1j68lwv22q6o3emn797nwjyqu FOREIGN KEY (store_id) REFERENCES baedalsodae.p_store(id)
+^^^ ---
 
 
 --
@@ -740,7 +819,8 @@ ALTER TABLE ONLY baedalsodae.p_cart
 --
 
 ALTER TABLE ONLY baedalsodae.p_tag_mapping
-    ADD CONSTRAINT fk5c2mn0ca2wow2thgcwnktm26m FOREIGN KEY (menu_item) REFERENCES baedalsodae.p_menu_item(id);
+    ADD CONSTRAINT fk5c2mn0ca2wow2thgcwnktm26m FOREIGN KEY (menu_item) REFERENCES baedalsodae.p_menu_item(id)
+^^^ ---
 
 
 --
@@ -748,7 +828,8 @@ ALTER TABLE ONLY baedalsodae.p_tag_mapping
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart_item
-    ADD CONSTRAINT fk_cart_item_cart_id FOREIGN KEY (cart_id) REFERENCES baedalsodae.p_cart(id);
+    ADD CONSTRAINT fk_cart_item_cart_id FOREIGN KEY (cart_id) REFERENCES baedalsodae.p_cart(id)
+^^^ ---
 
 
 --
@@ -756,7 +837,8 @@ ALTER TABLE ONLY baedalsodae.p_cart_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_cart_item
-    ADD CONSTRAINT fk_cart_item_menu_item_id FOREIGN KEY (menu_item_id) REFERENCES baedalsodae.p_menu_item(id);
+    ADD CONSTRAINT fk_cart_item_menu_item_id FOREIGN KEY (menu_item_id) REFERENCES baedalsodae.p_menu_item(id)
+^^^ ---
 
 
 --
@@ -764,7 +846,8 @@ ALTER TABLE ONLY baedalsodae.p_cart_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_order_item
-    ADD CONSTRAINT fk_order_item_order_id FOREIGN KEY (order_id) REFERENCES baedalsodae.p_order(id);
+    ADD CONSTRAINT fk_order_item_order_id FOREIGN KEY (order_id) REFERENCES baedalsodae.p_order(id)
+^^^ ---
 
 
 --
@@ -772,7 +855,8 @@ ALTER TABLE ONLY baedalsodae.p_order_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_store
-    ADD CONSTRAINT fk_store_category FOREIGN KEY (store_category_id) REFERENCES baedalsodae.p_store_category(id);
+    ADD CONSTRAINT fk_store_category FOREIGN KEY (store_category_id) REFERENCES baedalsodae.p_store_category(id)
+^^^ ---
 
 
 --
@@ -780,7 +864,8 @@ ALTER TABLE ONLY baedalsodae.p_store
 --
 
 ALTER TABLE ONLY baedalsodae.p_store_hours
-    ADD CONSTRAINT fk_store_hours_store FOREIGN KEY (store_id) REFERENCES baedalsodae.p_store(id);
+    ADD CONSTRAINT fk_store_hours_store FOREIGN KEY (store_id) REFERENCES baedalsodae.p_store(id)
+^^^ ---
 
 
 --
@@ -788,7 +873,8 @@ ALTER TABLE ONLY baedalsodae.p_store_hours
 --
 
 ALTER TABLE ONLY baedalsodae.p_menu_item
-    ADD CONSTRAINT fkahud6ajfc8tdjoa2hslwatpe5 FOREIGN KEY (menu_category_id) REFERENCES baedalsodae.p_menu_category(id);
+    ADD CONSTRAINT fkahud6ajfc8tdjoa2hslwatpe5 FOREIGN KEY (menu_category_id) REFERENCES baedalsodae.p_menu_category(id)
+^^^ ---
 
 
 --
@@ -796,7 +882,8 @@ ALTER TABLE ONLY baedalsodae.p_menu_item
 --
 
 ALTER TABLE ONLY baedalsodae.p_user_address
-    ADD CONSTRAINT fkkrjfeprj94j7tv40rym506du8 FOREIGN KEY (user_id) REFERENCES baedalsodae.p_user(id);
+    ADD CONSTRAINT fkkrjfeprj94j7tv40rym506du8 FOREIGN KEY (user_id) REFERENCES baedalsodae.p_user(id)
+^^^ ---
 
 
 --
@@ -804,7 +891,8 @@ ALTER TABLE ONLY baedalsodae.p_user_address
 --
 
 ALTER TABLE ONLY baedalsodae.p_tag_mapping
-    ADD CONSTRAINT fkrlbjt95f440hlg1f1fg9121kp FOREIGN KEY (tag_id) REFERENCES baedalsodae.p_tag(id);
+    ADD CONSTRAINT fkrlbjt95f440hlg1f1fg9121kp FOREIGN KEY (tag_id) REFERENCES baedalsodae.p_tag(id)
+^^^ ---
 
 
 
@@ -826,7 +914,8 @@ VALUES
     ('a0000001-0000-0000-0000-000000000008', '41', '경기도',     NOW(), NOW(), 0),
     ('a0000001-0000-0000-0000-000000000009', '43', '충청북도',   NOW(), NOW(), 0),
     ('a0000001-0000-0000-0000-000000000010', '44', '충청남도',   NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 0-B. p_sigg_area (10건)
 INSERT INTO baedalsodae.p_sigg_area (id, adm_code, name, created_at, updated_at, version)
@@ -841,7 +930,8 @@ VALUES
     ('b0000002-0000-0000-0000-000000000008', '11650', '서초구',   NOW(), NOW(), 0),
     ('b0000002-0000-0000-0000-000000000009', '11680', '강남구',   NOW(), NOW(), 0),
     ('b0000002-0000-0000-0000-000000000010', '11710', '송파구',   NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 0-C. p_end_area (10건)
 INSERT INTO baedalsodae.p_end_area (id, adm_code, name, created_at, updated_at, version)
@@ -856,7 +946,8 @@ VALUES
     ('c0000003-0000-0000-0000-000000000008', '1156010100', '여의도동', NOW(), NOW(), 0),
     ('c0000003-0000-0000-0000-000000000009', '1168010100', '잠원동',   NOW(), NOW(), 0),
     ('c0000003-0000-0000-0000-000000000010', '1168010400', '역삼1동',  NOW(), NOW(), 0)
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 1. p_user (100건)
 INSERT INTO baedalsodae.p_user (
@@ -884,7 +975,8 @@ SELECT
     NOW() - (random() * INTERVAL '30 days'),
     NULL, NULL, NULL, NULL, false
 FROM generate_series(1, 100) AS i
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 2. p_user_address (100건)
 INSERT INTO baedalsodae.p_user_address (
@@ -906,7 +998,8 @@ FROM (
     ORDER BY created_at
     LIMIT 100
 ) u
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- user_main_address_id 업데이트
 UPDATE baedalsodae.p_user u
@@ -914,7 +1007,8 @@ SET user_main_address_id = (
     SELECT a.id FROM baedalsodae.p_user_address a WHERE a.user_id = u.id LIMIT 1
 )
 WHERE u.user_main_address_id IS NULL
-  AND EXISTS (SELECT 1 FROM baedalsodae.p_user_address a WHERE a.user_id = u.id);
+  AND EXISTS (SELECT 1 FROM baedalsodae.p_user_address a WHERE a.user_id = u.id)
+^^^ ---
 
 -- 3. p_store_category (10건)
 INSERT INTO baedalsodae.p_store_category (
@@ -939,7 +1033,8 @@ FROM (VALUES
 ) AS v(cat_name, cat_desc)
 WHERE NOT EXISTS (
     SELECT 1 FROM baedalsodae.p_store_category WHERE name = v.cat_name
-);
+)
+^^^ ---
 
 -- 4. p_store (100건)
 INSERT INTO baedalsodae.p_store (
@@ -981,7 +1076,8 @@ JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_store_category
 ) cats ON cats.rn = ((i - 1) % 10) + 1
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 5. p_menu_category (100건)
 INSERT INTO baedalsodae.p_menu_category (
@@ -1003,7 +1099,8 @@ FROM generate_series(1, 100) AS i
 JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_store
-) st ON st.rn = i;
+) st ON st.rn = i
+^^^ ---
 
 -- 6. p_menu_item (100건)
 INSERT INTO baedalsodae.p_menu_item (
@@ -1039,7 +1136,8 @@ FROM generate_series(1, 100) AS i
 JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_menu_category
-) mc ON mc.rn = i;
+) mc ON mc.rn = i
+^^^ ---
 
 -- 7. p_cart (100건)
 INSERT INTO baedalsodae.p_cart (id, user_id, store_id, created_at, updated_at)
@@ -1059,7 +1157,8 @@ JOIN (
     FROM baedalsodae.p_store WHERE store_status = 'OPEN'
     LIMIT 100
 ) st ON st.rn = cust.rn
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 8. p_cart_item (100건)
 INSERT INTO baedalsodae.p_cart_item (id, cart_id, menu_item_id, quantity, created_at, updated_at)
@@ -1076,7 +1175,8 @@ FROM (
 JOIN (
     SELECT id, ROW_NUMBER() OVER (ORDER BY created_at) AS rn FROM baedalsodae.p_menu_item LIMIT 100
 ) mi ON mi.rn = c.rn
-ON CONFLICT DO NOTHING;
+ON CONFLICT DO NOTHING
+^^^ ---
 
 -- 9. p_order (100건)
 INSERT INTO baedalsodae.p_order (
@@ -1120,7 +1220,8 @@ JOIN baedalsodae.p_user_address ua ON ua.id = cust.user_main_address_id
 JOIN (
     SELECT id, name, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_store WHERE store_status = 'OPEN'
-) st ON st.rn = ((i - 1) % 90) + 1;
+) st ON st.rn = ((i - 1) % 90) + 1
+^^^ ---
 
 -- 10. p_order_item (100건)
 INSERT INTO baedalsodae.p_order_item (
@@ -1143,7 +1244,8 @@ FROM (
 JOIN (
     SELECT id, name, price, ROW_NUMBER() OVER (ORDER BY created_at) AS rn
     FROM baedalsodae.p_menu_item
-) mi ON mi.rn = o.rn;
+) mi ON mi.rn = o.rn
+^^^ ---
 
 -- 11. p_payment (100건)
 INSERT INTO baedalsodae.p_payment (
@@ -1169,7 +1271,8 @@ SELECT
     o.user_id, o.user_id,
     o.created_at,
     o.created_at + INTERVAL '1 minute'
-FROM baedalsodae.p_order o;
+FROM baedalsodae.p_order o
+^^^ ---
 
 -- 12. 태그 및 태그 매핑 삽입 (메뉴당 3~5개)
 DO $$
@@ -1207,4 +1310,5 @@ BEGIN
             i := i + 1;
         END LOOP;
     END LOOP;
-END $$;
+END $$
+^^^ ---
