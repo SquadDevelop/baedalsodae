@@ -540,3 +540,20 @@ Authorization: {{customerAccessToken}}
 ### Step 37. [고객] 리뷰 조회
 GET {{baseUrl}}/reviews/{{reviewId}}?userId={{customerUserId}}
 Authorization: {{customerAccessToken}}
+
+
+### Step . 마스터 계정의 임베딩 작업
+POST {{baseUrl}}/recommendations/sync-embeddings
+Content-Type: application/json
+Authorization: {{masterAccessToken}}
+
+
+### Step . AI 메뉴 추천
+POST {{baseUrl}}/recommendations/voice
+Content-Type: application/json
+Authorization: {{customerAccessToken}}
+
+{
+  "transcribedText": "아이들이 먹기 좋은거 추천해줘",
+  "userId": " 4b209831-e0e7-4594-b676-dd06114a4837"
+}
