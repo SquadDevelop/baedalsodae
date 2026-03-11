@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("!test")
 @RequiredArgsConstructor
-@DependsOn("dataSourceScriptDatabaseInitializer")
 @Order(2)
 public class DatabaseIndexInitializer implements ApplicationRunner {
 
