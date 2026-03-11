@@ -807,12 +807,6 @@ ALTER TABLE ONLY baedalsodae.p_tag_mapping
     ADD CONSTRAINT fkrlbjt95f440hlg1f1fg9121kp FOREIGN KEY (tag_id) REFERENCES baedalsodae.p_tag(id);
 
 
---
--- PostgreSQL database dump complete
---
-
-\unrestrict 6D8KnLjnaPopOmaUATkQdb6N7rjahzKKwhh4rH2el97xucJxgar3XXWGnTbKKbf
-
 
 
 -- ============================================================
