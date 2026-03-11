@@ -33,4 +33,9 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID
     @Query(
             "SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM MenuCategory c WHERE c.store.id = :storeId AND c.name = :name AND c.isDeleted = false")
     boolean existsByStoreIdAndNameAndDeletedIsFalse(UUID storeId, String name);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(
+            "SELECT c FROM MenuCategory c join fetch c.store WHERE c.id = :id AND c.isDeleted = false")
+    Optional<MenuCategory> findByIdAndDeletedIsFalseWithLock(UUID id);
 }

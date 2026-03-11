@@ -19,6 +19,10 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, UUID> {
     Optional<MenuItem> findByIdAndDeletedIsFalse(@Param("id") UUID id);
 
     @Query(
+            "SELECT m FROM MenuItem m JOIN FETCH m.menuCategory mc JOIN FETCH mc.store LEFT JOIN FETCH m.tagMappings tm LEFT JOIN FETCH tm.tag WHERE m.id = :id AND m.isDeleted = false")
+    Optional<MenuItem> findByIdWithTagMappings(UUID id);
+
+    @Query(
             "SELECT MAX(i.orderNo) FROM MenuItem i WHERE i.menuCategory.id = :menuCategoryId AND i.isDeleted = false")
     Optional<Integer> findMaxOrderNoByMenuCategoryId(UUID menuCategoryId);
 

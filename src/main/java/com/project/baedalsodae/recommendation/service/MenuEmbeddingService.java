@@ -43,7 +43,9 @@ public class MenuEmbeddingService {
             vectorStore.delete(List.of(menuItem.getId().toString()));
             return;
         }
-        Document doc = createDocument(menuItem);
+        MenuItem fresh = menuItemRepository.findByIdWithTagMappings(menuItem.getId()).orElse(null);
+        if (fresh == null) return;
+        Document doc = createDocument(fresh);
         vectorStore.accept(List.of(doc));
     }
 

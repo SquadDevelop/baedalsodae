@@ -19,7 +19,6 @@ import com.project.baedalsodae.tag.service.TagMappingService;
 import com.project.baedalsodae.user.entity.UserRole;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public MenuItemResponseDto createMenuItem(
             UUID menuCategoryId, MenuItemPostRequestDto request, UserDetailsImpl userDetails) {
-        MenuCategory category = getMenuCategoryByMenuCategoryId(menuCategoryId);
+        MenuCategory category = getMenuCategoryByMenuCategoryIdWithLock(menuCategoryId);
         StoreOwnershipValidator.verifyStoreOwnership(
                 category.getStore(), userDetails, ErrorCode.MENU_ITEM_FORBIDDEN);
         UUID storeId = category.getStore().getId();
@@ -54,11 +53,8 @@ public class MenuItemServiceImpl implements MenuItemService {
                         maxOrderNo + 1,
                         request.menuStatus(),
                         category);
-        try {
-            tagMappingService.createTagMappings(menuItemRepository.save(item), request.tagNames());
-        } catch (DataIntegrityViolationException e) {
-            throw new BusinessException(ErrorCode.MENU_ITEM_ORDER_CONFLICT);
-        }
+        tagMappingService.createTagMappings(menuItemRepository.save(item), request.tagNames());
+
         menuEmbeddingService.syncMenuItem(item);
         return MenuItemResponseDto.fromEntity(item);
     }
@@ -215,6 +211,12 @@ public class MenuItemServiceImpl implements MenuItemService {
     private MenuCategory getMenuCategoryByMenuCategoryId(UUID menuCategoryId) {
         return menuCategoryRepository
                 .findByIdAndDeletedIsFalse(menuCategoryId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
+    }
+
+    private MenuCategory getMenuCategoryByMenuCategoryIdWithLock(UUID menuCategoryId) {
+        return menuCategoryRepository
+                .findByIdAndDeletedIsFalseWithLock(menuCategoryId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MENU_CATEGORY_NOT_FOUND));
     }
 }

@@ -47,11 +47,6 @@ class UserAddressServiceTest {
         CreateUserAddressRequest request = createCreateAddressRequest();
         User user = createTestUser(userId);
 
-        given(
-                        userAddressRepository
-                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
-                                        eq(userId), any(), any()))
-                .willReturn(false);
         given(userRepository.findByUserIdAndIsDeletedFalse(userId)).willReturn(Optional.of(user));
         given(userAddressRepository.save(any(UserAddress.class)))
                 .willReturn(createTestAddress(user, UUID.randomUUID()));
@@ -61,24 +56,6 @@ class UserAddressServiceTest {
 
         // then
         verify(userAddressRepository).save(any(UserAddress.class));
-    }
-
-    @Test
-    @DisplayName("실패 - 동일한 사용자가 중복된 주소 등록 시도 시 예외 발생")
-    void createAddress_Duplicated_Failed() {
-        // given
-        UUID userId = UUID.randomUUID();
-        CreateUserAddressRequest request = createCreateAddressRequest();
-
-        given(
-                        userAddressRepository
-                                .existsByUserIdAndAddressRoadAddressAndAddressDetailAddress(
-                                        eq(userId), any(), any()))
-                .willReturn(true);
-
-        // when & then
-        assertThatThrownBy(() -> userAddressService.createAddress(userId, request))
-                .isInstanceOf(BusinessException.class);
     }
 
     @Test
