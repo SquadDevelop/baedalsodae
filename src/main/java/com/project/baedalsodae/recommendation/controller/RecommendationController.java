@@ -1,5 +1,6 @@
 package com.project.baedalsodae.recommendation.controller;
 
+import com.project.baedalsodae.auth.security.UserDetailsImpl;
 import com.project.baedalsodae.recommendation.dto.VoiceRecommendationRequest;
 import com.project.baedalsodae.recommendation.dto.VoiceRecommendationResponse;
 import com.project.baedalsodae.recommendation.service.MenuEmbeddingService;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -23,9 +25,11 @@ public class RecommendationController {
     @PreAuthorize("hasAnyAuthority('ROLE_CUSTOMER', 'ROLE_OWNER', 'ROLE_MANAGER', 'ROLE_MASTER')")
     @PostMapping("/voice")
     public ResponseEntity<VoiceRecommendationResponse> recommendByVoice(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @RequestBody VoiceRecommendationRequest request) {
+
         log.info("[Voice Recommendation] Input Text: {}", request.transcribedText());
-        VoiceRecommendationResponse response = recommendationService.recommendMenuItems(request);
+        VoiceRecommendationResponse response = recommendationService.recommendMenuItems(request, userDetails.getUserId());
         log.info(
                 "[Voice Recommendation] Response AI Message: '{}', Recommended Menu Count: {}",
                 response.aiMessage(),

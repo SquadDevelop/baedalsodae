@@ -63,8 +63,10 @@ class RecommendationControllerTest {
         @Test
         @DisplayName("정상적으로 메뉴를 추천한다")
         void recommendByVoice_success() throws Exception {
+//            UUID userId = UUID.randomUUID();
+
             // given
-            VoiceRecommendationRequest request = new VoiceRecommendationRequest("치킨 추천해줘", userId);
+            VoiceRecommendationRequest request = new VoiceRecommendationRequest("치킨 추천해줘");
 
             List<VoiceRecommendationResponse.RecommendedMenu> menus =
                     List.of(
@@ -80,7 +82,7 @@ class RecommendationControllerTest {
             VoiceRecommendationResponse response =
                     new VoiceRecommendationResponse("고소한 깐풍기의 후라이드 치킨을 추천드려요!", menus);
 
-            given(recommendationService.recommendMenuItems(any(VoiceRecommendationRequest.class)))
+            given(recommendationService.recommendMenuItems(any(VoiceRecommendationRequest.class), any(UUID.class)))
                     .willReturn(response);
 
             // when & then
@@ -122,12 +124,12 @@ class RecommendationControllerTest {
         @DisplayName("추천 결과가 없으면 안내 메시지를 반환한다")
         void recommendByVoice_emptyResult() throws Exception {
             // given
-            VoiceRecommendationRequest request = new VoiceRecommendationRequest("치킨 추천해줘", userId);
+            VoiceRecommendationRequest request = new VoiceRecommendationRequest("치킨 추천해줘");
 
             VoiceRecommendationResponse response =
                     new VoiceRecommendationResponse("죄송해요, 원하시는 조건에 맞는 메뉴를 찾지 못했어요.", List.of());
 
-            given(recommendationService.recommendMenuItems(any(VoiceRecommendationRequest.class)))
+            given(recommendationService.recommendMenuItems(any(VoiceRecommendationRequest.class), any(UUID.class)))
                     .willReturn(response);
 
             // when & then
