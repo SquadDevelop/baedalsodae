@@ -29,7 +29,8 @@ public class RecommendationController {
             @Valid @RequestBody VoiceRecommendationRequest request) {
 
         log.info("[Voice Recommendation] Input Text: {}", request.transcribedText());
-        VoiceRecommendationResponse response = recommendationService.recommendMenuItems(request, userDetails.getUserId());
+        VoiceRecommendationResponse response =
+                recommendationService.recommendMenuItems(request, userDetails.getUserId());
         log.info(
                 "[Voice Recommendation] Response AI Message: '{}', Recommended Menu Count: {}",
                 response.aiMessage(),
